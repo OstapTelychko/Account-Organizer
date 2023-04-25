@@ -6,7 +6,9 @@ from qdarktheme._style_loader import load_stylesheet
 
 
 app = QApplication([])
+
 ALIGMENT = Qt.AlignmentFlag
+APP_ICON = QIcon("./Images/App icon.png")
 
 dark_theme = load_stylesheet("dark")
 dark_theme_icon = QIcon("./Images/Dark theme.png")
@@ -17,16 +19,17 @@ light_theme_icon = QIcon("./Images/Light theme.png")
 # app.setStyleSheet(dark_theme)
 
 messages_list = []
-buttons_list = []
+# buttons_list = []
 
 # print(QFontDatabase.families())
-def create_message(text:str,type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
+def create_error(text:str,type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
     error = QMessageBox(text=text)
     # error.setText(text)
     error.addButton(QMessageBox.StandardButton.Ok)
     error.setWindowTitle("Account Organizer")
     if type_confirm:
         error.addButton(QMessageBox.StandardButton.Cancel)  
+    error.setWindowIcon(APP_ICON)
     error.setIcon(icon)
     messages_list.append(error)
     return error
@@ -38,15 +41,21 @@ def create_button(button_text:str,size:tuple[int])->QPushButton:
     button.setFont(QFont("C059 [urw]",pointSize=10))
     button.setMinimumSize(*size)
     button.setMaximumSize(*size)
-    if button_text not in ("<",">"):
-        buttons_list.append(button)
     return button
+
+
+class Errors():
+    incorrect_data_type_error = create_error("",False,QMessageBox.Icon.Warning)
+    account_alredy_exists_error  = create_error("",False,QMessageBox.Icon.Warning)
+    zero_current_balance_error = create_error("",True,QMessageBox.Icon.Question)
+
 
 
 class Main_window():
     window = QWidget()
     window.resize(1400,750)
     window.setWindowTitle("Account Organizer")
+    window.setWindowIcon(APP_ICON)
 
 
     #Account balance and settings
@@ -150,6 +159,8 @@ class Main_window():
         Income_scroll.setWidgetResizable(True)
         Income_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         Income_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        Income_scroll.setObjectName("Income-window")
+        Income_scroll.setStyleSheet("#Income-window{ border-color:rgb(0,205,0); border-width:2px }")
             
         Income_and_expenses.addTab(Income_scroll,"Income")
 
@@ -163,14 +174,13 @@ class Main_window():
 
 
     window.setLayout(main_layout)
-    window.setWindowIcon(QIcon("./Images/app icon.png"))
 
 
 
 class Settings_window():
     window = QDialog()
     window.resize(600,600)
-    window.setWindowIcon(QIcon("./Images/app icon.png"))
+    window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Settings")
 
     switch_themes_button = QToolButton()
@@ -185,9 +195,9 @@ class Settings_window():
     accounts.setMinimumWidth(200)
     accounts.addItem("Ostap Telychko")
 
-    add_account = create_button("Add account",(120,50))
-    delete_account = create_button("Delete account",(120,50))
-    rename_account = create_button("Rename account",(120,50))
+    add_account = create_button("Add account",(130,50))
+    delete_account = create_button("Delete account",(130,50))
+    rename_account = create_button("Rename account",(150,50))
 
     main_layout = QVBoxLayout()
     main_layout.addWidget(switch_themes_button,alignment=ALIGMENT.AlignHCenter)
@@ -200,5 +210,39 @@ class Settings_window():
     window.setLayout(main_layout)
 
 
-    
 
+class Add_accoount_window():
+    window = QDialog()
+    window.resize(800,800)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Add account")
+
+    message = QLabel()
+    message.setWordWrap(True)
+    message.setMinimumHeight(60)
+
+    Full_name_layout = QHBoxLayout()
+    name = QLineEdit()
+    name.setPlaceholderText("Name")
+    surname = QLineEdit()
+    surname.setPlaceholderText("Surname")
+
+    Full_name_layout.addWidget(name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    Full_name_layout.addWidget(surname,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+
+    button = create_button("",(120,50))
+    current_balance = QLineEdit()
+    current_balance.setPlaceholderText("Current balance")
+
+    main_layout = QVBoxLayout()
+    main_layout.addStretch(1)
+    main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)    
+    main_layout.addStretch(1)
+    main_layout.addLayout(Full_name_layout)
+    main_layout.addStretch(1)
+    main_layout.addWidget(current_balance,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
+    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
+
+    window.setLayout(main_layout)

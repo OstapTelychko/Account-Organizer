@@ -14,6 +14,12 @@ class Account():
             return bool(result)
 
 
+    def get_all_accounts(self)-> list:
+        with self.connection:
+            accounts = self.cursor.execute("select account_name from 'Accounts'").fetchall()
+            return accounts
+
+
     def create_account(self,balance:float | int=0):
         with self.connection:
             self.cursor.execute("insert into 'Accounts' ('account_name','current_balance') values(?,?)",(self.user_name,balance,))
@@ -108,10 +114,10 @@ class Account():
 
     
 
-account = Account("Accounts.sqlite","Hranutel3")
-# account.create_account()
-# account.create_category("Products","expenses")
-account.account_id = account.get_account_id()
-category_id = account.get_category_id("Products","expenses")
-account.create_transaction(category_id,2023,4,18,100,"Ковбаса")
+# account = Account("Accounts.sqlite","Hranutel3")
+# # account.create_account()
+# # account.create_category("Products","expenses")
+# account.account_id = account.get_account_id()
+# category_id = account.get_category_id("Products","expenses")
+# account.create_transaction(category_id,2023,4,18,100,"Ковбаса")
 # print(account.account_exists())

@@ -1,5 +1,6 @@
 from GUI import *
 from Languages import LANGUAGES
+from Accont_mangment import Account
 from datetime import datetime
 import toml
 
@@ -7,6 +8,7 @@ import toml
 Current_balance = 0
 Current_month = datetime.now().month
 Current_year = datetime.now().year
+Accounts_list = []
 
 def update_config():
     with open("./configuration.toml","w",encoding="utf-8") as file:
@@ -39,7 +41,20 @@ def change_language(language):
 
     Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
     Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
+    Main_window.Income_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
 
+    Settings_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][0])
+    Settings_window.delete_account.setText(LANGUAGES[Language]["Account"]["Account management"][0])
+    Settings_window.add_account.setText(LANGUAGES[Language]["Account"]["Account management"][1])
+    Settings_window.rename_account.setText(LANGUAGES[Language]["Account"]["Account management"][2])
+
+    Add_accoount_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][1])
+    Add_accoount_window.name.setPlaceholderText(LANGUAGES[Language]["Account"][0])
+    Add_accoount_window.surname.setPlaceholderText(LANGUAGES[Language]["Account"][1])
+
+    Errors.incorrect_data_type_error.setText(LANGUAGES[Language]["Errors"][0])
+    Errors.account_alredy_exists_error.setText(LANGUAGES[Language]["Errors"][1])
+    Errors.zero_current_balance_error.setText(LANGUAGES[Language]["Errors"][2])
 
 def next_month():
     global Current_month
@@ -77,6 +92,37 @@ def previous_year():
     Main_window.current_year.setText(str(Current_year))
 
 
+def show_add_user_window():
+    Add_accoount_window.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][0])
+    Add_accoount_window.button.setText(LANGUAGES[Language]["General management"][1])
+    Add_accoount_window.window.exec()
+
+
+def add_user():
+    global Current_balance
+
+    name = Add_accoount_window.name.text()
+    surname = Add_accoount_window.surname.text()
+
+    if name.isalpha() and surname.isalpha():
+        account  = Account("./Accounts.sqlite",name+" "+surname)
+        if not account.account_exists():
+            balance = Add_accoount_window.current_balance.text()
+            if balance != "":
+                if balance.isdigit():
+                    account.create_account(int(balance))
+                    Current_balance = int(balance)
+                    Add_accoount_window.window.hide()
+            else:
+                if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
+                    account.create_account(0)
+                    Current_balance = 0
+                    Add_accoount_window.window.hide()
+        else:
+            Errors.account_alredy_exists_error.exec()
+    else:
+        Errors.incorrect_data_type_error.exec()
+
 
 if __name__ == "__main__":
     with open("./configuration.toml") as file:
@@ -102,6 +148,11 @@ if __name__ == "__main__":
     Main_window.settings.clicked.connect(Settings_window.window.exec)
     Settings_window.switch_themes_button.clicked.connect(swith_theme)
     Settings_window.languages.currentIndexChanged.connect(change_language)
+    Settings_window.add_account.clicked.connect(show_add_user_window)
+
+    Add_accoount_window.button.clicked.connect(add_user)
+    
+
     Main_window.next_month_button.clicked.connect(next_month)
     Main_window.previous_month_button.clicked.connect(previous_month)
     Main_window.next_year_button.clicked.connect(next_year)
