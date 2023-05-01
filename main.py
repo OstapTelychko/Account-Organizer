@@ -23,12 +23,23 @@ def swith_theme():
     if Configuration["Theme"] == "Dark":
         app.setStyleSheet(light_theme)
         Settings_window.switch_themes_button.setIcon(light_theme_icon)
+
+        if len(Categories) != 0:
+            for category in Categories:
+                Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(205,205,205)}")
+
         Configuration.update({"Theme" : "Light"})
     elif Configuration["Theme"] == "Light":
         app.setStyleSheet(dark_theme)
         Settings_window.switch_themes_button.setIcon(dark_theme_icon)
+
+        if len(Categories) != 0:
+            for category in Categories:
+                Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
+
         Configuration.update({"Theme" : "Dark"})
     update_config()
+
 
 def change_language(language):
     global Configuration,Language
@@ -62,6 +73,13 @@ def change_language(language):
     Add_category_window.button.setText(LANGUAGES[Language]["General management"][1])
     Add_category_window.window.setWindowTitle(LANGUAGES[Language]["Account"]["Category management"][0])
 
+    Category_settings_window.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
+    Category_settings_window.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
+    Category_settings_window.show_statistics.setText(LANGUAGES[Language]["Account"]["Category management"][3])
+
+    Rename_category_window.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][4])
+    Rename_category_window.button.setText(LANGUAGES[Language]["General management"][2])
+
     for index,error in enumerate(errors_list):
         error.setText(LANGUAGES[Language]["Errors"][index])
         error.button(QMessageBox.StandardButton.Ok).setText(LANGUAGES[Language]["General management"][3])
@@ -76,7 +94,35 @@ def change_language(language):
             Categories[category]["Columns"]["Name"].setText(LANGUAGES[Language]["Account"]["Info"][0])
             Categories[category]["Columns"]["Date"].setText(LANGUAGES[Language]["Account"]["Info"][1])
             Categories[category]["Columns"]["Value"].setText(LANGUAGES[Language]["Account"]["Info"][2])
+            total_value = Categories[category]["Total value"].text().split(" ")[1]
+            Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+total_value)
     
+    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Incomes = Settings_window.total_income.text().split(" ")[2]
+    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
+    Expenses = Settings_window.total_expense.text().split(" ")[2]
+    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
+    Settings_window.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())    
+
+
+def calculate_current_balance():
+    global Current_balance
+
+    Incomes = 0
+    Expenses = 0
+
+    for category in account.get_all_categories():
+        if category[1] == "Incomes":
+            for transaction in account.get_all_transactions(category[0]):
+                Incomes += transaction[5]
+        elif category[1] == "Expenses":
+            for transaction in account.get_all_transactions(category[0]):
+                Expenses += transaction[5]
+    
+    Current_balance = Incomes - Expenses
+    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
+    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
 
 
 def next_month():
@@ -158,13 +204,6 @@ def add_user():
         Errors.incorrect_data_type_error.exec()
 
 
-# def load_account_data():
-#     global Current_balance
-
-#     Current_balance = account.get_account_balance()
-#     Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-
-
 def create_category():
     global Categories
 
@@ -174,32 +213,82 @@ def create_category():
     if not account.category_exists(category_name,category_type):
         account.create_category(category_name,category_type)
         category_id = account.get_category_id(category_name,category_type) 
-        Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language)
+        Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language,Configuration["Theme"])
+        connect_categories_to_settings()
         Add_category_window.window.hide()
     else:
         Errors.category_exists_error.exec()
 
 
 def load_categories():
+    global Categories
+
     for category in account.get_all_categories():
-        Categories[category[0]]=load_category(category[1],category[2],account,category[0],Current_year,Current_month,Language)
+        Categories[category[0]]=load_category(category[1],category[2],account,category[0],Current_year,Current_month,Language,Configuration["Theme"])
 
 
-def show_category_settings(category_name:str,event:bool=False):
-    # for category in Categories:
-    #     print(Categories[category]["Settings"].sender())    
-    Category_settings_window.window.setWindowTitle(category_name)
-    Category_settings_window.window.exec()
+def show_category_settings(category_name:str,useless_variable:bool=False): # I added useless variable to avoid error with Pyside6 which sends False after click on the button
+    if account.category_exists(category_name,CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()]):
+        Category_settings_window.window.setWindowTitle(category_name)
+        Category_settings_window.window.exec()
+
+
+def remove_category():
+    global Categories
+
+    category_name = Category_settings_window.window.windowTitle()
+
+    if Errors.delete_category_question.exec() == QMessageBox.StandardButton.Ok:
+        category_id = account.get_category_id(category_name,CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()])
+        account.delete_category(category_id)
+        Category_settings_window.window.setWindowTitle(" ")
+        Category_settings_window.window.hide()
+
+        Categories[category_id]["Category window"].deleteLater()
+        Categories[category_id]["Settings"].deleteLater()
+        Categories[category_id]["Add transaction"].deleteLater()
+        Categories[category_id]["Rename transaction"].deleteLater()
+        Categories[category_id]["Delete transaction"].deleteLater()
+        del Categories[category_id]
+
+        calculate_current_balance()
+
+
+def rename_category():
+    global Categories
+
+    new_category_name = Rename_category_window.new_category_name.text().strip()
+    current_name = Rename_category_window.window.windowTitle()
+    category_type = CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()]
+
+    if not account.category_exists(new_category_name,category_type):
+        for category in Categories:
+            if Categories[category]["Name"] == current_name:
+                Categories[category].update({"Name":new_category_name})
+                Categories[category]["Settings"].clicked.connect(lambda category_name= new_category_name,useless_variable=False: show_category_settings(category_name=category_name,useless_variable=useless_variable))
+                Categories[category]["Name label"].setText(new_category_name)
+                account.rename_category(account.get_category_id(current_name,category_type),new_category_name)
+                Rename_category_window.window.hide()
+                Category_settings_window.window.hide()
+    else:
+        Errors.category_exists_error.exec()
+
+
+def add_transaction():
+    ...
+
+
+def connect_categories_to_settings():
+    for category in Categories:
+        Categories[category]["Settings"].clicked.connect(lambda category_name= Categories[category]["Name"],useless_variable=False: show_category_settings(category_name=category_name,useless_variable=useless_variable))
 
 
 if __name__ == "__main__":
     with open("./configuration.toml") as file:
         Configuration = toml.load("./configuration.toml")
 
-
     #Load selected language 
     Language = Configuration["Language"]
-    change_language(Language)
     Settings_window.languages.setCurrentIndex([*LANGUAGES.keys()].index(Language))
 
     #Set selected theme
@@ -223,6 +312,11 @@ if __name__ == "__main__":
     Settings_window.add_account.clicked.connect(show_add_user_window)
 
     Add_accoount_window.button.clicked.connect(add_user)
+
+    #Category settings
+    Category_settings_window.delete_category.clicked.connect(remove_category)
+    Category_settings_window.rename_category.clicked.connect(lambda: (Rename_category_window.window.setWindowTitle(Category_settings_window.window.windowTitle()),Rename_category_window.window.exec()))
+    Rename_category_window.button.clicked.connect(rename_category)
     
     #Date management
     Main_window.next_month_button.clicked.connect(next_month)
@@ -235,27 +329,28 @@ if __name__ == "__main__":
     Main_window.add_expenses_category.clicked.connect(Add_category_window.window.exec)
     Add_category_window.button.clicked.connect(create_category)
 
-    #Load last used account name and id
+    #Load last used account name 
     Account_name = Configuration["Account_name"]
 
     #Create new account if it doesn't exist
     if Account_name == "":
         show_add_user_window()
     
+    #Connect to db
     account = Account("./Accounts.sqlite",Account_name)
     account.get_account_id()
 
+    #Load categories if they exists
     if len(account.get_all_categories()) > 0:
         load_categories()
-
-    for category in Categories:
-        Categories[category]["Settings"].clicked.connect(lambda category_name= Categories[category]["Name"],event=False: show_category_settings(category_name=category_name,event=event))
-        # print(id(Categories[category]["Settings"]))
+    connect_categories_to_settings()
 
     [Accounts_list.append(item[0]) for item in account.get_all_accounts()]
     Settings_window.accounts.addItems(Accounts_list)
     Settings_window.accounts.setCurrentText(Account_name)
 
+    calculate_current_balance()
+    change_language(Language)
 
     Main_window.window.show()
     app.exec()

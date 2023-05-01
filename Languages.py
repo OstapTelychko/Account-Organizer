@@ -41,6 +41,10 @@ LANGUAGES = {
                 3:"Balance ",
                 4:"Incomes",
                 5:"Expenses",
+                6:"Total: ",
+                7:"Total income: ",
+                8:"Total expense: ",
+                9:"Created "
             },
             "Transactions management":{
                 0:"Create transaction",
@@ -50,14 +54,17 @@ LANGUAGES = {
             "Category management":{
                 0:"Create category",
                 1:"Delete category",
-                2:"Rename category"
+                2:"Rename category",
+                3:"Statistics",
+                4:"New name"
             }
         },
         "Errors":{
             0:"You entered invalid type of data, check them again",
             1:"Account with this name alredy exists",
             2:"You haven't entered a current balance, i will count it as 0 (if that's not true value there may be discrepancy between current and actual balance)",
-            3:"This category already exists"
+            3:"This category already exists",
+            4:"Are you sure you want to delete the category? You will lose ALL transactions added to this category and your current balance will be recalculated"
         },
         "Windows":{
             0:"Settings",
@@ -108,6 +115,10 @@ LANGUAGES = {
                 3:"Баланс ",
                 4:"Доходи",
                 5:"Витрати",
+                6:"Загалом: ",
+                7:"Загальний дохід: ",
+                8:"Загальні витрати: ",
+                9:"Акаунт створенний ",
             },
             "Transactions management":{
                 0:"Створити транзакцію",
@@ -117,14 +128,17 @@ LANGUAGES = {
             "Category management":{
                 0:"Додати категорію",
                 1:"Видалити категорію",
-                2:"Переназвати категорію"
+                2:"Переназвати категорію",
+                3:"Статистика",
+                4:"Нова назва"
             }
         },
         "Errors":{
             0:"Ви ввели не правильний тип даних, перевірте їх знов",
             1:"Акаунт під такою назвою вже існує",
             2:"Ви не ввели поточного балансу, я зарахую це як 0 (якщо це не є правдим значенням, можуть виникнути розбіжності з реальним і поточним балансом). Продовжити?",
-            3:"Ця категорія вже існує"
+            3:"Ця категорія вже існує",
+            4:"Ви впевненні що хочете видалити категорію? Ви втратите ВСІ транзакції, які були записані до цієї категорії і поточний баланс буде перерахований"
         },
         "Windows":{
             0:"Налаштування",

@@ -26,6 +26,12 @@ class Account():
             self.get_account_id()
 
 
+    def get_account_date(self)->str:
+        with self.connection:
+            date = self.cursor.execute("select date from 'Accounts' where id=?",(self.account_id,)).fetchone()[0]
+            return date
+
+
     def get_account_id(self):
         "Set account id"
         with self.connection:
@@ -77,14 +83,14 @@ class Account():
             return categories
 
 
-    def rename_category(self,category_id:int):
+    def rename_category(self,category_id:int,new_name:str):
         with self.connection:
-            self.cursor.execute("update categories set category_name where category_id=?",(category_id,))
+            self.cursor.execute("update Categories set category_name=? where id=?",(new_name,category_id))
 
 
     def delete_category(self,category_id:int):
         with self.connection:
-            self.cursor.execute("delete from 'Categories' where category_id=?",(category_id,))
+            self.cursor.execute("delete from 'Categories' where id=?",(category_id,))
 
 
     def delete_transaction(self,category_id:int,year:int,month:int,day:int,value:int|float,name:str):
@@ -113,7 +119,12 @@ class Account():
         with self.connection:
             transactions = self.cursor.execute("select * from 'Transactions' where category_id=? and year=?",(category_id,year,)).fetchall()
             return transactions
+    
 
+    def get_all_transactions(self,category_id:int):
+        with self.connection:
+            transactions = self.cursor.execute("select * from 'Transactions' where category_id=?",(category_id,)).fetchall()
+            return transactions
     
 
 

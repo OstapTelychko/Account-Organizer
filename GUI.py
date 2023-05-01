@@ -1,12 +1,12 @@
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QListWidget,QScrollArea,QApplication,QGridLayout,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QGridLayout,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QPixmap,QIcon,QFont,QFontDatabase
 from qdarktheme._style_loader import load_stylesheet
 from Accont_mangment import Account
 from Languages import LANGUAGES
 
-
-
+# QListWidgetItem()
+# QListWidget.addItem
 app = QApplication([])
 
 ALIGMENT = Qt.AlignmentFlag
@@ -15,13 +15,10 @@ APP_ICON = QIcon("./Images/App icon.png")
 dark_theme = load_stylesheet("dark")
 dark_theme_icon = QIcon("./Images/Dark theme.png")
 
-light_theme = load_stylesheet("light",custom_colors={"background":"#ffffff","foreground":"#191a1b"})
+light_theme = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})
 light_theme_icon = QIcon("./Images/Light theme.png")
 
-# app.setStyleSheet(dark_theme)
-
 errors_list = []
-# buttons_list = []
 
 # print(QFontDatabase.families())
 def create_error(text:str,type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
@@ -46,7 +43,7 @@ def create_button(button_text:str,size:tuple[int])->QPushButton:
     return button
 
 
-def load_category(type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str)-> dict:
+def load_category(category_type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str,theme:str)-> dict:
     """Add category to user window
 
         Args:
@@ -65,14 +62,21 @@ def load_category(type:str,name:str,account:Account,category_id:int,year:int,mon
             `Language` (str): Language for buttons and columns
 
         Returns:
-            `category` (dict): Dictionary with category name and link on add, delete, rename transaction buttons
+            `category` (dict): Dictionary with category name, type and link on add, delete, rename transaction buttons
     """
+
     category = {}
+    category["Type"] = category_type
 
     category_window = QWidget()
     category_layout = QVBoxLayout()
+
+    category_total_value = QLabel("")
+    category["Total value"] = category_total_value
+
     category_name = QLabel(name)
     category["Name"] = name
+    category["Name label"] = category_name
 
     category_settings = QToolButton()
     category_settings.setIcon(QIcon("./Images/Settings icon.png"))
@@ -80,42 +84,60 @@ def load_category(type:str,name:str,account:Account,category_id:int,year:int,mon
     category["Settings"] = category_settings
 
     Category_general_info = QHBoxLayout()
+    Category_general_info.addWidget(category_total_value, alignment=ALIGMENT.AlignLeft)
     Category_general_info.addWidget(category_name, alignment=ALIGMENT.AlignHCenter)
-    Category_general_info.addWidget(category_settings)
+    Category_general_info.addWidget(category_settings,alignment=ALIGMENT.AlignRight)
 
-    category_data = QWidget()
-    category_data_layout = QGridLayout()
+    category_data = QTableWidget()
+    category["Category data"] = category_data
 
-    transaction_name_title = QLabel(LANGUAGES[Language]["Account"]["Info"][0])
-    transaction_day_title = QLabel(LANGUAGES[Language]["Account"]["Info"][1])
-    transaction_value_title = QLabel(LANGUAGES[Language]["Account"]["Info"][2])
+    category_data.setMinimumWidth(600)
+    category_data.setMinimumHeight(300)
+    if theme == "Dark":
+        category_data.setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
+    category_data.setColumnCount(3)
+
+    header = category_data.horizontalHeader()
+    header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+    header.setSectionResizeMode(0,QHeaderView.ResizeMode.Stretch)
+
+    row = category_data.verticalHeader()
+    row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+    category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0],LANGUAGES[Language]["Account"]["Info"][1],LANGUAGES[Language]["Account"]["Info"][2]))
+
+    transaction_name_title = QTableWidgetItem()
+    transaction_day_title = QTableWidgetItem(LANGUAGES[Language]["Account"]["Info"][1])
+    transaction_value_title = QTableWidgetItem(LANGUAGES[Language]["Account"]["Info"][2])
 
     category["Columns"] = {}
     category["Columns"]["Name"] = transaction_name_title
     category["Columns"]["Date"] = transaction_day_title
     category["Columns"]["Value"] = transaction_value_title
 
-    category_data_layout.addWidget(transaction_name_title,0,0)
-    category_data_layout.addWidget(transaction_day_title,0,1,alignment=ALIGMENT.AlignLeft)
-    category_data_layout.addWidget(transaction_value_title,0,2,alignment=ALIGMENT.AlignLeft)
+    # category_data.setHorizontalHeaderLabels(0,0,transaction_name_title)
+    # category_data.setItem(0,1,transaction_day_title)
+    # category_data.setItem(0,2,transaction_value_title)
 
     transactions = account.get_transactions_by_month(category_id,year,month)
-    if len(transactions) > 0: #Check if transactions are in db
-        for index,transaction in enumerate(transactions):
-            transaction_name = QLabel(transaction[6])
-            transaction_day = QLabel(str(transaction[4]))
-            transaction_value = QLabel(str(transaction[5]))
-            category_data_layout.addWidget(transaction_name,index+1,0)
-            category_data_layout.addWidget(transaction_day,index+1,1,alignment=ALIGMENT.AlignLeft)
-            category_data_layout.addWidget(transaction_value,index+1,2,alignment=ALIGMENT.AlignLeft)
+    total_value = 0
 
-    category_data.setLayout(category_data_layout)
-    category_data_scroll = QScrollArea()
-    category_data_scroll.setWidget(category_data)
-    category_data_scroll.setWidgetResizable(True)
-    category_data_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    category_data_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-    category_data_scroll.setMinimumWidth(400)
+    if len(transactions) > 0: #Check if transactions are in db
+        category_data.setRowCount(len(transactions))
+        for index,transaction in enumerate(transactions):
+            category_data.setItem(index,0,QTableWidgetItem(transaction[6]))
+            category_data.setItem(index,1,QTableWidgetItem(str(transaction[4])))
+            category_data.setItem(index,2,QTableWidgetItem(str(transaction[5])))
+            total_value += transaction[5]
+    category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(total_value))
+    # category_data.show(
+    # category_data.setLayout(category_data_layout)
+    # category_data_scroll = QScrollArea()
+    # category_data_scroll.setWidget(category_data)
+    # category_data_scroll.setWidgetResizable(True)
+    # category_data_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    # category_data_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+    # category_data_scroll.setMinimumWidth(400)
 
     add_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][0],(155,40))
     delete_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][1],(155,40))
@@ -132,13 +154,14 @@ def load_category(type:str,name:str,account:Account,category_id:int,year:int,mon
 
     category_layout.addStretch(1)
     category_layout.addLayout(Category_general_info)
-    category_layout.addWidget(category_data_scroll,alignment=ALIGMENT.AlignVCenter)
+    category_layout.addWidget(category_data,alignment=ALIGMENT.AlignVCenter)
     category_layout.addLayout(transactions_managment)
     category_layout.addStretch(1)
 
     category_window.setLayout(category_layout)
+    category["Category window"] = category_window
 
-    if type == "Incomes":
+    if category_type == "Incomes":
         Main_window.Incomes_window_layout.addWidget(category_window)
     else:
         Main_window.Expenses_window_layout.addWidget(category_window)
@@ -150,6 +173,7 @@ class Errors():
     account_alredy_exists_error  = create_error("",False,QMessageBox.Icon.Warning)
     zero_current_balance_error = create_error("",True,QMessageBox.Icon.Question)
     category_exists_error = create_error("",False,QMessageBox.Icon.Warning)
+    delete_category_question = create_error("",True,QMessageBox.Icon.Question)
 
 
 
@@ -211,7 +235,7 @@ class Main_window():
 
     Incomes_window_layout.setSpacing(70)
     Incomes_window.setLayout(Incomes_window_layout)
-    # Incomes_window.setUpdatesEnabled(True)
+    Incomes_window.setUpdatesEnabled(True)
 
     Incomes_scroll = QScrollArea()
     Incomes_scroll.setWidget(Incomes_window)
@@ -220,7 +244,7 @@ class Main_window():
     Incomes_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     Incomes_scroll.setObjectName("Income-window")
     Incomes_scroll.setStyleSheet("#Income-window{ border-color:rgba(0,205,0,100); border-width:2px }")
-    # Incomes_scroll.setUpdatesEnabled(True)
+    Incomes_scroll.setUpdatesEnabled(True)
         
     Expenses_window = QWidget()
     Expenses_window_layout = QHBoxLayout()
@@ -230,6 +254,7 @@ class Main_window():
         
     Expenses_window_layout.setSpacing(70)
     Expenses_window.setLayout(Expenses_window_layout)
+    Expenses_window.setUpdatesEnabled(True)
 
     Expenses_scroll = QScrollArea()
     Expenses_scroll.setWidget(Expenses_window)
@@ -238,6 +263,7 @@ class Main_window():
     Expenses_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     Expenses_scroll.setObjectName("Expenses-window")
     Expenses_scroll.setStyleSheet("#Expenses-window{ border-color:rgba(205,0,0,100); border-width:2px }")
+    Expenses_scroll.setUpdatesEnabled(True)
 
     Incomes_and_expenses.addTab(Incomes_scroll,"Income")
     Incomes_and_expenses.addTab(Expenses_scroll,"Expenses")
@@ -274,13 +300,21 @@ class Settings_window():
     delete_account = create_button("Delete account",(130,50))
     rename_account = create_button("Rename account",(150,50))
 
+    total_income = QLabel()
+    total_expense = QLabel()
+    account_created_date = QLabel()
+
     main_layout = QVBoxLayout()
+    main_layout.setSpacing(50)
     main_layout.addWidget(switch_themes_button,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(languages,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(accounts,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(add_account,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(rename_account,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(delete_account,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(total_income,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
+    main_layout.addWidget(total_expense,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
+    main_layout.addWidget(account_created_date,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
 
     window.setLayout(main_layout)
 
@@ -292,7 +326,7 @@ class Category_settings_window():
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle(" ")
 
-    rename_category = create_button("Rename category",(160,40))
+    rename_category = create_button("Rename category",(165,40))
     delete_category = create_button("Delete category",(160,40))
     show_statistics = create_button("Statistics",(150,40))
 
@@ -360,5 +394,26 @@ class Add_category_window():
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
 
     window.setLayout(main_layout)
+
+
+
+class Rename_category_window():
+    window = QDialog()
+    window.resize(600,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Rename")
+
+    new_category_name = QLineEdit()
+    new_category_name.setMinimumWidth(150)
+    new_category_name.setPlaceholderText("New name")
+    button = create_button("Rename",(150,40))
+
+    main_layout = QVBoxLayout()
+    # main_layout.addSt
+    main_layout.addWidget(new_category_name,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+
+    window.setLayout(main_layout)
+
 
 
