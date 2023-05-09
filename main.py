@@ -1,10 +1,20 @@
 from GUI import *
 from Languages import LANGUAGES
 from Accont_mangment import Account
-from datetime import datetime
+from datetime import datetime,date,timedelta
 import toml
+from calendar import monthrange
 
+# print(calendar.monthrange(2023,4))
 
+# today = date(2023,4,1)
+# start = today - timedelta(days=today.weekday())
+# end = start + timedelta(days=6)
+# print("Today: " + str(today))
+# print("Start: " + str(start.day))
+# print("End: " + str(end.day))
+# number = 0.4353535353
+# print(f"{number:.0f}")
 Current_balance = 0
 Current_month = datetime.now().month
 Current_year = datetime.now().year
@@ -80,6 +90,11 @@ def change_language(language):
     Rename_category_window.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][4])
     Rename_category_window.button.setText(LANGUAGES[Language]["General management"][2])
 
+    Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][5])
+    Transaction_management_window.transaction_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
+    Transaction_management_window.transaction_day.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][1])
+    Transaction_management_window.transaction_value.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][2])
+
     for index,error in enumerate(errors_list):
         error.setText(LANGUAGES[Language]["Errors"][index])
         error.button(QMessageBox.StandardButton.Ok).setText(LANGUAGES[Language]["General management"][3])
@@ -90,10 +105,8 @@ def change_language(language):
         for category in Categories:
             Categories[category]["Add transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][0])
             Categories[category]["Delete transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][1])
-            Categories[category]["Rename transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][2])
-            Categories[category]["Columns"]["Name"].setText(LANGUAGES[Language]["Account"]["Info"][0])
-            Categories[category]["Columns"]["Date"].setText(LANGUAGES[Language]["Account"]["Info"][1])
-            Categories[category]["Columns"]["Value"].setText(LANGUAGES[Language]["Account"]["Info"][2])
+            Categories[category]["Edit transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][2])
+            Categories[category]["Category data"].setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0],LANGUAGES[Language]["Account"]["Info"][1],LANGUAGES[Language]["Account"]["Info"][2]))
             total_value = Categories[category]["Total value"].text().split(" ")[1]
             Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+total_value)
     
@@ -214,7 +227,7 @@ def create_category():
         account.create_category(category_name,category_type)
         category_id = account.get_category_id(category_name,category_type) 
         Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language,Configuration["Theme"])
-        connect_categories_to_settings()
+        activate_categories()
         Add_category_window.window.hide()
     else:
         Errors.category_exists_error.exec()
@@ -227,7 +240,7 @@ def load_categories():
         Categories[category[0]]=load_category(category[1],category[2],account,category[0],Current_year,Current_month,Language,Configuration["Theme"])
 
 
-def show_category_settings(category_name:str,useless_variable:bool=False): # I added useless variable to avoid error with Pyside6 which sends False after click on the button
+def show_category_settings(category_name:str):
     if account.category_exists(category_name,CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()]):
         Category_settings_window.window.setWindowTitle(category_name)
         Category_settings_window.window.exec()
@@ -247,7 +260,7 @@ def remove_category():
         Categories[category_id]["Category window"].deleteLater()
         Categories[category_id]["Settings"].deleteLater()
         Categories[category_id]["Add transaction"].deleteLater()
-        Categories[category_id]["Rename transaction"].deleteLater()
+        Categories[category_id]["Edit transaction"].deleteLater()
         Categories[category_id]["Delete transaction"].deleteLater()
         del Categories[category_id]
 
@@ -274,18 +287,145 @@ def rename_category():
         Errors.category_exists_error.exec()
 
 
-def add_transaction():
-    ...
+def update_category_total_value(category_id:int):
+    transactions = account.get_transactions_by_month(category_id,Current_year,Current_month)
+    total_value = 0
+
+    if len(transactions) != 0:
+        for transaction in transactions:
+            total_value += transaction[5]
+    Categories[category_id]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+str(total_value))
+    
+
+def show_edit_transaction_window(category_name:str,category_data:QTableWidget):
+    selected_row = category_data.selectedItems()
+    if len(selected_row) != 0 and  not len(selected_row) < 3:
+        if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
+            Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][5])
+            Transaction_management_window.message.setText(LANGUAGES[Language]["Account"]["Transactions management"]["Messages"][0])
+            Transaction_management_window.window.setWindowTitle(category_name)
+            Transaction_management_window.transaction_name.setText(selected_row[0].text())
+            Transaction_management_window.transaction_day.setText(selected_row[1].text)
+            Transaction_management_window.transaction_value.setText(selected_row[2].text())
+            Transaction_management_window.transaction_id = int(category_data.item(selected_row[0].row(),3).text())
+            Transaction_management_window.window.exec()
+        else:
+            Errors.only_one_row_error.exec()
+    else:
+        Errors.unselected_row_error.exec()
 
 
-def connect_categories_to_settings():
+def update_transaction(transaction_id:int,transaction_name:str,transaction_day:int,transaction_value:int|float,category_data:QTableWidget):
+    account.update_transaction(transaction_id,transaction_name,transaction_day,transaction_value)
+                
+    for row in range(category_data.rowCount()):
+        if int(category_data.item(row,3).text()) == transaction_id:
+            category_data.item(row,0).setText(transaction_name)
+            category_data.item(row,1).setData(Qt.ItemDataRole.EditRole,transaction_day)
+            category_data.item(row,2).setData(Qt.ItemDataRole.EditRole,transaction_value)
+
+
+def show_add_transaction_window(category_name:str):
+    Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][1])
+    Transaction_management_window.message.setText(LANGUAGES[Language]["Account"]["Transactions management"]["Messages"][1])
+    Transaction_management_window.transaction_name.setText("")
+    Transaction_management_window.transaction_day.setText("")
+    Transaction_management_window.transaction_value.setText("")
+
+    Transaction_management_window.window.setWindowTitle(category_name)
+    Transaction_management_window.window.exec()
+
+
+def add_transaction(transaction_name:str,transaction_day:int,transaction_value:int|float,category_data:QTableWidget,category_id):
+    account.add_transaction(category_id,Current_year,Current_month,transaction_day,transaction_value,transaction_name)
+
+    row = category_data.rowCount()
+    category_data.setRowCount(row+1)
+
+    day = QTableWidgetItem()
+    day.setData(Qt.ItemDataRole.DisplayRole,transaction_day)
+    value = QTableWidgetItem()
+    value.setData(Qt.ItemDataRole.DisplayRole,transaction_value)
+    category_data.setItem(row,0,QTableWidgetItem(transaction_name))
+    category_data.setItem(row,1,day)
+    category_data.setItem(row,2,value)
+
+
+def transaction_data_handler():
+    transaction_name = Transaction_management_window.transaction_name.text().strip()
+    transaction_day = Transaction_management_window.transaction_day.text()
+    transaction_value = Transaction_management_window.transaction_value.text()
+    transaction_id = Transaction_management_window.transaction_id
+    category_id = account.get_category_id(Transaction_management_window.window.windowTitle(),CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()])
+    category_data = Categories[category_id]["Category data"]
+
+    if  transaction_day != "" or transaction_value != "":
+        if transaction_day.isalnum() and transaction_value.replace(".","").isdigit():
+            transaction_day = int(transaction_day)
+            max_month_day = monthrange(Current_year,Current_month)[1]
+            if 0 < transaction_day <= max_month_day:
+                if transaction_value.find("."):
+                    transaction_value = float(transaction_value)
+                else:
+                    transaction_value = int(transaction_value)
+
+                if Transaction_management_window.button.text() == LANGUAGES[Language]["General management"][5]: #Update 
+                    update_transaction(transaction_id,transaction_name,transaction_day,transaction_value,category_data)
+                else: #Add
+                    add_transaction(transaction_name,transaction_day,transaction_value,category_data,category_id)
+
+                update_category_total_value(category_id)
+                calculate_current_balance()
+                Transaction_management_window.window.hide()
+            else:
+                Errors.day_out_range_error.setText(LANGUAGES[Language]["Errors"][8]+f"1-{max_month_day}")
+                Errors.day_out_range_error.exec()
+        else:
+            Errors.incorrect_data_type_error.exec()
+    else:
+        Errors.empty_fields_error.exec()
+
+
+def remove_transaction(category_data:QTableWidget):
+    selected_row = category_data.selectedItems()
+    if len(selected_row) != 0 and  not len(selected_row) < 3:
+        if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
+            print(category_data.item(0,3))
+            transaction_id = category_data.item(selected_row[0].row(),3).data(Qt.ItemDataRole.EditRole)
+            if Errors.delete_transaction_question.exec() == QMessageBox.StandardButton.Ok:
+                account.delete_transaction(transaction_id)
+
+                print(category_data.rowCount())
+                for row in range(category_data.rowCount()):
+                    if category_data.item(row,3).data(Qt.ItemDataRole.EditRole) == transaction_id:
+                        category_data.removeRow(row)
+                        break
+                
+                category_data.setRowCount(category_data.rowCount())
+                header = category_data.horizontalHeader()
+                header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+                header.setSectionResizeMode(0,QHeaderView.ResizeMode.Stretch)
+                row = category_data.verticalHeader()
+                row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+                print(category_data.rowCount())
+        else:
+            Errors.only_one_row_error.exec()
+    else:
+        Errors.unselected_row_error.exec()
+
+
+def activate_categories():
     for category in Categories:
-        Categories[category]["Settings"].clicked.connect(lambda category_name= Categories[category]["Name"],useless_variable=False: show_category_settings(category_name=category_name,useless_variable=useless_variable))
+        Categories[category]["Settings"].clicked.connect(lambda category_name = Categories[category]["Name"],_=False: show_category_settings(category_name=category_name))
+        Categories[category]["Add transaction"].clicked.connect(lambda category_name = Categories[category]["Name"],_=False: show_add_transaction_window(category_name))
+        Categories[category]["Edit transaction"].clicked.connect(lambda category_name= Categories[category]["Name"],category_data = Categories[category]["Category data"]:show_edit_transaction_window(category_name=category_name,category_data=category_data))
+        Categories[category]["Delete transaction"].clicked.connect(lambda category_data = Categories[category]["Category data"],_=False:remove_transaction(category_data))
 
 
 if __name__ == "__main__":
     with open("./configuration.toml") as file:
         Configuration = toml.load("./configuration.toml")
+
 
     #Load selected language 
     Language = Configuration["Language"]
@@ -317,6 +457,7 @@ if __name__ == "__main__":
     Category_settings_window.delete_category.clicked.connect(remove_category)
     Category_settings_window.rename_category.clicked.connect(lambda: (Rename_category_window.window.setWindowTitle(Category_settings_window.window.windowTitle()),Rename_category_window.window.exec()))
     Rename_category_window.button.clicked.connect(rename_category)
+    Transaction_management_window.button.clicked.connect(transaction_data_handler)
     
     #Date management
     Main_window.next_month_button.clicked.connect(next_month)
@@ -343,7 +484,7 @@ if __name__ == "__main__":
     #Load categories if they exists
     if len(account.get_all_categories()) > 0:
         load_categories()
-    connect_categories_to_settings()
+    activate_categories()
 
     [Accounts_list.append(item[0]) for item in account.get_all_accounts()]
     Settings_window.accounts.addItems(Accounts_list)

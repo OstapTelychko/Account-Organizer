@@ -93,12 +93,17 @@ class Account():
             self.cursor.execute("delete from 'Categories' where id=?",(category_id,))
 
 
-    def delete_transaction(self,category_id:int,year:int,month:int,day:int,value:int|float,name:str):
+    def delete_transaction(self,transaction_id:int):
         with self.connection:
-            self.cursor.execute("delete  from 'Transactions' where category_id=? and year=? and month=? and day=? and value=? and name=?",(category_id,year,month,day,value,name,)).fetchone()[0]
+            self.cursor.execute("delete  from 'Transactions' where id=?",(transaction_id,))
             
 
-    def create_transaction(self,category_id:int,year:int,month:int,day:int,value:int|float,name:str):
+    def update_transaction(self,transaction_id:int,transaction_name:str,transaction_day:int,transaction_value:int):
+        with self.connection:
+            self.cursor.execute("update Transactions set name=?, day=?, value=? where id=?",(transaction_name,transaction_day,transaction_value,transaction_id,))
+
+
+    def add_transaction(self,category_id:int,year:int,month:int,day:int,value:int|float,name:str):
         with self.connection:
             self.cursor.execute("insert into 'Transactions' (category_id,year,month,day,value,name) values(?,?,?,?,?,?)",(category_id,year,month,day,value,name,))
     
