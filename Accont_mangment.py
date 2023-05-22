@@ -2,15 +2,15 @@ import sqlite3
 from functools import cache
 
 class Account():
-    def __init__(self,database:str,user_name:str):
-        self.connection = sqlite3.connect(database) 
+    def __init__(self,user_name:str):
+        self.connection = sqlite3.connect("./Accounts.sqlite") 
         self.cursor = self.connection.cursor()
         self.account_name = user_name
 
 
-    def account_exists(self)-> bool:
+    def account_exists(self,name:str)-> bool:
         with self.connection:
-            result = self.cursor.execute("select * from 'Accounts' where account_name=?",(self.account_name,)).fetchone()
+            result = self.cursor.execute("select * from 'Accounts' where account_name=?",(name,)).fetchone()
             return bool(result)
 
 
@@ -23,7 +23,7 @@ class Account():
     def create_account(self,balance:float | int=0):
         with self.connection:
             self.cursor.execute("insert into 'Accounts' ('account_name','current_balance') values(?,?)",(self.account_name,balance,))
-            self.get_account_id()
+            self.set_account_id()
 
 
     def get_account_date(self)->str:
@@ -32,7 +32,7 @@ class Account():
             return date
 
 
-    def get_account_id(self):
+    def set_account_id(self):
         "Set account id"
         with self.connection:
             id = self.cursor.execute("select id from 'Accounts' where account_name=?",(self.account_name,)).fetchone()[0]
@@ -49,9 +49,9 @@ class Account():
             self.cursor.execute("update 'Accounts' set balance=?, where account_name=?",(balance,self.account_name,))
 
 
-    def rename_account(self,account_id:int,new_account_name:str):
+    def rename_account(self,old_name:int,new_account_name:str):
         with self.connection:
-            self.cursor.execute("update 'Accounts' set account_name=? where id = ?",(new_account_name,account_id,))
+            self.cursor.execute("update 'Accounts' set account_name=? where account_name = ?",(new_account_name,old_name,))
             self.account_name = new_account_name
     
 
@@ -107,6 +107,12 @@ class Account():
         with self.connection:
             self.cursor.execute("insert into 'Transactions' (category_id,year,month,day,value,name) values(?,?,?,?,?,?)",(category_id,year,month,day,value,name,))
     
+
+    def get_last_transaction_id(self)->int:
+        with self.connection:
+            id = self.cursor.execute("select id from 'Transactions' order by id desc").fetchone()[0]
+            return id
+
 
     def get_transactions_by_day(self,category_id:int,year:int,month:int,day:int):
         with self.connection:

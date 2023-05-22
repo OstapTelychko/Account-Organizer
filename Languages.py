@@ -1,3 +1,5 @@
+from GUI import *
+
 LANGUAGES = {
     "English":{
         "Months":{
@@ -25,13 +27,15 @@ LANGUAGES = {
         "Account":{
             0:"Name",
             1:"Surname",
+            2:"Current balance",
             "Account management":{
                 0:"Delete account",
                 1:"Create account",
                 2:"Rename account",
+                3:"New name",
+                4:"New surname",
                 "Messages":{
                     0:"Enter name and surname to create a new account. (You can't use the same full name)",
-                    1:"Enter name and surname to delete account. ",
                     1:"Enter new name and surname to rename account. "
                 }
             },
@@ -45,7 +49,17 @@ LANGUAGES = {
                 6:"Total: ",
                 7:"Total income: ",
                 8:"Total expense: ",
-                9:"Created "
+                9:"Created ",
+                "Statistics":{
+                    0:"Statistics",
+                    1:"Monthly",
+                    2:"Quarterly",
+                    3:"Yearly",
+                    4:"Total income ",
+                    5:"Acerage income ",
+                    6:"Total expenses ",
+                    7:"Average expenses "
+                }
             },
             "Transactions management":{
                 0:"Add transaction",
@@ -65,27 +79,36 @@ LANGUAGES = {
                 0:"Create category",
                 1:"Delete category",
                 2:"Rename category",
-                3:"Statistics",
                 4:"New name",
             }
         },
         "Errors":{
-            0:"You entered invalid type of data, check them again",
+            0:"You have entered invalid type of data, check them again",
             1:"Account with this name alredy exists",
             2:"You haven't entered a current balance, i will count it as 0 (if that's not true value there may be discrepancy between current and actual balance)",
             3:"This category already exists",
             4:"Are you sure you want to delete the category? You will lose ALL transactions added to this category and your current balance will be recalculated",
             5:"Select transaction. (Click on transaction number to select)",
             6:"Please select only 1 row",
-            7:"You can't leave the date and value fields empty",
+            7:"You can't leave the fields empty",
             8:"The day must be in range ",
-            9:"Are you sure you want to remove transaction?"
+            9:"Are you sure you want to remove transaction?",
+            10:"Would you like to load account ?",
+            11:"Are you sure you want to remove account ? This action is irreversible",
+            12:"I can't calculate empty expression",
+            13:"You have used forbidden word in expression"
+        },
+        "Mini calculator":{
+            0:"Mini calculator",
+            1:"You can't divide by zero",
+            2:"You have entered incorrect expression"
         },
         "Windows":{
             0:"Settings",
             1:"Add account",
             2:"Rename account",
             3:"Delete account",
+            4:"Statistics"
         }   
     },
     "Українська":{
@@ -114,10 +137,13 @@ LANGUAGES = {
         "Account":{
             0:"Ім'я",
             1:"Прізвище",
+            2:"Поточний баланс",
             "Account management":{
                 0:"Видалити акаунт",
                 1:"Створити акаунт",
                 2:"Переназвати акаунт",
+                3:"Нове ім'я",
+                4:"Нове Прізвище",
                 "Messages":{
                     0:"Введіть ім'я і прізвище, щоб створити новий акаунт. (Використовувати те саме ім'я і призвище не можна) ",
                     1:"Введіть ім'я і прізвище акаунта, якого бажаєте видалити. ",
@@ -135,6 +161,16 @@ LANGUAGES = {
                 7:"Загальний дохід: ",
                 8:"Загальні витрати: ",
                 9:"Акаунт створенний ",
+                "Statistics":{
+                    0:"Статистика",
+                    1:"Місячна",
+                    2:"Квартальна",
+                    3:"Річна",
+                    4:"Загальний дохід ",
+                    5:"Середній дохід ",
+                    6:"Загальні витрати ",
+                    7:"Середні витрати "
+                }
             },
             "Transactions management":{
                 0:"Додати транзакцію",
@@ -154,7 +190,6 @@ LANGUAGES = {
                 0:"Додати категорію",
                 1:"Видалити категорію",
                 2:"Переназвати категорію",
-                3:"Статистика",
                 4:"Нова назва"
             }
         },
@@ -166,16 +201,88 @@ LANGUAGES = {
             4:"Ви впевненні що хочете видалити категорію? Ви втратите ВСІ транзакції, які були записані до цієї категорії і поточний баланс буде перерахований",
             5:"Виберіть транзакцію. (Щоб вибрати транзацію натисніть на її номер)",
             6:"Виберіть тільки одну транзакцію.",
-            7:"Не можна залишати поля дати і значення пустими",
+            7:"Не можна залишати поля  пустими",
             8:"День мусить бути в діапазоні ",
-            9:"Ви впевнені, що хочете видалити цю транзацію?"
+            9:"Ви впевнені, що хочете видалити цю транзацію?",
+            10:"Бажаєте загрузити account ?",
+            11:"Ви впевнені, що хочете видалити account ? Ця дія є незворотньою",
+            12:"Я не можу обрахувати пустий вираз",
+            13:"Ви використали заборонені слова в виразі"
+        },
+        "Mini calculator":{
+            0:"Міні калькулятор",
+            1:"Не можна ділити на нуль",
+            2:"Не правильно написаний вираз"
         },
         "Windows":{
             0:"Налаштування",
             1:"Додати акаунт",
             2:"Переназвати акаунт",
             3:"Видалити акаунт",
-
+            4:"Статистика"
         }
     }
 }
+
+
+def change_language(Language,Categories:dict,Current_balance:int|float,Current_month:int,account:Account):
+    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
+    Main_window.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
+    Main_window.Incomes_and_expenses.setTabText(1,LANGUAGES[Language]["Account"]["Info"][5])
+    Main_window.add_incomes_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
+    Main_window.add_expenses_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
+    Main_window.statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][0])
+    Main_window.mini_calculator_label.setText(LANGUAGES[Language]["Mini calculator"][0])
+
+    Settings_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][0])
+    Settings_window.delete_account.setText(LANGUAGES[Language]["Account"]["Account management"][0])
+    Settings_window.add_account.setText(LANGUAGES[Language]["Account"]["Account management"][1])
+    Settings_window.rename_account.setText(LANGUAGES[Language]["Account"]["Account management"][2])
+
+    Rename_account_window.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][1])
+    Rename_account_window.button.setText(LANGUAGES[Language]["General management"][5])
+    Rename_account_window.new_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][3])
+    Rename_account_window.new_surname.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][4])
+    Rename_account_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][2])
+
+    Add_category_window.category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
+    Add_category_window.button.setText(LANGUAGES[Language]["General management"][1])
+    Add_category_window.window.setWindowTitle(LANGUAGES[Language]["Account"]["Category management"][0])
+
+    Category_settings_window.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
+    Category_settings_window.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
+
+    Rename_category_window.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][4])
+    Rename_category_window.button.setText(LANGUAGES[Language]["General management"][2])
+
+    Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][5])
+    Transaction_management_window.transaction_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
+    Transaction_management_window.transaction_day.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][1])
+    Transaction_management_window.transaction_value.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][2])
+
+    Statistcs_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][4])
+    Statistcs_window.monthly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][1])
+    Statistcs_window.quarterly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][2])
+    Statistcs_window.yearly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][3])
+
+    for index,error in enumerate(errors_list):
+        error.setText(LANGUAGES[Language]["Errors"][index])
+        error.button(QMessageBox.StandardButton.Ok).setText(LANGUAGES[Language]["General management"][3])
+        if error.button(QMessageBox.StandardButton.Cancel) != None:
+            error.button(QMessageBox.StandardButton.Cancel).setText(LANGUAGES[Language]["General management"][4])
+    
+    for category in Categories:
+        Categories[category]["Add transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][0])
+        Categories[category]["Delete transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][1])
+        Categories[category]["Edit transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][2])
+        Categories[category]["Category data"].setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0],LANGUAGES[Language]["Account"]["Info"][1],LANGUAGES[Language]["Account"]["Info"][2]))
+        total_value = Categories[category]["Total value"].text().split(" ")[1]
+        Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+total_value)
+    
+    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Incomes = Settings_window.total_income.text().split(" ")[2]
+    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
+    Expenses = Settings_window.total_expense.text().split(" ")[2]
+    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
+    Settings_window.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())  

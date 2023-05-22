@@ -1,16 +1,15 @@
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QGridLayout,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QGridLayout,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QPixmap,QIcon,QFont,QFontDatabase
 from qdarktheme._style_loader import load_stylesheet
 from Accont_mangment import Account
-from Languages import LANGUAGES
 
-# QListWidgetItem()
-# QListWidget.addItem
+
 app = QApplication([])
 
 ALIGMENT = Qt.AlignmentFlag
 APP_ICON = QIcon("./Images/App icon.png")
+Languages_loaded = False
 
 dark_theme = load_stylesheet("dark")
 dark_theme_icon = QIcon("./Images/Dark theme.png")
@@ -21,9 +20,8 @@ light_theme_icon = QIcon("./Images/Light theme.png")
 errors_list = []
 
 # print(QFontDatabase.families())
-def create_error(text:str,type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
-    error = QMessageBox(text=text)
-    # error.setText(text)
+def create_error(type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
+    error = QMessageBox()
     error.addButton(QMessageBox.StandardButton.Ok)
     error.setWindowTitle("Account Organizer")
     if type_confirm:
@@ -44,6 +42,9 @@ def create_button(button_text:str,size:tuple[int])->QPushButton:
 
 
 def load_category(category_type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str,theme:str)-> dict:
+
+    if not Languages_loaded:
+        from Languages import LANGUAGES
     """Add category to user window
 
         Args:
@@ -69,6 +70,7 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     category["Type"] = category_type
 
     category_window = QWidget()
+    category_window.setMaximumWidth(1000)
     category_layout = QVBoxLayout()
 
     category_total_value = QLabel("")
@@ -92,7 +94,7 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     category["Category data"] = category_data
 
     category_data.setMinimumWidth(600)
-    category_data.setMinimumHeight(300)
+    category_data.setMinimumHeight(270)
 
     
     if theme == "Dark":
@@ -119,11 +121,11 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
         category_data.setRowCount(len(transactions))
         for index,transaction in enumerate(transactions):
             transaction_day = QTableWidgetItem()
-            transaction_day.setData(Qt.ItemDataRole.bit_count(Qt.ItemDataRole.DisplayRole),transaction[4])
+            transaction_day.setData(Qt.ItemDataRole.EditRole,transaction[4])
             transaction_value = QTableWidgetItem()
-            transaction_value.setData(Qt.ItemDataRole.bit_count(Qt.ItemDataRole.DisplayRole),transaction[5])
+            transaction_value.setData(Qt.ItemDataRole.EditRole,transaction[5])
             transaction_id = QTableWidgetItem()
-            transaction_id.setData(Qt.ItemDataRole.bit_count(Qt.ItemDataRole.DisplayRole),transaction[0])
+            transaction_id.setData(Qt.ItemDataRole.EditRole,transaction[0])
             
             category_data.setItem(index,0,QTableWidgetItem(transaction[6]))
             category_data.setItem(index,1,transaction_day)
@@ -165,24 +167,28 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
 
 
 class Errors():
-    incorrect_data_type_error = create_error("",False,QMessageBox.Icon.Warning)
-    account_alredy_exists_error  = create_error("",False,QMessageBox.Icon.Warning)
-    zero_current_balance_error = create_error("",True,QMessageBox.Icon.Question)
-    category_exists_error = create_error("",False,QMessageBox.Icon.Warning)
-    delete_category_question = create_error("",True,QMessageBox.Icon.Question)
-    unselected_row_error = create_error("",False,QMessageBox.Icon.Warning)
-    only_one_row_error = create_error("",False,QMessageBox.Icon.Warning)
-    empty_fields_error = create_error("",False,QMessageBox.Icon.Warning)
-    day_out_range_error = create_error("",False,QMessageBox.Icon.Critical)
-    delete_transaction_question = create_error("",True,QMessageBox.Icon.Question)
+    incorrect_data_type_error = create_error(False,QMessageBox.Icon.Warning)
+    account_alredy_exists_error  = create_error(False,QMessageBox.Icon.Warning)
+    zero_current_balance_error = create_error(True,QMessageBox.Icon.Question)
+    category_exists_error = create_error(False,QMessageBox.Icon.Warning)
+    delete_category_question = create_error(True,QMessageBox.Icon.Question)
+    unselected_row_error = create_error(False,QMessageBox.Icon.Warning)
+    only_one_row_error = create_error(False,QMessageBox.Icon.Warning)
+    empty_fields_error = create_error(False,QMessageBox.Icon.Warning)
+    day_out_range_error = create_error(False,QMessageBox.Icon.Critical)
+    delete_transaction_question = create_error(True,QMessageBox.Icon.Question)
+    load_account_question =  create_error(True,QMessageBox.Icon.Question)
+    delete_account_warning = create_error(True,QMessageBox.Icon.Critical)
+    empty_expression_error = create_error(False,QMessageBox.Icon.Information)
+    forbidden_calculator_word_error = create_error(False,QMessageBox.Icon.Critical)
 
 
 
 class Main_window():
     window = QWidget()
     window.resize(1400,750)
-    window.setMinimumHeight(630)
-    window.setMinimumWidth(750)
+    window.setMinimumHeight(650)
+    window.setMinimumWidth(1150)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
 
@@ -229,6 +235,7 @@ class Main_window():
     Incomes_and_expenses = QTabWidget()
 
     Incomes_window = QWidget()
+    Incomes_window.setMinimumHeight(400)
     Incomes_window_layout = QHBoxLayout()
     
     add_incomes_category = create_button("Create category",(170,40))
@@ -269,12 +276,31 @@ class Main_window():
     Incomes_and_expenses.addTab(Incomes_scroll,"Income")
     Incomes_and_expenses.addTab(Expenses_scroll,"Expenses")
 
+    window_bottom = QHBoxLayout()
+    statistics = create_button("Statistics",(160,40))
+    mini_calculator_label = QLabel("Mini-calculator")
+    mini_calculator_text = QLineEdit()
+    mini_calculator_text.setPlaceholderText("2 * 3 = 6;  3 / 2 = 1.5;  3 + 2 = 5;  2 - 3 = -1;  4 ** 2 = 16")
+    mini_calculator_text.setMinimumWidth(600)
+    calculate = create_button("=",(100,40))
+    calculate.setFont(QFont("C059 [urw]",pointSize=18))
+
+    window_bottom.addStretch(1)
+    window_bottom.addWidget(statistics)
+    window_bottom.addStretch(5)
+    window_bottom.addWidget(mini_calculator_label)
+    window_bottom.addWidget(mini_calculator_text)
+    window_bottom.addWidget(calculate)
+    window_bottom.addStretch(1)
 
     main_layout= QVBoxLayout()
     main_layout.addLayout(General_info)
     main_layout.addLayout(Year_layout)
     main_layout.addLayout(Month_layout)
     main_layout.addWidget(Incomes_and_expenses)
+    main_layout.addStretch(1)
+    main_layout.addLayout(window_bottom)
+    main_layout.addStretch(1)
 
     window.setLayout(main_layout)
 
@@ -306,15 +332,23 @@ class Settings_window():
     account_created_date = QLabel()
 
     main_layout = QVBoxLayout()
-    main_layout.setSpacing(50)
+    main_layout.addStretch(2)
     main_layout.addWidget(switch_themes_button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
     main_layout.addWidget(languages,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
     main_layout.addWidget(accounts,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(5)
     main_layout.addWidget(add_account,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
     main_layout.addWidget(rename_account,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
     main_layout.addWidget(delete_account,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(5)
     main_layout.addWidget(total_income,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
+    main_layout.addStretch(1)
     main_layout.addWidget(total_expense,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
+    main_layout.addStretch(1)
     main_layout.addWidget(account_created_date,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
 
     window.setLayout(main_layout)
@@ -329,18 +363,16 @@ class Category_settings_window():
 
     rename_category = create_button("Rename category",(195,40))
     delete_category = create_button("Delete category",(180,40))
-    show_statistics = create_button("Statistics",(160,40))
 
     main_layout = QVBoxLayout()
     main_layout.addWidget(rename_category,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(delete_category,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addWidget(show_statistics,alignment=ALIGMENT.AlignHCenter)
 
     window.setLayout(main_layout)
 
 
 
-class Add_accoount_window():
+class Add_account_window():
     window = QDialog()
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
@@ -370,6 +402,35 @@ class Add_accoount_window():
     main_layout.addLayout(Full_name_layout)
     main_layout.addStretch(1)
     main_layout.addWidget(current_balance,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
+    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
+
+    window.setLayout(main_layout)
+
+
+
+class Rename_account_window():
+    window = QDialog()
+    window.resize(800,800)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Rename account")
+    
+    message = QLabel()
+
+    new_name = QLineEdit("New name")
+    new_surname = QLineEdit("New Surname")
+    full_name_layout = QHBoxLayout()
+    full_name_layout.addWidget(new_name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    full_name_layout.addWidget(new_surname,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+
+    button = create_button("Update",(160,40))
+
+    main_layout = QVBoxLayout()
+    main_layout.addStretch(1)
+    main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addStretch(1)
+    main_layout.addLayout(full_name_layout)
     main_layout.addStretch(1)
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
     main_layout.addStretch(1)
@@ -449,3 +510,42 @@ class Transaction_management_window():
 
     window.setLayout(main_layout)
 
+
+
+class Statistcs_window():
+    window = QDialog()
+    window.resize(600,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Statistics")
+
+    monthly_statistics = create_button("Monthly",(150,40))
+    quarterly_statistics = create_button("Quarterly",(150,40))
+    yearly_statistics = create_button("Yearly",(150,40))
+
+    main_layout = QVBoxLayout()
+    main_layout.addSpacing(50)
+    main_layout.addWidget(monthly_statistics,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(quarterly_statistics,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(yearly_statistics,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+
+    window.setLayout(main_layout)
+
+
+
+class Monthly_statistics():
+    window = QDialog()
+    window.resize(600,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("April")
+    window.setStyleSheet(""" 
+    QListWidget::item:hover,
+    QListWidget::item:disabled:hover,
+    QListWidget::item:hover:!active,
+    QListWidget::item:focus
+    {background: transparent}""")#Disable background color change on mouseover
+    
+    statistics = QListWidget()
+    main_layout = QVBoxLayout()
+    main_layout.addWidget(statistics)
+
+    window.setLayout(main_layout)
