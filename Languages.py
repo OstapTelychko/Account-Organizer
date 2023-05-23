@@ -56,9 +56,14 @@ LANGUAGES = {
                     2:"Quarterly",
                     3:"Yearly",
                     4:"Total income ",
-                    5:"Acerage income ",
+                    5:"Average income ",
                     6:"Total expenses ",
-                    7:"Average expenses "
+                    7:"Average expenses ",
+                    8:"Income with expenses ",
+                    9:"The most lucrative category ",
+                    10:"The most lucrative categories ",
+                    11:"The most lucrative transactions:",
+                    12:"No name"
                 }
             },
             "Transactions management":{
@@ -169,7 +174,12 @@ LANGUAGES = {
                     4:"Загальний дохід ",
                     5:"Середній дохід ",
                     6:"Загальні витрати ",
-                    7:"Середні витрати "
+                    7:"Середні витрати ",
+                    8:"Дохід з витратами ",
+                    9:"Найприбутковіша категорія ",
+                    10:"Найприбутковіші категорії",
+                    11:"Найприбутковіші транзакції:",
+                    12:"Без назви"
                 }
             },
             "Transactions management":{

@@ -25,6 +25,7 @@ CATEGORY_TYPE = {0:"Incomes",1:"Expenses"}
 FORBIDDEN_CALCULATOR_WORDS = ["import","def","for","while","open","del","__","with","exit","raise","print","range","quit","class","try","if","input","object","global","lambda","match"]
 
 Switch_account = True
+MONTHS_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 def update_config():
     with open("./configuration.toml","w",encoding="utf-8") as file:
@@ -359,8 +360,7 @@ def transaction_data_handler():
         if transaction_day.isalnum() and transaction_value.replace(".","").isdigit():
             transaction_day = int(transaction_day)
 
-            months_days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-            max_month_day = months_days[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
+            max_month_day = MONTHS_DAYS[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
             if 0 < transaction_day <= max_month_day:
                 if transaction_value.find("."):
                     transaction_value = float(transaction_value)
@@ -540,8 +540,7 @@ def show_monthly_statistics():
             for category in Categories:
                 Categories_total_values[category] = sum([transaction[5] for transaction in account.get_transactions_by_month(category,Current_year,Current_month)])
 
-            highest_total_value = max([total_value for total_value in Categories_total_values])
-            
+            highest_total_value = max([total_value for total_value in Categories_total_values.values()])
 
             #Highest categories
             Categories_with_highest_total_value = {}
@@ -563,7 +562,7 @@ def show_monthly_statistics():
             Categories_with_highest_total_value["Highest total value"] = highest_total_value
 
             #Lowest categories
-            lowest_total_value = min([total_value for total_value in Categories_total_values])
+            lowest_total_value = min([total_value for total_value in Categories_total_values.values()])
             Categories_with_lowest_total_value = {}
             for category in Categories_total_values:
                 if Categories_total_values[category] == lowest_total_value:
@@ -589,15 +588,27 @@ def show_monthly_statistics():
 
         total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
         total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
+        days_amount = MONTHS_DAYS[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
         if total_income != 0 and total_expense != 0:
-            incomes_transactions_amount = sum([len(account.get_transactions_by_month(category,Current_year,Current_month)) for category in Incomes_categories])
-            expenses_transactions_amount = sum([len(account.get_transactions_by_month(category,Current_year,Current_month)) for category in Expenses_categories])
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(total_income))
-            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+str(total_income/incomes_transactions_amount))
+            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+f"{total_income/days_amount:.2f}")
             Monthly_statistics.statistics.addItem("")
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
-            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+str(total_expense/expenses_transactions_amount))
+            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+f"{total_expense/days_amount:.2f}")
+            Monthly_statistics.statistics.addItem("")
+            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense}")
+            Monthly_statistics.statistics.addItem("")
+            if len(Incomes_statistic[0]) == 2:
+                category = [*Incomes_statistic[0].keys()][0]
+                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][9]+Categories[category]["Name"])
+                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][11])
+
+                for transaction_name,transaction_value in Incomes_statistic[0][category].items():
+                    if transaction_name != "Highest value":
+                        if transaction_name == "":
+                            transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
+                        Monthly_statistics.statistics.addItem(f"{transaction_name} - {Incomes_statistic[0][category]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {Incomes_statistic[0][category]['Highest value']}")
         Monthly_statistics.window.exec()
 
 
