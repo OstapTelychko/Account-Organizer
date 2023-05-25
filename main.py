@@ -168,7 +168,7 @@ def show_add_user_window():
 
 
 def add_user():
-    global Account_name,Configuration,Switch_account
+    global Account_name,Configuration
 
     name = Add_account_window.name.text().strip()
     surname = Add_account_window.surname.text().strip()
@@ -179,29 +179,27 @@ def add_user():
         if not account.account_exists(full_name):
             balance = Add_account_window.current_balance.text()
             if balance != "":
-                if balance.isdigit():
-                    account.create_account(int(balance))
+
+                def complete_adding_account():
+                    global Switch_account
+
                     Add_account_window.window.hide()
                     Account_name = full_name
                     Configuration.update({"Account_name":Account_name})
                     update_config()
                     Settings_window.accounts.addItem(full_name)
                     Accounts_list.append(Account_name)
-                    load_account_data(Account_name)
                     Switch_account = False
+                    load_account_data(Account_name)
                     Settings_window.accounts.setCurrentText(Account_name)
+
+                if balance.isdigit():
+                    account.create_account(int(balance))
+                    complete_adding_account()    
             else:
                 if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
                     account.create_account(0)
-                    Add_account_window.window.hide()
-                    Account_name = full_name
-                    Configuration.update({"Account_name":Account_name})
-                    update_config()
-                    Settings_window.accounts.addItem(full_name)
-                    Accounts_list.append(Account_name)
-                    Switch_account = False
-                    load_account_data(Account_name)
-                    Settings_window.accounts.setCurrentText(Account_name)
+                    complete_adding_account()
         else:
             Errors.account_alredy_exists_error.exec()
     else:
@@ -336,12 +334,20 @@ def add_transaction(transaction_name:str,transaction_day:int,transaction_value:i
 
     day = QTableWidgetItem()
     day.setData(Qt.ItemDataRole.EditRole,transaction_day)
+    day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
+
     value = QTableWidgetItem()
     value.setData(Qt.ItemDataRole.EditRole,transaction_value)
+    value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
     transaction_id = QTableWidgetItem()
     transaction_id.setData(Qt.ItemDataRole.EditRole,account.get_last_transaction_id())
+    transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-    category_data.setItem(row,0,QTableWidgetItem(transaction_name))
+    name = QTableWidgetItem(transaction_name)
+    name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
+    category_data.setItem(row,0,name)
     category_data.setItem(row,1,day)
     category_data.setItem(row,2,value)
     category_data.setItem(row,3,transaction_id)
@@ -526,6 +532,60 @@ def calulate_expression():
         Errors.empty_expression_error.exec()
 
 
+def get_min_and_max_categories(Categories:list,year:int,month:int)->tuple:
+    Categories_total_values = {}
+
+    for category in Categories:
+        Categories_total_values[category] = sum([transaction[5] for transaction in account.get_transactions_by_month(category,year,month)])
+
+    highest_total_value = max([total_value for total_value in Categories_total_values.values()])
+
+    def get_min_and_max_transactions(transactions:dict):
+        #Highest transactions
+        highest_transaction_value = max([transaction[5] for transaction in transactions])
+        transactions_with_highest_value = [transaction[6] for transaction in transactions if transaction[5] == highest_transaction_value]
+
+        transactions_names = [name for name in transactions_with_highest_value]
+        transactions_with_highest_value = {}
+        for transaction_name in set(transactions_names):
+            transactions_with_highest_value[transaction_name] = transactions_names.count(transaction_name)
+        transactions_with_highest_value["Highest value"] = highest_transaction_value
+        
+        #Lowest transactions
+        lowest_transaction_value = min([transaction[5] for transaction in transactions])
+        transactions_with_lowest_value = [transaction[6] for transaction in transactions if transaction[5] == lowest_transaction_value]
+
+        transactions_names = [name for name in transactions_with_lowest_value]
+        transactions_with_lowest_value = {}
+        for transaction_name in set(transactions_names):
+            transactions_with_lowest_value[transaction_name] = transactions_names.count(transaction_name)
+        transactions_with_lowest_value["Lowest value"] = lowest_transaction_value
+
+        return (transactions_with_highest_value,transactions_with_lowest_value)
+
+    #Highest categories
+    Categories_with_highest_total_value = {}
+    for category in Categories_total_values:
+        if Categories_total_values[category] == highest_total_value:
+            transactions = account.get_transactions_by_month(category,year,month)
+            transactions_statistic = get_min_and_max_transactions(transactions)
+            Categories_with_highest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
+    Categories_with_highest_total_value["Highest total value"] = highest_total_value
+
+    #Lowest categories
+    lowest_total_value = min([total_value for total_value in Categories_total_values.values()])
+    Categories_with_lowest_total_value = {}
+    if lowest_total_value != 0:
+        for category in Categories_total_values:
+            if Categories_total_values[category] == lowest_total_value and category != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
+                transactions = account.get_transactions_by_month(category,year,month)
+                transactions_statistic = get_min_and_max_transactions(transactions)
+                Categories_with_lowest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
+        Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
+
+    return (Categories_with_highest_total_value,Categories_with_lowest_total_value,Categories_total_values)
+
+
 def show_monthly_statistics():
     Monthly_statistics.window.setWindowTitle(LANGUAGES[Language]["Months"][Current_month])
     Monthly_statistics.statistics.clear()
@@ -533,58 +593,8 @@ def show_monthly_statistics():
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
         
-
-        def get_min_and_max_categories(Categories:list)->tuple:
-            Categories_total_values = {}
-
-            for category in Categories:
-                Categories_total_values[category] = sum([transaction[5] for transaction in account.get_transactions_by_month(category,Current_year,Current_month)])
-
-            highest_total_value = max([total_value for total_value in Categories_total_values.values()])
-
-            #Highest categories
-            Categories_with_highest_total_value = {}
-            for category in Categories_total_values:
-                if Categories_total_values[category] == highest_total_value:
-                    transactions = account.get_transactions_by_month(category,Current_year,Current_month)
-
-                    #Highest transactions
-                    highest_transaction_value = max([transaction[5] for transaction in transactions])
-                    transactions_with_highest_value = [transaction[6] for transaction in transactions if transaction[5] == highest_transaction_value]
-
-                    transactions_names = [name for name in transactions_with_highest_value]
-                    transactions_with_highest_value = {}
-                    for transaction_name in set(transactions_names):
-                        transactions_with_highest_value[transaction_name] = transactions_names.count(transaction_name)
-                    transactions_with_highest_value["Highest value"] = highest_transaction_value
-
-                    Categories_with_highest_total_value[category] = transactions_with_highest_value
-            Categories_with_highest_total_value["Highest total value"] = highest_total_value
-
-            #Lowest categories
-            lowest_total_value = min([total_value for total_value in Categories_total_values.values()])
-            Categories_with_lowest_total_value = {}
-            for category in Categories_total_values:
-                if Categories_total_values[category] == lowest_total_value:
-
-                    #Lowest transactions
-                    lowest_transaction_value = min([transaction[5] for transaction in transactions])
-                    transactions_with_lowest_value = [transaction[6] for transaction in transactions if transaction[5] == lowest_transaction_value]
-
-                    transactions_names = [name for name in transactions_with_lowest_value]
-                    transactions_with_lowest_value = {}
-                    for transaction_name in set(transactions_names):
-                        transactions_with_lowest_value[transaction_name] = transactions_names.count(transaction_name)
-                    transactions_with_lowest_value["Lowest value"] = lowest_transaction_value
-
-                    Categories_with_lowest_total_value[category] = transactions_with_lowest_value
-            Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
-
-            return (Categories_with_highest_total_value,Categories_with_lowest_total_value,Categories_total_values)
-        
-
-        Incomes_statistic = get_min_and_max_categories(Incomes_categories)
-        Expenses_statistic = get_min_and_max_categories(Expenses_categories)
+        Incomes_statistic = get_min_and_max_categories(Incomes_categories,Current_year,Current_month)
+        Expenses_statistic = get_min_and_max_categories(Expenses_categories,Current_year,Current_month)
 
         total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
         total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
@@ -598,17 +608,57 @@ def show_monthly_statistics():
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+f"{total_expense/days_amount:.2f}")
             Monthly_statistics.statistics.addItem("")
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense}")
-            Monthly_statistics.statistics.addItem("")
-            if len(Incomes_statistic[0]) == 2:
-                category = [*Incomes_statistic[0].keys()][0]
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][9]+Categories[category]["Name"])
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][11])
 
-                for transaction_name,transaction_value in Incomes_statistic[0][category].items():
+            def add_highest_and_lowest_transactions(category:int,statistic:dict):
+                #Highest transactions
+                Monthly_statistics.statistics.addItem("")
+                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][11])
+                for transaction_name,transaction_value in statistic[category][0].items():
                     if transaction_name != "Highest value":
                         if transaction_name == "":
                             transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
-                        Monthly_statistics.statistics.addItem(f"{transaction_name} - {Incomes_statistic[0][category]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {Incomes_statistic[0][category]['Highest value']}")
+                        Monthly_statistics.statistics.addItem(f"{transaction_name} - {statistic[category][0]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][0]['Highest value']}")
+                
+                #Lowest transactions
+                Monthly_statistics.statistics.addItem("")
+                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][15])
+                for transaction_name,transaction_value in statistic[category][1].items():
+                    if transaction_name != "Lowest value":
+                        if transaction_name == "":
+                            transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
+                        Monthly_statistics.statistics.addItem(f"{transaction_name} - {statistic[category][1]['Lowest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][1]['Lowest value']}")
+
+            #Highest category
+            if len(Incomes_statistic[0]) == 2:
+                most_lucrative_category = [*Incomes_statistic[0].keys()][0]
+                Monthly_statistics.statistics.addItem("")
+                Monthly_statistics.statistics.addItem("")
+                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][9]+Categories[most_lucrative_category]["Name"]+f"  ({Incomes_statistic[0]['Highest total value']})")
+                add_highest_and_lowest_transactions(most_lucrative_category,Incomes_statistic[0])
+            elif len(Incomes_statistic[0]) > 2:#Highest categories
+                Monthly_statistics.statistics.addItem("")
+                Monthly_statistics.statistics.addItem("")
+                highest_categories = [category for category in Incomes_statistic[0] if category != "Highest total value"]
+                highest_categories_names = str((*[Categories[category]['Name'] for category in highest_categories],)).replace("'","")
+                Monthly_statistics.statistics.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][10]}  {highest_categories_names}  ({Incomes_statistic[0]['Highest total value']})")
+
+                for category in highest_categories:
+                    Monthly_statistics.statistics.addItem("")
+                    Monthly_statistics.statistics.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][16]} {Categories[category]['Name']}")
+                    add_highest_and_lowest_transactions(category,Incomes_statistic[0])
+
+            #Lowest category
+            if len(Incomes_statistic[1]) == 2:
+                least_lucrative_category = [*Incomes_statistic[1].keys()][0] 
+                Monthly_statistics.statistics.addItem("")
+                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][13]+Categories[least_lucrative_category]["Name"]+f" ({Incomes_statistic[1]['Lowest total value']})")
+                print(1)
+                add_highest_and_lowest_transactions(least_lucrative_category,Incomes_statistic[1])
+            else:#If we have more then on highest or lowest category for example: highest categories Presents - 2000 Job - 2000; lowest categories Books - 150 Magazines - 150
+                ... 
+
+                
+
         Monthly_statistics.window.exec()
 
 

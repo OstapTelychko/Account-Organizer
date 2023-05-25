@@ -63,7 +63,11 @@ LANGUAGES = {
                     9:"The most lucrative category ",
                     10:"The most lucrative categories ",
                     11:"The most lucrative transactions:",
-                    12:"No name"
+                    12:"No name",
+                    13:"The least lecrative category ",
+                    14:"The least lecrative categories ",
+                    15:"The least lucrative transactions:",
+                    16:"Category "
                 }
             },
             "Transactions management":{
@@ -179,7 +183,11 @@ LANGUAGES = {
                     9:"Найприбутковіша категорія ",
                     10:"Найприбутковіші категорії",
                     11:"Найприбутковіші транзакції:",
-                    12:"Без назви"
+                    12:"Без назви",
+                    13:"Найменш прибуткова категорія ",
+                    14:"Найменш прибуткові категорії ",
+                    15:"Найменш прибуткові транзакції:",
+                    16:"Категорія "
                 }
             },
             "Transactions management":{

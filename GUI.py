@@ -122,12 +122,20 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
         for index,transaction in enumerate(transactions):
             transaction_day = QTableWidgetItem()
             transaction_day.setData(Qt.ItemDataRole.EditRole,transaction[4])
+            transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
+
             transaction_value = QTableWidgetItem()
             transaction_value.setData(Qt.ItemDataRole.EditRole,transaction[5])
+            transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
             transaction_id = QTableWidgetItem()
             transaction_id.setData(Qt.ItemDataRole.EditRole,transaction[0])
+            transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
+            transaction_name = QTableWidgetItem(transaction[6])
+            transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
             
-            category_data.setItem(index,0,QTableWidgetItem(transaction[6]))
+            category_data.setItem(index,0,transaction_name)
             category_data.setItem(index,1,transaction_day)
             category_data.setItem(index,2,transaction_value)
             category_data.setItem(index,3,transaction_id)
