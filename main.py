@@ -407,6 +407,14 @@ def remove_transaction(category_data:QTableWidget,category_id:int):
                 calculate_current_balance()
                 row = category_data.verticalHeader()
                 row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+                #Without this transactions management buttons work twice (double delete double add double edit)
+                Categories[category_id]["Delete transaction"].setDisabled(True)
+                Categories[category_id]["Add transaction"].setDisabled(True)
+                Categories[category_id]["Edit transaction"].setDisabled(True)
+                Categories[category_id]["Delete transaction"].setDisabled(False)
+                Categories[category_id]["Add transaction"].setDisabled(False)
+                Categories[category_id]["Edit transaction"].setDisabled(False)
         else:
             Errors.only_one_row_error.exec()
     else:
@@ -573,17 +581,81 @@ def get_min_and_max_categories(Categories:list,year:int,month:int)->tuple:
     Categories_with_highest_total_value["Highest total value"] = highest_total_value
 
     #Lowest categories
-    lowest_total_value = min([total_value for total_value in Categories_total_values.values()])
-    Categories_with_lowest_total_value = {}
-    if lowest_total_value != 0:
+    for category,total_value in Categories_total_values.copy().items():
+        if total_value == 0:
+            del Categories_total_values[category]
+
+    if len(Categories_total_values) != 0:
+        lowest_total_value = min([total_value for total_value in Categories_total_values.values() if total_value])
+        Categories_with_lowest_total_value = {}
         for category in Categories_total_values:
-            if Categories_total_values[category] == lowest_total_value and category != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
+            if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
                 transactions = account.get_transactions_by_month(category,year,month)
                 transactions_statistic = get_min_and_max_transactions(transactions)
                 Categories_with_lowest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
         Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
 
     return (Categories_with_highest_total_value,Categories_with_lowest_total_value,Categories_total_values)
+
+
+def add_statistic(statistic_list:QListWidget,statistic_data:dict,words:list):
+
+    def add_highest_and_lowest_transactions(category:int,statistic:dict):
+        #Highest transactions
+        statistic_list.addItem("")
+        statistic_list.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][words[4]])
+        for transaction_name,transaction_value in statistic[category][0].items():
+            if transaction_name != "Highest value":
+                if transaction_name == "":
+                    transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
+                statistic_list.addItem(f"{transaction_name} - {statistic[category][0]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][0]['Highest value']}")
+        
+        #Lowest transactions
+        if statistic[category][1]["Lowest value"] != statistic[category][0]["Highest value"]:
+            statistic_list.addItem("")
+            statistic_list.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][words[5]])
+            for transaction_name,transaction_value in statistic[category][1].items():
+                if transaction_name != "Lowest value":
+                    if transaction_name == "":
+                        transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
+                    statistic_list.addItem(f"{transaction_name} - {statistic[category][1]['Lowest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][1]['Lowest value']}")
+    
+    #Highest category
+    if len(statistic_data[0]) == 2:
+        most_category = [*statistic_data[0].keys()][0]
+        # statistic_list.addItem("")
+        # statistic_list.addItem("")
+        statistic_list.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][words[0]]+Categories[most_category]["Name"]+f"  ({statistic_data[0]['Highest total value']})")
+        add_highest_and_lowest_transactions(most_category,statistic_data[0])
+    elif len(statistic_data[0]) > 2:#Highest categories
+        # statistic_list.addItem("")
+        # statistic_list.addItem("")
+        highest_categories = [category for category in statistic_data[0] if category != "Highest total value"]
+        highest_categories_names = str((*[Categories[category]['Name'] for category in highest_categories],)).replace("'","")
+        statistic_list.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][words[1]]}  {highest_categories_names}  ({statistic_data[0]['Highest total value']})")
+
+        for category in highest_categories:
+            statistic_list.addItem("")
+            statistic_list.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][16]} {Categories[category]['Name']}")
+            add_highest_and_lowest_transactions(category,statistic_data[0])
+
+    #Lowest category
+    if len(statistic_data[1]) == 2:
+        least_category = [*statistic_data[1].keys()][0] 
+        statistic_list.addItem("")
+        statistic_list.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][words[2]]+Categories[least_category]["Name"]+f" ({statistic_data[1]['Lowest total value']})")
+        add_highest_and_lowest_transactions(least_category,statistic_data[1])
+    elif len(statistic_data[1]) > 2:#Lowest categories
+        statistic_list.addItem("")
+        statistic_list.addItem("")
+        lowest_categories = [category for category in statistic_data[1] if category != "Lowest total value"]
+        lowest_categories_names = str((*[Categories[category]['Name'] for category in lowest_categories],)).replace("'","")
+        statistic_list.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][words[3]]}  {lowest_categories_names}  ({statistic_data[1]['Lowest total value']})")
+
+        for category in lowest_categories:
+            statistic_list.addItem("")
+            statistic_list.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][16]} {Categories[category]['Name']}")
+            add_highest_and_lowest_transactions(category,statistic_data[1])
 
 
 def show_monthly_statistics():
@@ -593,14 +665,14 @@ def show_monthly_statistics():
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
         
-        Incomes_statistic = get_min_and_max_categories(Incomes_categories,Current_year,Current_month)
-        Expenses_statistic = get_min_and_max_categories(Expenses_categories,Current_year,Current_month)
+        if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,Current_month)) or len(account.get_transactions_by_month(Expenses_categories[0],Current_year,Current_month)):
+            Incomes_statistic = get_min_and_max_categories(Incomes_categories,Current_year,Current_month)
+            Expenses_statistic = get_min_and_max_categories(Expenses_categories,Current_year,Current_month)
 
-        total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
-        total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
-        days_amount = MONTHS_DAYS[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
+            total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
+            total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
+            days_amount = MONTHS_DAYS[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
-        if total_income != 0 and total_expense != 0:
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(total_income))
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+f"{total_income/days_amount:.2f}")
             Monthly_statistics.statistics.addItem("")
@@ -609,57 +681,20 @@ def show_monthly_statistics():
             Monthly_statistics.statistics.addItem("")
             Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense}")
 
-            def add_highest_and_lowest_transactions(category:int,statistic:dict):
-                #Highest transactions
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][11])
-                for transaction_name,transaction_value in statistic[category][0].items():
-                    if transaction_name != "Highest value":
-                        if transaction_name == "":
-                            transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
-                        Monthly_statistics.statistics.addItem(f"{transaction_name} - {statistic[category][0]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][0]['Highest value']}")
+            Monthly_statistics.statistics.addItem("")
+            Monthly_statistics.statistics.addItem("")
+            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"][4])
+            add_statistic(Monthly_statistics.statistics,Incomes_statistic,[9,10,13,14,11,15])
+            Monthly_statistics.statistics.addItem("")
+            Monthly_statistics.statistics.addItem("")
+            Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"][5])
+            add_statistic(Monthly_statistics.statistics,Expenses_statistic,[17,18,20,21,19,22])
                 
-                #Lowest transactions
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][15])
-                for transaction_name,transaction_value in statistic[category][1].items():
-                    if transaction_name != "Lowest value":
-                        if transaction_name == "":
-                            transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
-                        Monthly_statistics.statistics.addItem(f"{transaction_name} - {statistic[category][1]['Lowest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][1]['Lowest value']}")
-
-            #Highest category
-            if len(Incomes_statistic[0]) == 2:
-                most_lucrative_category = [*Incomes_statistic[0].keys()][0]
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][9]+Categories[most_lucrative_category]["Name"]+f"  ({Incomes_statistic[0]['Highest total value']})")
-                add_highest_and_lowest_transactions(most_lucrative_category,Incomes_statistic[0])
-            elif len(Incomes_statistic[0]) > 2:#Highest categories
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem("")
-                highest_categories = [category for category in Incomes_statistic[0] if category != "Highest total value"]
-                highest_categories_names = str((*[Categories[category]['Name'] for category in highest_categories],)).replace("'","")
-                Monthly_statistics.statistics.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][10]}  {highest_categories_names}  ({Incomes_statistic[0]['Highest total value']})")
-
-                for category in highest_categories:
-                    Monthly_statistics.statistics.addItem("")
-                    Monthly_statistics.statistics.addItem(f"{LANGUAGES[Language]['Account']['Info']['Statistics'][16]} {Categories[category]['Name']}")
-                    add_highest_and_lowest_transactions(category,Incomes_statistic[0])
-
-            #Lowest category
-            if len(Incomes_statistic[1]) == 2:
-                least_lucrative_category = [*Incomes_statistic[1].keys()][0] 
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][13]+Categories[least_lucrative_category]["Name"]+f" ({Incomes_statistic[1]['Lowest total value']})")
-                print(1)
-                add_highest_and_lowest_transactions(least_lucrative_category,Incomes_statistic[1])
-            else:#If we have more then on highest or lowest category for example: highest categories Presents - 2000 Job - 2000; lowest categories Books - 150 Magazines - 150
-                ... 
-
-                
-
-        Monthly_statistics.window.exec()
+            Monthly_statistics.window.exec()
+        else:
+            Errors.no_transactions_error.exec()
+    else:
+        Errors.no_category_error.exec()
 
 
         

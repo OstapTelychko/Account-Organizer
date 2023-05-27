@@ -9,7 +9,6 @@ app = QApplication([])
 
 ALIGMENT = Qt.AlignmentFlag
 APP_ICON = QIcon("./Images/App icon.png")
-Languages_loaded = False
 
 dark_theme = load_stylesheet("dark")
 dark_theme_icon = QIcon("./Images/Dark theme.png")
@@ -42,9 +41,6 @@ def create_button(button_text:str,size:tuple[int])->QPushButton:
 
 
 def load_category(category_type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str,theme:str)-> dict:
-
-    if not Languages_loaded:
-        from Languages import LANGUAGES
     """Add category to user window
 
         Args:
@@ -189,6 +185,8 @@ class Errors():
     delete_account_warning = create_error(True,QMessageBox.Icon.Critical)
     empty_expression_error = create_error(False,QMessageBox.Icon.Information)
     forbidden_calculator_word_error = create_error(False,QMessageBox.Icon.Critical)
+    no_category_error = create_error(False,QMessageBox.Icon.Information)
+    no_transactions_error = create_error(False,QMessageBox.Icon.Information)
 
 
 
@@ -283,6 +281,7 @@ class Main_window():
 
     Incomes_and_expenses.addTab(Incomes_scroll,"Income")
     Incomes_and_expenses.addTab(Expenses_scroll,"Expenses")
+    Incomes_and_expenses.setMinimumHeight(400)
 
     window_bottom = QHBoxLayout()
     statistics = create_button("Statistics",(160,40))
@@ -557,3 +556,5 @@ class Monthly_statistics():
     main_layout.addWidget(statistics)
 
     window.setLayout(main_layout)
+
+from Languages import LANGUAGES

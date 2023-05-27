@@ -67,7 +67,14 @@ LANGUAGES = {
                     13:"The least lecrative category ",
                     14:"The least lecrative categories ",
                     15:"The least lucrative transactions:",
-                    16:"Category "
+                    16:"Category ",
+                    17:"The most expensive category ",
+                    18:"The most expensive categories ",
+                    19:"The most expensive transactions ",
+                    20:"The cheapest category ",
+                    21:"The cheapest categories ",
+                    22:"The cheapest transactions ",
+
                 }
             },
             "Transactions management":{
@@ -105,7 +112,9 @@ LANGUAGES = {
             10:"Would you like to load account ?",
             11:"Are you sure you want to remove account ? This action is irreversible",
             12:"I can't calculate empty expression",
-            13:"You have used forbidden word in expression"
+            13:"You have used forbidden word in expression",
+            14:"You should have at least one category for income and one for expenses to see monthly statistics",
+            15:"You should have at least one income transaction and one expense transaction to see monthly statistics"
         },
         "Mini calculator":{
             0:"Mini calculator",
@@ -187,7 +196,13 @@ LANGUAGES = {
                     13:"Найменш прибуткова категорія ",
                     14:"Найменш прибуткові категорії ",
                     15:"Найменш прибуткові транзакції:",
-                    16:"Категорія "
+                    16:"Категорія ",
+                    17:"Найдорожча категорія ",
+                    18:"Найдорожчі категорії ",
+                    19:"Найдорожчі транзакції ",
+                    20:"Найдешевша категорія ",
+                    21:"Найдешевші категорії ",
+                    22:"Найдешевші транзакції ",
                 }
             },
             "Transactions management":{
@@ -225,7 +240,10 @@ LANGUAGES = {
             10:"Бажаєте загрузити account ?",
             11:"Ви впевнені, що хочете видалити account ? Ця дія є незворотньою",
             12:"Я не можу обрахувати пустий вираз",
-            13:"Ви використали заборонені слова в виразі"
+            13:"Ви використали заборонені слова в виразі",
+            14:"Ви повині мати принаймні одну категорію для доходів і одну для витрат, щоб побачити місячну статистику",
+            15:"Ви повині мати принаймні одну тразакцію доходу і одні витрат, щоб побачити місячну статистику"
+
         },
         "Mini calculator":{
             0:"Міні калькулятор",
