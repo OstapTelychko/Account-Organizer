@@ -46,7 +46,7 @@ LANGUAGES = {
                 3:"Balance ",
                 4:"Incomes",
                 5:"Expenses",
-                6:"Total: ",
+                6:"Total ",
                 7:"Total income: ",
                 8:"Total expense: ",
                 9:"Created ",
@@ -74,7 +74,7 @@ LANGUAGES = {
                     20:"The cheapest category ",
                     21:"The cheapest categories ",
                     22:"The cheapest transactions ",
-
+                    23:" Quarter"
                 }
             },
             "Transactions management":{
@@ -126,7 +126,8 @@ LANGUAGES = {
             1:"Add account",
             2:"Rename account",
             3:"Delete account",
-            4:"Statistics"
+            4:"Statistics",
+            5:"Quarterly Statistics",
         }   
     },
     "Українська":{
@@ -175,7 +176,7 @@ LANGUAGES = {
                 3:"Баланс ",
                 4:"Доходи",
                 5:"Витрати",
-                6:"Загалом: ",
+                6:"Загалом ",
                 7:"Загальний дохід: ",
                 8:"Загальні витрати: ",
                 9:"Акаунт створенний ",
@@ -203,6 +204,7 @@ LANGUAGES = {
                     20:"Найдешевша категорія ",
                     21:"Найдешевші категорії ",
                     22:"Найдешевші транзакції ",
+                    23:" Квартал"
                 }
             },
             "Transactions management":{
@@ -236,7 +238,7 @@ LANGUAGES = {
             6:"Виберіть тільки одну транзакцію.",
             7:"Не можна залишати поля  пустими",
             8:"День мусить бути в діапазоні ",
-            9:"Ви впевнені, що хочете видалити цю транзацію?",
+            9:"Ви впевнені, що хочете видалити цю транзакцію?",
             10:"Бажаєте загрузити account ?",
             11:"Ви впевнені, що хочете видалити account ? Ця дія є незворотньою",
             12:"Я не можу обрахувати пустий вираз",
@@ -255,7 +257,8 @@ LANGUAGES = {
             1:"Додати акаунт",
             2:"Переназвати акаунт",
             3:"Видалити акаунт",
-            4:"Статистика"
+            4:"Статистика",
+            5:"Квартальна статистика"
         }
     }
 }
@@ -301,6 +304,19 @@ def change_language(Language,Categories:dict,Current_balance:int|float,Current_m
     Statistcs_window.monthly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][1])
     Statistcs_window.quarterly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][2])
     Statistcs_window.yearly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][3])
+
+    Quarterly_statistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][5])
+    quarters_numbers = ["I","II","III","IV"]
+    month_number = 1
+    for quarter in Quarterly_statistics.statistics:
+        Quarterly_statistics.statistics[quarter]["Label"].setText(quarters_numbers[quarter-1]+LANGUAGES[Language]["Account"]["Info"]["Statistics"][23])
+        for month_list in Quarterly_statistics.statistics[quarter]:
+            if month_list != 0 and month_list != "Label":
+                Quarterly_statistics.statistics[quarter][month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_number])
+                month_number+=1
+            elif month_list == 0:
+                Quarterly_statistics.statistics[quarter][0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
+
 
     for index,error in enumerate(errors_list):
         error.setText(LANGUAGES[Language]["Errors"][index])

@@ -249,7 +249,6 @@ class Main_window():
 
     Incomes_window_layout.setSpacing(70)
     Incomes_window.setLayout(Incomes_window_layout)
-    Incomes_window.setUpdatesEnabled(True)
 
     Incomes_scroll = QScrollArea()
     Incomes_scroll.setWidget(Incomes_window)
@@ -258,7 +257,6 @@ class Main_window():
     Incomes_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     Incomes_scroll.setObjectName("Income-window")
     Incomes_scroll.setStyleSheet("#Income-window{ border-color:rgba(0,205,0,100); border-width:2px }")
-    Incomes_scroll.setUpdatesEnabled(True)
         
     Expenses_window = QWidget()
     Expenses_window_layout = QHBoxLayout()
@@ -268,7 +266,6 @@ class Main_window():
         
     Expenses_window_layout.setSpacing(70)
     Expenses_window.setLayout(Expenses_window_layout)
-    Expenses_window.setUpdatesEnabled(True)
 
     Expenses_scroll = QScrollArea()
     Expenses_scroll.setWidget(Expenses_window)
@@ -277,11 +274,12 @@ class Main_window():
     Expenses_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     Expenses_scroll.setObjectName("Expenses-window")
     Expenses_scroll.setStyleSheet("#Expenses-window{ border-color:rgba(205,0,0,100); border-width:2px }")
-    Expenses_scroll.setUpdatesEnabled(True)
 
     Incomes_and_expenses.addTab(Incomes_scroll,"Income")
     Incomes_and_expenses.addTab(Expenses_scroll,"Expenses")
     Incomes_and_expenses.setMinimumHeight(400)
+    Incomes_and_expenses.setObjectName("Incomes-and-expenses")
+    Incomes_and_expenses.setStyleSheet("QTabWidget::pane{border:none}")
 
     window_bottom = QHBoxLayout()
     statistics = create_button("Statistics",(160,40))
@@ -556,5 +554,83 @@ class Monthly_statistics():
     main_layout.addWidget(statistics)
 
     window.setLayout(main_layout)
+
+
+
+class Quarterly_statistics():
+    window = QDialog()
+    window.resize(800,600)
+    window.setMinimumSize(800,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Quarterly Statistics")
+    window.setStyleSheet(""" 
+    QListWidget::item:hover,
+    QListWidget::item:disabled:hover,
+    QListWidget::item:hover:!active,
+    QListWidget::item:focus
+    {background: transparent}""")#Disable background color change on mouseover
+
+    statistics_layout = QVBoxLayout()
+    # statistics_layout.setSpacing(90)
+    statistics_window = QWidget()
+
+    statistics = {}
+    for quarter in range(1,5):
+        statistics[quarter] = {}
+
+        quarter_label = QLabel()
+        quarter_label.setContentsMargins(0,50,0,0)
+        statistics[quarter]["Label"] = quarter_label
+        statistics_layout.addWidget(quarter_label,alignment=ALIGMENT.AlignBottom)
+
+        quarter_window = QWidget()
+        quarter_layout = QHBoxLayout()
+        quarter_layout.setSpacing(30)
+
+        for statistic_list in range(4):
+            statistics[quarter][statistic_list] = {}
+
+            statistic_label = QLabel()
+            statistic_label_layout = QHBoxLayout()
+            statistic_label_layout.addWidget(statistic_label,alignment=ALIGMENT.AlignHCenter)
+            statistics[quarter][statistic_list]["Label"] = statistic_label
+
+            statistic_data = QListWidget()
+            statistic_data.setMinimumHeight(200)
+            statistic_data.setMinimumWidth(350)
+            statistics[quarter][statistic_list]["Statistic data"] = statistic_data
+
+            statistic_layout = QVBoxLayout()
+            statistic_layout.addLayout(statistic_label_layout)
+            statistic_layout.addWidget(statistic_data,ALIGMENT.AlignVCenter)
+
+            quarter_layout.addLayout(statistic_layout)
+
+        quarter_window.setLayout(quarter_layout)
+
+        quarter_scroll = QScrollArea()
+        quarter_scroll.setWidget(quarter_window)
+        quarter_scroll.setWidgetResizable(True)
+        quarter_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        quarter_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        quarter_scroll.setMinimumHeight(300)
+        quarter_scroll.setStyleSheet("QScrollArea{border:none}")
+        statistics_layout.addWidget(quarter_scroll)
+
+    statistics_window.setLayout(statistics_layout)
+    window_scroll = QScrollArea()
+    window_scroll.setWidget(statistics_window)
+    window_scroll.setWidgetResizable(True)
+    window_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    window_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+    window_scroll.setStyleSheet("QScrollArea{border:none}")
+
+    main_layout = QVBoxLayout()
+    main_layout.addWidget(window_scroll)
+    window.setLayout(main_layout)
+
+
+
+
 
 from Languages import LANGUAGES
