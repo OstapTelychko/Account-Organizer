@@ -158,3 +158,14 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
             Errors.no_transactions_error.exec()
     else:
         Errors.no_category_error.exec()
+
+
+def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,account:Account,months_days:list):
+
+    #Clear quarters statistics
+    for quarter in Quarterly_statistics.statistics:
+        for statistic_list in Quarterly_statistics[quarter]:
+            if statistic_list != "Label":
+                Quarterly_statistics.statistics[quarter][statistic_list]["Statistic Data"].clear()
+    
+    first_quarter_transactions = {}

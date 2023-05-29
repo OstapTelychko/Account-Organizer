@@ -598,7 +598,7 @@ class Quarterly_statistics():
             statistic_data = QListWidget()
             statistic_data.setMinimumHeight(200)
             statistic_data.setMinimumWidth(350)
-            statistics[quarter][statistic_list]["Statistic data"] = statistic_data
+            statistics[quarter][statistic_list]["Statistic Data"] = statistic_data
 
             statistic_layout = QVBoxLayout()
             statistic_layout.addLayout(statistic_label_layout)
