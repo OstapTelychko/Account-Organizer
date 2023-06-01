@@ -1,21 +1,12 @@
 from GUI import *
 from Languages import LANGUAGES,change_language
 from Accont_mangment import Account
-from Statistics import show_monthly_statistics
+from Statistics import show_monthly_statistics,show_quarterly_statistics
 from datetime import datetime
 import toml
 from sys import exit
 
-# print(calendar.monthrange(2023,4))
 
-# today = date(2023,4,1)
-# start = today - timedelta(days=today.weekday())
-# end = start + timedelta(days=6)
-# print("Today: " + str(today))
-# print("Start: " + str(start.day))
-# print("End: " + str(end.day))
-# number = 0.4353535353
-# print(f"{number:.0f}")
 Current_balance = 0
 Current_month = datetime.now().month
 Current_year = datetime.now().year
@@ -364,7 +355,7 @@ def transaction_data_handler():
     category_data = Categories[category_id]["Category data"]
 
     if  transaction_day != "" or transaction_value != "":
-        if transaction_day.isalnum() and transaction_value.replace(".","").isdigit():
+        if transaction_day.isalnum() and transaction_value.replace(".","").isdigit() and not transaction_day.isalpha() :
             transaction_day = int(transaction_day)
 
             max_month_day = MONTHS_DAYS[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
@@ -577,7 +568,7 @@ if __name__ == "__main__":
     #Statistics
     Main_window.statistics.clicked.connect(Statistcs_window.window.exec)
     Statistcs_window.monthly_statistics.clicked.connect(lambda:show_monthly_statistics(Categories,Language,Current_year,Current_month,account,MONTHS_DAYS))
-    Statistcs_window.quarterly_statistics.clicked.connect(Quarterly_statistics.window.exec)
+    Statistcs_window.quarterly_statistics.clicked.connect(lambda:show_quarterly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
     
     #Category settings
     Category_settings_window.delete_category.clicked.connect(remove_category)

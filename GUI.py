@@ -522,6 +522,7 @@ class Statistcs_window():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Statistics")
+    window.setWindowFlags(Qt.WindowType.Window)
 
     monthly_statistics = create_button("Monthly",(150,40))
     quarterly_statistics = create_button("Quarterly",(150,40))
@@ -559,7 +560,7 @@ class Monthly_statistics():
 
 class Quarterly_statistics():
     window = QDialog()
-    window.resize(800,600)
+    window.resize(800,700)
     window.setMinimumSize(800,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Quarterly Statistics")
@@ -569,9 +570,9 @@ class Quarterly_statistics():
     QListWidget::item:hover:!active,
     QListWidget::item:focus
     {background: transparent}""")#Disable background color change on mouseover
+    window.setWindowFlags(Qt.WindowType.Window)
 
     statistics_layout = QVBoxLayout()
-    # statistics_layout.setSpacing(90)
     statistics_window = QWidget()
 
     statistics = {}
@@ -596,8 +597,9 @@ class Quarterly_statistics():
             statistics[quarter][statistic_list]["Label"] = statistic_label
 
             statistic_data = QListWidget()
-            statistic_data.setMinimumHeight(200)
-            statistic_data.setMinimumWidth(350)
+            statistic_data.setWordWrap(True)
+            statistic_data.setMinimumHeight(250)
+            statistic_data.setMinimumWidth(500)
             statistics[quarter][statistic_list]["Statistic Data"] = statistic_data
 
             statistic_layout = QVBoxLayout()
@@ -613,7 +615,7 @@ class Quarterly_statistics():
         quarter_scroll.setWidgetResizable(True)
         quarter_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         quarter_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        quarter_scroll.setMinimumHeight(300)
+        quarter_scroll.setMinimumHeight(350)
         quarter_scroll.setStyleSheet("QScrollArea{border:none}")
         statistics_layout.addWidget(quarter_scroll)
 
