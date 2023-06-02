@@ -633,6 +633,57 @@ class Quarterly_statistics():
 
 
 
+class Yearly_statistics():
+    window = QDialog()
+    window.resize(800,700)
+    window.setMinimumSize(800,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Yearly Statistics")
+    window.setStyleSheet(""" 
+    QListWidget::item:hover,
+    QListWidget::item:disabled:hover,
+    QListWidget::item:hover:!active,
+    QListWidget::item:focus
+    {background: transparent}""")#Disable background color change on mouseover
+    window.setWindowFlags(Qt.WindowType.Window)
+    
+    statistics = {}
+    statistics_window = QWidget()
+    statistics_window_layout = QVBoxLayout()
+
+    for statistics_list in range(13):
+        statistics[statistics_list] = {}
+
+        statistics_label = QLabel()
+        statistics_label.setContentsMargins(0,50,0,0)
+        statistics_label_layout = QHBoxLayout()
+        statistics_label_layout.addWidget(statistics_label,alignment=ALIGMENT.AlignHCenter)
+        statistics[statistics_list]["Label"] = statistics_label
+
+        statistics_data = QListWidget()
+        statistics_data.setMinimumHeight(400)
+        statistics_data.setWordWrap(True)
+        statistics[statistics_list]["Statistic Data"] = statistics_data
+
+        statistics_layout = QVBoxLayout()
+        statistics_layout.addLayout(statistics_label_layout)
+        statistics_layout.addWidget(statistics_data)
+
+        statistics_window_layout.addLayout(statistics_layout)
+    statistics_window.setLayout(statistics_window_layout)
+
+    statistics_scroll = QScrollArea()
+    statistics_scroll.setWidget(statistics_window)
+    statistics_scroll.setWidgetResizable(True)
+    statistics_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+    statistics_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    statistics_scroll.setStyleSheet("QScrollArea{border:none}")
+
+    main_layout = QVBoxLayout()
+    main_layout.addWidget(statistics_scroll)
+    window.setLayout(main_layout)
+
+
 
 
 from Languages import LANGUAGES

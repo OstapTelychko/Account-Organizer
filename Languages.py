@@ -55,11 +55,11 @@ LANGUAGES = {
                     1:"Monthly",
                     2:"Quarterly",
                     3:"Yearly",
-                    4:"Total income ",
-                    5:"Average income ",
-                    6:"Total expenses ",
-                    7:"Average expenses ",
-                    8:"Income with expenses ",
+                    4:"Total income   ",
+                    5:"Average income   ",
+                    6:"Total expenses   ",
+                    7:"Average expenses   ",
+                    8:"Income with expenses   ",
                     9:"The most lucrative category ",
                     10:"The most lucrative categories ",
                     11:"The most lucrative transactions:",
@@ -74,7 +74,11 @@ LANGUAGES = {
                     20:"The cheapest category ",
                     21:"The cheapest categories ",
                     22:"The cheapest transactions ",
-                    23:" Quarter"
+                    23:" Quarter",
+                    24:"Average income per day   ",
+                    25:"Average income per month   ",
+                    26:"Average expenses per day   ",
+                    27:"Average expenses per month   "
                 }
             },
             "Transactions management":{
@@ -128,6 +132,7 @@ LANGUAGES = {
             3:"Delete account",
             4:"Statistics",
             5:"Quarterly Statistics",
+            6:"Yearly statistics"
         }   
     },
     "Українська":{
@@ -185,11 +190,11 @@ LANGUAGES = {
                     1:"Місячна",
                     2:"Квартальна",
                     3:"Річна",
-                    4:"Загальний дохід ",
-                    5:"Середній дохід ",
-                    6:"Загальні витрати ",
-                    7:"Середні витрати ",
-                    8:"Дохід з витратами ",
+                    4:"Загальний дохід   ",
+                    5:"Середній дохід   ",
+                    6:"Загальні витрати   ",
+                    7:"Середні витрати   ",
+                    8:"Дохід з витратами   ",
                     9:"Найприбутковіша категорія  ",
                     10:"Найприбутковіші категорії ",
                     11:"Найприбутковіші транзакції:",
@@ -204,7 +209,11 @@ LANGUAGES = {
                     20:"Найдешевша категорія  ",
                     21:"Найдешевші категорії  ",
                     22:"Найдешевші транзакції  ",
-                    23:" Квартал"
+                    23:" Квартал",
+                    24:"Середіній дохід за день   ",
+                    25:"Середній дохід за місяць   ",
+                    26:"Середіні витрати за день   ",
+                    27:"Середіні витрати за місяць   ",
                 }
             },
             "Transactions management":{
@@ -257,7 +266,8 @@ LANGUAGES = {
             2:"Переназвати акаунт",
             3:"Видалити акаунт",
             4:"Статистика",
-            5:"Квартальна статистика"
+            5:"Квартальна статистика",
+            6:"Річна статистика"
         }
     }
 }
@@ -315,6 +325,13 @@ def change_language(Language,Categories:dict,Current_balance:int|float,Current_m
                 month_number+=1
             elif month_list == 0:
                 Quarterly_statistics.statistics[quarter][0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
+    
+    Yearly_statistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][6])
+    for month_list in Yearly_statistics.statistics:
+        if month_list != 0:
+            Yearly_statistics.statistics[month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_list])
+        else:
+            Yearly_statistics.statistics[0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
 
 
     for index,error in enumerate(errors_list):
