@@ -1,24 +1,24 @@
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QGridLayout,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget
 from PySide6.QtCore import Qt,QSize
-from PySide6.QtGui import QPixmap,QIcon,QFont,QFontDatabase
+from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
 from Accont_mangment import Account
 
+ROOT_DIRECTORY = __file__.replace("GUI.py","")
 
 app = QApplication([])
 
 ALIGMENT = Qt.AlignmentFlag
-APP_ICON = QIcon("./Images/App icon.png")
+APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
 
 dark_theme = load_stylesheet("dark")
-dark_theme_icon = QIcon("./Images/Dark theme.png")
+dark_theme_icon = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
 
 light_theme = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})
-light_theme_icon = QIcon("./Images/Light theme.png")
+light_theme_icon = QIcon(f"{ROOT_DIRECTORY}/Images/Light theme.png")
 
 errors_list = []
 
-# print(QFontDatabase.families())
 def create_error(type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
     error = QMessageBox()
     error.addButton(QMessageBox.StandardButton.Ok)
@@ -77,7 +77,7 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     category["Name label"] = category_name
 
     category_settings = QToolButton()
-    category_settings.setIcon(QIcon("./Images/Settings icon.png"))
+    category_settings.setIcon(QIcon(f"{ROOT_DIRECTORY}/Images/Settings icon.png"))
     category_settings.setIconSize(QSize(30,30))
     category["Settings"] = category_settings
 
@@ -204,7 +204,7 @@ class Main_window():
     account_current_balance = QLabel("Balance: 0")
     account_current_balance.setFont(QFont("C059 [urw]",pointSize=15))
     settings = QToolButton()
-    settings.setIcon(QIcon("./Images/Settings icon.png"))
+    settings.setIcon(QIcon(f"{ROOT_DIRECTORY}/Images/Settings icon.png"))
     settings.setIconSize(QSize(30,30))
 
     General_info.addStretch(7)
@@ -322,8 +322,8 @@ class Settings_window():
 
     languages = QComboBox()
     languages.addItems(("English","Українська"))
-    languages.setItemIcon(0,QIcon("./Images/English.png"))
-    languages.setItemIcon(1,QIcon("./Images/Ukrainian.png"))
+    languages.setItemIcon(0,QIcon(f"{ROOT_DIRECTORY}/Images/English.png"))
+    languages.setItemIcon(1,QIcon(f"{ROOT_DIRECTORY}/Images/Ukrainian.png"))
 
     accounts = QComboBox()
     accounts.setMinimumWidth(250)
@@ -476,7 +476,6 @@ class Rename_category_window():
     button = create_button("Rename",(170,40))
 
     main_layout = QVBoxLayout()
-    # main_layout.addSt
     main_layout.addWidget(new_category_name,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
 

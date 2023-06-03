@@ -1,9 +1,10 @@
 import sqlite3
 from functools import cache
+from GUI import ROOT_DIRECTORY
 
 class Account():
     def __init__(self,user_name:str):
-        self.connection = sqlite3.connect("./Accounts.sqlite") 
+        self.connection = sqlite3.connect(f"{ROOT_DIRECTORY}/Accounts.sqlite") 
         self.cursor = self.connection.cursor()
         self.account_name = user_name
 

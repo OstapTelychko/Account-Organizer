@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from GUI import *
 from Languages import LANGUAGES,change_language
 from Accont_mangment import Account
@@ -20,7 +21,7 @@ Switch_account = True
 MONTHS_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 def update_config():
-    with open("./configuration.toml","w",encoding="utf-8") as file:
+    with open(f"{ROOT_DIRECTORY}/configuration.toml","w",encoding="utf-8") as file:
         toml.dump(Configuration,file)
 
 
@@ -533,8 +534,8 @@ def calulate_expression():
 
 
 if __name__ == "__main__":
-    with open("./configuration.toml") as file:
-        Configuration = toml.load("./configuration.toml")
+    with open(f"{ROOT_DIRECTORY}/configuration.toml") as file:
+        Configuration = toml.load(f"{ROOT_DIRECTORY}/configuration.toml")
 
 
     #Load selected language 
