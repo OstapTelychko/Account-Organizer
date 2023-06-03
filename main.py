@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from GUI import *
 from Languages import LANGUAGES,change_language
-from Accont_mangment import Account
+from Account_management import Account
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
 from datetime import datetime
 import toml
@@ -596,6 +596,8 @@ if __name__ == "__main__":
     Add_account_window.button.clicked.connect(add_user)
     if Account_name == "":
         show_add_user_window()
+    if Account_name == "":
+        exit()
     
     #Connect to db
     account = Account(Account_name)

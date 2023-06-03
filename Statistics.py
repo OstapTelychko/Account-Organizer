@@ -1,6 +1,6 @@
 from GUI import *
 from Languages import LANGUAGES
-from Accont_mangment import Account
+from Account_management import Account
 
 
 def get_min_and_max_categories(unsorted_categories:list,year:int,month:int,account:Account)->tuple:

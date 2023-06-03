@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,Q
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
-from Accont_mangment import Account
+from Account_management import Account
 
 ROOT_DIRECTORY = __file__.replace("GUI.py","")
 
