@@ -111,25 +111,12 @@ class Account():
         with self.connection:
             id = self.cursor.execute("select id from 'Transactions' order by id desc").fetchone()[0]
             return id
-
-
-    def get_transactions_by_day(self,category_id:int,year:int,month:int,day:int):
-        with self.connection:
-            transactions = self.cursor.execute("select * from 'Transactions' where category_id=? and year=? and month=? and day=?",(category_id,year,month,day,)).fetchall()
-            return transactions
     
-
     def get_transactions_by_month(self,category_id:int,year:int,month:int):
         with self.connection:
             transactions = self.cursor.execute("select * from 'Transactions' where category_id=? and year=? and month=?",(category_id,year,month,)).fetchall()
             return transactions
-    
-
-    def get_transactions_by_year(self,category_id:int,year:int):
-        with self.connection:
-            transactions = self.cursor.execute("select * from 'Transactions' where category_id=? and year=?",(category_id,year,)).fetchall()
-            return transactions
-    
+        
 
     def get_all_transactions(self,category_id:int):
         with self.connection:

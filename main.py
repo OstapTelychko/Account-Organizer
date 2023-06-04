@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from GUI import *
 from Languages import LANGUAGES,change_language
 from Account_management import Account
@@ -171,9 +172,8 @@ def add_user():
         account  = Account(full_name)
         if not account.account_exists(full_name):
             balance = Add_account_window.current_balance.text()
-            if balance != "":
 
-                def complete_adding_account():
+            def complete_adding_account():
                     global Switch_account
 
                     Add_account_window.window.hide()
@@ -186,16 +186,20 @@ def add_user():
                     load_account_data(Account_name)
                     Settings_window.accounts.setCurrentText(Account_name)
 
+            if balance != "":
                 if balance.isdigit():
                     account.create_account(int(balance))
                     complete_adding_account()    
             else:
+                Errors.zero_current_balance_error.setText(LANGUAGES[Language]["Errors"][2])
                 if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
                     account.create_account(0)
                     complete_adding_account()
         else:
+            Errors.account_alredy_exists_error.setText(LANGUAGES[Language]["Errors"][1])
             Errors.account_alredy_exists_error.exec()
     else:
+        Errors.incorrect_data_type_error.setText(LANGUAGES[Language]["Errors"][0])
         Errors.incorrect_data_type_error.exec()
 
 
@@ -209,7 +213,13 @@ def create_category():
         account.create_category(category_name,category_type)
         category_id = account.get_category_id(category_name,category_type) 
         Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language,Configuration["Theme"])
-        activate_categories()
+
+        #Activate Category
+        Categories[category_id]["Settings"].clicked.connect(lambda category_name = Categories[category_id]["Name"],_=False: show_category_settings(category_name=category_name))
+        Categories[category_id]["Add transaction"].clicked.connect(lambda category_name = Categories[category_id]["Name"],_=False: show_add_transaction_window(category_name))
+        Categories[category_id]["Edit transaction"].clicked.connect(lambda category_name= Categories[category_id]["Name"],category_data = Categories[category_id]["Category data"]:show_edit_transaction_window(category_name=category_name,category_data=category_data))
+        Categories[category_id]["Delete transaction"].clicked.connect(lambda category_data = Categories[category_id]["Category data"],category_id=category_id:remove_transaction(category_data,category_id))
+
         Add_category_window.category_name.setText("")
         Add_category_window.window.hide()
     else:
@@ -261,11 +271,20 @@ def rename_category():
         for category in Categories:
             if Categories[category]["Name"] == current_name:
                 Categories[category].update({"Name":new_category_name})
-                Categories[category]["Settings"].clicked.connect(lambda category_name= new_category_name,useless_variable=False: show_category_settings(category_name=category_name,useless_variable=useless_variable))
+
+                #Update connections
+                Categories[category]["Settings"].clicked.disconnect()
+                Categories[category]["Add transaction"].clicked.disconnect()
+                Categories[category]["Edit transaction"].clicked.disconnect()
+                Categories[category]["Settings"].clicked.connect(lambda category_name= new_category_name,_=False: show_category_settings(category_name=category_name))
+                Categories[category]["Add transaction"].clicked.connect(lambda category_name = new_category_name,_=False: show_add_transaction_window(category_name))
+                Categories[category]["Edit transaction"].clicked.connect(lambda category_name= new_category_name,category_data = Categories[category]["Category data"]:show_edit_transaction_window(category_name=category_name,category_data=category_data))
                 Categories[category]["Name label"].setText(new_category_name)
-                account.rename_category(account.get_category_id(current_name,category_type),new_category_name)
+
+                account.rename_category(category,new_category_name)
                 Rename_category_window.window.hide()
                 Category_settings_window.window.hide()
+                Rename_category_window.new_category_name.setText("")
     else:
         Errors.category_exists_error.exec()
 
@@ -400,14 +419,6 @@ def remove_transaction(category_data:QTableWidget,category_id:int):
                 calculate_current_balance()
                 row = category_data.verticalHeader()
                 row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-
-                #Without this transactions management buttons work twice (double delete double add double edit)
-                Categories[category_id]["Delete transaction"].setDisabled(True)
-                Categories[category_id]["Add transaction"].setDisabled(True)
-                Categories[category_id]["Edit transaction"].setDisabled(True)
-                Categories[category_id]["Delete transaction"].setDisabled(False)
-                Categories[category_id]["Add transaction"].setDisabled(False)
-                Categories[category_id]["Edit transaction"].setDisabled(False)
         else:
             Errors.only_one_row_error.exec()
     else:

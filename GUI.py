@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QGridLayout,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
@@ -193,7 +193,7 @@ class Errors():
 class Main_window():
     window = QWidget()
     window.resize(1400,750)
-    window.setMinimumHeight(650)
+    window.setMinimumHeight(685)
     window.setMinimumWidth(1150)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
@@ -241,7 +241,7 @@ class Main_window():
     Incomes_and_expenses = QTabWidget()
 
     Incomes_window = QWidget()
-    Incomes_window.setMinimumHeight(400)
+    Incomes_window.setMinimumHeight(350)
     Incomes_window_layout = QHBoxLayout()
     
     add_incomes_category = create_button("Create category",(170,40))
@@ -277,7 +277,7 @@ class Main_window():
 
     Incomes_and_expenses.addTab(Incomes_scroll,"Income")
     Incomes_and_expenses.addTab(Expenses_scroll,"Expenses")
-    Incomes_and_expenses.setMinimumHeight(400)
+    Incomes_and_expenses.setMinimumHeight(500)
     Incomes_and_expenses.setObjectName("Incomes-and-expenses")
     Incomes_and_expenses.setStyleSheet("QTabWidget::pane{border:none}")
 

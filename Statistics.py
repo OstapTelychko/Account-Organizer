@@ -120,11 +120,11 @@ def add_statistic(statistic_list:QListWidget,statistic_data:dict,words:list,Lang
 def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Current_month:int,account:Account,months_days:list):
     Monthly_statistics.window.setWindowTitle(LANGUAGES[Language]["Months"][Current_month])
     Monthly_statistics.statistics.clear()
-    if len(Categories) > 0:
+    if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
-        if not len(Incomes_categories) or not len(Expenses_categories):
-            if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,Current_month)) or len(account.get_transactions_by_month(Expenses_categories[0],Current_year,Current_month)):
+        if  len(Incomes_categories) >= 1 and  len(Expenses_categories) >= 1:
+            if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,Current_month)) and len(account.get_transactions_by_month(Expenses_categories[0],Current_year,Current_month)):
                 Incomes_statistic = get_min_and_max_categories(Incomes_categories,Current_year,Current_month,account)
                 Expenses_statistic = get_min_and_max_categories(Expenses_categories,Current_year,Current_month,account)
 
@@ -151,9 +151,9 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
                     
                 Monthly_statistics.window.exec()
             else:
-                Errors.no_category_error.exec()
+                Errors.no_transactions_error.exec()
         else:
-            Errors.no_transactions_error.exec()
+            Errors.no_category_error.exec()
     else:
         Errors.no_category_error.exec()
 
@@ -165,7 +165,6 @@ def add_month_statistics(Incomes_categories:dict,Expenses_categories:dict,Curren
     total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
     total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
     days_amount = months_days[current_month-1] + (current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
-    # month_statistics = Quarterly_statistics.statistics[quarter][month+1]["Statistic Data"]
 
     month_statistics.addItem(Statistic_words[4]+str(total_income))
     month_statistics.addItem(Statistic_words[5]+f"{total_income/days_amount:.2f}")
@@ -193,10 +192,10 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
             if statistic_list != "Label":
                 Quarterly_statistics.statistics[quarter][statistic_list]["Statistic Data"].clear()
 
-    if len(Categories):
+    if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
-        if len(Expenses_categories) > 1 and len(Incomes_categories) > 1:
+        if len(Expenses_categories) >= 1 and len(Incomes_categories) >= 1:
 
             month_numbers = [(1,2,3),(4,5,6),(7,8,9),(10,11,12)]
             for quarter in Quarterly_statistics.statistics:
@@ -279,10 +278,10 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
     for statistic_list in Yearly_statistics.statistics:
         Yearly_statistics.statistics[statistic_list]["Statistic Data"].clear()
     
-    if len(Categories):
+    if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
-        if len(Expenses_categories) > 1 and len(Incomes_categories) > 1:
+        if len(Expenses_categories) >= 1 and len(Incomes_categories) >= 1:
             Incomes_categories_total_values = {}
             Expenses_categories_total_values = {}
 
