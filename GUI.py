@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget,QSizePolicy
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
@@ -327,6 +327,7 @@ class Settings_window():
 
     accounts = QComboBox()
     accounts.setMinimumWidth(250)
+    accounts.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
 
     add_account = create_button("Add account",(150,50))
     delete_account = create_button("Delete account",(150,50))
