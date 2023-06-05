@@ -5,6 +5,7 @@ from Languages import LANGUAGES,change_language
 from Account_management import Account
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
 from datetime import datetime
+from functools import partial
 import toml
 from sys import exit
 
@@ -167,25 +168,28 @@ def add_user():
     name = Add_account_window.name.text().strip()
     surname = Add_account_window.surname.text().strip()
 
-    if name.isalpha() and surname.isalpha():
+    #For expample: Ostap  Telychko (Treatment) is allowed now
+    prepared_name = name.replace(" ","").replace("(","").replace(")","")
+    prepared_surname = surname.replace(" ","").replace("(","").replace(")","")
+
+    if prepared_name.isalpha() and prepared_surname.isalpha():
         full_name = name+" "+surname
         account  = Account(full_name)
         if not account.account_exists(full_name):
             balance = Add_account_window.current_balance.text()
 
             def complete_adding_account():
-                    global Switch_account
+                global Switch_account
 
-                    Add_account_window.window.hide()
-                    Account_name = full_name
-                    Configuration.update({"Account_name":Account_name})
-                    update_config()
-                    Settings_window.accounts.addItem(full_name)
-                    Accounts_list.append(Account_name)
-                    Switch_account = False
-                    load_account_data(Account_name)
-                    Settings_window.accounts.setCurrentText(Account_name)
-
+                Add_account_window.window.hide()
+                Account_name = full_name
+                Configuration.update({"Account_name":Account_name})
+                update_config()
+                Settings_window.accounts.addItem(full_name)
+                Accounts_list.append(Account_name)
+                Switch_account = False
+                load_account_data(Account_name)
+                Settings_window.accounts.setCurrentText(Account_name)
             if balance != "":
                 if balance.isdigit():
                     account.create_account(int(balance))
@@ -215,10 +219,10 @@ def create_category():
         Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language,Configuration["Theme"])
 
         #Activate Category
-        Categories[category_id]["Settings"].clicked.connect(lambda category_name = Categories[category_id]["Name"],_=False: show_category_settings(category_name=category_name))
-        Categories[category_id]["Add transaction"].clicked.connect(lambda category_name = Categories[category_id]["Name"],_=False: show_add_transaction_window(category_name))
-        Categories[category_id]["Edit transaction"].clicked.connect(lambda category_name= Categories[category_id]["Name"],category_data = Categories[category_id]["Category data"]:show_edit_transaction_window(category_name=category_name,category_data=category_data))
-        Categories[category_id]["Delete transaction"].clicked.connect(lambda category_data = Categories[category_id]["Category data"],category_id=category_id:remove_transaction(category_data,category_id))
+        Categories[category_id]["Settings"].clicked.connect(partial(show_category_settings,Categories[category_id]["Name"]))
+        Categories[category_id]["Add transaction"].clicked.connect(partial(show_add_transaction_window,Categories[category_id]["Name"]))
+        Categories[category_id]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,Categories[category_id]["Name"],Categories[category_id]["Category data"]))
+        Categories[category_id]["Delete transaction"].clicked.connect(partial(remove_transaction,Categories[category_id]["Category data"],category_id))
 
         Add_category_window.category_name.setText("")
         Add_category_window.window.hide()
@@ -276,9 +280,9 @@ def rename_category():
                 Categories[category]["Settings"].clicked.disconnect()
                 Categories[category]["Add transaction"].clicked.disconnect()
                 Categories[category]["Edit transaction"].clicked.disconnect()
-                Categories[category]["Settings"].clicked.connect(lambda category_name= new_category_name,_=False: show_category_settings(category_name=category_name))
-                Categories[category]["Add transaction"].clicked.connect(lambda category_name = new_category_name,_=False: show_add_transaction_window(category_name))
-                Categories[category]["Edit transaction"].clicked.connect(lambda category_name= new_category_name,category_data = Categories[category]["Category data"]:show_edit_transaction_window(category_name=category_name,category_data=category_data))
+                Categories[category]["Settings"].clicked.connect(partial(show_category_settings,new_category_name ))
+                Categories[category]["Add transaction"].clicked.connect(partial(show_add_transaction_window,new_category_name))
+                Categories[category]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,new_category_name,Categories[category]["Category data"]))
                 Categories[category]["Name label"].setText(new_category_name)
 
                 account.rename_category(category,new_category_name)
@@ -427,10 +431,10 @@ def remove_transaction(category_data:QTableWidget,category_id:int):
 
 def activate_categories():
     for category in Categories:
-        Categories[category]["Settings"].clicked.connect(lambda category_name = Categories[category]["Name"],_=False: show_category_settings(category_name=category_name))
-        Categories[category]["Add transaction"].clicked.connect(lambda category_name = Categories[category]["Name"],_=False: show_add_transaction_window(category_name))
-        Categories[category]["Edit transaction"].clicked.connect(lambda category_name= Categories[category]["Name"],category_data = Categories[category]["Category data"]:show_edit_transaction_window(category_name=category_name,category_data=category_data))
-        Categories[category]["Delete transaction"].clicked.connect(lambda category_data = Categories[category]["Category data"],category_id=category:remove_transaction(category_data,category_id))
+        Categories[category]["Settings"].clicked.connect(partial(show_category_settings,Categories[category]["Name"]))
+        Categories[category]["Add transaction"].clicked.connect(partial(show_add_transaction_window,Categories[category]["Name"]))
+        Categories[category]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,Categories[category]["Name"],Categories[category]["Category data"]))
+        Categories[category]["Delete transaction"].clicked.connect(partial(remove_transaction,Categories[category]["Category data"],category))
 
 
 def load_account_data(name:str):
@@ -619,7 +623,9 @@ if __name__ == "__main__":
         load_categories()
     activate_categories()
 
-    [Accounts_list.append(item[0]) for item in account.get_all_accounts()]
+    [Accounts_list.append(item[0]) for item in account.get_all_accounts() if item[0] not in Accounts_list]
+
+    Settings_window.accounts.clear()
     Settings_window.accounts.addItems(Accounts_list)
     Settings_window.accounts.setCurrentText(Account_name)
 
