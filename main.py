@@ -273,7 +273,7 @@ def rename_category():
 
     if not account.category_exists(new_category_name,category_type):
         for category in Categories:
-            if Categories[category]["Name"] == current_name:
+            if Categories[category]["Name"] == current_name and Categories[category]["Type"] == category_type:
                 Categories[category].update({"Name":new_category_name})
 
                 #Update connections
