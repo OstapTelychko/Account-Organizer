@@ -4,26 +4,26 @@ from GUI import *
 from Languages import LANGUAGES,change_language
 from Account_management import Account
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
-from datetime import datetime
+from Project_configuration import ROOT_DIRECTORY, MONTHS_DAYS, FORBIDDEN_CALCULATOR_WORDS, CATEGORY_TYPE
 from functools import partial
+from datetime import datetime
 import toml
 from sys import exit
 
 
-Current_balance = 0
 Current_month = datetime.now().month
 Current_year = datetime.now().year
-
+Current_balance = 0
+Current_total_income = 0
+Current_total_expenses = 0
 Accounts_list = []
 Categories = {}
-CATEGORY_TYPE = {0:"Incomes",1:"Expenses"}
-FORBIDDEN_CALCULATOR_WORDS = ["import","def","for","while","open","del","__","with","exit","raise","print","range","quit","class","try","if","input","object","global","lambda","match"]
 
 Switch_account = True
-MONTHS_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-def update_config():
-    with open(f"{ROOT_DIRECTORY}/configuration.toml","w",encoding="utf-8") as file:
+
+def update_user_config():
+    with open(f"{ROOT_DIRECTORY}/User_configuration.toml","w",encoding="utf-8") as file:
         toml.dump(Configuration,file)
 
 
@@ -47,7 +47,7 @@ def swith_theme():
                 Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
 
         Configuration.update({"Theme" : "Dark"})
-    update_config()
+    update_user_config()
 
 
 def load_language(language):
@@ -60,28 +60,53 @@ def load_language(language):
     else:
         Configuration["Language"] = language
         Language = language
-    update_config()
+    update_user_config()
     change_language(Language,Categories,Current_balance,Current_month,account)
 
 
 def calculate_current_balance():
-    global Current_balance
+    global Current_balance, Current_total_income, Current_total_expenses
 
-    Incomes = 0
-    Expenses = 0
+    Current_total_income = 0
+    Current_total_expenses = 0
 
     for category in account.get_all_categories():
         if category[1] == "Incomes":
             for transaction in account.get_all_transactions(category[0]):
-                Incomes += transaction[5]
+                Current_total_income += transaction[5]
         elif category[1] == "Expenses":
             for transaction in account.get_all_transactions(category[0]):
-                Expenses += transaction[5]
+                Current_total_expenses += transaction[5]
     
-    Current_balance = Incomes - Expenses
+    Current_balance = Current_total_income - Current_total_expenses
+    account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
     Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
-    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
+    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
+    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+
+
+def load_account_balance():
+    global Current_balance, Current_total_income, Current_total_expenses
+
+    Current_balance, Current_total_income, Current_total_expenses = account.get_account_balance()
+
+    if Current_total_income == 0 and Current_total_expenses == 0:
+        print(1)
+        calculate_current_balance()
+    
+    print(Current_total_expenses)
+    print(Current_total_income)
+    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
+    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+
+
+def update_account_balance():
+    account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
+
+    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
+    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
 
 
 def load_categories_data():
@@ -184,12 +209,13 @@ def add_user():
                 Add_account_window.window.hide()
                 Account_name = full_name
                 Configuration.update({"Account_name":Account_name})
-                update_config()
+                update_user_config()
                 Settings_window.accounts.addItem(full_name)
                 Accounts_list.append(Account_name)
                 Switch_account = False
                 load_account_data(Account_name)
                 Settings_window.accounts.setCurrentText(Account_name)
+
             if balance != "":
                 if balance.isdigit():
                     account.create_account(int(balance))
@@ -322,12 +348,24 @@ def show_edit_transaction_window(category_name:str,category_data:QTableWidget):
 
 
 def update_transaction(transaction_id:int,transaction_name:str,transaction_day:int,transaction_value:int|float,category_data:QTableWidget):
+    global Current_balance, Current_total_income, Current_total_expenses
+
     account.update_transaction(transaction_id,transaction_name,transaction_day,transaction_value)
                 
     for row in range(category_data.rowCount()):
         if int(category_data.item(row,3).text()) == transaction_id:
             category_data.item(row,0).setText(transaction_name)
             category_data.item(row,1).setData(Qt.ItemDataRole.EditRole,transaction_day)
+
+            old_value = category_data.item(row,2).data(Qt.ItemDataRole.EditRole)
+            values_difference = transaction_value - old_value
+
+            if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
+                Current_total_income += values_difference
+                Current_balance += values_difference
+            else:
+                Current_total_expenses += values_difference
+                Current_balance -=  values_difference
             category_data.item(row,2).setData(Qt.ItemDataRole.EditRole,transaction_value)
 
 
@@ -342,15 +380,26 @@ def show_add_transaction_window(category_name:str):
     Transaction_management_window.window.exec()
 
 
-def add_transaction(transaction_name:str,transaction_day:int,transaction_value:int|float,category_data:QTableWidget,category_id:int):
+def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:QTableWidget, category_id:int):
+    global Current_balance, Current_total_income, Current_total_expenses
+
     account.add_transaction(category_id,Current_year,Current_month,transaction_day,transaction_value,transaction_name)
+
+    print(Current_total_expenses)
+    if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
+        Current_total_income += transaction_value
+        Current_balance += transaction_value
+    else:
+        Current_total_expenses += transaction_value
+        Current_balance -= transaction_value
+    print(Current_total_expenses)
 
     row = category_data.rowCount()
     category_data.setRowCount(row+1)
 
     day = QTableWidgetItem()
     day.setData(Qt.ItemDataRole.EditRole,transaction_day)
-    day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
+    day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes in this case cells in table can't be edited
 
     value = QTableWidgetItem()
     value.setData(Qt.ItemDataRole.EditRole,transaction_value)
@@ -379,7 +428,7 @@ def transaction_data_handler():
     category_data = Categories[category_id]["Category data"]
 
     if  transaction_day != "" or transaction_value != "":
-        if transaction_value.replace(".","").isdigit() and  transaction_day.isdigit() :
+        if transaction_value.replace(".","").isdigit() and  transaction_day.isdigit():
             transaction_day = int(transaction_day)
 
             max_month_day = MONTHS_DAYS[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
@@ -395,7 +444,7 @@ def transaction_data_handler():
                     add_transaction(transaction_name,transaction_day,transaction_value,category_data,category_id)
 
                 update_category_total_value(category_id)
-                calculate_current_balance()
+                update_account_balance()
                 Transaction_management_window.window.hide()
             else:
                 Errors.day_out_range_error.setText(LANGUAGES[Language]["Errors"][8]+f"1-{max_month_day}")
@@ -407,11 +456,15 @@ def transaction_data_handler():
 
 
 def remove_transaction(category_data:QTableWidget,category_id:int):
+    global Current_balance, Current_total_expenses, Current_total_income
+
     selected_row = category_data.selectedItems()
     if len(selected_row) != 0 and  not len(selected_row) < 3:
         if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row()  and selected_row[0].row() == selected_row[2].row():
             transaction_id = category_data.item(selected_row[0].row(),3).data(Qt.ItemDataRole.EditRole)
             if Errors.delete_transaction_question.exec() == QMessageBox.StandardButton.Ok:
+
+                transaction_value = selected_row[2].data(Qt.ItemDataRole.EditRole)
                 account.delete_transaction(transaction_id)
 
                 for row in range(category_data.rowCount()):
@@ -420,7 +473,14 @@ def remove_transaction(category_data:QTableWidget,category_id:int):
                         break
 
                 update_category_total_value(category_id)
-                calculate_current_balance()
+                if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
+                    Current_total_income -= transaction_value
+                    Current_balance -= transaction_value
+                else:
+                    Current_total_expenses -= transaction_value
+                    Current_balance += transaction_value
+                update_account_balance()
+
                 row = category_data.verticalHeader()
                 row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         else:
@@ -455,10 +515,10 @@ def load_account_data(name:str):
     Settings_window.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())    
 
     Configuration.update({"Account_name":Account_name})
-    update_config()
+    update_user_config()
     load_categories()
     activate_categories()
-    calculate_current_balance()
+    load_account_balance()
 
 
 def switch_account(name:str):
@@ -490,7 +550,7 @@ def remove_account():
             Settings_window.accounts.setCurrentText(Accounts_list[0])
         else:#Close app if db is empty
             Configuration.update({"Account_name":""})
-            update_config()
+            update_user_config()
             exit()
 
 
@@ -509,12 +569,12 @@ def rename_account():
     if name != " " or surname != "":
         new_name = name+" "+surname
         if not account.account_exists(new_name):
-            account.rename_account(Account_name,new_name)
+            account.rename_account(new_name)
 
             Accounts_list[Accounts_list.index(Account_name)] = new_name
             Account_name = new_name
             Configuration.update({"Account_name":new_name})
-            update_config()
+            update_user_config()
 
             Switch_account = False
             Settings_window.accounts.clear()
@@ -549,8 +609,8 @@ def calulate_expression():
 
 
 if __name__ == "__main__":
-    with open(f"{ROOT_DIRECTORY}/configuration.toml") as file:
-        Configuration = toml.load(f"{ROOT_DIRECTORY}/configuration.toml")
+    with open(f"{ROOT_DIRECTORY}/User_configuration.toml") as file:
+        Configuration = toml.load(f"{ROOT_DIRECTORY}/User_configuration.toml")
 
 
     #Load selected language 
@@ -635,8 +695,7 @@ if __name__ == "__main__":
     Settings_window.delete_account.clicked.connect(remove_account)
     Rename_account_window.button.clicked.connect(rename_account)
 
-
-    calculate_current_balance()
+    load_account_balance()
     load_language(Language)
 
     Main_window.window.show()

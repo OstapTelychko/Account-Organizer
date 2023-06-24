@@ -36,7 +36,7 @@ LANGUAGES = {
                 4:"New surname",
                 "Messages":{
                     0:"Enter name and surname to create a new account. (You can't use the same full name)",
-                    1:"Enter new name and surname to rename account. "
+                    1:"Enter new name and surname. "
                 }
             },
             "Info":{
@@ -103,7 +103,7 @@ LANGUAGES = {
             }
         },
         "Errors":{
-            0:"You have entered invalid type of data, check them again",
+            0:"You have entered invalid type of data, check entered fields again",
             1:"Account with this name alredy exists",
             2:"You haven't entered a current balance, i will count it as 0 (if that's not true value there may be discrepancy between current and actual balance)",
             3:"This category already exists",
@@ -169,9 +169,8 @@ LANGUAGES = {
                 3:"Нове ім'я",
                 4:"Нове Прізвище",
                 "Messages":{
-                    0:"Введіть ім'я і прізвище, щоб створити новий акаунт. (Використовувати те саме ім'я і призвище не можна) ",
-                    1:"Введіть ім'я і прізвище акаунта, якого бажаєте видалити. ",
-                    2:"Введіть нове ім'я і прізвище акаунта, щоб його переназвати. "
+                    0:"Введіть ім'я і прізвище, щоб створити новий акаунт. (Використовувати те саме ім'я і прізвище не можна) ",
+                    1:"Введіть нове ім'я і прізвище. "
                 }
             },
             "Info":{
@@ -238,7 +237,7 @@ LANGUAGES = {
             }
         },
         "Errors":{
-            0:"Ви ввели не правильний тип даних, перевірте їх знов",
+            0:"Ви ввели не правильний тип даних, перевірте введені дані знов",
             1:"Акаунт під такою назвою вже існує",
             2:"Ви не ввели поточного балансу, я зарахую це як 0 (якщо це не є правдим значенням, можуть виникнути розбіжності з реальним і поточним балансом). Продовжити?",
             3:"Ця категорія вже існує",

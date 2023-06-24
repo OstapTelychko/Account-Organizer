@@ -117,6 +117,7 @@ def add_statistic(statistic_list:QListWidget,statistic_data:dict,words:list,Lang
             add_highest_and_lowest_transactions(category,statistic_data[1])
 
 
+
 def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Current_month:int,account:Account,months_days:list):
     Monthly_statistics.window.setWindowTitle(LANGUAGES[Language]["Months"][Current_month])
     Monthly_statistics.statistics.clear()
@@ -158,6 +159,7 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
         Errors.no_category_error.exec()
 
 
+
 def add_month_statistics(Incomes_categories:dict,Expenses_categories:dict,Current_year:int,current_month:int,account:Account,Statistic_words:dict,months_days:list,month_statistics:QListWidget,Language:str,Categories:dict):
     Incomes_statistic = get_min_and_max_categories(Incomes_categories,Current_year,current_month,account)
     Expenses_statistic = get_min_and_max_categories(Expenses_categories,Current_year,current_month,account)
@@ -182,6 +184,7 @@ def add_month_statistics(Incomes_categories:dict,Expenses_categories:dict,Curren
     month_statistics.addItem("")
     month_statistics.addItem(LANGUAGES[Language]["Account"]["Info"][5])
     add_statistic(month_statistics,Expenses_statistic,[17,18,20,21,19,22],Language,Categories)
+
 
 
 def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,account:Account,months_days:list):
@@ -271,6 +274,7 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
             Errors.no_category_error.exec()
     else:
         Errors.no_category_error.exec()
+
 
 
 def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account:Account,months_days:list):

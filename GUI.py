@@ -3,13 +3,19 @@ from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
 from Account_management import Account
+from Project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
+from sys import platform
 
-ROOT_DIRECTORY = __file__.replace("GUI.py","")
 
 app = QApplication([])
 
 ALIGMENT = Qt.AlignmentFlag
 APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
+
+if platform == "linux":
+    BASIC_FONT = QFont("C059 [urw]",pointSize=12)
+else:#Windows
+    BASIC_FONT = QFont("Calibri",pointSize=12)
 
 dark_theme = load_stylesheet("dark")
 dark_theme_icon = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
@@ -33,7 +39,6 @@ def create_error(type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
 
 def create_button(button_text:str,size:tuple[int])->QPushButton:
     button = QPushButton(text=button_text)
-    # button.setFont(QFont("Calibri",pointSize=10))
     button.setFont(QFont("C059 [urw]",pointSize=12))
     button.setMinimumSize(*size)
     button.setMaximumSize(*size)
@@ -70,9 +75,11 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     category_layout = QVBoxLayout()
 
     category_total_value = QLabel("")
+    category_total_value.setFont(BASIC_FONT)
     category["Total value"] = category_total_value
 
     category_name = QLabel(name)
+    category_name.setFont(BASIC_FONT)
     category["Name"] = name
     category["Name label"] = category_name
 
@@ -105,10 +112,12 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
     header.setSectionResizeMode(0,QHeaderView.ResizeMode.Stretch)
 
-    row = category_data.verticalHeader()
-    row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+    column = category_data.verticalHeader()
+    column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
     category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0],LANGUAGES[Language]["Account"]["Info"][1],LANGUAGES[Language]["Account"]["Info"][2]))
+    row = category_data.horizontalHeader()
+    row.setFont(BASIC_FONT)
 
     transactions = account.get_transactions_by_month(category_id,year,month)
     total_value = 0
@@ -167,6 +176,7 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
         Main_window.Incomes_window_layout.addWidget(category_window)
     else:
         Main_window.Expenses_window_layout.addWidget(category_window)
+
     return category
 
 
@@ -217,6 +227,7 @@ class Main_window():
     Year_layout = QHBoxLayout()
     previous_year_button = create_button("<",(32,30))
     current_year = QLabel("2023")
+    current_year.setFont(BASIC_FONT)
     next_year_button = create_button(">",(32,30))
 
     Year_layout.addStretch(5)
@@ -229,6 +240,7 @@ class Main_window():
     Month_layout = QHBoxLayout()
     previous_month_button = create_button("<",(30,30))
     current_month = QLabel("April")
+    current_month.setFont(BASIC_FONT)
     next_month_button = create_button(">",(30,30))
 
     Month_layout.addStretch(5)
@@ -239,6 +251,7 @@ class Main_window():
 
     #Income and expenses windows 
     Incomes_and_expenses = QTabWidget()
+    Incomes_and_expenses.setFont(BASIC_FONT)
 
     Incomes_window = QWidget()
     Incomes_window.setMinimumHeight(350)
@@ -316,26 +329,35 @@ class Settings_window():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Settings")
+    window.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")
 
     switch_themes_button = QToolButton()
     switch_themes_button.setIconSize(QSize(35,35))
 
     languages = QComboBox()
-    languages.addItems(("English","Українська"))
-    languages.setItemIcon(0,QIcon(f"{ROOT_DIRECTORY}/Images/English.png"))
-    languages.setItemIcon(1,QIcon(f"{ROOT_DIRECTORY}/Images/Ukrainian.png"))
+    languages.setFont(BASIC_FONT)
+    languages.addItems(AVAILABLE_LANGUAGES)
+
+    for language in range(len(AVAILABLE_LANGUAGES)):
+        languages.setItemIcon(language,QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
+    # languages.setIconSize(QSize(6,6))
 
     accounts = QComboBox()
+    accounts.setFont(BASIC_FONT)
     accounts.setMinimumWidth(250)
     accounts.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
 
     add_account = create_button("Add account",(150,50))
     delete_account = create_button("Delete account",(150,50))
+    delete_account.setStyleSheet("QPushButton{color:rgba(255,0,0,150)}")
     rename_account = create_button("Rename account",(180,50))
 
     total_income = QLabel()
+    total_income.setFont(BASIC_FONT)
     total_expense = QLabel()
+    total_expense.setFont(BASIC_FONT)
     account_created_date = QLabel()
+    account_created_date.setFont(BASIC_FONT)
 
     main_layout = QVBoxLayout()
     main_layout.addStretch(2)
@@ -385,8 +407,10 @@ class Add_account_window():
     window.setWindowTitle("Add account")
 
     message = QLabel()
+    message.setFont(BASIC_FONT)
     message.setWordWrap(True)
-    message.setMinimumHeight(60)
+    message.setMinimumHeight(80)
+    message.setMinimumWidth(450)
 
     Full_name_layout = QHBoxLayout()
     name = QLineEdit()
@@ -423,6 +447,7 @@ class Rename_account_window():
     window.setWindowTitle("Rename account")
     
     message = QLabel()
+    message.setFont(BASIC_FONT)
 
     new_name = QLineEdit("New name")
     new_surname = QLineEdit("New Surname")
@@ -491,6 +516,7 @@ class Transaction_management_window():
     window.setWindowTitle("Edit")
 
     message = QLabel()
+    message.setFont(BASIC_FONT)
 
     transaction_layout = QHBoxLayout()
     transaction_name = QLineEdit()
@@ -551,6 +577,7 @@ class Monthly_statistics():
     {background: transparent}""")#Disable background color change on mouseover
     
     statistics = QListWidget()
+    statistics.setFont(BASIC_FONT)
     main_layout = QVBoxLayout()
     main_layout.addWidget(statistics)
 
@@ -569,7 +596,7 @@ class Quarterly_statistics():
     QListWidget::item:disabled:hover,
     QListWidget::item:hover:!active,
     QListWidget::item:focus
-    {background: transparent}""")#Disable background color change on mouseover
+    {background: transparent}""")#Disable background color change on hover
     window.setWindowFlags(Qt.WindowType.Window)
 
     statistics_layout = QVBoxLayout()
@@ -580,6 +607,7 @@ class Quarterly_statistics():
         statistics[quarter] = {}
 
         quarter_label = QLabel()
+        quarter_label.setFont(BASIC_FONT)
         quarter_label.setContentsMargins(0,50,0,0)
         statistics[quarter]["Label"] = quarter_label
         statistics_layout.addWidget(quarter_label,alignment=ALIGMENT.AlignBottom)
@@ -592,11 +620,13 @@ class Quarterly_statistics():
             statistics[quarter][statistic_list] = {}
 
             statistic_label = QLabel()
+            statistic_label.setFont(BASIC_FONT)
             statistic_label_layout = QHBoxLayout()
             statistic_label_layout.addWidget(statistic_label,alignment=ALIGMENT.AlignHCenter)
             statistics[quarter][statistic_list]["Label"] = statistic_label
 
             statistic_data = QListWidget()
+            statistic_data.setFont(BASIC_FONT)
             statistic_data.setWordWrap(True)
             statistic_data.setMinimumHeight(250)
             statistic_data.setMinimumWidth(500)
@@ -655,12 +685,14 @@ class Yearly_statistics():
         statistics[statistics_list] = {}
 
         statistics_label = QLabel()
+        statistics_label.setFont(BASIC_FONT)
         statistics_label.setContentsMargins(0,50,0,0)
         statistics_label_layout = QHBoxLayout()
         statistics_label_layout.addWidget(statistics_label,alignment=ALIGMENT.AlignHCenter)
         statistics[statistics_list]["Label"] = statistics_label
 
         statistics_data = QListWidget()
+        statistics_data.setFont(BASIC_FONT)
         statistics_data.setMinimumHeight(400)
         statistics_data.setWordWrap(True)
         statistics[statistics_list]["Statistic Data"] = statistics_data
@@ -682,7 +714,6 @@ class Yearly_statistics():
     main_layout = QVBoxLayout()
     main_layout.addWidget(statistics_scroll)
     window.setLayout(main_layout)
-
 
 
 
