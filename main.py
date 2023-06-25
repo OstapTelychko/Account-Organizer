@@ -91,11 +91,8 @@ def load_account_balance():
     Current_balance, Current_total_income, Current_total_expenses = account.get_account_balance()
 
     if Current_total_income == 0 and Current_total_expenses == 0:
-        print(1)
         calculate_current_balance()
     
-    print(Current_total_expenses)
-    print(Current_total_income)
     Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
     Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
     Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
@@ -385,14 +382,12 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
 
     account.add_transaction(category_id,Current_year,Current_month,transaction_day,transaction_value,transaction_name)
 
-    print(Current_total_expenses)
     if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
         Current_total_income += transaction_value
         Current_balance += transaction_value
     else:
         Current_total_expenses += transaction_value
         Current_balance -= transaction_value
-    print(Current_total_expenses)
 
     row = category_data.rowCount()
     category_data.setRowCount(row+1)
@@ -683,6 +678,7 @@ if __name__ == "__main__":
         load_categories()
     activate_categories()
 
+    #Add accounts to list
     [Accounts_list.append(item[0]) for item in account.get_all_accounts() if item[0] not in Accounts_list]
 
     Settings_window.accounts.clear()

@@ -99,7 +99,7 @@ LANGUAGES = {
                 0:"Create category",
                 1:"Delete category",
                 2:"Rename category",
-                4:"New name",
+                3:"New name",
             }
         },
         "Errors":{
@@ -156,7 +156,7 @@ LANGUAGES = {
             2:"Переназвати",
             3:"Ок",
             4:"Скасувати",
-            5:"Обновити"
+            5:"Оновити"
         },
         "Account":{
             0:"Ім'я",
@@ -209,10 +209,10 @@ LANGUAGES = {
                     21:"Найдешевші категорії  ",
                     22:"Найдешевші транзакції  ",
                     23:" Квартал",
-                    24:"Середіній дохід за день   ",
+                    24:"Середній дохід за день   ",
                     25:"Середній дохід за місяць   ",
-                    26:"Середіні витрати за день   ",
-                    27:"Середіні витрати за місяць   ",
+                    26:"Середні витрати за день   ",
+                    27:"Середні витрати за місяць   ",
                 }
             },
             "Transactions management":{
@@ -220,7 +220,7 @@ LANGUAGES = {
                 1:"Видалити транзакцію",
                 2:"Змінити транзакцію",
                 "Messages":{
-                    0:"Ведіть значення, які хочете змінити",
+                    0:"Ведіть дані в поля, які хочете змінити",
                     1:"""
                     Введіть назву (необов'язково) день і значення транзації за прикладом:
 
@@ -233,7 +233,7 @@ LANGUAGES = {
                 0:"Додати категорію",
                 1:"Видалити категорію",
                 2:"Переназвати категорію",
-                4:"Нова назва"
+                3:"Нова назва"
             }
         },
         "Errors":{
@@ -268,11 +268,146 @@ LANGUAGES = {
             5:"Квартальна статистика",
             6:"Річна статистика"
         }
+    },
+    "Polski":{
+        "Months":{
+            1:"Styczeń",
+            2:"Luty",
+            3:"Marzec",
+            4:"Kwieсień",
+            5:"Maj",
+            6:"Czerwiec",
+            7:"Lipiec",
+            8:"Sierpień",
+            9:"Wrzesień",
+            10:"Październik",
+            11:"Listopad",
+            12:"Grudzień",
+        },
+        "General management":{
+            0:"Usunąnć",
+            1:"Dodać",
+            2:"Zmienić nazwę",
+            3:"Ok",
+            4:"Anulować",
+            5:"Zmienić"
+        },
+        "Account":{
+            0:"Imię",
+            1:"Nazwisko",
+            2:"Potoczne saldo",
+            "Account management":{
+                0:"Usuń konto",
+                1:"Dodaj konto",
+                2:"Zmień nazwę konta",
+                3:"Nowe imię",
+                4:"Nowe nazwisko",
+                "Messages":{
+                    0:"Wprowadźcie imię i nazwisko, aby dodać nowe konto. (Nie wolno używać tego samego imienia i nazwiska)",
+                    1:"Wprowadź nowe imię i nazwisko"
+                }
+            },
+            "Info":{
+                0:"Nazwa",
+                1:"Data",
+                2:"Wartość",
+                3:"Saldo ",
+                4:"Dochód ",
+                5:"Wydatki ",
+                6:"Ogólnie ",
+                7:"Całkowity dochód: ",
+                8:"Całkowite wydatki: ",
+                9:"Konto dodane ",
+                "Statistics":{
+                    0:"Statystyka",
+                    1:"Miesiączna",
+                    2:"Kwartalna",
+                    3:"Roczna",
+                    4:"Całkowity dochód   ",
+                    5:"Średni dochód   ",
+                    6:"Całkowite wydatki   ",
+                    7:"Średnie wydatki   ",
+                    8:"Dochód z wydatkami   ",
+                    9:"Najwięcej dochodów otrzymano z  ",
+                    10:"Najwięcej dochodów otrzymano z  ",
+                    11:"Najwiekszy dochód otrzymano z transakcji:  ",
+                    12:"Bez nazwy ",
+                    13:"Najmniej dochodów otrzymano z  ",
+                    14:"Najmniej dochodów otrzymano z  ",
+                    15:"Najmniejszy dochód otrzymano z transakcji:  ",
+                    16:"Kategoria ",
+                    17:"Najdroższa kategoria  ",
+                    18:"Najdroższe kategorie  ",
+                    19:"Najdroższe transakcji  ",
+                    20:"Najtańsza kategoria  ",
+                    21:"Najtańsze kategorie  ",
+                    22:"Najtańsze transakcji  ",
+                    23:" Kwartał",
+                    24:"Średni dzienny dochód  ",
+                    25:"Średni miesięczny dochód  ",
+                    26:"Średnie wytraty dziennie  ",
+                    27:"Średnie wytraty miesięczne  "
+                }  
+            },
+            "Transactions management":{
+                0:"Dodać transakcję",
+                1:"Usunąć transakcję",
+                2:"Źmienić transakcję",
+                "Messages":{
+                    0:"Wprowadźcie dane w polach, które chcecie zmienić",
+                    1:"""
+                    Wpiszcie nazwę (niekonicznie), dzień i wartość transakcji za przykładem:
+
+                                            Harry'ego Pottera   28    13850
+                                            Wypłata         20      25000
+                    """
+                }
+            },
+            "Category management":{
+                0:"Dodać kategorię",
+                1:"Usunąć kategorię",
+                2:"Zmienić nazwę kategorii",
+                3:"Nowa nazwa"
+            }
+        },
+        "Errors":{
+            0:"Wpisaliscie nie korektny typ danych, sprawdź wpisane dane znow",
+            1:"Konto z takim imieniem już istnieje",
+            2:"Nie podałeś aktualnego salda, policzę to jako 0 (jeśli to nieprawda, wystąpi rozbieżność między rzeczywistym a całkowitym saldem). Kontynuować?",
+            3:"Ta kategoria już istnieje",
+            4:"Czy na pewno chcecie usunąć kategorię? Utracisz WSZYSTKIE transakcje zarejestrowane w tej kategorii, a bieżące saldo zostanie przeliczone",
+            5:"Wybierzcie transakcję. (aby wybrać transakcję, kliknij na jej numer)",
+            6:"Wybierzcie tylko jedną transakcję.",
+            7:"Pola nie mogą pozostać puste",
+            8:"Dzień powinien być w zakresie ",
+            9:"Czy na pewno chcecie usunąć tę transakcję?",
+            10:"Załadować account ?",
+            11:"Czy na pewno chcecie usunąć account ? Ta czynność jest nieodwracalna",
+            12:"Nie mogę obliczyć pustego wyrażenia",
+            13:"W wyrażeniu użyłeś zabronionych słów",
+            14:"Aby zobaczyć statystyki miesięczne, musisz mieć co najmniej jedną kategorię dochodów i jedną kategorię wydatków",
+            15:"Aby zobaczyć miesięczne statystyki, musisz mieć co najmniej jedną transakcję dochodu i jedną transakcję wydatkóws"
+        },
+        "Mini calculator":{
+            0:"Mały kalkulator",
+            1:"Nie można podzielić przez zero",
+            2:"Wyrażenie jest napisane nie poprawnie"
+        },
+        "Windows":{
+            0:"Ustawienia",
+            1:"Dodać konto",
+            2:"Zmienić nazwę konta",
+            3:"Usunąnć konto",
+            4:"Statystyka",
+            5:"Statystyka kwartalna",
+            6:"Statystyka roczna"
+        }
     }
 }
 
 
-def change_language(Language,Categories:dict,Current_balance:int|float,Current_month:int,account:Account):
+def change_language(Language, Categories:dict, Current_balance:int|float, Current_month:int, account:Account):
+    LANGUAGES[Language]["Account"]["Category management"]
     Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
     Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
     Main_window.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
@@ -300,7 +435,7 @@ def change_language(Language,Categories:dict,Current_balance:int|float,Current_m
     Category_settings_window.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
     Category_settings_window.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
 
-    Rename_category_window.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][4])
+    Rename_category_window.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][3])
     Rename_category_window.button.setText(LANGUAGES[Language]["General management"][2])
 
     Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][5])
