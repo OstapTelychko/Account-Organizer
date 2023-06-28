@@ -78,7 +78,12 @@ def calculate_current_balance():
             for transaction in account.get_all_transactions(category[0]):
                 Current_total_expenses += transaction[5]
     
-    Current_balance = Current_total_income - Current_total_expenses
+    # If user created account recently with balance not 0 and he don't have transactions yet
+    if Current_total_income == 0 and Current_total_expenses == 0 and account.get_account_balance()[0] != 0:
+        Current_balance = account.get_account_balance()[0]
+    else:
+        Current_balance = Current_total_income - Current_total_expenses
+
     account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
     Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
     Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
