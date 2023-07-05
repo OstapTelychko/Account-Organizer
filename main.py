@@ -5,6 +5,8 @@ from Languages import LANGUAGES,change_language
 from Account_management import Account
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
 from Project_configuration import ROOT_DIRECTORY, MONTHS_DAYS, FORBIDDEN_CALCULATOR_WORDS, CATEGORY_TYPE
+from Copy_statistics import show_information_message, copy_month_transactions
+
 from functools import partial
 from datetime import datetime
 import toml
@@ -31,7 +33,7 @@ def swith_theme():
     global Configuration
     if Configuration["Theme"] == "Dark":
         app.setStyleSheet(light_theme)
-        Settings_window.switch_themes_button.setIcon(light_theme_icon)
+        SettingsWindow.switch_themes_button.setIcon(light_theme_icon)
 
         if len(Categories) != 0:
             for category in Categories:
@@ -40,7 +42,7 @@ def swith_theme():
         Configuration.update({"Theme" : "Light"})
     elif Configuration["Theme"] == "Light":
         app.setStyleSheet(dark_theme)
-        Settings_window.switch_themes_button.setIcon(dark_theme_icon)
+        SettingsWindow.switch_themes_button.setIcon(dark_theme_icon)
 
         if len(Categories) != 0:
             for category in Categories:
@@ -85,9 +87,9 @@ def calculate_current_balance():
         Current_balance = Current_total_income - Current_total_expenses
 
     account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
-    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
-    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
 
 
 def load_account_balance():
@@ -98,17 +100,17 @@ def load_account_balance():
     if Current_total_income == 0 and Current_total_expenses == 0:
         calculate_current_balance()
     
-    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
-    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
 
 
 def update_account_balance():
     account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
 
-    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
-    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
 
 
 def load_categories_data():
@@ -124,14 +126,21 @@ def load_categories_data():
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
+                name = QTableWidgetItem(transaction[6])
+                name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
                 day = QTableWidgetItem()
                 day.setData(Qt.ItemDataRole.EditRole,transaction[4])
+                day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
                 value = QTableWidgetItem()
                 value.setData(Qt.ItemDataRole.EditRole,transaction[5])
+                value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
                 transaction_id = QTableWidgetItem()
                 transaction_id.setData(Qt.ItemDataRole.EditRole,transaction[0])
 
-                category_data.setItem(row,0,QTableWidgetItem(transaction[6]))
+                category_data.setItem(row,0,name)
                 category_data.setItem(row,1,day)
                 category_data.setItem(row,2,value)
                 category_data.setItem(row,3,transaction_id)
@@ -144,9 +153,9 @@ def next_month():
 
     if Current_month != 12:
         Current_month +=1
-        Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
+        MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
     else:
-        Main_window.current_month.setText(LANGUAGES[Language]["Months"][1])
+        MainWindow.current_month.setText(LANGUAGES[Language]["Months"][1])
         Current_month = 1
     load_categories_data()
 
@@ -156,9 +165,9 @@ def previous_month():
 
     Current_month -= 1
     if Current_month != 0:
-        Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
+        MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
     else:
-        Main_window.current_month.setText(LANGUAGES[Language]["Months"][12])
+        MainWindow.current_month.setText(LANGUAGES[Language]["Months"][12])
         Current_month = 12
     load_categories_data()
 
@@ -167,7 +176,7 @@ def next_year():
     global Current_year
 
     Current_year += 1
-    Main_window.current_year.setText(str(Current_year))
+    MainWindow.current_year.setText(str(Current_year))
     load_categories_data()
 
 
@@ -175,25 +184,26 @@ def previous_year():
     global Current_year
 
     Current_year -= 1
-    Main_window.current_year.setText(str(Current_year))
+    MainWindow.current_year.setText(str(Current_year))
     load_categories_data()
 
 
 def show_add_user_window():
-    Add_account_window.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][0])
-    Add_account_window.button.setText(LANGUAGES[Language]["General management"][1])
-    Add_account_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][1])
-    Add_account_window.name.setPlaceholderText(LANGUAGES[Language]["Account"][0])
-    Add_account_window.surname.setPlaceholderText(LANGUAGES[Language]["Account"][1])
-    Add_account_window.current_balance.setPlaceholderText(LANGUAGES[Language]["Account"][2])
-    Add_account_window.window.exec()
+    AddAccountWindow.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][0])
+    AddAccountWindow.button.setText(LANGUAGES[Language]["General management"][1])
+    AddAccountWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][1])
+    AddAccountWindow.name.setPlaceholderText(LANGUAGES[Language]["Account"][0])
+    AddAccountWindow.surname.setPlaceholderText(LANGUAGES[Language]["Account"][1])
+    AddAccountWindow.current_balance.setPlaceholderText(LANGUAGES[Language]["Account"][2])
+    AddAccountWindow.window.exec()
+
 
 
 def add_user():
     global Account_name,Configuration
 
-    name = Add_account_window.name.text().strip()
-    surname = Add_account_window.surname.text().strip()
+    name = AddAccountWindow.name.text().strip()
+    surname = AddAccountWindow.surname.text().strip()
 
     #For expample: Ostap  Telychko (Treatment) is allowed now
     prepared_name = name.replace(" ","").replace("(","").replace(")","")
@@ -203,20 +213,21 @@ def add_user():
         full_name = name+" "+surname
         account  = Account(full_name)
         if not account.account_exists(full_name):
-            balance = Add_account_window.current_balance.text()
+            balance = AddAccountWindow.current_balance.text()
 
             def complete_adding_account():
                 global Switch_account
 
-                Add_account_window.window.hide()
+                AddAccountWindow.window.hide()
                 Account_name = full_name
                 Configuration.update({"Account_name":Account_name})
                 update_user_config()
-                Settings_window.accounts.addItem(full_name)
+                SettingsWindow.accounts.addItem(full_name)
                 Accounts_list.append(Account_name)
                 Switch_account = False
                 load_account_data(Account_name)
-                Settings_window.accounts.setCurrentText(Account_name)
+                SettingsWindow.accounts.setCurrentText(Account_name)
+                show_information_message()
 
             if balance != "":
                 if balance.isdigit():
@@ -238,8 +249,8 @@ def add_user():
 def create_category():
     global Categories
 
-    category_type = "Incomes" if Main_window.Incomes_and_expenses.currentIndex() == 0 else "Expenses"
-    category_name = Add_category_window.category_name.text().strip()
+    category_type = "Incomes" if MainWindow.Incomes_and_expenses.currentIndex() == 0 else "Expenses"
+    category_name = AddCategoryWindow.category_name.text().strip()
 
     if not account.category_exists(category_name,category_type):
         account.create_category(category_name,category_type)
@@ -252,8 +263,8 @@ def create_category():
         Categories[category_id]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,Categories[category_id]["Name"],Categories[category_id]["Category data"]))
         Categories[category_id]["Delete transaction"].clicked.connect(partial(remove_transaction,Categories[category_id]["Category data"],category_id))
 
-        Add_category_window.category_name.setText("")
-        Add_category_window.window.hide()
+        AddCategoryWindow.category_name.setText("")
+        AddCategoryWindow.window.hide()
     else:
         Errors.category_exists_error.exec()
 
@@ -266,21 +277,22 @@ def load_categories():
 
 
 def show_category_settings(category_name:str):
-    if account.category_exists(category_name,CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()]):
-        Category_settings_window.window.setWindowTitle(category_name)
-        Category_settings_window.window.exec()
+    if account.category_exists(category_name,CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
+        CategorySettingsWindow.window.setWindowTitle(category_name)
+        CategorySettingsWindow.window.exec()
+
 
 
 def remove_category():
     global Categories
 
-    category_name = Category_settings_window.window.windowTitle()
+    category_name = CategorySettingsWindow.window.windowTitle()
 
     if Errors.delete_category_question.exec() == QMessageBox.StandardButton.Ok:
-        category_id = account.get_category_id(category_name,CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()])
+        category_id = account.get_category_id(category_name,CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
         account.delete_category(category_id)
-        Category_settings_window.window.setWindowTitle(" ")
-        Category_settings_window.window.hide()
+        CategorySettingsWindow.window.setWindowTitle(" ")
+        CategorySettingsWindow.window.hide()
 
         Categories[category_id]["Category window"].deleteLater()
         Categories[category_id]["Settings"].deleteLater()
@@ -295,9 +307,9 @@ def remove_category():
 def rename_category():
     global Categories
 
-    new_category_name = Rename_category_window.new_category_name.text().strip()
-    current_name = Rename_category_window.window.windowTitle()
-    category_type = CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()]
+    new_category_name = RenameCategoryWindow.new_category_name.text().strip()
+    current_name = RenameCategoryWindow.window.windowTitle()
+    category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
 
     if not account.category_exists(new_category_name,category_type):
         for category in Categories:
@@ -314,9 +326,9 @@ def rename_category():
                 Categories[category]["Name label"].setText(new_category_name)
 
                 account.rename_category(category,new_category_name)
-                Rename_category_window.window.hide()
-                Category_settings_window.window.hide()
-                Rename_category_window.new_category_name.setText("")
+                RenameCategoryWindow.window.hide()
+                CategorySettingsWindow.window.hide()
+                RenameCategoryWindow.new_category_name.setText("")
     else:
         Errors.category_exists_error.exec()
 
@@ -335,14 +347,14 @@ def show_edit_transaction_window(category_name:str,category_data:QTableWidget):
     selected_row = category_data.selectedItems()
     if len(selected_row) != 0 and  not len(selected_row) < 3:
         if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
-            Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][5])
-            Transaction_management_window.message.setText(LANGUAGES[Language]["Account"]["Transactions management"]["Messages"][0])
-            Transaction_management_window.window.setWindowTitle(category_name)
-            Transaction_management_window.transaction_name.setText(selected_row[0].text())
-            Transaction_management_window.transaction_day.setText(selected_row[1].text())
-            Transaction_management_window.transaction_value.setText(selected_row[2].text())
-            Transaction_management_window.transaction_id = int(category_data.item(selected_row[0].row(),3).text())
-            Transaction_management_window.window.exec()
+            TransactionManagementWindow.button.setText(LANGUAGES[Language]["General management"][5])
+            TransactionManagementWindow.message.setText(LANGUAGES[Language]["Account"]["Transactions management"]["Messages"][0])
+            TransactionManagementWindow.window.setWindowTitle(category_name)
+            TransactionManagementWindow.transaction_name.setText(selected_row[0].text())
+            TransactionManagementWindow.transaction_day.setText(selected_row[1].text())
+            TransactionManagementWindow.transaction_value.setText(selected_row[2].text())
+            TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(),3).text())
+            TransactionManagementWindow.window.exec()
         else:
             Errors.only_one_row_error.exec()
     else:
@@ -362,7 +374,7 @@ def update_transaction(transaction_id:int,transaction_name:str,transaction_day:i
             old_value = category_data.item(row,2).data(Qt.ItemDataRole.EditRole)
             values_difference = transaction_value - old_value
 
-            if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
+            if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
                 Current_total_income += values_difference
                 Current_balance += values_difference
             else:
@@ -372,14 +384,14 @@ def update_transaction(transaction_id:int,transaction_name:str,transaction_day:i
 
 
 def show_add_transaction_window(category_name:str):
-    Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][1])
-    Transaction_management_window.message.setText(LANGUAGES[Language]["Account"]["Transactions management"]["Messages"][1])
-    Transaction_management_window.transaction_name.setText("")
-    Transaction_management_window.transaction_day.setText("")
-    Transaction_management_window.transaction_value.setText("")
+    TransactionManagementWindow.button.setText(LANGUAGES[Language]["General management"][1])
+    TransactionManagementWindow.message.setText(LANGUAGES[Language]["Account"]["Transactions management"]["Messages"][1])
+    TransactionManagementWindow.transaction_name.setText("")
+    TransactionManagementWindow.transaction_day.setText("")
+    TransactionManagementWindow.transaction_value.setText("")
 
-    Transaction_management_window.window.setWindowTitle(category_name)
-    Transaction_management_window.window.exec()
+    TransactionManagementWindow.window.setWindowTitle(category_name)
+    TransactionManagementWindow.window.exec()
 
 
 def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:QTableWidget, category_id:int):
@@ -387,7 +399,7 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
 
     account.add_transaction(category_id,Current_year,Current_month,transaction_day,transaction_value,transaction_name)
 
-    if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
+    if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
         Current_total_income += transaction_value
         Current_balance += transaction_value
     else:
@@ -416,15 +428,15 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     category_data.setItem(row,1,day)
     category_data.setItem(row,2,value)
     category_data.setItem(row,3,transaction_id)
-    Transaction_management_window.window.hide()
+    TransactionManagementWindow.window.hide()
 
 
 def transaction_data_handler():
-    transaction_name = Transaction_management_window.transaction_name.text().strip()
-    transaction_day = Transaction_management_window.transaction_day.text()
-    transaction_value = Transaction_management_window.transaction_value.text()
-    transaction_id = Transaction_management_window.transaction_id
-    category_id = account.get_category_id(Transaction_management_window.window.windowTitle(),CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()])
+    transaction_name = TransactionManagementWindow.transaction_name.text().strip()
+    transaction_day = TransactionManagementWindow.transaction_day.text()
+    transaction_value = TransactionManagementWindow.transaction_value.text()
+    transaction_id = TransactionManagementWindow.transaction_id
+    category_id = account.get_category_id(TransactionManagementWindow.window.windowTitle(),CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
     category_data = Categories[category_id]["Category data"]
 
     if  transaction_day != "" or transaction_value != "":
@@ -438,14 +450,14 @@ def transaction_data_handler():
                 else:
                     transaction_value = int(transaction_value)
 
-                if Transaction_management_window.button.text() == LANGUAGES[Language]["General management"][5]: #Update 
+                if TransactionManagementWindow.button.text() == LANGUAGES[Language]["General management"][5]: #Update 
                     update_transaction(transaction_id,transaction_name,transaction_day,transaction_value,category_data)
                 else: #Add
                     add_transaction(transaction_name,transaction_day,transaction_value,category_data,category_id)
 
                 update_category_total_value(category_id)
                 update_account_balance()
-                Transaction_management_window.window.hide()
+                TransactionManagementWindow.window.hide()
             else:
                 Errors.day_out_range_error.setText(LANGUAGES[Language]["Errors"][8]+f"1-{max_month_day}")
                 Errors.day_out_range_error.exec()
@@ -473,7 +485,7 @@ def remove_transaction(category_data:QTableWidget,category_id:int):
                         break
 
                 update_category_total_value(category_id)
-                if CATEGORY_TYPE[Main_window.Incomes_and_expenses.currentIndex()] == "Incomes":
+                if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
                     Current_total_income -= transaction_value
                     Current_balance -= transaction_value
                 else:
@@ -512,7 +524,7 @@ def load_account_data(name:str):
     Account_name = name
     account = Account(Account_name)
     account.set_account_id()
-    Settings_window.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())    
+    SettingsWindow.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())    
 
     Configuration.update({"Account_name":Account_name})
     update_user_config()
@@ -529,7 +541,7 @@ def switch_account(name:str):
             load_account_data(name)
         else:
             Switch_account = False
-            Settings_window.accounts.setCurrentText(Account_name)
+            SettingsWindow.accounts.setCurrentText(Account_name)
     else:
         Switch_account = True
 
@@ -541,13 +553,13 @@ def remove_account():
     if Errors.delete_account_warning.exec() == QMessageBox.StandardButton.Ok:
         account.delete_account()
         Switch_account = False
-        Settings_window.accounts.removeItem(Accounts_list.index(Account_name))
+        SettingsWindow.accounts.removeItem(Accounts_list.index(Account_name))
         Accounts_list.remove(Account_name)
 
         if len(Accounts_list) != 0:
             load_account_data(Accounts_list[0])
             Switch_account = False
-            Settings_window.accounts.setCurrentText(Accounts_list[0])
+            SettingsWindow.accounts.setCurrentText(Accounts_list[0])
         else:#Close app if db is empty
             Configuration.update({"Account_name":""})
             update_user_config()
@@ -555,17 +567,17 @@ def remove_account():
 
 
 def show_rename_account_window():
-    full_name = Settings_window.accounts.currentText().split(" ")
-    Rename_account_window.new_name.setText(full_name[0])
-    Rename_account_window.new_surname.setText(full_name[1])
-    Rename_account_window.window.exec()
+    full_name = SettingsWindow.accounts.currentText().split(" ")
+    RenameAccountWindow.new_name.setText(full_name[0])
+    RenameAccountWindow.new_surname.setText(full_name[1])
+    RenameAccountWindow.window.exec()
 
 
 def rename_account():
     global Account_name,Switch_account,Configuration
 
-    name = Rename_account_window.new_name.text().strip()
-    surname = Rename_account_window.new_surname.text().strip()
+    name = RenameAccountWindow.new_name.text().strip()
+    surname = RenameAccountWindow.new_surname.text().strip()
     if name != " " or surname != "":
         new_name = name+" "+surname
         if not account.account_exists(new_name):
@@ -577,12 +589,12 @@ def rename_account():
             update_user_config()
 
             Switch_account = False
-            Settings_window.accounts.clear()
+            SettingsWindow.accounts.clear()
             Switch_account = False
-            Settings_window.accounts.addItems(Accounts_list)
+            SettingsWindow.accounts.addItems(Accounts_list)
             Switch_account = False
-            Settings_window.accounts.setCurrentText(Account_name)
-            Rename_account_window.window.hide()
+            SettingsWindow.accounts.setCurrentText(Account_name)
+            RenameAccountWindow.window.hide()
         else:
             Errors.account_alredy_exists_error.exec()
     else:
@@ -590,7 +602,7 @@ def rename_account():
 
 
 def calulate_expression():
-    expression = Main_window.mini_calculator_text.text()
+    expression = MainWindow.mini_calculator_text.text()
     if expression != "":
         if not any([word in expression for word in FORBIDDEN_CALCULATOR_WORDS]):
             try:
@@ -601,11 +613,12 @@ def calulate_expression():
                 result = LANGUAGES[Language]["Mini calculator"][2]
             except Exception as ex:
                 result = str(ex)
-            Main_window.mini_calculator_text.setText(result)
+            MainWindow.mini_calculator_text.setText(result)
         else:
             Errors.forbidden_calculator_word_error.exec()
     else:
         Errors.empty_expression_error.exec()
+
 
 
 if __name__ == "__main__":
@@ -615,60 +628,61 @@ if __name__ == "__main__":
 
     #Load selected language 
     Language = Configuration["Language"]
-    Settings_window.languages.setCurrentIndex([*LANGUAGES.keys()].index(Language))
+    SettingsWindow.languages.setCurrentIndex([*LANGUAGES.keys()].index(Language))
 
     #Set selected theme
     if Configuration["Theme"] == "Dark":
         app.setStyleSheet(dark_theme)
-        Settings_window.switch_themes_button.setIcon(dark_theme_icon)
+        SettingsWindow.switch_themes_button.setIcon(dark_theme_icon)
     if Configuration["Theme"] == "Light":
         app.setStyleSheet(light_theme)
-        Settings_window.switch_themes_button.setIcon(light_theme_icon)
+        SettingsWindow.switch_themes_button.setIcon(light_theme_icon)
 
 
     #Set current month and year
-    Main_window.current_year.setText(str(Current_year))
-    Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
+    MainWindow.current_year.setText(str(Current_year))
+    MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
 
     #Connect buttons to functions
     #Settings
-    Main_window.settings.clicked.connect(Settings_window.window.exec)
-    Settings_window.switch_themes_button.clicked.connect(swith_theme)
-    Settings_window.languages.currentIndexChanged.connect(load_language)
-    Settings_window.add_account.clicked.connect(show_add_user_window)
-    Settings_window.rename_account.clicked.connect(show_rename_account_window)
+    MainWindow.settings.clicked.connect(SettingsWindow.window.exec)
+    SettingsWindow.switch_themes_button.clicked.connect(swith_theme)
+    SettingsWindow.languages.currentIndexChanged.connect(load_language)
+    SettingsWindow.add_account.clicked.connect(show_add_user_window)
+    SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
 
     #Activate mini calculator
-    Main_window.calculate.clicked.connect(calulate_expression)
+    MainWindow.calculate.clicked.connect(calulate_expression)
 
     #Statistics
-    Main_window.statistics.clicked.connect(Statistcs_window.window.exec)
-    Statistcs_window.monthly_statistics.clicked.connect(lambda:show_monthly_statistics(Categories,Language,Current_year,Current_month,account,MONTHS_DAYS))
-    Statistcs_window.quarterly_statistics.clicked.connect(lambda:show_quarterly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
-    Statistcs_window.yearly_statistics.clicked.connect(lambda:show_yearly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
+    MainWindow.statistics.clicked.connect(StatistcsWindow.window.exec)
+    StatistcsWindow.monthly_statistics.clicked.connect(lambda:show_monthly_statistics(Categories,Language,Current_year,Current_month,account,MONTHS_DAYS))
+    StatistcsWindow.quarterly_statistics.clicked.connect(lambda:show_quarterly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
+    StatistcsWindow.yearly_statistics.clicked.connect(lambda:show_yearly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
     
     #Category settings
-    Category_settings_window.delete_category.clicked.connect(remove_category)
-    Category_settings_window.rename_category.clicked.connect(lambda: (Rename_category_window.window.setWindowTitle(Category_settings_window.window.windowTitle()),Rename_category_window.window.exec()))
-    Rename_category_window.button.clicked.connect(rename_category)
-    Transaction_management_window.button.clicked.connect(transaction_data_handler)
+    CategorySettingsWindow.delete_category.clicked.connect(remove_category)
+    CategorySettingsWindow.rename_category.clicked.connect(lambda: (RenameCategoryWindow.window.setWindowTitle(CategorySettingsWindow.window.windowTitle()),RenameCategoryWindow.window.exec()))
+    CategorySettingsWindow.copy_transactions.clicked.connect(lambda: copy_month_transactions(account,Current_month,Current_year,Language,app))
+    RenameCategoryWindow.button.clicked.connect(rename_category)
+    TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
     
     #Date management
-    Main_window.next_month_button.clicked.connect(next_month)
-    Main_window.previous_month_button.clicked.connect(previous_month)
-    Main_window.next_year_button.clicked.connect(next_year)
-    Main_window.previous_year_button.clicked.connect(previous_year)
+    MainWindow.next_month_button.clicked.connect(next_month)
+    MainWindow.previous_month_button.clicked.connect(previous_month)
+    MainWindow.next_year_button.clicked.connect(next_year)
+    MainWindow.previous_year_button.clicked.connect(previous_year)
 
     #Add category
-    Main_window.add_incomes_category.clicked.connect(Add_category_window.window.exec)
-    Main_window.add_expenses_category.clicked.connect(Add_category_window.window.exec)
-    Add_category_window.button.clicked.connect(create_category)
+    MainWindow.add_incomes_category.clicked.connect(AddCategoryWindow.window.exec)
+    MainWindow.add_expenses_category.clicked.connect(AddCategoryWindow.window.exec)
+    AddCategoryWindow.button.clicked.connect(create_category)
 
     #Load last used account name 
     Account_name = Configuration["Account_name"]
 
     #Create new account if it doesn't exist
-    Add_account_window.button.clicked.connect(add_user)
+    AddAccountWindow.button.clicked.connect(add_user)
     if Account_name == "":
         show_add_user_window()
     if Account_name == "":
@@ -686,18 +700,19 @@ if __name__ == "__main__":
     #Add accounts to list
     [Accounts_list.append(item[0]) for item in account.get_all_accounts() if item[0] not in Accounts_list]
 
-    Settings_window.accounts.clear()
-    Settings_window.accounts.addItems(Accounts_list)
-    Settings_window.accounts.setCurrentText(Account_name)
+    SettingsWindow.accounts.clear()
+    SettingsWindow.accounts.addItems(Accounts_list)
+    SettingsWindow.accounts.setCurrentText(Account_name)
 
 
     #Account management
-    Settings_window.accounts.currentTextChanged.connect(switch_account)
-    Settings_window.delete_account.clicked.connect(remove_account)
-    Rename_account_window.button.clicked.connect(rename_account)
+    SettingsWindow.accounts.currentTextChanged.connect(switch_account)
+    SettingsWindow.delete_account.clicked.connect(remove_account)
+    RenameAccountWindow.button.clicked.connect(rename_account)
 
     load_account_balance()
     load_language(Language)
 
-    Main_window.window.show()
+    # screen_center = QScreen.availableGeometry(app.primaryScreen()).center()
+    MainWindow.window.show()
     app.exec()

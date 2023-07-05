@@ -119,8 +119,8 @@ def add_statistic(statistic_list:QListWidget,statistic_data:dict,words:list,Lang
 
 
 def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Current_month:int,account:Account,months_days:list):
-    Monthly_statistics.window.setWindowTitle(LANGUAGES[Language]["Months"][Current_month])
-    Monthly_statistics.statistics.clear()
+    MonthlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Months"][Current_month])
+    MonthlyStatistics.statistics.clear()
     if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
@@ -133,24 +133,24 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
                 total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
                 days_amount = months_days[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(total_income))
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+f"{total_income/days_amount:.2f}")
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+f"{total_expense/days_amount:.2f}")
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense}")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(total_income))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+f"{total_income/days_amount:.2f}")
+                MonthlyStatistics.statistics.addItem("")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+f"{total_expense/days_amount:.2f}")
+                MonthlyStatistics.statistics.addItem("")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense}")
 
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"][4])
-                add_statistic(Monthly_statistics.statistics,Incomes_statistic,[9,10,13,14,11,15],Language,Categories)
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem("")
-                Monthly_statistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"][5])
-                add_statistic(Monthly_statistics.statistics,Expenses_statistic,[17,18,20,21,19,22],Language,Categories)
+                MonthlyStatistics.statistics.addItem("")
+                MonthlyStatistics.statistics.addItem("")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"][4])
+                add_statistic(MonthlyStatistics.statistics,Incomes_statistic,[9,10,13,14,11,15],Language,Categories)
+                MonthlyStatistics.statistics.addItem("")
+                MonthlyStatistics.statistics.addItem("")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"][5])
+                add_statistic(MonthlyStatistics.statistics,Expenses_statistic,[17,18,20,21,19,22],Language,Categories)
                     
-                Monthly_statistics.window.exec()
+                MonthlyStatistics.window.exec()
             else:
                 Errors.no_transactions_error.exec()
         else:
@@ -190,10 +190,10 @@ def add_month_statistics(Incomes_categories:dict,Expenses_categories:dict,Curren
 def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,account:Account,months_days:list):
 
     #Clear quarters statistics
-    for quarter in Quarterly_statistics.statistics:
-        for statistic_list in Quarterly_statistics.statistics[quarter]:
+    for quarter in QuarterlyStatistics.statistics:
+        for statistic_list in QuarterlyStatistics.statistics[quarter]:
             if statistic_list != "Label":
-                Quarterly_statistics.statistics[quarter][statistic_list]["Statistic Data"].clear()
+                QuarterlyStatistics.statistics[quarter][statistic_list]["Statistic Data"].clear()
 
     if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
@@ -201,7 +201,7 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
         if len(Expenses_categories) >= 1 and len(Incomes_categories) >= 1:
 
             month_numbers = [(1,2,3),(4,5,6),(7,8,9),(10,11,12)]
-            for quarter in Quarterly_statistics.statistics:
+            for quarter in QuarterlyStatistics.statistics:
                 Incomes_categories_total_values = {}
                 Expenses_categories_total_values = {}
 
@@ -224,7 +224,7 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                 total_expense = sum(total_value for total_value in Expenses_categories_total_values.values())
                 days_amount = sum(months_days[:3]) if quarter == 0 else sum(months_days[3:6]) if quarter ==  1 else sum(months_days[6:9]) if months_days == 2 else sum(months_days[9:12])
 
-                Total_statistic_list = Quarterly_statistics.statistics[quarter][0]["Statistic Data"]
+                Total_statistic_list = QuarterlyStatistics.statistics[quarter][0]["Statistic Data"]
                 Statistic_words = LANGUAGES[Language]["Account"]["Info"]["Statistics"]
 
                 Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
@@ -266,10 +266,10 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                 for month in range(3):
                     current_month = month_numbers[quarter-1][month]
                     if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,current_month)) and len(account.get_transactions_by_month(Expenses_categories[0],Current_year,current_month)):
-                        add_month_statistics(Incomes_categories,Expenses_categories,Current_year,current_month,account,Statistic_words,months_days,Quarterly_statistics.statistics[quarter][month+1]["Statistic Data"],Language,Categories)
+                        add_month_statistics(Incomes_categories,Expenses_categories,Current_year,current_month,account,Statistic_words,months_days,QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"],Language,Categories)
                     else:
-                        Quarterly_statistics.statistics[quarter][month+1]["Statistic Data"].addItem(Errors.no_transactions_error.text())
-            Quarterly_statistics.window.exec()
+                        QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"].addItem(Errors.no_transactions_error.text())
+            QuarterlyStatistics.window.exec()
         else:
             Errors.no_category_error.exec()
     else:
@@ -279,8 +279,8 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
 
 def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account:Account,months_days:list):
     #Clear yearly statistics
-    for statistic_list in Yearly_statistics.statistics:
-        Yearly_statistics.statistics[statistic_list]["Statistic Data"].clear()
+    for statistic_list in YearlyStatistics.statistics:
+        YearlyStatistics.statistics[statistic_list]["Statistic Data"].clear()
     
     if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
@@ -308,7 +308,7 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
             total_expense = sum(total_value for total_value in Expenses_categories_total_values.values())
             days_amount = 365 if Current_year % 4 != 0 else 366
 
-            Total_statistic_list = Yearly_statistics.statistics[0]["Statistic Data"]
+            Total_statistic_list = YearlyStatistics.statistics[0]["Statistic Data"]
             Statistic_words = LANGUAGES[Language]["Account"]["Info"]["Statistics"]
 
             Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
@@ -350,11 +350,11 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
 
             for month in range(1,13):
                 if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,month)) and len(account.get_transactions_by_month(Expenses_categories[0],Current_year,month)):
-                    add_month_statistics(Incomes_categories,Expenses_categories,Current_year,month,account,Statistic_words,months_days,Yearly_statistics.statistics[month]["Statistic Data"],Language,Categories)
+                    add_month_statistics(Incomes_categories,Expenses_categories,Current_year,month,account,Statistic_words,months_days,YearlyStatistics.statistics[month]["Statistic Data"],Language,Categories)
                 else:
-                    Yearly_statistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions_error.text())
+                    YearlyStatistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions_error.text())
 
-            Yearly_statistics.window.exec()
+            YearlyStatistics.window.exec()
         else:
             Errors.no_category_error.exec()
     else:

@@ -408,64 +408,64 @@ LANGUAGES = {
 
 def change_language(Language, Categories:dict, Current_balance:int|float, Current_month:int, account:Account):
     LANGUAGES[Language]["Account"]["Category management"]
-    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    Main_window.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
-    Main_window.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
-    Main_window.Incomes_and_expenses.setTabText(1,LANGUAGES[Language]["Account"]["Info"][5])
-    Main_window.add_incomes_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
-    Main_window.add_expenses_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
-    Main_window.statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][0])
-    Main_window.mini_calculator_label.setText(LANGUAGES[Language]["Mini calculator"][0])
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
+    MainWindow.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
+    MainWindow.Incomes_and_expenses.setTabText(1,LANGUAGES[Language]["Account"]["Info"][5])
+    MainWindow.add_incomes_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
+    MainWindow.add_expenses_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
+    MainWindow.statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][0])
+    MainWindow.mini_calculator_label.setText(LANGUAGES[Language]["Mini calculator"][0])
 
-    Settings_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][0])
-    Settings_window.delete_account.setText(LANGUAGES[Language]["Account"]["Account management"][0])
-    Settings_window.add_account.setText(LANGUAGES[Language]["Account"]["Account management"][1])
-    Settings_window.rename_account.setText(LANGUAGES[Language]["Account"]["Account management"][2])
+    SettingsWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][0])
+    SettingsWindow.delete_account.setText(LANGUAGES[Language]["Account"]["Account management"][0])
+    SettingsWindow.add_account.setText(LANGUAGES[Language]["Account"]["Account management"][1])
+    SettingsWindow.rename_account.setText(LANGUAGES[Language]["Account"]["Account management"][2])
 
-    Rename_account_window.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][1])
-    Rename_account_window.button.setText(LANGUAGES[Language]["General management"][5])
-    Rename_account_window.new_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][3])
-    Rename_account_window.new_surname.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][4])
-    Rename_account_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][2])
+    RenameAccountWindow.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][1])
+    RenameAccountWindow.button.setText(LANGUAGES[Language]["General management"][5])
+    RenameAccountWindow.new_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][3])
+    RenameAccountWindow.new_surname.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][4])
+    RenameAccountWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][2])
 
-    Add_category_window.category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
-    Add_category_window.button.setText(LANGUAGES[Language]["General management"][1])
-    Add_category_window.window.setWindowTitle(LANGUAGES[Language]["Account"]["Category management"][0])
+    AddCategoryWindow.category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
+    AddCategoryWindow.button.setText(LANGUAGES[Language]["General management"][1])
+    AddCategoryWindow.window.setWindowTitle(LANGUAGES[Language]["Account"]["Category management"][0])
 
-    Category_settings_window.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
-    Category_settings_window.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
+    CategorySettingsWindow.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
+    CategorySettingsWindow.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
 
-    Rename_category_window.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][3])
-    Rename_category_window.button.setText(LANGUAGES[Language]["General management"][2])
+    RenameCategoryWindow.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][3])
+    RenameCategoryWindow.button.setText(LANGUAGES[Language]["General management"][2])
 
-    Transaction_management_window.button.setText(LANGUAGES[Language]["General management"][5])
-    Transaction_management_window.transaction_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
-    Transaction_management_window.transaction_day.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][1])
-    Transaction_management_window.transaction_value.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][2])
+    TransactionManagementWindow.button.setText(LANGUAGES[Language]["General management"][5])
+    TransactionManagementWindow.transaction_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
+    TransactionManagementWindow.transaction_day.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][1])
+    TransactionManagementWindow.transaction_value.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][2])
 
-    Statistcs_window.window.setWindowTitle(LANGUAGES[Language]["Windows"][4])
-    Statistcs_window.monthly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][1])
-    Statistcs_window.quarterly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][2])
-    Statistcs_window.yearly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][3])
+    StatistcsWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][4])
+    StatistcsWindow.monthly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][1])
+    StatistcsWindow.quarterly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][2])
+    StatistcsWindow.yearly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][3])
 
-    Quarterly_statistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][5])
+    QuarterlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][5])
     quarters_numbers = ["I","II","III","IV"]
     month_number = 1
-    for quarter in Quarterly_statistics.statistics:
-        Quarterly_statistics.statistics[quarter]["Label"].setText(quarters_numbers[quarter-1]+LANGUAGES[Language]["Account"]["Info"]["Statistics"][23])
-        for month_list in Quarterly_statistics.statistics[quarter]:
+    for quarter in QuarterlyStatistics.statistics:
+        QuarterlyStatistics.statistics[quarter]["Label"].setText(quarters_numbers[quarter-1]+LANGUAGES[Language]["Account"]["Info"]["Statistics"][23])
+        for month_list in QuarterlyStatistics.statistics[quarter]:
             if month_list != 0 and month_list != "Label":
-                Quarterly_statistics.statistics[quarter][month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_number])
+                QuarterlyStatistics.statistics[quarter][month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_number])
                 month_number+=1
             elif month_list == 0:
-                Quarterly_statistics.statistics[quarter][0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
+                QuarterlyStatistics.statistics[quarter][0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
     
-    Yearly_statistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][6])
-    for month_list in Yearly_statistics.statistics:
+    YearlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][6])
+    for month_list in YearlyStatistics.statistics:
         if month_list != 0:
-            Yearly_statistics.statistics[month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_list])
+            YearlyStatistics.statistics[month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_list])
         else:
-            Yearly_statistics.statistics[0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
+            YearlyStatistics.statistics[0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
 
 
     for index,error in enumerate(errors_list):
@@ -482,9 +482,9 @@ def change_language(Language, Categories:dict, Current_balance:int|float, Curren
         total_value = Categories[category]["Total value"].text().split(" ")[1]
         Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+total_value)
     
-    Main_window.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    Incomes = Settings_window.total_income.text().split(" ")[2]
-    Settings_window.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
-    Expenses = Settings_window.total_expense.text().split(" ")[2]
-    Settings_window.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
-    Settings_window.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())  
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    Incomes = SettingsWindow.total_income.text().split(" ")[2]
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
+    Expenses = SettingsWindow.total_expense.text().split(" ")[2]
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
+    SettingsWindow.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())  

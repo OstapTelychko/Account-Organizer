@@ -1,10 +1,13 @@
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget,QSizePolicy
-from PySide6.QtCore import Qt,QSize
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget,QSizePolicy,QMainWindow
+from PySide6.QtCore import Qt,QSize, QRunnable, Slot, QThreadPool
 from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
+from sys import platform
+from time import sleep
+
 from Account_management import Account
 from Project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
-from sys import platform
+
 
 
 app = QApplication([])
@@ -173,9 +176,9 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     category["Category window"] = category_window
 
     if category_type == "Incomes":
-        Main_window.Incomes_window_layout.addWidget(category_window)
+        MainWindow.Incomes_window_layout.addWidget(category_window)
     else:
-        Main_window.Expenses_window_layout.addWidget(category_window)
+        MainWindow.Expenses_window_layout.addWidget(category_window)
 
     return category
 
@@ -200,9 +203,9 @@ class Errors():
 
 
 
-class Main_window():
+class MainWindow():
     window = QWidget()
-    window.resize(1400,750)
+    window.resize(1500,750)
     window.setMinimumHeight(685)
     window.setMinimumWidth(1150)
     window.setWindowTitle("Account Organizer")
@@ -297,6 +300,7 @@ class Main_window():
     window_bottom = QHBoxLayout()
     statistics = create_button("Statistics",(160,40))
     mini_calculator_label = QLabel("Mini-calculator")
+    mini_calculator_label.setFont(BASIC_FONT)
     mini_calculator_text = QLineEdit()
     mini_calculator_text.setPlaceholderText("2 * 3 = 6;  3 / 2 = 1.5;  3 + 2 = 5;  2 - 3 = -1;  4 ** 2 = 16")
     mini_calculator_text.setMinimumWidth(600)
@@ -324,7 +328,7 @@ class Main_window():
 
 
 
-class Settings_window():
+class SettingsWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -340,7 +344,6 @@ class Settings_window():
 
     for language in range(len(AVAILABLE_LANGUAGES)):
         languages.setItemIcon(language,QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
-    # languages.setIconSize(QSize(6,6))
 
     accounts = QComboBox()
     accounts.setFont(BASIC_FONT)
@@ -383,7 +386,7 @@ class Settings_window():
 
 
 
-class Category_settings_window():
+class CategorySettingsWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -391,16 +394,18 @@ class Category_settings_window():
 
     rename_category = create_button("Rename category",(195,40))
     delete_category = create_button("Delete category",(180,40))
+    copy_transactions = create_button("Copy transactions",(200,40))
 
     main_layout = QVBoxLayout()
     main_layout.addWidget(rename_category,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(delete_category,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(copy_transactions,alignment=ALIGMENT.AlignHCenter)
 
     window.setLayout(main_layout)
 
 
 
-class Add_account_window():
+class AddAccountWindow():
     window = QDialog()
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
@@ -440,7 +445,7 @@ class Add_account_window():
 
 
 
-class Rename_account_window():
+class RenameAccountWindow():
     window = QDialog()
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
@@ -470,7 +475,7 @@ class Rename_account_window():
 
 
 
-class Add_category_window():
+class AddCategoryWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -490,7 +495,7 @@ class Add_category_window():
 
 
 
-class Rename_category_window():
+class RenameCategoryWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -509,7 +514,7 @@ class Rename_category_window():
 
 
 
-class Transaction_management_window():
+class TransactionManagementWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -543,7 +548,7 @@ class Transaction_management_window():
 
 
 
-class Statistcs_window():
+class StatistcsWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -564,7 +569,7 @@ class Statistcs_window():
 
 
 
-class Monthly_statistics():
+class MonthlyStatistics():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
@@ -585,7 +590,7 @@ class Monthly_statistics():
 
 
 
-class Quarterly_statistics():
+class QuarterlyStatistics():
     window = QDialog()
     window.resize(800,700)
     window.setMinimumSize(800,600)
@@ -663,7 +668,7 @@ class Quarterly_statistics():
 
 
 
-class Yearly_statistics():
+class YearlyStatistics():
     window = QDialog()
     window.resize(800,700)
     window.setMinimumSize(800,600)
@@ -714,6 +719,64 @@ class Yearly_statistics():
     main_layout = QVBoxLayout()
     main_layout.addWidget(statistics_scroll)
     window.setLayout(main_layout)
+
+
+
+class InformationMessage:
+    window = QDialog()
+    window.setWindowFlags(Qt.WindowType.Popup)
+    window.resize(200,50)
+    window.setMaximumWidth(200)
+    window.setMaximumHeight(50)
+    window.setWindowIcon(APP_ICON)
+    window.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+    message = QWidget()
+    message.resize(200,50)
+    message.setStyleSheet("""QWidget{
+                background:rgb(40, 40, 40);
+                border-top-left-radius:15px;
+                border-bottom-left-radius:15px;
+                border-top-right-radius:15px;
+                border-bottom-right-radius:15px;}
+                """)
+
+    message_text = QLabel("Statisctics has been copied")
+    message_text.setFont(BASIC_FONT)
+    message_layout = QVBoxLayout()
+    message_layout.addWidget(message_text)
+    message.setLayout(message_layout)
+
+    main_layout=  QVBoxLayout()
+    main_layout.addWidget(message)
+    window.setLayout(main_layout)
+
+    threadpool = QThreadPool()
+
+
+    class Worker(QRunnable):
+
+        @Slot()
+        def run(self):
+            opacity = 0
+            InformationMessage.window.setWindowOpacity(0)
+            InformationMessage.window.show()
+            for _ in range(5):
+                QApplication.processEvents()
+                opacity += 0.2
+                InformationMessage.window.setWindowOpacity(opacity)
+                InformationMessage.window.update()
+                sleep(0.05)
+            sleep(1)
+            for _ in range(5):
+                opacity -= 0.2
+                QApplication.processEvents()
+                InformationMessage.window.setWindowOpacity(opacity)
+                InformationMessage.window.update()
+                sleep(0.05)
+            InformationMessage.window.hide()
+            CategorySettingsWindow.copy_transactions.setEnabled(True)
+
 
 
 
