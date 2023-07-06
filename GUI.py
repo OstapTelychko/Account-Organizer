@@ -48,10 +48,11 @@ def create_button(button_text:str,size:tuple[int])->QPushButton:
     return button
 
 
-def load_category(category_type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str,theme:str)-> dict:
+def load_category(category_type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str,theme:str) -> dict:
     """Add category to user window
 
-        Args:
+        Arguments
+        -------
             `type` (str): category type incomes or expenses
 
             `name` (str): category name
@@ -66,7 +67,8 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
 
             `Language` (str): Language for buttons and columns
 
-        Returns:
+        Returns
+        ------
             `category` (dict): Dictionary with category name, type and link on add, delete, rename transaction buttons
     """
 
@@ -200,7 +202,7 @@ class Errors():
     forbidden_calculator_word_error = create_error(False,QMessageBox.Icon.Critical)
     no_category_error = create_error(False,QMessageBox.Icon.Information)
     no_transactions_error = create_error(False,QMessageBox.Icon.Information)
-
+    no_category_name_error = create_error(False,QMessageBox.Icon.Information)
 
 
 class MainWindow():
@@ -392,9 +394,9 @@ class CategorySettingsWindow():
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle(" ")
 
-    rename_category = create_button("Rename category",(195,40))
-    delete_category = create_button("Delete category",(180,40))
-    copy_transactions = create_button("Copy transactions",(200,40))
+    rename_category = create_button("Rename category",(255,40))
+    delete_category = create_button("Delete category",(255,40))
+    copy_transactions = create_button("Copy transactions",(275,40))
 
     main_layout = QVBoxLayout()
     main_layout.addWidget(rename_category,alignment=ALIGMENT.AlignHCenter)
@@ -583,8 +585,14 @@ class MonthlyStatistics():
     
     statistics = QListWidget()
     statistics.setFont(BASIC_FONT)
+
+    copy_statistics = create_button("Copy month statistics",(275,40))
+    copy_statistics_layout = QHBoxLayout()
+    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
+
     main_layout = QVBoxLayout()
     main_layout.addWidget(statistics)
+    main_layout.addLayout(copy_statistics_layout)
 
     window.setLayout(main_layout)
 
@@ -654,6 +662,11 @@ class QuarterlyStatistics():
         quarter_scroll.setStyleSheet("QScrollArea{border:none}")
         statistics_layout.addWidget(quarter_scroll)
 
+    copy_statistics = create_button("Copy quarterly statistics",(300,40))
+    copy_statistics_layout = QHBoxLayout()
+    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
+    statistics_layout.addLayout(copy_statistics_layout)
+
     statistics_window.setLayout(statistics_layout)
     window_scroll = QScrollArea()
     window_scroll.setWidget(statistics_window)
@@ -707,6 +720,13 @@ class YearlyStatistics():
         statistics_layout.addWidget(statistics_data)
 
         statistics_window_layout.addLayout(statistics_layout)
+    
+    copy_statistics = create_button("Copy yearly statistics",(275,40))
+    copy_statistics_layout = QHBoxLayout()
+    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
+
+    statistics_window_layout.addLayout(copy_statistics_layout)
+
     statistics_window.setLayout(statistics_window_layout)
 
     statistics_scroll = QScrollArea()
@@ -725,14 +745,14 @@ class YearlyStatistics():
 class InformationMessage:
     window = QDialog()
     window.setWindowFlags(Qt.WindowType.Popup)
-    window.resize(200,50)
-    window.setMaximumWidth(200)
+    window.resize(250,50)
+    window.setMaximumWidth(250)
     window.setMaximumHeight(50)
     window.setWindowIcon(APP_ICON)
     window.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
     message = QWidget()
-    message.resize(200,50)
+    message.resize(250,50)
     message.setStyleSheet("""QWidget{
                 background:rgb(40, 40, 40);
                 border-top-left-radius:15px;
@@ -743,8 +763,8 @@ class InformationMessage:
 
     message_text = QLabel("Statisctics has been copied")
     message_text.setFont(BASIC_FONT)
-    message_layout = QVBoxLayout()
-    message_layout.addWidget(message_text)
+    message_layout = QHBoxLayout()
+    message_layout.addWidget(message_text,alignment=ALIGMENT.AlignCenter)
     message.setLayout(message_layout)
 
     main_layout=  QVBoxLayout()
@@ -776,6 +796,9 @@ class InformationMessage:
                 sleep(0.05)
             InformationMessage.window.hide()
             CategorySettingsWindow.copy_transactions.setEnabled(True)
+            MonthlyStatistics.copy_statistics.setEnabled(True)
+            QuarterlyStatistics.copy_statistics.setEnabled(True)
+            YearlyStatistics.copy_statistics.setEnabled(True)
 
 
 

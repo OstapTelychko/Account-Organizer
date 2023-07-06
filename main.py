@@ -5,7 +5,7 @@ from Languages import LANGUAGES,change_language
 from Account_management import Account
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
 from Project_configuration import ROOT_DIRECTORY, MONTHS_DAYS, FORBIDDEN_CALCULATOR_WORDS, CATEGORY_TYPE
-from Copy_statistics import show_information_message, copy_month_transactions
+from Copy_statistics import show_information_message, copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
 from functools import partial
 from datetime import datetime
@@ -35,6 +35,7 @@ def swith_theme():
         app.setStyleSheet(light_theme)
         SettingsWindow.switch_themes_button.setIcon(light_theme_icon)
 
+        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(200,200,200);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
         if len(Categories) != 0:
             for category in Categories:
                 Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(205,205,205)}")
@@ -44,6 +45,7 @@ def swith_theme():
         app.setStyleSheet(dark_theme)
         SettingsWindow.switch_themes_button.setIcon(dark_theme_icon)
 
+        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(40,40,40);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
         if len(Categories) != 0:
             for category in Categories:
                 Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
@@ -198,7 +200,6 @@ def show_add_user_window():
     AddAccountWindow.window.exec()
 
 
-
 def add_user():
     global Account_name,Configuration
 
@@ -252,21 +253,25 @@ def create_category():
     category_type = "Incomes" if MainWindow.Incomes_and_expenses.currentIndex() == 0 else "Expenses"
     category_name = AddCategoryWindow.category_name.text().strip()
 
-    if not account.category_exists(category_name,category_type):
-        account.create_category(category_name,category_type)
-        category_id = account.get_category_id(category_name,category_type) 
-        Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language,Configuration["Theme"])
+    if category_name != "":
+        if not account.category_exists(category_name,category_type):
+            account.create_category(category_name,category_type)
+            category_id = account.get_category_id(category_name,category_type) 
+            Categories[category_id]=load_category(category_type,category_name,account,category_id,Current_year,Current_month,Language,Configuration["Theme"])
 
-        #Activate Category
-        Categories[category_id]["Settings"].clicked.connect(partial(show_category_settings,Categories[category_id]["Name"]))
-        Categories[category_id]["Add transaction"].clicked.connect(partial(show_add_transaction_window,Categories[category_id]["Name"]))
-        Categories[category_id]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,Categories[category_id]["Name"],Categories[category_id]["Category data"]))
-        Categories[category_id]["Delete transaction"].clicked.connect(partial(remove_transaction,Categories[category_id]["Category data"],category_id))
+            #Activate Category
+            Categories[category_id]["Settings"].clicked.connect(partial(show_category_settings,Categories[category_id]["Name"]))
+            Categories[category_id]["Add transaction"].clicked.connect(partial(show_add_transaction_window,Categories[category_id]["Name"]))
+            Categories[category_id]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,Categories[category_id]["Name"],Categories[category_id]["Category data"]))
+            Categories[category_id]["Delete transaction"].clicked.connect(partial(remove_transaction,Categories[category_id]["Category data"],category_id))
 
-        AddCategoryWindow.category_name.setText("")
-        AddCategoryWindow.window.hide()
+            AddCategoryWindow.category_name.setText("")
+            AddCategoryWindow.window.hide()
+            show_information_message(LANGUAGES[Language]["Account"]["Category management"][8])
+        else:
+            Errors.category_exists_error.exec()
     else:
-        Errors.category_exists_error.exec()
+        Errors.no_category_name_error.exec()
 
 
 def load_categories():
@@ -280,7 +285,6 @@ def show_category_settings(category_name:str):
     if account.category_exists(category_name,CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
         CategorySettingsWindow.window.setWindowTitle(category_name)
         CategorySettingsWindow.window.exec()
-
 
 
 def remove_category():
@@ -302,6 +306,7 @@ def remove_category():
         del Categories[category_id]
 
         calculate_current_balance()
+        show_information_message(LANGUAGES[Language]["Account"]["Category management"][7])
 
 
 def rename_category():
@@ -329,6 +334,7 @@ def rename_category():
                 RenameCategoryWindow.window.hide()
                 CategorySettingsWindow.window.hide()
                 RenameCategoryWindow.new_category_name.setText("")
+                show_information_message(LANGUAGES[Language]["Account"]["Category management"][6])
     else:
         Errors.category_exists_error.exec()
 
@@ -634,9 +640,11 @@ if __name__ == "__main__":
     if Configuration["Theme"] == "Dark":
         app.setStyleSheet(dark_theme)
         SettingsWindow.switch_themes_button.setIcon(dark_theme_icon)
+        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(40,40,40);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
     if Configuration["Theme"] == "Light":
         app.setStyleSheet(light_theme)
         SettingsWindow.switch_themes_button.setIcon(light_theme_icon)
+        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(200, 200, 200);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
 
 
     #Set current month and year
@@ -659,11 +667,14 @@ if __name__ == "__main__":
     StatistcsWindow.monthly_statistics.clicked.connect(lambda:show_monthly_statistics(Categories,Language,Current_year,Current_month,account,MONTHS_DAYS))
     StatistcsWindow.quarterly_statistics.clicked.connect(lambda:show_quarterly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
     StatistcsWindow.yearly_statistics.clicked.connect(lambda:show_yearly_statistics(Categories,Language,Current_year,account,MONTHS_DAYS))
+    MonthlyStatistics.copy_statistics.clicked.connect(lambda: copy_monthly_statistics(app,Language))
+    QuarterlyStatistics.copy_statistics.clicked.connect(lambda: copy_quarterly_statistics(app,Language))
+    YearlyStatistics.copy_statistics.clicked.connect(lambda: copy_yearly_statistics(app,Language))
     
     #Category settings
     CategorySettingsWindow.delete_category.clicked.connect(remove_category)
     CategorySettingsWindow.rename_category.clicked.connect(lambda: (RenameCategoryWindow.window.setWindowTitle(CategorySettingsWindow.window.windowTitle()),RenameCategoryWindow.window.exec()))
-    CategorySettingsWindow.copy_transactions.clicked.connect(lambda: copy_month_transactions(account,Current_month,Current_year,Language,app))
+    CategorySettingsWindow.copy_transactions.clicked.connect(lambda: copy_monthly_transactions(account,Current_month,Current_year,Language,app))
     RenameCategoryWindow.button.clicked.connect(rename_category)
     TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
     
@@ -713,6 +724,5 @@ if __name__ == "__main__":
     load_account_balance()
     load_language(Language)
 
-    # screen_center = QScreen.availableGeometry(app.primaryScreen()).center()
     MainWindow.window.show()
     app.exec()

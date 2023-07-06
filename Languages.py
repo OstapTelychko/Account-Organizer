@@ -78,7 +78,14 @@ LANGUAGES = {
                     24:"Average income per day   ",
                     25:"Average income per month   ",
                     26:"Average expenses per day   ",
-                    27:"Average expenses per month   "
+                    27:"Average expenses per month   ",
+                    28:"Copy monthly statistics",
+                    29:"Monthly statistics has copied",
+                    30:"Copy quarterly statistics",
+                    31:"Quarterly statistics has copied",
+                    32:"Copy yearly statistics",
+                    33:"Yearly statistics has copied"
+
                 }
             },
             "Transactions management":{
@@ -100,6 +107,11 @@ LANGUAGES = {
                 1:"Delete category",
                 2:"Rename category",
                 3:"New name",
+                4:"Copy month transactions",
+                5:"Month transactions have copied",
+                6:"Name of category has updated",
+                7:"Category has removed",
+                8:"Category has created"
             }
         },
         "Errors":{
@@ -118,7 +130,8 @@ LANGUAGES = {
             12:"I can't calculate empty expression",
             13:"You have used forbidden word in expression",
             14:"You should have at least one category for income and one for expenses to see monthly statistics",
-            15:"You should have at least one income transaction and one expense transaction to see monthly statistics"
+            15:"You should have at least one income transaction and one expense transaction to see monthly statistics",
+            16:"Name of category can't be empty field"
         },
         "Mini calculator":{
             0:"Mini calculator",
@@ -213,6 +226,12 @@ LANGUAGES = {
                     25:"Середній дохід за місяць   ",
                     26:"Середні витрати за день   ",
                     27:"Середні витрати за місяць   ",
+                    28:"Скопіювати місячну статистику",
+                    29:"Місячна статиска скопійована",
+                    30:"Скопіювати квартальну статистику",
+                    31:"Квартальна статистика скопійована",
+                    32:"Скопіювати річну статистику",
+                    33:"Річна статистика скопійована"
                 }
             },
             "Transactions management":{
@@ -233,7 +252,12 @@ LANGUAGES = {
                 0:"Додати категорію",
                 1:"Видалити категорію",
                 2:"Переназвати категорію",
-                3:"Нова назва"
+                3:"Нова назва",
+                4:"Скопіювати місячні транзакції",
+                5:"Місячні транзакції скопійовані",
+                6:"Назва категорії обновлена",
+                7:"Категорія видалена",
+                8:"Категорія створена"
             }
         },
         "Errors":{
@@ -253,6 +277,7 @@ LANGUAGES = {
             13:"Ви використали заборонені слова в виразі",
             14:"Ви повині мати принаймні одну категорію для доходів і одну для витрат, щоб побачити місячну статистику",
             15:"Ви повині мати принаймні одну тразакцію доходу і одну витрат, щоб побачити місячну статистику",
+            16:"Назвою категорії не може бути пусте поле"
         },
         "Mini calculator":{
             0:"Міні калькулятор",
@@ -346,7 +371,13 @@ LANGUAGES = {
                     24:"Średni dzienny dochód  ",
                     25:"Średni miesięczny dochód  ",
                     26:"Średnie wytraty dziennie  ",
-                    27:"Średnie wytraty miesięczne  "
+                    27:"Średnie wytraty miesięczne  ",
+                    28:"Kopiować miesięczną statystykę",
+                    29:"Miesięczna statystyka skopiowana",
+                    30:"Kopiować kwartalną statystykę",
+                    31:"Kwartalna statystyka skopiowana",
+                    32:"Kopiować roczną statystykę",
+                    33:"Roczna statystyka skopiowana"
                 }  
             },
             "Transactions management":{
@@ -367,7 +398,12 @@ LANGUAGES = {
                 0:"Dodać kategorię",
                 1:"Usunąć kategorię",
                 2:"Zmienić nazwę kategorii",
-                3:"Nowa nazwa"
+                3:"Nowa nazwa",
+                4:"Kopiować miesięczne transakcje",
+                5:"Miesięczne transakcje są skopiowane",
+                6:"Nazwa kategorii zmieniona",
+                7:"Kategoria usunięta",
+                8:"Kategoria dodana"
             }
         },
         "Errors":{
@@ -386,7 +422,8 @@ LANGUAGES = {
             12:"Nie mogę obliczyć pustego wyrażenia",
             13:"W wyrażeniu użyłeś zabronionych słów",
             14:"Aby zobaczyć statystyki miesięczne, musisz mieć co najmniej jedną kategorię dochodów i jedną kategorię wydatków",
-            15:"Aby zobaczyć miesięczne statystyki, musisz mieć co najmniej jedną transakcję dochodu i jedną transakcję wydatkóws"
+            15:"Aby zobaczyć miesięczne statystyki, musisz mieć co najmniej jedną transakcję dochodu i jedną transakcję wydatkóws",
+            16:"Nazwą kategorii nie morze być puste pole"
         },
         "Mini calculator":{
             0:"Mały kalkulator",
@@ -406,8 +443,9 @@ LANGUAGES = {
 }
 
 
+
 def change_language(Language, Categories:dict, Current_balance:int|float, Current_month:int, account:Account):
-    LANGUAGES[Language]["Account"]["Category management"]
+
     MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
     MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
     MainWindow.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
@@ -434,6 +472,7 @@ def change_language(Language, Categories:dict, Current_balance:int|float, Curren
 
     CategorySettingsWindow.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
     CategorySettingsWindow.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
+    CategorySettingsWindow.copy_transactions.setText(LANGUAGES[Language]["Account"]["Category management"][4])
 
     RenameCategoryWindow.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][3])
     RenameCategoryWindow.button.setText(LANGUAGES[Language]["General management"][2])
@@ -448,7 +487,10 @@ def change_language(Language, Categories:dict, Current_balance:int|float, Curren
     StatistcsWindow.quarterly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][2])
     StatistcsWindow.yearly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][3])
 
+    MonthlyStatistics.copy_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][28])
+
     QuarterlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][5])
+    QuarterlyStatistics.copy_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][30])
     quarters_numbers = ["I","II","III","IV"]
     month_number = 1
     for quarter in QuarterlyStatistics.statistics:
@@ -461,6 +503,7 @@ def change_language(Language, Categories:dict, Current_balance:int|float, Curren
                 QuarterlyStatistics.statistics[quarter][0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
     
     YearlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][6])
+    YearlyStatistics.copy_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][32])
     for month_list in YearlyStatistics.statistics:
         if month_list != 0:
             YearlyStatistics.statistics[month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_list])
