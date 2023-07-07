@@ -3,14 +3,16 @@ from Project_configuration import CATEGORY_TYPE
 from Account_management import Account
 from Languages import LANGUAGES
 
+from threading import Thread
+
 
 def show_information_message(text:str):
     InformationMessage.message_text.setText(text)
     screen_center = MainWindow.window.frameGeometry().center()
     InformationMessage.window.move(screen_center)
 
-    message_worker = InformationMessage.Worker()
-    InformationMessage.threadpool.start(message_worker)
+    message_worker = Thread(target=InformationMessage.run)
+    message_worker.run()
     
 
 

@@ -12,13 +12,14 @@ from Project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
 app = QApplication([])
 
+
 ALIGMENT = Qt.AlignmentFlag
 APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
 
 if platform == "linux":
     BASIC_FONT = QFont("C059 [urw]",pointSize=12)
 else:#Windows
-    BASIC_FONT = QFont("Calibri",pointSize=12)
+    BASIC_FONT = QFont("Georgia",pointSize=12)
 
 dark_theme = load_stylesheet("dark")
 dark_theme_icon = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
@@ -42,7 +43,7 @@ def create_error(type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
 
 def create_button(button_text:str,size:tuple[int])->QPushButton:
     button = QPushButton(text=button_text)
-    button.setFont(QFont("C059 [urw]",pointSize=12))
+    button.setFont(BASIC_FONT)
     button.setMinimumSize(*size)
     button.setMaximumSize(*size)
     return button
@@ -743,8 +744,11 @@ class YearlyStatistics():
 
 
 class InformationMessage:
-    window = QDialog()
-    window.setWindowFlags(Qt.WindowType.Popup)
+    window = QWidget()
+    if platform != "linux":
+        window.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint| Qt.WindowType.FramelessWindowHint)
+    else:#In Windows Popup have black borders but WindowStaysOnTopHint doesn't work in linux
+        window.setWindowFlags(Qt.WindowType.Popup)
     window.resize(250,50)
     window.setMaximumWidth(250)
     window.setMaximumHeight(50)
@@ -771,34 +775,29 @@ class InformationMessage:
     main_layout.addWidget(message)
     window.setLayout(main_layout)
 
-    threadpool = QThreadPool()
 
-
-    class Worker(QRunnable):
-
-        @Slot()
-        def run(self):
-            opacity = 0
-            InformationMessage.window.setWindowOpacity(0)
-            InformationMessage.window.show()
-            for _ in range(5):
-                QApplication.processEvents()
-                opacity += 0.2
-                InformationMessage.window.setWindowOpacity(opacity)
-                InformationMessage.window.update()
-                sleep(0.05)
-            sleep(1)
-            for _ in range(5):
-                opacity -= 0.2
-                QApplication.processEvents()
-                InformationMessage.window.setWindowOpacity(opacity)
-                InformationMessage.window.update()
-                sleep(0.05)
-            InformationMessage.window.hide()
-            CategorySettingsWindow.copy_transactions.setEnabled(True)
-            MonthlyStatistics.copy_statistics.setEnabled(True)
-            QuarterlyStatistics.copy_statistics.setEnabled(True)
-            YearlyStatistics.copy_statistics.setEnabled(True)
+    def run():
+        opacity = 0
+        InformationMessage.window.setWindowOpacity(0)
+        InformationMessage.window.show()
+        for _ in range(5):
+            QApplication.processEvents()
+            opacity += 0.2
+            InformationMessage.window.setWindowOpacity(opacity)
+            InformationMessage.window.update()
+            sleep(0.05)
+        sleep(1)
+        for _ in range(5):
+            opacity -= 0.2
+            QApplication.processEvents()
+            InformationMessage.window.setWindowOpacity(opacity)
+            InformationMessage.window.update()
+            sleep(0.05)
+        InformationMessage.window.hide()
+        CategorySettingsWindow.copy_transactions.setEnabled(True)
+        MonthlyStatistics.copy_statistics.setEnabled(True)
+        QuarterlyStatistics.copy_statistics.setEnabled(True)
+        YearlyStatistics.copy_statistics.setEnabled(True)
 
 
 

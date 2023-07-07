@@ -228,7 +228,6 @@ def add_user():
                 Switch_account = False
                 load_account_data(Account_name)
                 SettingsWindow.accounts.setCurrentText(Account_name)
-                show_information_message()
 
             if balance != "":
                 if balance.isdigit():
@@ -630,7 +629,6 @@ def calulate_expression():
 if __name__ == "__main__":
     with open(f"{ROOT_DIRECTORY}/User_configuration.toml") as file:
         Configuration = toml.load(f"{ROOT_DIRECTORY}/User_configuration.toml")
-
 
     #Load selected language 
     Language = Configuration["Language"]
