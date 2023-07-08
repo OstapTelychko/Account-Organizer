@@ -746,8 +746,8 @@ class YearlyStatistics():
 class InformationMessage:
     window = QWidget()
     if platform != "linux":
-        window.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint| Qt.WindowType.FramelessWindowHint)
-    else:#In Windows Popup have black borders but WindowStaysOnTopHint doesn't work in linux
+        window.setWindowFlags( Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
+    else:#In Windows Popup work worse then in linux. I have to use more flags to get the same result
         window.setWindowFlags(Qt.WindowType.Popup)
     window.resize(250,50)
     window.setMaximumWidth(250)
@@ -781,17 +781,17 @@ class InformationMessage:
         InformationMessage.window.setWindowOpacity(0)
         InformationMessage.window.show()
         for _ in range(5):
-            QApplication.processEvents()
             opacity += 0.2
             InformationMessage.window.setWindowOpacity(opacity)
             InformationMessage.window.update()
+            QApplication.processEvents()
             sleep(0.05)
-        sleep(1)
+        sleep(0.6)
         for _ in range(5):
             opacity -= 0.2
-            QApplication.processEvents()
             InformationMessage.window.setWindowOpacity(opacity)
             InformationMessage.window.update()
+            QApplication.processEvents()
             sleep(0.05)
         InformationMessage.window.hide()
         CategorySettingsWindow.copy_transactions.setEnabled(True)
