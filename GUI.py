@@ -745,7 +745,7 @@ class YearlyStatistics():
 
 class InformationMessage:
     window = QWidget()
-    window.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.FramelessWindowHint | Qt.WindowType.Popup)
+    window.setWindowFlags( Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
     window.resize(250,50)
     window.setMaximumWidth(250)
     window.setMaximumHeight(50)
@@ -797,7 +797,6 @@ class InformationMessage:
         MonthlyStatistics.copy_statistics.setEnabled(True)
         QuarterlyStatistics.copy_statistics.setEnabled(True)
         YearlyStatistics.copy_statistics.setEnabled(True)
-
 
 
 

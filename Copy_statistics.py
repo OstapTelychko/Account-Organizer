@@ -1,4 +1,4 @@
-from GUI import InformationMessage, MainWindow, CategorySettingsWindow, QApplication, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI import InformationMessage, MainWindow, CategorySettingsWindow, QApplication, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, platform
 from Project_configuration import CATEGORY_TYPE
 from Account_management import Account
 from Languages import LANGUAGES
@@ -13,7 +13,6 @@ def show_information_message(text:str):
 
     message_worker = Thread(target=InformationMessage.run)
     message_worker.run()
-    
 
 
 def copy_monthly_transactions(account: Account, Current_month:int, Current_year:int, Language:str, app:QApplication):
@@ -32,7 +31,10 @@ def copy_monthly_transactions(account: Account, Current_month:int, Current_year:
             
 
             app.clipboard().setText(result)
-            show_information_message(LANGUAGES[Language]["Account"]["Category management"][5])
+        else:
+            app.clipboard().setText("")
+            
+        show_information_message(LANGUAGES[Language]["Account"]["Category management"][5])
 
 
 def copy_monthly_statistics(app:QApplication, Language:str):
