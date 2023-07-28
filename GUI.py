@@ -745,10 +745,12 @@ class YearlyStatistics():
 
 class InformationMessage:
     window = QWidget()
-    if platform != "linux":
-        window.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint| Qt.WindowType.FramelessWindowHint)
-    else:#In Windows Popup have black borders but WindowStaysOnTopHint doesn't work in linux
-        window.setWindowFlags(Qt.WindowType.Popup)
+    # if platform != "linux":
+    #     window.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint| Qt.WindowType.FramelessWindowHint)
+    # else:#In Windows Popup have black borders but WindowStaysOnTopHint doesn't work in linux
+    #     # window.setWindowFlags(Qt.WindowType.Popup)
+    #     pass
+    window.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint| Qt.WindowType.FramelessWindowHint | Qt.WindowType.Popup)
     window.resize(250,50)
     window.setMaximumWidth(250)
     window.setMaximumHeight(50)
@@ -780,19 +782,21 @@ class InformationMessage:
         opacity = 0
         InformationMessage.window.setWindowOpacity(0)
         InformationMessage.window.show()
+
         for _ in range(5):
-            QApplication.processEvents()
             opacity += 0.2
             InformationMessage.window.setWindowOpacity(opacity)
             InformationMessage.window.update()
+            QApplication.processEvents()
             sleep(0.05)
-        sleep(1)
+        sleep(0.6)
         for _ in range(5):
             opacity -= 0.2
-            QApplication.processEvents()
             InformationMessage.window.setWindowOpacity(opacity)
             InformationMessage.window.update()
+            QApplication.processEvents()
             sleep(0.05)
+
         InformationMessage.window.hide()
         CategorySettingsWindow.copy_transactions.setEnabled(True)
         MonthlyStatistics.copy_statistics.setEnabled(True)

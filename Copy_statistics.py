@@ -83,5 +83,3 @@ def copy_yearly_statistics(app:QApplication, Language:str):
         app.clipboard().setText(result)
         show_information_message(LANGUAGES[Language]["Account"]["Info"]["Statistics"][33])
 
-
-    

@@ -1,6 +1,7 @@
 import sqlite3
 from Project_configuration import ROOT_DIRECTORY
 
+
 class Account():
 
     def __init__(self, user_name:str):

@@ -117,7 +117,6 @@ def add_statistic(statistic_list:QListWidget,statistic_data:dict,words:list,Lang
             add_highest_and_lowest_transactions(category,statistic_data[1])
 
 
-
 def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Current_month:int,account:Account,months_days:list):
     MonthlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Months"][Current_month])
     MonthlyStatistics.statistics.clear()
@@ -139,7 +138,7 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+f"{total_expense/days_amount:.2f}")
                 MonthlyStatistics.statistics.addItem("")
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense}")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense:.2f}")
 
                 MonthlyStatistics.statistics.addItem("")
                 MonthlyStatistics.statistics.addItem("")
@@ -233,7 +232,7 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                 Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
                 Total_statistic_list.addItem(Statistic_words[7]+f"{total_expense/days_amount:.2f}")
                 Total_statistic_list.addItem("")
-                Total_statistic_list.addItem(Statistic_words[8]+str(total_income-total_expense))
+                Total_statistic_list.addItem(Statistic_words[8]+f"{total_income-total_expense:.2f}")
 
                 def add_total_statistics(statistic:dict,words:list):
                     max_total_value  = max(total_value for total_value in statistic.values())
@@ -319,7 +318,7 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
             Total_statistic_list.addItem(Statistic_words[27]+f"{total_expense/12:.2f}")
             Total_statistic_list.addItem(Statistic_words[26]+f"{total_expense/days_amount:.2f}")
             Total_statistic_list.addItem("")
-            Total_statistic_list.addItem(Statistic_words[8]+str(total_income-total_expense))
+            Total_statistic_list.addItem(Statistic_words[8]+f"{total_income-total_expense:.2f}")
 
             def add_total_statistics(statistic:dict,words:list):
                 max_total_value  = max(total_value for total_value in statistic.values())

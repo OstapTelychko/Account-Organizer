@@ -531,3 +531,4 @@ def change_language(Language, Categories:dict, Current_balance:int|float, Curren
     Expenses = SettingsWindow.total_expense.text().split(" ")[2]
     SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
     SettingsWindow.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())  
+    

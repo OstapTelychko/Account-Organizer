@@ -606,7 +606,7 @@ def rename_account():
         Errors.empty_fields_error.exec()
 
 
-def calulate_expression():
+def calculate_expression():
     expression = MainWindow.mini_calculator_text.text()
     if expression != "":
         if not any([word in expression for word in FORBIDDEN_CALCULATOR_WORDS]):
@@ -623,6 +623,7 @@ def calulate_expression():
             Errors.forbidden_calculator_word_error.exec()
     else:
         Errors.empty_expression_error.exec()
+
 
 
 
@@ -658,7 +659,7 @@ if __name__ == "__main__":
     SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
 
     #Activate mini calculator
-    MainWindow.calculate.clicked.connect(calulate_expression)
+    MainWindow.calculate.clicked.connect(calculate_expression)
 
     #Statistics
     MainWindow.statistics.clicked.connect(StatistcsWindow.window.exec)
