@@ -133,12 +133,12 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
                 days_amount = months_days[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(total_income))
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+f"{total_income/days_amount:.2f}")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+str(round(total_income/days_amount,2)))
                 MonthlyStatistics.statistics.addItem("")
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+f"{total_expense/days_amount:.2f}")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+str(round(total_expense/days_amount,2)))
                 MonthlyStatistics.statistics.addItem("")
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+f"{total_income - total_expense:.2f}")
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+str(round(total_income - total_expense,2)))
 
                 MonthlyStatistics.statistics.addItem("")
                 MonthlyStatistics.statistics.addItem("")
@@ -168,12 +168,12 @@ def add_month_statistics(Incomes_categories:dict,Expenses_categories:dict,Curren
     days_amount = months_days[current_month-1] + (current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
     month_statistics.addItem(Statistic_words[4]+str(total_income))
-    month_statistics.addItem(Statistic_words[5]+f"{total_income/days_amount:.2f}")
+    month_statistics.addItem(Statistic_words[5]+str(round(total_income/days_amount,2)))
     month_statistics.addItem("")
     month_statistics.addItem(Statistic_words[6]+str(total_expense))
-    month_statistics.addItem(Statistic_words[7]+f"{total_expense/days_amount:.2f}")
+    month_statistics.addItem(Statistic_words[7]+str(round(total_expense/days_amount,2)))
     month_statistics.addItem("")
-    month_statistics.addItem(Statistic_words[8]+f"{total_income - total_expense}")
+    month_statistics.addItem(Statistic_words[8]+str(round(total_income - total_expense,2)))
 
     month_statistics.addItem("")
     month_statistics.addItem("")
@@ -227,12 +227,12 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                 Statistic_words = LANGUAGES[Language]["Account"]["Info"]["Statistics"]
 
                 Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
-                Total_statistic_list.addItem(Statistic_words[5]+f"{total_income/days_amount:.2f}")
+                Total_statistic_list.addItem(Statistic_words[5]+str(round(total_income/days_amount,2)))
                 Total_statistic_list.addItem("")
                 Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
-                Total_statistic_list.addItem(Statistic_words[7]+f"{total_expense/days_amount:.2f}")
+                Total_statistic_list.addItem(Statistic_words[7]+str(round(total_expense/days_amount,2)))
                 Total_statistic_list.addItem("")
-                Total_statistic_list.addItem(Statistic_words[8]+f"{total_income-total_expense:.2f}")
+                Total_statistic_list.addItem(Statistic_words[8]+str(round(total_income - total_expense,2)))
 
                 def add_total_statistics(statistic:dict,words:list):
                     max_total_value  = max(total_value for total_value in statistic.values())
@@ -305,18 +305,18 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
             #Entire year statistics
             total_income = sum(total_value for total_value in Incomes_categories_total_values.values())
             total_expense = sum(total_value for total_value in Expenses_categories_total_values.values())
-            days_amount = 365 if Current_year % 4 != 0 else 366
+            days_amount = 365 if Current_year % 4 != 0 else 366# 365 days if year is not leap
 
             Total_statistic_list = YearlyStatistics.statistics[0]["Statistic Data"]
             Statistic_words = LANGUAGES[Language]["Account"]["Info"]["Statistics"]
 
             Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
-            Total_statistic_list.addItem(Statistic_words[25]+f"{total_income/12:.2f}")
-            Total_statistic_list.addItem(Statistic_words[24]+f"{total_income/days_amount:.2f}")
+            Total_statistic_list.addItem(Statistic_words[25]+str(round(total_income/12,2)))
+            Total_statistic_list.addItem(Statistic_words[24]+str(round(total_income/days_amount,2)))
             Total_statistic_list.addItem("")
             Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
-            Total_statistic_list.addItem(Statistic_words[27]+f"{total_expense/12:.2f}")
-            Total_statistic_list.addItem(Statistic_words[26]+f"{total_expense/days_amount:.2f}")
+            Total_statistic_list.addItem(Statistic_words[27]+str(round(total_expense/12,2)))
+            Total_statistic_list.addItem(Statistic_words[26]+str(round(total_expense/days_amount,2)))
             Total_statistic_list.addItem("")
             Total_statistic_list.addItem(Statistic_words[8]+f"{total_income-total_expense:.2f}")
 

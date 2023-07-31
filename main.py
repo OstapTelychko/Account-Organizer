@@ -89,9 +89,9 @@ def calculate_current_balance():
         Current_balance = Current_total_income - Current_total_expenses
 
     account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
-    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(round(Current_total_income,2)))
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(round(Current_total_expenses,2)))
 
 
 def load_account_balance():
@@ -102,9 +102,10 @@ def load_account_balance():
     if Current_total_income == 0 and Current_total_expenses == 0:
         calculate_current_balance()
     
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
-    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+    
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(round(Current_total_income,2)))
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(round(Current_total_expenses,2)))
 
 
 def update_account_balance():
