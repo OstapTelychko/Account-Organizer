@@ -446,7 +446,7 @@ LANGUAGES = {
 
 def change_language(Language, Categories:dict, Current_balance:int|float, Current_month:int, account:Account):
 
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
     MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
     MainWindow.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
     MainWindow.Incomes_and_expenses.setTabText(1,LANGUAGES[Language]["Account"]["Info"][5])
@@ -525,7 +525,7 @@ def change_language(Language, Categories:dict, Current_balance:int|float, Curren
         total_value = Categories[category]["Total value"].text().split(" ")[1]
         Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+total_value)
     
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
     Incomes = SettingsWindow.total_income.text().split(" ")[2]
     SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
     Expenses = SettingsWindow.total_expense.text().split(" ")[2]

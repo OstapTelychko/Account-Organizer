@@ -111,9 +111,9 @@ def load_account_balance():
 def update_account_balance():
     account.update_account_balance(Current_balance,Current_total_income,Current_total_expenses)
 
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(Current_balance))
-    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Current_total_income))
-    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Current_total_expenses))
+    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
+    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(round(Current_total_income,2)))
+    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(round(Current_total_expenses,2)))
 
 
 def load_categories_data():
