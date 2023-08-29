@@ -152,7 +152,7 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
             category_data.setItem(index,3,transaction_id)
             total_value += transaction[5]
             
-    category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(total_value))
+    category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
     category_data.setSortingEnabled(True)
 
 

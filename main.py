@@ -346,7 +346,7 @@ def update_category_total_value(category_id:int):
     if len(transactions) != 0:
         for transaction in transactions:
             total_value += transaction[5]
-    Categories[category_id]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+str(total_value))
+    Categories[category_id]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
     
 
 def show_edit_transaction_window(category_name:str,category_data:QTableWidget):
