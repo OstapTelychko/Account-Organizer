@@ -20,7 +20,7 @@ def get_min_and_max_categories(unsorted_categories:list,year:int,month:int,accou
         transactions_with_highest_value = {}
         for transaction_name in set(transactions_names):
             transactions_with_highest_value[transaction_name] = transactions_names.count(transaction_name)
-        transactions_with_highest_value["Highest value"] = highest_transaction_value
+        transactions_with_highest_value["Highest value"] = round(highest_transaction_value, 2)
         
         #Lowest transactions
         lowest_transaction_value = min([transaction[5] for transaction in transactions])
@@ -30,7 +30,7 @@ def get_min_and_max_categories(unsorted_categories:list,year:int,month:int,accou
         transactions_with_lowest_value = {}
         for transaction_name in set(transactions_names):
             transactions_with_lowest_value[transaction_name] = transactions_names.count(transaction_name)
-        transactions_with_lowest_value["Lowest value"] = lowest_transaction_value
+        transactions_with_lowest_value["Lowest value"] = round(lowest_transaction_value, 2)
 
         return (transactions_with_highest_value,transactions_with_lowest_value)
 
@@ -41,7 +41,7 @@ def get_min_and_max_categories(unsorted_categories:list,year:int,month:int,accou
             transactions = account.get_transactions_by_month(category,year,month)
             transactions_statistic = get_min_and_max_transactions(transactions)
             Categories_with_highest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
-    Categories_with_highest_total_value["Highest total value"] = highest_total_value
+    Categories_with_highest_total_value["Highest total value"] = round(highest_total_value, 2)
 
     #Lowest categories
     for category,total_value in Categories_total_values.copy().items():
@@ -56,18 +56,18 @@ def get_min_and_max_categories(unsorted_categories:list,year:int,month:int,accou
                 transactions = account.get_transactions_by_month(category,year,month)
                 transactions_statistic = get_min_and_max_transactions(transactions)
                 Categories_with_lowest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
-        Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
+        Categories_with_lowest_total_value["Lowest total value"] = round(lowest_total_value, 2)
 
     return (Categories_with_highest_total_value,Categories_with_lowest_total_value,Categories_total_values)
 
 
-def add_statistic(statistic_list:QListWidget,statistic_data:dict,words:list,Language:str,Categories:dict):
+def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list, Language:str, Categories:dict):
 
     def add_highest_and_lowest_transactions(category:int,statistic:dict):
         #Highest transactions
         statistic_list.addItem("")
         statistic_list.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][words[4]])
-        for transaction_name,transaction_value in statistic[category][0].items():
+        for transaction_name, transaction_value in statistic[category][0].items():
             if transaction_name != "Highest value":
                 if transaction_name == "":
                     transaction_name = LANGUAGES[Language]["Account"]["Info"]["Statistics"][12]
@@ -123,8 +123,11 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
     if len(Categories) >= 2:
         Incomes_categories = [category for category in Categories if Categories[category]["Type"] == "Incomes"]
         Expenses_categories = [category for category in Categories if Categories[category]["Type"] == "Expenses"]
+        Incomes_categories_have_transactions = any([bool(len(account.get_transactions_by_month(category,Current_year,Current_month))) for category in Incomes_categories])
+        Expenses_categories_have_transactions = any([bool(len(account.get_transactions_by_month(category,Current_year,Current_month))) for category in Expenses_categories])
+
         if  len(Incomes_categories) >= 1 and  len(Expenses_categories) >= 1:
-            if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,Current_month)) and len(account.get_transactions_by_month(Expenses_categories[0],Current_year,Current_month)):
+            if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                 Incomes_statistic = get_min_and_max_categories(Incomes_categories,Current_year,Current_month,account)
                 Expenses_statistic = get_min_and_max_categories(Expenses_categories,Current_year,Current_month,account)
 
@@ -167,13 +170,13 @@ def add_month_statistics(Incomes_categories:dict,Expenses_categories:dict,Curren
     total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
     days_amount = months_days[current_month-1] + (current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
-    month_statistics.addItem(Statistic_words[4]+str(total_income))
+    month_statistics.addItem(Statistic_words[4]+str(round(total_income, 2)))
     month_statistics.addItem(Statistic_words[5]+str(round(total_income/days_amount,2)))
     month_statistics.addItem("")
-    month_statistics.addItem(Statistic_words[6]+str(total_expense))
-    month_statistics.addItem(Statistic_words[7]+str(round(total_expense/days_amount,2)))
+    month_statistics.addItem(Statistic_words[6]+str(round(total_expense, 2)))
+    month_statistics.addItem(Statistic_words[7]+str(round(total_expense/days_amount, 2)))
     month_statistics.addItem("")
-    month_statistics.addItem(Statistic_words[8]+str(round(total_income - total_expense,2)))
+    month_statistics.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 
     month_statistics.addItem("")
     month_statistics.addItem("")
@@ -226,13 +229,13 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                 Total_statistic_list = QuarterlyStatistics.statistics[quarter][0]["Statistic Data"]
                 Statistic_words = LANGUAGES[Language]["Account"]["Info"]["Statistics"]
 
-                Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
-                Total_statistic_list.addItem(Statistic_words[5]+str(round(total_income/days_amount,2)))
+                Total_statistic_list.addItem(Statistic_words[4]+str(round(total_income, 2)))
+                Total_statistic_list.addItem(Statistic_words[5]+str(round(total_income/days_amount, 2)))
                 Total_statistic_list.addItem("")
-                Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
-                Total_statistic_list.addItem(Statistic_words[7]+str(round(total_expense/days_amount,2)))
+                Total_statistic_list.addItem(Statistic_words[6]+str(round(total_expense, 2)))
+                Total_statistic_list.addItem(Statistic_words[7]+str(round(total_expense/days_amount, 2)))
                 Total_statistic_list.addItem("")
-                Total_statistic_list.addItem(Statistic_words[8]+str(round(total_income - total_expense,2)))
+                Total_statistic_list.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 
                 def add_total_statistics(statistic:dict,words:list):
                     max_total_value  = max(total_value for total_value in statistic.values())
@@ -241,10 +244,10 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                     max_category = [category for category,total_value in statistic.items() if total_value == max_total_value ][0]
                     min_category = [category for category,total_value in statistic.items() if total_value == min_total_value ][0]
 
-                    Total_statistic_list.addItem(Statistic_words[words[0]]+Categories[max_category]["Name"]+f" ({max_total_value})")
+                    Total_statistic_list.addItem(Statistic_words[words[0]]+Categories[max_category]["Name"]+f" ({round(max_total_value, 2)})")
                     Total_statistic_list.addItem("")
                     if min_category != max_category:
-                        Total_statistic_list.addItem(Statistic_words[words[1]]+Categories[min_category]["Name"]+f" ({min_total_value})")
+                        Total_statistic_list.addItem(Statistic_words[words[1]]+Categories[min_category]["Name"]+f" ({round(min_total_value, 2)})")
                     Total_statistic_list.addItem("")
 
                     sorted_income_categories = dict(sorted(statistic.items(),key=lambda x:x[1],reverse=True))
@@ -264,7 +267,10 @@ def show_quarterly_statistics(Categories:dict,Language:str,Current_year:int,acco
                 #Months statistics
                 for month in range(3):
                     current_month = month_numbers[quarter-1][month]
-                    if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,current_month)) and len(account.get_transactions_by_month(Expenses_categories[0],Current_year,current_month)):
+                    Incomes_categories_have_transactions = any([bool(len(account.get_transactions_by_month(category,Current_year,current_month))) for category in Incomes_categories])
+                    Expenses_categories_have_transactions = any([bool(len(account.get_transactions_by_month(category,Current_year,current_month))) for category in Expenses_categories])
+
+                    if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                         add_month_statistics(Incomes_categories,Expenses_categories,Current_year,current_month,account,Statistic_words,months_days,QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"],Language,Categories)
                     else:
                         QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"].addItem(Errors.no_transactions_error.text())
@@ -310,11 +316,11 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
             Total_statistic_list = YearlyStatistics.statistics[0]["Statistic Data"]
             Statistic_words = LANGUAGES[Language]["Account"]["Info"]["Statistics"]
 
-            Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
+            Total_statistic_list.addItem(Statistic_words[4]+str(round(total_income, 2)))
             Total_statistic_list.addItem(Statistic_words[25]+str(round(total_income/12,2)))
             Total_statistic_list.addItem(Statistic_words[24]+str(round(total_income/days_amount,2)))
             Total_statistic_list.addItem("")
-            Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
+            Total_statistic_list.addItem(Statistic_words[6]+str(round(total_expense, 2)))
             Total_statistic_list.addItem(Statistic_words[27]+str(round(total_expense/12,2)))
             Total_statistic_list.addItem(Statistic_words[26]+str(round(total_expense/days_amount,2)))
             Total_statistic_list.addItem("")
@@ -327,15 +333,15 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
                 max_category = [category for category,total_value in statistic.items() if total_value == max_total_value ][0]
                 min_category = [category for category,total_value in statistic.items() if total_value == min_total_value ][0]
 
-                Total_statistic_list.addItem(Statistic_words[words[0]]+Categories[max_category]["Name"]+f" ({max_total_value})")
+                Total_statistic_list.addItem(Statistic_words[words[0]]+Categories[max_category]["Name"]+f" ({round(max_total_value, 2)})")
                 Total_statistic_list.addItem("")
                 if min_category != max_category:
-                    Total_statistic_list.addItem(Statistic_words[words[1]]+Categories[min_category]["Name"]+f" ({min_total_value})")
+                    Total_statistic_list.addItem(Statistic_words[words[1]]+Categories[min_category]["Name"]+f" ({round(min_total_value, 2)})")
                 Total_statistic_list.addItem("")
 
-                sorted_income_categories = dict(sorted(statistic.items(),key=lambda x:x[1],reverse=True))
-                for category,total_value in sorted_income_categories.items():
-                    Total_statistic_list.addItem(f"{Categories[category]['Name']} - {total_value}")
+                sorted_categories = dict(sorted(statistic.items(),key=lambda x:x[1],reverse=True))
+                for category,total_value in sorted_categories.items():
+                    Total_statistic_list.addItem(f"{Categories[category]['Name']} - {round(total_value, 2)}")
 
             Total_statistic_list.addItem("")
             Total_statistic_list.addItem("")
@@ -348,7 +354,10 @@ def show_yearly_statistics(Categories:dict,Language:str,Current_year:int,account
             add_total_statistics(Expenses_categories_total_values,[17,20])
 
             for month in range(1,13):
-                if len(account.get_transactions_by_month(Incomes_categories[0],Current_year,month)) and len(account.get_transactions_by_month(Expenses_categories[0],Current_year,month)):
+                Incomes_categories_have_transactions = any([bool(len(account.get_transactions_by_month(category,Current_year,month))) for category in Incomes_categories])
+                Expenses_categories_have_transactions = any([bool(len(account.get_transactions_by_month(category,Current_year,month))) for category in Expenses_categories])
+
+                if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                     add_month_statistics(Incomes_categories,Expenses_categories,Current_year,month,account,Statistic_words,months_days,YearlyStatistics.statistics[month]["Statistic Data"],Language,Categories)
                 else:
                     YearlyStatistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions_error.text())
