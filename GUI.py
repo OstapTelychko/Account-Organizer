@@ -11,6 +11,7 @@ from Project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
 
 app = QApplication([])
+app.setApplicationName("Account Organizer")
 
 
 ALIGMENT = Qt.AlignmentFlag
