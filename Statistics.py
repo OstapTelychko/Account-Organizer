@@ -135,10 +135,10 @@ def show_monthly_statistics(Categories:dict,Language:str,Current_year:int,Curren
                 total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
                 days_amount = months_days[Current_month-1] + (Current_month == 2 and Current_year % 4 == 0)#Add one day to February (29) if year is leap
 
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(total_income))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][4]+str(round(total_income, 2)))
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][5]+str(round(total_income/days_amount,2)))
                 MonthlyStatistics.statistics.addItem("")
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][6]+str(round(total_expense, 2)))
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][7]+str(round(total_expense/days_amount,2)))
                 MonthlyStatistics.statistics.addItem("")
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Language]["Account"]["Info"]["Statistics"][8]+str(round(total_income - total_expense,2)))
