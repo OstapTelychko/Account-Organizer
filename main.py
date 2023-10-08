@@ -148,7 +148,7 @@ def load_categories_data():
                 category_data.setItem(row,2,value)
                 category_data.setItem(row,3,transaction_id)
                 total_value += transaction[5]
-        Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+str(total_value))
+        Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
 
 
 def next_month():
