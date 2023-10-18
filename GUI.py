@@ -1,12 +1,12 @@
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget,QSizePolicy,QMainWindow
-from PySide6.QtCore import Qt,QSize, QRunnable, Slot, QThreadPool
+from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
 from sys import platform
 from time import sleep
 
-from Account_management import Account
-from Project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
+from Account import Account
+from project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
 
 
@@ -15,22 +15,27 @@ app.setApplicationName("Account Organizer")
 
 
 ALIGMENT = Qt.AlignmentFlag
+
+ICON_SIZE = QSize(30, 30)
 APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
+ADD_TRANSACTION_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/add transaction.png")
+REMOVE_TRANSACTION_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/remove transaction.png")
+EDIT_TRANSACTION_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/edit transaction.png")
 
 if platform == "linux":
-    BASIC_FONT = QFont("C059 [urw]",pointSize=12)
+    BASIC_FONT = QFont("C059 [urw]", pointSize=12)
 else:#Windows
-    BASIC_FONT = QFont("Georgia",pointSize=12)
+    BASIC_FONT = QFont("Georgia", pointSize=12)
 
-dark_theme = load_stylesheet("dark")
-dark_theme_icon = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
+DARK_THEME = load_stylesheet("dark")
+DARK_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
 
-light_theme = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})
-light_theme_icon = QIcon(f"{ROOT_DIRECTORY}/Images/Light theme.png")
+LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})
+LIGHT_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Light theme.png")
 
 errors_list = []
 
-def create_error(type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
+def create_error(type_confirm:bool, icon:QMessageBox.Icon) -> QMessageBox:
     error = QMessageBox()
     error.addButton(QMessageBox.StandardButton.Ok)
     error.setWindowTitle("Account Organizer")
@@ -42,7 +47,7 @@ def create_error(type_confirm:bool,icon:QMessageBox.Icon) -> QMessageBox:
     return error
 
 
-def create_button(button_text:str,size:tuple[int])->QPushButton:
+def create_button(button_text:str, size:tuple[int])->QPushButton:
     button = QPushButton(text=button_text)
     button.setFont(BASIC_FONT)
     button.setMinimumSize(*size)
@@ -50,7 +55,7 @@ def create_button(button_text:str,size:tuple[int])->QPushButton:
     return button
 
 
-def load_category(category_type:str,name:str,account:Account,category_id:int,year:int,month:int,Language:str,theme:str) -> dict:
+def load_category(category_type:str, name:str, account:Account, category_id:int, year:int, month:int, Language:str, theme:str) -> dict:
     """Add category to user window
 
         Arguments
@@ -71,7 +76,7 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
 
         Returns
         ------
-            `category` (dict): Dictionary with category name, type and link on add, delete, rename transaction buttons
+            `category` (dict): Dictionary with category name, type and links on add, delete, rename transaction buttons
     """
 
     category = {}
@@ -156,10 +161,17 @@ def load_category(category_type:str,name:str,account:Account,category_id:int,yea
     category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
     category_data.setSortingEnabled(True)
 
-
     add_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][0],(185,40))
+    add_transaction.setIcon(ADD_TRANSACTION_ICON)
+    add_transaction.setIconSize(ICON_SIZE)
+
     delete_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][1],(185,40))
+    delete_transaction.setIcon(REMOVE_TRANSACTION_ICON)
+    delete_transaction.setIconSize(ICON_SIZE)
+
     edit_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][2],(210,40))
+    edit_transaction.setIcon(EDIT_TRANSACTION_ICON)
+    edit_transaction.setIconSize(ICON_SIZE)
     
     category["Add transaction"] = add_transaction
     category["Delete transaction"] = delete_transaction
@@ -222,7 +234,7 @@ class MainWindow():
     account_current_balance.setFont(QFont("C059 [urw]",pointSize=15))
     settings = QToolButton()
     settings.setIcon(QIcon(f"{ROOT_DIRECTORY}/Images/Settings icon.png"))
-    settings.setIconSize(QSize(30,30))
+    settings.setIconSize(ICON_SIZE)
 
     General_info.addStretch(7)
     General_info.addWidget(account_current_balance,alignment=ALIGMENT.AlignTop| ALIGMENT.AlignHCenter)
@@ -309,7 +321,10 @@ class MainWindow():
     mini_calculator_text.setPlaceholderText("2 * 3 = 6;  3 / 2 = 1.5;  3 + 2 = 5;  2 - 3 = -1;  4 ** 2 = 16")
     mini_calculator_text.setMinimumWidth(600)
     calculate = create_button("=",(100,40))
-    calculate.setFont(QFont("C059 [urw]",pointSize=18))
+    if platform == "linux":
+        calculate.setFont(QFont("C059 [urw]", pointSize=18))
+    else:#Windows
+        calculate.setFont(QFont("Georgia", pointSize=18))
 
     window_bottom.addStretch(1)
     window_bottom.addWidget(statistics)
@@ -340,7 +355,7 @@ class SettingsWindow():
     window.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")
 
     switch_themes_button = QToolButton()
-    switch_themes_button.setIconSize(QSize(35,35))
+    switch_themes_button.setIconSize(ICON_SIZE)
 
     languages = QComboBox()
     languages.setFont(BASIC_FONT)
@@ -430,7 +445,7 @@ class AddAccountWindow():
     Full_name_layout.addWidget(name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     Full_name_layout.addWidget(surname,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
 
-    button = create_button("",(140,50))
+    button = create_button("", (140,50))
     current_balance = QLineEdit()
     current_balance.setPlaceholderText("Current balance")
 
@@ -464,7 +479,7 @@ class RenameAccountWindow():
     full_name_layout.addWidget(new_name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     full_name_layout.addWidget(new_surname,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
 
-    button = create_button("Update",(160,40))
+    button = create_button("Update", (160,40))
 
     main_layout = QVBoxLayout()
     main_layout.addStretch(1)
@@ -488,7 +503,7 @@ class AddCategoryWindow():
     category_name = QLineEdit()
     category_name.setPlaceholderText("Category name")
 
-    button = create_button("Add category",(160,40))
+    button = create_button("Add category", (160,40))
 
     main_layout = QVBoxLayout()
 
@@ -508,7 +523,7 @@ class RenameCategoryWindow():
     new_category_name = QLineEdit()
     new_category_name.setMinimumWidth(150)
     new_category_name.setPlaceholderText("New name")
-    button = create_button("Rename",(170,40))
+    button = create_button("Rename", (170,40))
 
     main_layout = QVBoxLayout()
     main_layout.addWidget(new_category_name,alignment=ALIGMENT.AlignHCenter)
@@ -537,7 +552,7 @@ class TransactionManagementWindow():
     transaction_layout.addWidget(transaction_day,alignment=ALIGMENT.AlignVCenter)
     transaction_layout.addWidget(transaction_value,alignment=ALIGMENT.AlignVCenter)
 
-    button = create_button("",(150,40))
+    button = create_button("", (150,40))
 
     main_layout = QVBoxLayout()
     main_layout.addStretch(1)
@@ -559,9 +574,9 @@ class StatistcsWindow():
     window.setWindowTitle("Statistics")
     window.setWindowFlags(Qt.WindowType.Window)
 
-    monthly_statistics = create_button("Monthly",(150,40))
-    quarterly_statistics = create_button("Quarterly",(150,40))
-    yearly_statistics = create_button("Yearly",(150,40))
+    monthly_statistics = create_button("Monthly", (150,40))
+    quarterly_statistics = create_button("Quarterly", (150,40))
+    yearly_statistics = create_button("Yearly", (150,40))
 
     main_layout = QVBoxLayout()
     main_layout.addSpacing(50)
@@ -588,7 +603,7 @@ class MonthlyStatistics():
     statistics = QListWidget()
     statistics.setFont(BASIC_FONT)
 
-    copy_statistics = create_button("Copy month statistics",(275,40))
+    copy_statistics = create_button("Copy month statistics", (275,40))
     copy_statistics_layout = QHBoxLayout()
     copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
 
@@ -723,7 +738,7 @@ class YearlyStatistics():
 
         statistics_window_layout.addLayout(statistics_layout)
     
-    copy_statistics = create_button("Copy yearly statistics",(275,40))
+    copy_statistics = create_button("Copy yearly statistics", (275,40))
     copy_statistics_layout = QHBoxLayout()
     copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
 
@@ -801,4 +816,4 @@ class InformationMessage:
 
 
 
-from Languages import LANGUAGES
+from languages import LANGUAGES

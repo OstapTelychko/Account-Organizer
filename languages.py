@@ -1,5 +1,3 @@
-from GUI import *
-
 LANGUAGES = {
     "English":{
         "Months":{
@@ -89,9 +87,9 @@ LANGUAGES = {
                 }
             },
             "Transactions management":{
-                0:"Add transaction",
-                1:"Delete transaction",
-                2:"Edit transaction",
+                0:" Add",
+                1:" Delete",
+                2:" Edit",
                 "Messages":{
                     0:"Enter the values you want to change",
                     1:"""
@@ -235,9 +233,9 @@ LANGUAGES = {
                 }
             },
             "Transactions management":{
-                0:"Додати транзакцію",
-                1:"Видалити транзакцію",
-                2:"Змінити транзакцію",
+                0:" Додати",
+                1:" Видалити",
+                2:" Змінити",
                 "Messages":{
                     0:"Ведіть дані в поля, які хочете змінити",
                     1:"""
@@ -381,9 +379,9 @@ LANGUAGES = {
                 }  
             },
             "Transactions management":{
-                0:"Dodać transakcję",
-                1:"Usunąć transakcję",
-                2:"Źmienić transakcję",
+                0:" Dodać",
+                1:" Usunąć",
+                2:" Źmienić",
                 "Messages":{
                     0:"Wprowadźcie dane w polach, które chcecie zmienić",
                     1:"""
@@ -441,94 +439,3 @@ LANGUAGES = {
         }
     }
 }
-
-
-
-def change_language(Language, Categories:dict, Current_balance:int|float, Current_month:int, account:Account):
-
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
-    MainWindow.current_month.setText(LANGUAGES[Language]["Months"][Current_month])
-    MainWindow.Incomes_and_expenses.setTabText(0,LANGUAGES[Language]["Account"]["Info"][4])
-    MainWindow.Incomes_and_expenses.setTabText(1,LANGUAGES[Language]["Account"]["Info"][5])
-    MainWindow.add_incomes_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
-    MainWindow.add_expenses_category.setText(LANGUAGES[Language]["Account"]["Category management"][0])
-    MainWindow.statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][0])
-    MainWindow.mini_calculator_label.setText(LANGUAGES[Language]["Mini calculator"][0])
-
-    SettingsWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][0])
-    SettingsWindow.delete_account.setText(LANGUAGES[Language]["Account"]["Account management"][0])
-    SettingsWindow.add_account.setText(LANGUAGES[Language]["Account"]["Account management"][1])
-    SettingsWindow.rename_account.setText(LANGUAGES[Language]["Account"]["Account management"][2])
-
-    RenameAccountWindow.message.setText(LANGUAGES[Language]["Account"]["Account management"]["Messages"][1])
-    RenameAccountWindow.button.setText(LANGUAGES[Language]["General management"][5])
-    RenameAccountWindow.new_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][3])
-    RenameAccountWindow.new_surname.setPlaceholderText(LANGUAGES[Language]["Account"]["Account management"][4])
-    RenameAccountWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][2])
-
-    AddCategoryWindow.category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
-    AddCategoryWindow.button.setText(LANGUAGES[Language]["General management"][1])
-    AddCategoryWindow.window.setWindowTitle(LANGUAGES[Language]["Account"]["Category management"][0])
-
-    CategorySettingsWindow.delete_category.setText(LANGUAGES[Language]["Account"]["Category management"][1])
-    CategorySettingsWindow.rename_category.setText(LANGUAGES[Language]["Account"]["Category management"][2])
-    CategorySettingsWindow.copy_transactions.setText(LANGUAGES[Language]["Account"]["Category management"][4])
-
-    RenameCategoryWindow.new_category_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Category management"][3])
-    RenameCategoryWindow.button.setText(LANGUAGES[Language]["General management"][2])
-
-    TransactionManagementWindow.button.setText(LANGUAGES[Language]["General management"][5])
-    TransactionManagementWindow.transaction_name.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][0])
-    TransactionManagementWindow.transaction_day.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][1])
-    TransactionManagementWindow.transaction_value.setPlaceholderText(LANGUAGES[Language]["Account"]["Info"][2])
-
-    StatistcsWindow.window.setWindowTitle(LANGUAGES[Language]["Windows"][4])
-    StatistcsWindow.monthly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][1])
-    StatistcsWindow.quarterly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][2])
-    StatistcsWindow.yearly_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][3])
-
-    MonthlyStatistics.copy_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][28])
-
-    QuarterlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][5])
-    QuarterlyStatistics.copy_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][30])
-    quarters_numbers = ["I","II","III","IV"]
-    month_number = 1
-    for quarter in QuarterlyStatistics.statistics:
-        QuarterlyStatistics.statistics[quarter]["Label"].setText(quarters_numbers[quarter-1]+LANGUAGES[Language]["Account"]["Info"]["Statistics"][23])
-        for month_list in QuarterlyStatistics.statistics[quarter]:
-            if month_list != 0 and month_list != "Label":
-                QuarterlyStatistics.statistics[quarter][month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_number])
-                month_number+=1
-            elif month_list == 0:
-                QuarterlyStatistics.statistics[quarter][0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
-    
-    YearlyStatistics.window.setWindowTitle(LANGUAGES[Language]["Windows"][6])
-    YearlyStatistics.copy_statistics.setText(LANGUAGES[Language]["Account"]["Info"]["Statistics"][32])
-    for month_list in YearlyStatistics.statistics:
-        if month_list != 0:
-            YearlyStatistics.statistics[month_list]["Label"].setText(LANGUAGES[Language]["Months"][month_list])
-        else:
-            YearlyStatistics.statistics[0]["Label"].setText(LANGUAGES[Language]["Account"]["Info"][6])
-
-
-    for index,error in enumerate(errors_list):
-        error.setText(LANGUAGES[Language]["Errors"][index])
-        error.button(QMessageBox.StandardButton.Ok).setText(LANGUAGES[Language]["General management"][3])
-        if error.button(QMessageBox.StandardButton.Cancel) != None:
-            error.button(QMessageBox.StandardButton.Cancel).setText(LANGUAGES[Language]["General management"][4])
-    
-    for category in Categories:
-        Categories[category]["Add transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][0])
-        Categories[category]["Delete transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][1])
-        Categories[category]["Edit transaction"].setText(LANGUAGES[Language]["Account"]["Transactions management"][2])
-        Categories[category]["Category data"].setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0],LANGUAGES[Language]["Account"]["Info"][1],LANGUAGES[Language]["Account"]["Info"][2]))
-        total_value = Categories[category]["Total value"].text().split(" ")[1]
-        Categories[category]["Total value"].setText(LANGUAGES[Language]["Account"]["Info"][6]+total_value)
-    
-    MainWindow.account_current_balance.setText(LANGUAGES[Language]["Account"]["Info"][3]+str(round(Current_balance,2)))
-    Incomes = SettingsWindow.total_income.text().split(" ")[2]
-    SettingsWindow.total_income.setText(LANGUAGES[Language]["Account"]["Info"][7]+str(Incomes))
-    Expenses = SettingsWindow.total_expense.text().split(" ")[2]
-    SettingsWindow.total_expense.setText(LANGUAGES[Language]["Account"]["Info"][8]+str(Expenses))
-    SettingsWindow.account_created_date.setText(LANGUAGES[Language]["Account"]["Info"][9]+account.get_account_date())  
-    

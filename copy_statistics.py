@@ -1,7 +1,7 @@
-from GUI import InformationMessage, MainWindow, CategorySettingsWindow, QApplication, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, platform
-from Project_configuration import CATEGORY_TYPE
-from Account_management import Account
-from Languages import LANGUAGES
+from Session import Session
+from GUI import InformationMessage, MainWindow, CategorySettingsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, app
+from project_configuration import CATEGORY_TYPE
+from languages import LANGUAGES
 
 from threading import Thread
 
@@ -15,17 +15,17 @@ def show_information_message(text:str):
     message_worker.run()
 
 
-def copy_monthly_transactions(account: Account, Current_month:int, Current_year:int, Language:str, app:QApplication):
+def copy_monthly_transactions():
     if CategorySettingsWindow.copy_transactions.isEnabled():
         CategorySettingsWindow.copy_transactions.setEnabled(False)
         category_name = CategorySettingsWindow.window.windowTitle()
-        category_id = account.get_category_id(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
+        category_id = Session.account.get_category_id(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
         
-        transactions = account.get_transactions_by_month(category_id, Current_year, Current_month)
+        transactions = Session.account.get_transactions_by_month(category_id, Session.Current_year, Session.Current_month)
         if len(transactions):
             result = ""
-            column_names = LANGUAGES[Language]["Account"]["Info"]
-            result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Language]['Months'][Current_month]}\t{Current_year}\n"
+            column_names = LANGUAGES[Session.Language]["Account"]["Info"]
+            result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.Language]['Months'][Session.Current_month]}\t{Session.Current_year}\n"
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction[5]}\t\t{transaction[4]}\t{transaction[6]}\n"
             
@@ -34,10 +34,10 @@ def copy_monthly_transactions(account: Account, Current_month:int, Current_year:
         else:
             app.clipboard().setText("")
             
-        show_information_message(LANGUAGES[Language]["Account"]["Category management"][5])
+        show_information_message(LANGUAGES[Session.Language]["Account"]["Category management"][5])
 
 
-def copy_monthly_statistics(app:QApplication, Language:str):
+def copy_monthly_statistics():
     if MonthlyStatistics.copy_statistics.isEnabled():
         MonthlyStatistics.copy_statistics.setEnabled(False)
         statistics = MonthlyStatistics.statistics
@@ -47,10 +47,10 @@ def copy_monthly_statistics(app:QApplication, Language:str):
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Language]["Account"]["Info"]["Statistics"][29])
+        show_information_message(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][29])
 
 
-def copy_quarterly_statistics(app:QApplication, Language:str):
+def copy_quarterly_statistics():
     if QuarterlyStatistics.copy_statistics.isEnabled():
         QuarterlyStatistics.copy_statistics.setEnabled(False)
         statistics = QuarterlyStatistics.statistics
@@ -67,10 +67,10 @@ def copy_quarterly_statistics(app:QApplication, Language:str):
             result+= "\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Language]["Account"]["Info"]["Statistics"][31])
+        show_information_message(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][31])
 
 
-def copy_yearly_statistics(app:QApplication, Language:str):
+def copy_yearly_statistics():
     if YearlyStatistics.copy_statistics.isEnabled():
         YearlyStatistics.copy_statistics.setEnabled(False)
         statistics = YearlyStatistics.statistics
@@ -83,5 +83,5 @@ def copy_yearly_statistics(app:QApplication, Language:str):
             result += "\n\n\n"
 
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Language]["Account"]["Info"]["Statistics"][33])
+        show_information_message(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][33])
 
