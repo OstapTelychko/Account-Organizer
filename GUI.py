@@ -14,6 +14,7 @@ app = QApplication([])
 app.setApplicationName("Account Organizer")
 
 
+
 ALIGMENT = Qt.AlignmentFlag
 
 ICON_SIZE = QSize(30, 30)
@@ -567,7 +568,7 @@ class TransactionManagementWindow():
 
 
 
-class StatistcsWindow():
+class StatisticsWindow():
     window = QDialog()
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)

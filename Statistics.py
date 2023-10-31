@@ -1,15 +1,14 @@
 from Session import Session
 from GUI import *
 from languages import LANGUAGES
-from Account import Account
 from project_configuration import MONTHS_DAYS
 
 
-def get_min_and_max_categories(unsorted_categories:list) -> tuple:
+def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> tuple:
     Categories_total_values = {}
 
     for category in unsorted_categories:
-        Categories_total_values[category] = sum([transaction[5] for transaction in Session.account.get_transactions_by_month(category, Session.Current_year, Session.Current_month)])
+        Categories_total_values[category] = sum([transaction[5] for transaction in Session.account.get_transactions_by_month(category, Session.Current_year, current_month)])
 
     highest_total_value = max([total_value for total_value in Categories_total_values.values()])
 
@@ -40,7 +39,7 @@ def get_min_and_max_categories(unsorted_categories:list) -> tuple:
     Categories_with_highest_total_value = {}
     for category in Categories_total_values:
         if Categories_total_values[category] == highest_total_value:
-            transactions = Session.account.get_transactions_by_month(category, Session.Current_year, Session.Current_month)
+            transactions = Session.account.get_transactions_by_month(category, Session.Current_year, current_month)
             transactions_statistic = get_min_and_max_transactions(transactions)
             Categories_with_highest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
     Categories_with_highest_total_value["Highest total value"] = round(highest_total_value, 2)
@@ -55,7 +54,7 @@ def get_min_and_max_categories(unsorted_categories:list) -> tuple:
         Categories_with_lowest_total_value = {}
         for category in Categories_total_values:
             if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
-                transactions = Session.account.get_transactions_by_month(category, Session.Current_year, Session.Current_month)
+                transactions = Session.account.get_transactions_by_month(category, Session.Current_year, current_month)
                 transactions_statistic = get_min_and_max_transactions(transactions)
                 Categories_with_lowest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
         Categories_with_lowest_total_value["Lowest total value"] = round(lowest_total_value, 2)
@@ -131,8 +130,8 @@ def show_monthly_statistics():
 
         if  len(Incomes_categories) >= 1 and  len(Expenses_categories) >= 1:
             if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
-                Incomes_statistic = get_min_and_max_categories(Incomes_categories)
-                Expenses_statistic = get_min_and_max_categories(Expenses_categories)
+                Incomes_statistic = get_min_and_max_categories(Incomes_categories, Session.Current_month)
+                Expenses_statistic = get_min_and_max_categories(Expenses_categories, Session.Current_month)
 
                 total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
                 total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
@@ -155,6 +154,7 @@ def show_monthly_statistics():
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Session.Language]["Account"]["Info"][5])
                 add_statistic(MonthlyStatistics.statistics, Expenses_statistic, [17,18,20,21,19,22])
                     
+                StatisticsWindow.window.done(1)
                 MonthlyStatistics.window.exec()
             else:
                 Errors.no_transactions_error.exec()
@@ -164,9 +164,9 @@ def show_monthly_statistics():
         Errors.no_category_error.exec()
 
 
-def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Statistic_words:dict, month_statistics:QListWidget):
-    Incomes_statistic = get_min_and_max_categories(Incomes_categories)
-    Expenses_statistic = get_min_and_max_categories(Expenses_categories)
+def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Statistic_words:dict, month_statistics:QListWidget, current_month:str):
+    Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)
+    Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)
 
     total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
     total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
@@ -272,9 +272,11 @@ def show_quarterly_statistics():
                     Expenses_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.Current_year, current_month))) for category in Expenses_categories])
 
                     if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
-                        add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"])
+                        add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"], current_month)
                     else:
                         QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"].addItem(Errors.no_transactions_error.text())
+
+            StatisticsWindow.window.done(1)
             QuarterlyStatistics.window.exec()
         else:
             Errors.no_category_error.exec()
@@ -354,14 +356,15 @@ def show_yearly_statistics():
             add_total_statistics(Expenses_categories_total_values, [17,20])
 
             for month in range(1,13):
-                Incomes_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.Current_year,month))) for category in Incomes_categories])
-                Expenses_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.Current_year,month))) for category in Expenses_categories])
+                Incomes_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.Current_year, month))) for category in Incomes_categories])
+                Expenses_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.Current_year, month))) for category in Expenses_categories])
 
                 if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
-                    add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, YearlyStatistics.statistics[month]["Statistic Data"])
+                    add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, YearlyStatistics.statistics[month]["Statistic Data"], month)
                 else:
                     YearlyStatistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions_error.text())
 
+            StatisticsWindow.window.done(1)
             YearlyStatistics.window.exec()
         else:
             Errors.no_category_error.exec()

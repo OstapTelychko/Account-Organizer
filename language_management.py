@@ -41,10 +41,10 @@ def change_language():
     TransactionManagementWindow.transaction_day.setPlaceholderText(LANGUAGES[Session.Language]["Account"]["Info"][1])
     TransactionManagementWindow.transaction_value.setPlaceholderText(LANGUAGES[Session.Language]["Account"]["Info"][2])
 
-    StatistcsWindow.window.setWindowTitle(LANGUAGES[Session.Language]["Windows"][4])
-    StatistcsWindow.monthly_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][1])
-    StatistcsWindow.quarterly_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][2])
-    StatistcsWindow.yearly_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][3])
+    StatisticsWindow.window.setWindowTitle(LANGUAGES[Session.Language]["Windows"][4])
+    StatisticsWindow.monthly_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][1])
+    StatisticsWindow.quarterly_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][2])
+    StatisticsWindow.yearly_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][3])
 
     MonthlyStatistics.copy_statistics.setText(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][28])
 

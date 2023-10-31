@@ -3,7 +3,7 @@
 from GUI import *
 from Session import Session
 from languages import LANGUAGES
-from project_configuration import MONTHS_DAYS, FORBIDDEN_CALCULATOR_WORDS, AVAILABLE_LANGUAGES
+from project_configuration import FORBIDDEN_CALCULATOR_WORDS, AVAILABLE_LANGUAGES
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
 from copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
@@ -93,10 +93,10 @@ if __name__ == "__main__":
     MainWindow.calculate.clicked.connect(calculate_expression)
 
     #Statistics
-    MainWindow.statistics.clicked.connect(StatistcsWindow.window.exec)
-    StatistcsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
-    StatistcsWindow.quarterly_statistics.clicked.connect(show_quarterly_statistics)
-    StatistcsWindow.yearly_statistics.clicked.connect(show_yearly_statistics)
+    MainWindow.statistics.clicked.connect(StatisticsWindow.window.exec)
+    StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
+    StatisticsWindow.quarterly_statistics.clicked.connect(show_quarterly_statistics)
+    StatisticsWindow.yearly_statistics.clicked.connect(show_yearly_statistics)
     MonthlyStatistics.copy_statistics.clicked.connect(copy_monthly_statistics)
     QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
