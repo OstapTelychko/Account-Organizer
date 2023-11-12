@@ -115,7 +115,7 @@ LANGUAGES = {
         "Errors":{
             0:"You have entered invalid type of data, check entered fields again",
             1:"Account with this name alredy exists",
-            2:"You haven't entered a current balance, i will count it as 0 (if that's not true value there may be discrepancy between current and actual balance)",
+            2:"You haven't entered a current balance, current balance will count as 0 (if that's not true value there may be discrepancy between current and actual balance)",
             3:"This category already exists",
             4:"Are you sure you want to delete the category? You will lose ALL transactions added to this category and your current balance will be recalculated",
             5:"Select transaction. (Click on transaction number to select)",
@@ -261,7 +261,7 @@ LANGUAGES = {
         "Errors":{
             0:"Ви ввели не правильний тип даних, перевірте введені дані знов",
             1:"Акаунт під такою назвою вже існує",
-            2:"Ви не ввели поточного балансу, я зарахую це як 0 (якщо це не є правдим значенням, можуть виникнути розбіжності з реальним і поточним балансом). Продовжити?",
+            2:"Ви не ввели поточного балансу, поточний баланс буде зарахований як 0 (якщо це не є правдим значенням, можуть виникнути розбіжності між реальним і поточним балансом). Продовжити?",
             3:"Ця категорія вже існує",
             4:"Ви впевненні що хочете видалити категорію? Ви втратите ВСІ транзакції, які були записані до цієї категорії і поточний баланс буде перерахований",
             5:"Виберіть транзакцію. (Щоб вибрати транзацію натисніть на її номер)",
@@ -407,7 +407,7 @@ LANGUAGES = {
         "Errors":{
             0:"Wpisaliscie nie korektny typ danych, sprawdź wpisane dane znow",
             1:"Konto z takim imieniem już istnieje",
-            2:"Nie podałeś aktualnego salda, policzę to jako 0 (jeśli to nieprawda, wystąpi rozbieżność między rzeczywistym a całkowitym saldem). Kontynuować?",
+            2:"Nie podałeś aktualnego salda, saldo będzie równe 0 (jeśli to nieprawdziwe , wystąpi rozbieżność między rzeczywistym a saldem w programie). Kontynuować?",
             3:"Ta kategoria już istnieje",
             4:"Czy na pewno chcecie usunąć kategorię? Utracisz WSZYSTKIE transakcje zarejestrowane w tej kategorii, a bieżące saldo zostanie przeliczone",
             5:"Wybierzcie transakcję. (aby wybrać transakcję, kliknij na jej numer)",

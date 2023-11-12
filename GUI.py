@@ -1,10 +1,12 @@
-from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget,QSizePolicy,QMainWindow
-from PySide6.QtCore import Qt,QSize
-from PySide6.QtGui import QIcon,QFont
-from qdarktheme._style_loader import load_stylesheet
 from sys import platform
 from time import sleep
 
+from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLineEdit,QLabel,QPushButton,QScrollArea,QApplication,QMessageBox,QTabWidget,QToolButton,QComboBox,QDialog,QTableWidget,QTableWidgetItem,QHeaderView,QListWidget,QSizePolicy
+from PySide6.QtCore import Qt,QSize, QEvent
+from PySide6.QtGui import QIcon,QFont
+from qdarktheme._style_loader import load_stylesheet
+
+from languages import LANGUAGES
 from Account import Account
 from project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
@@ -119,44 +121,50 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
         category_data.setStyleSheet("QTableWidget{background-color:rgb(205,205,205)}")
 
     category_data.setColumnCount(4)
-    category_data.setColumnHidden(3,True)
+    category_data.setColumnHidden(3, True)
 
     header = category_data.horizontalHeader()
     header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-    header.setSectionResizeMode(0,QHeaderView.ResizeMode.Stretch)
+    header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)# Name of transaction
+    header.setSectionResizeMode(1, QHeaderView.ResizeMode.Custom)# Day of transaction
+    category_data.setColumnWidth(1, 50)
 
     column = category_data.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-    category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0],LANGUAGES[Language]["Account"]["Info"][1],LANGUAGES[Language]["Account"]["Info"][2]))
+    category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0], LANGUAGES[Language]["Account"]["Info"][1], LANGUAGES[Language]["Account"]["Info"][2]))
     row = category_data.horizontalHeader()
     row.setFont(BASIC_FONT)
 
-    transactions = account.get_transactions_by_month(category_id,year,month)
+    transactions = account.get_transactions_by_month(category_id, year, month)
     total_value = 0
-
+    
     if len(transactions) > 0: #Check if transactions are in db
         category_data.setRowCount(len(transactions))
         for index,transaction in enumerate(transactions):
+
             transaction_day = QTableWidgetItem()
-            transaction_day.setData(Qt.ItemDataRole.EditRole,transaction[4])
+            transaction_day.setTextAlignment(ALIGMENT.AlignCenter)
+            transaction_day.setData(Qt.ItemDataRole.EditRole, transaction[4])
             transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
 
             transaction_value = QTableWidgetItem()
-            transaction_value.setData(Qt.ItemDataRole.EditRole,transaction[5])
+            transaction_value.setTextAlignment(ALIGMENT.AlignCenter)
+            transaction_value.setData(Qt.ItemDataRole.EditRole, transaction[5])
             transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             transaction_id = QTableWidgetItem()
-            transaction_id.setData(Qt.ItemDataRole.EditRole,transaction[0])
+            transaction_id.setData(Qt.ItemDataRole.EditRole, transaction[0])
             transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             transaction_name = QTableWidgetItem(transaction[6])
             transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-            
-            category_data.setItem(index,0,transaction_name)
-            category_data.setItem(index,1,transaction_day)
-            category_data.setItem(index,2,transaction_value)
-            category_data.setItem(index,3,transaction_id)
+
+
+            category_data.setItem(index, 0, transaction_name)
+            category_data.setItem(index, 1, transaction_day)
+            category_data.setItem(index, 2, transaction_value)
+            category_data.setItem(index, 3, transaction_id)
             total_value += transaction[5]
             
     category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
@@ -200,6 +208,11 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
     return category
 
 
+def close_dialog(event:QEvent):
+    event.accept()
+    MainWindow.window.raise_()
+
+
 class Errors():
     incorrect_data_type_error = create_error(False,QMessageBox.Icon.Warning)
     account_alredy_exists_error  = create_error(False,QMessageBox.Icon.Warning)
@@ -220,6 +233,7 @@ class Errors():
     no_category_name_error = create_error(False,QMessageBox.Icon.Information)
 
 
+
 class MainWindow():
     window = QWidget()
     window.resize(1500,750)
@@ -227,7 +241,6 @@ class MainWindow():
     window.setMinimumWidth(1150)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
-
 
     #Account balance and settings
     General_info = QHBoxLayout()
@@ -354,6 +367,7 @@ class SettingsWindow():
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Settings")
     window.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")
+    window.closeEvent = close_dialog
 
     switch_themes_button = QToolButton()
     switch_themes_button.setIconSize(ICON_SIZE)
@@ -363,7 +377,7 @@ class SettingsWindow():
     languages.addItems(AVAILABLE_LANGUAGES)
 
     for language in range(len(AVAILABLE_LANGUAGES)):
-        languages.setItemIcon(language,QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
+        languages.setItemIcon(language, QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
 
     accounts = QComboBox()
     accounts.setFont(BASIC_FONT)
@@ -411,6 +425,8 @@ class CategorySettingsWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle(" ")
+    window.closeEvent = close_dialog
+
 
     rename_category = create_button("Rename category",(255,40))
     delete_category = create_button("Delete category",(255,40))
@@ -430,6 +446,17 @@ class AddAccountWindow():
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Add account")
+    window.closeEvent = close_dialog
+
+    languages = QComboBox()
+    languages.setFont(BASIC_FONT)
+    languages.addItems(AVAILABLE_LANGUAGES)
+
+    for language in range(len(AVAILABLE_LANGUAGES)):
+        languages.setItemIcon(language, QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
+
+    languages_layout = QHBoxLayout()
+    languages_layout.addWidget(languages, alignment=ALIGMENT.AlignRight)
 
     message = QLabel()
     message.setFont(BASIC_FONT)
@@ -451,6 +478,7 @@ class AddAccountWindow():
     current_balance.setPlaceholderText("Current balance")
 
     main_layout = QVBoxLayout()
+    main_layout.addLayout(languages_layout)
     main_layout.addStretch(1)
     main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)    
     main_layout.addStretch(1)
@@ -470,6 +498,7 @@ class RenameAccountWindow():
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Rename account")
+    window.closeEvent = close_dialog
     
     message = QLabel()
     message.setFont(BASIC_FONT)
@@ -500,6 +529,7 @@ class AddCategoryWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Add category")
+    window.closeEvent = close_dialog
 
     category_name = QLineEdit()
     category_name.setPlaceholderText("Category name")
@@ -520,6 +550,7 @@ class RenameCategoryWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Rename")
+    window.closeEvent = close_dialog
 
     new_category_name = QLineEdit()
     new_category_name.setMinimumWidth(150)
@@ -539,6 +570,7 @@ class TransactionManagementWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Edit")
+    window.closeEvent = close_dialog
 
     message = QLabel()
     message.setFont(BASIC_FONT)
@@ -574,6 +606,7 @@ class StatisticsWindow():
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Statistics")
     window.setWindowFlags(Qt.WindowType.Window)
+    window.closeEvent = close_dialog
 
     monthly_statistics = create_button("Monthly", (150,40))
     quarterly_statistics = create_button("Quarterly", (150,40))
@@ -594,6 +627,7 @@ class MonthlyStatistics():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("April")
+    window.closeEvent = close_dialog
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -622,6 +656,7 @@ class QuarterlyStatistics():
     window.setMinimumSize(800,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Quarterly Statistics")
+    window.closeEvent = close_dialog
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -705,6 +740,7 @@ class YearlyStatistics():
     window.setMinimumSize(800,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Yearly Statistics")
+    window.closeEvent = close_dialog
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -817,4 +853,4 @@ class InformationMessage:
 
 
 
-from languages import LANGUAGES
+

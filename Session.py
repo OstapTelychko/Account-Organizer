@@ -1,7 +1,10 @@
 from datetime import datetime
 import toml
+
 from project_configuration import ROOT_DIRECTORY
 from Account import Account
+
+
 
 class Session:
     Current_month = 1
@@ -18,9 +21,9 @@ class Session:
 
     Language = "Українська"
     Theme = "Dark"
-    Account_name = "Ostap Telychko"
+    Account_name = ""
 
-    account:Account = None#I added  :Account to allow my IDE to highlight the functions of Account class :)
+    account:Account = None#I added  :Account to allow my IDE to highlight the functions of Account class
 
 
     def start_session():
@@ -36,9 +39,7 @@ class Session:
             #Load last used account name 
             Session.Account_name = User_conf["Account_name"]
 
-        #Connect to db
-        Session.account = Account(Session.Account_name)
-        Session.account.set_account_id()
+        
     
 
     def update_user_config():

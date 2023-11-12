@@ -3,19 +3,15 @@ from Account import Account
 from languages import LANGUAGES
 from GUI import QMessageBox, AddAccountWindow, RenameAccountWindow, SettingsWindow, Errors
 
-from balance_management import load_account_balance
-from category_management import load_categories, activate_categories
+from AppManagement.balance import load_account_balance
+from AppManagement.category import load_categories, activate_categories
+from AppManagement.language import change_language_add_account, change_language
 
 from sys import exit
 
 
 def show_add_user_window():
-    AddAccountWindow.message.setText(LANGUAGES[Session.Language]["Account"]["Account management"]["Messages"][0])
-    AddAccountWindow.button.setText(LANGUAGES[Session.Language]["General management"][1])
-    AddAccountWindow.window.setWindowTitle(LANGUAGES[Session.Language]["Windows"][1])
-    AddAccountWindow.name.setPlaceholderText(LANGUAGES[Session.Language]["Account"][0])
-    AddAccountWindow.surname.setPlaceholderText(LANGUAGES[Session.Language]["Account"][1])
-    AddAccountWindow.current_balance.setPlaceholderText(LANGUAGES[Session.Language]["Account"][2])
+    change_language_add_account(Session.Language)
     AddAccountWindow.window.exec()
 
 
@@ -23,35 +19,40 @@ def add_user():
     name = AddAccountWindow.name.text().strip()
     surname = AddAccountWindow.surname.text().strip()
 
-    #For expample: Ostap  Telychko (Treatment) is allowed now
+    #For expample: Ostap  Telychko (Treatment) is allowed
     prepared_name = name.replace(" ","").replace("(","").replace(")","")
     prepared_surname = surname.replace(" ","").replace("(","").replace(")","")
 
     if prepared_name.isalpha() and prepared_surname.isalpha():
         full_name = name+" "+surname
-        Session.account = Account(full_name)
+        account = Account(full_name)
 
-        if not Session.account.account_exists(full_name):
+        if not account.account_exists(full_name):
             balance = AddAccountWindow.current_balance.text()
 
             def complete_adding_account():
                 AddAccountWindow.window.hide()
+
                 Session.Account_name = full_name
+                Session.account = account
                 Session.update_user_config()
+
                 SettingsWindow.accounts.addItem(full_name)
                 Session.Accounts_list.append(Session.Account_name)
                 Session.Switch_account = False
                 load_account_data(Session.Account_name)
                 SettingsWindow.accounts.setCurrentText(Session.Account_name)
+                change_language()
+                
 
             if balance != "":
                 if balance.isdigit():
-                    Session.account.create_account(int(balance))
+                    account.create_account(int(balance))
                     complete_adding_account()    
             else:
                 Errors.zero_current_balance_error.setText(LANGUAGES[Session.Language]["Errors"][2])
                 if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
-                    Session.account.create_account(0)
+                    account.create_account(0)
                     complete_adding_account()
         else:
             Errors.account_alredy_exists_error.setText(LANGUAGES[Session.Language]["Errors"][1])

@@ -1,12 +1,13 @@
+from functools import partial
+
 from Session import Session
-from GUI import QTableWidgetItem, Qt, QMessageBox, MainWindow, AddCategoryWindow, Errors, CategorySettingsWindow, RenameCategoryWindow, load_category
+from GUI import QTableWidgetItem, Qt, QMessageBox, MainWindow, AddCategoryWindow, Errors, CategorySettingsWindow, RenameCategoryWindow, load_category, ALIGMENT
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 from copy_statistics import show_information_message
-from balance_management import calculate_current_balance
-from transaction_management import show_add_transaction_window, show_edit_transaction_window, remove_transaction
+from AppManagement.balance import calculate_current_balance
+from AppManagement.transaction import show_add_transaction_window, show_edit_transaction_window, remove_transaction
 
-from functools import partial
 
 
 
@@ -27,10 +28,12 @@ def load_categories_data():
                 name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 day = QTableWidgetItem()
+                day.setTextAlignment(ALIGMENT.AlignCenter)
                 day.setData(Qt.ItemDataRole.EditRole,transaction[4])
                 day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 value = QTableWidgetItem()
+                value.setTextAlignment(ALIGMENT.AlignCenter)
                 value.setData(Qt.ItemDataRole.EditRole,transaction[5])
                 value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 

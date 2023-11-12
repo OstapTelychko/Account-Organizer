@@ -1,7 +1,7 @@
 from Session import Session
 from GUI import MainWindow
 from languages import LANGUAGES
-from category_management import load_categories_data
+from AppManagement.category import load_categories_data
 
 
 def next_month():

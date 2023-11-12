@@ -5,6 +5,8 @@ from GUI import *
 
 
 def change_language():
+    SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.Language))
+
     MainWindow.account_current_balance.setText(LANGUAGES[Session.Language]["Account"]["Info"][3]+str(round(Session.Current_balance, 2)))
     MainWindow.current_month.setText(LANGUAGES[Session.Language]["Months"][Session.Current_month])
     MainWindow.Incomes_and_expenses.setTabText(0,LANGUAGES[Session.Language]["Account"]["Info"][4])
@@ -92,8 +94,26 @@ def change_language():
     SettingsWindow.account_created_date.setText(LANGUAGES[Session.Language]["Account"]["Info"][9]+Session.account.get_account_date())  
 
 
+def change_language_add_account(language: int | str):
+    if type(language) is int:# var language is a string when the language is loaded from the user config
+        language = AVAILABLE_LANGUAGES[language]
+        Session.Language = language
+    else:
+        Session.Language = language
+    Session.update_user_config()
+
+    AddAccountWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.Language))
+    
+    AddAccountWindow.message.setText(LANGUAGES[Session.Language]["Account"]["Account management"]["Messages"][0])
+    AddAccountWindow.button.setText(LANGUAGES[Session.Language]["General management"][1])
+    AddAccountWindow.window.setWindowTitle(LANGUAGES[Session.Language]["Windows"][1])
+    AddAccountWindow.name.setPlaceholderText(LANGUAGES[Session.Language]["Account"][0])
+    AddAccountWindow.surname.setPlaceholderText(LANGUAGES[Session.Language]["Account"][1])
+    AddAccountWindow.current_balance.setPlaceholderText(LANGUAGES[Session.Language]["Account"][2])
+
+
 def load_language(language):
-    if type(language) is int:
+    if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
         Session.Language = language
     else:

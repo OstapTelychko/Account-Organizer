@@ -1,8 +1,8 @@
 from Session import Session
-from GUI import QTableWidget, QTableWidgetItem, Qt, QMessageBox, QHeaderView, TransactionManagementWindow, Errors, MainWindow
+from GUI import QTableWidget, QTableWidgetItem, Qt, QMessageBox, QHeaderView, TransactionManagementWindow, Errors, MainWindow, ALIGMENT
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
-from balance_management import update_account_balance
+from AppManagement.balance import update_account_balance
 
 
 
@@ -71,10 +71,12 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     category_data.setRowCount(row+1)
 
     day = QTableWidgetItem()
+    day.setTextAlignment(ALIGMENT.AlignCenter)
     day.setData(Qt.ItemDataRole.EditRole, transaction_day)
     day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes in this case cells in table can't be edited
 
     value = QTableWidgetItem()
+    value.setTextAlignment(ALIGMENT.AlignCenter)
     value.setData(Qt.ItemDataRole.EditRole, transaction_value)
     value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
@@ -122,7 +124,7 @@ def transaction_data_handler():
                 try:
                     update_category_total_value
                 except UnboundLocalError:
-                    from category_management import update_category_total_value
+                    from AppManagement.category import update_category_total_value
                 update_category_total_value(category_id)
                 
                 update_account_balance()
@@ -156,7 +158,7 @@ def remove_transaction(category_data:QTableWidget, category_id:int):
                 try:
                     update_category_total_value
                 except UnboundLocalError:
-                    from category_management import update_category_total_value
+                    from AppManagement.category import update_category_total_value
                 update_category_total_value(category_id)
 
                 if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":

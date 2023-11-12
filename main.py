@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from sys import exit
 
 from GUI import *
 from Session import Session
@@ -7,12 +8,12 @@ from project_configuration import FORBIDDEN_CALCULATOR_WORDS, AVAILABLE_LANGUAGE
 from Statistics import show_monthly_statistics,show_quarterly_statistics,show_yearly_statistics
 from copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
-from language_management import load_language
-from balance_management import load_account_balance
-from category_management import create_category, load_categories, remove_category, rename_category,  activate_categories
-from transaction_management import transaction_data_handler
-from date_management import next_month, previous_month, next_year, previous_year
-from account_management import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
+from AppManagement.language import load_language, change_language_add_account
+from AppManagement.balance import load_account_balance
+from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories
+from AppManagement.transaction import transaction_data_handler
+from AppManagement.date import next_month, previous_month, next_year, previous_year
+from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
 
 
 
@@ -63,8 +64,6 @@ def calculate_expression():
 
 if __name__ == "__main__":
     Session.start_session()
-
-    SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.Language))
 
     #Set selected theme
     if Session.Theme == "Dark":
@@ -122,10 +121,14 @@ if __name__ == "__main__":
 
     #Create new account if it doesn't exist
     AddAccountWindow.button.clicked.connect(add_user)
-    if Session.Account_name == "":
+    AddAccountWindow.languages.currentIndexChanged.connect(change_language_add_account)
+    #Connect to db
+    if not Account(Session.Account_name).account_exists(Session.Account_name):
         show_add_user_window()
-    # if Account_name == "":
-    #     exit()
+        if not Session.account:
+            exit() 
+    Session.account = Account(Session.Account_name)
+    Session.account.set_account_id()
     
 
     #Load categories if they exists
