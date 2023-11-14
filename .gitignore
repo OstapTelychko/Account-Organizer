@@ -5,3 +5,4 @@
 /account-organizer.desktop
 /User_configuration.toml
 /Accounts.sqlite
+/AppManagement/__pycache__

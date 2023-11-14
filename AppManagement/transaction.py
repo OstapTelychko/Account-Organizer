@@ -6,7 +6,6 @@ from AppManagement.balance import update_account_balance
 
 
 
-
 def show_edit_transaction_window(category_name:str, category_data:QTableWidget):
     selected_row = category_data.selectedItems()
 
@@ -146,14 +145,10 @@ def remove_transaction(category_data:QTableWidget, category_id:int):
             transaction_id = category_data.item(selected_row[0].row(), 3).data(Qt.ItemDataRole.EditRole)
 
             if Errors.delete_transaction_question.exec() == QMessageBox.StandardButton.Ok:
-
                 transaction_value = selected_row[2].data(Qt.ItemDataRole.EditRole)
                 Session.account.delete_transaction(transaction_id)
 
-                for row in range(category_data.rowCount()):
-                    if category_data.item(row, 3).data(Qt.ItemDataRole.EditRole) == transaction_id:
-                        category_data.removeRow(row)
-                        break
+                category_data.removeRow(selected_row[0].row())
 
                 try:
                     update_category_total_value
