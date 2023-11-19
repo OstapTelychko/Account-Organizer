@@ -4,7 +4,7 @@ from sys import exit
 from GUI import *
 from Session import Session
 from languages import LANGUAGES
-from project_configuration import FORBIDDEN_CALCULATOR_WORDS, AVAILABLE_LANGUAGES
+from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from Statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics
 from copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
@@ -18,25 +18,25 @@ from AppManagement.account import show_add_user_window, add_user, switch_account
 
 
 def swith_theme():
-    if Session.Theme == "Dark":
+    if Session.theme == "Dark":
         app.setStyleSheet(LIGHT_THEME)
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
 
         InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(200,200,200);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-        if len(Session.Categories) != 0:
-            for category in Session.Categories:
-                Session.Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(205,205,205)}")
-        Session.Theme = "Light"
+        if len(Session.categories) != 0:
+            for category in Session.categories:
+                Session.categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(205,205,205)}")
+        Session.theme = "Light"
 
-    elif Session.Theme == "Light":
+    elif Session.theme == "Light":
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
 
         InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(40,40,40);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-        if len(Session.Categories) != 0:
-            for category in Session.Categories:
-                Session.Categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
-        Session.Theme = "Dark"
+        if len(Session.categories) != 0:
+            for category in Session.categories:
+                Session.categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
+        Session.theme = "Dark"
 
     Session.update_user_config()
 
@@ -49,9 +49,9 @@ def calculate_expression():
             try:
                 result = str(eval(expression))
             except ZeroDivisionError:
-                result = LANGUAGES[Session.Language]["Mini calculator"][1]
+                result = LANGUAGES[Session.language]["Mini calculator"][1]
             except SyntaxError:
-                result = LANGUAGES[Session.Language]["Mini calculator"][2]
+                result = LANGUAGES[Session.language]["Mini calculator"][2]
             except Exception as ex:
                 result = str(ex)
             MainWindow.mini_calculator_text.setText(result)
@@ -65,19 +65,19 @@ def main():
     Session.start_session()
 
     #Set selected theme
-    if Session.Theme == "Dark":
+    if Session.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
         InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(40,40,40);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-    if Session.Theme == "Light":
+    if Session.theme == "Light":
         app.setStyleSheet(LIGHT_THEME)
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
         InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(200, 200, 200);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
 
 
     #Set current month and year
-    MainWindow.current_year.setText(str(Session.Current_year))
-    MainWindow.current_month.setText(LANGUAGES[Session.Language]["Months"][Session.Current_month])
+    MainWindow.current_year.setText(str(Session.current_year))
+    MainWindow.current_month.setText(LANGUAGES[Session.language]["Months"][Session.current_month])
 
     #Connect buttons to functions
     #Settings
@@ -122,11 +122,11 @@ def main():
     AddAccountWindow.button.clicked.connect(add_user)
     AddAccountWindow.languages.currentIndexChanged.connect(change_language_add_account)
     #Connect to db
-    if not Account(Session.Account_name).account_exists(Session.Account_name):
+    if not Account(Session.account_name).account_exists(Session.account_name):
         show_add_user_window()
         if not Session.account:
             exit() 
-    Session.account = Account(Session.Account_name)
+    Session.account = Account(Session.account_name)
     Session.account.set_account_id()
     
 
@@ -136,11 +136,11 @@ def main():
     activate_categories()
 
     #Add accounts to list
-    [Session.Accounts_list.append(item[0]) for item in Session.account.get_all_accounts() if item[0] not in Session.Accounts_list]
+    [Session.accounts_list.append(item[0]) for item in Session.account.get_all_accounts() if item[0] not in Session.accounts_list]
 
     SettingsWindow.accounts.clear()
-    SettingsWindow.accounts.addItems(Session.Accounts_list)
-    SettingsWindow.accounts.setCurrentText(Session.Account_name)
+    SettingsWindow.accounts.addItems(Session.accounts_list)
+    SettingsWindow.accounts.setCurrentText(Session.account_name)
 
 
     #Account management
@@ -149,7 +149,7 @@ def main():
     RenameAccountWindow.button.clicked.connect(rename_account)
 
     load_account_balance()
-    load_language(Session.Language)
+    load_language(Session.language)
 
     MainWindow.window.show()
     app.exec()

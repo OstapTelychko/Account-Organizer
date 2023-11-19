@@ -23,15 +23,13 @@ LANGUAGES = {
             5:"Update"
         },
         "Account":{
-            0:"Name",
-            1:"Surname",
-            2:"Current balance",
+            0:"Current balance",
+            1:"Account Name",
             "Account management":{
                 0:"Delete account",
                 1:"Create account",
                 2:"Rename account",
-                3:"New name",
-                4:"New surname",
+                3:"New account name",
                 "Messages":{
                     0:"Enter name and surname to create a new account. (You can't use the same full name)",
                     1:"Enter new name and surname. "
@@ -170,15 +168,13 @@ LANGUAGES = {
             5:"Оновити"
         },
         "Account":{
-            0:"Ім'я",
-            1:"Прізвище",
-            2:"Поточний баланс",
+            0:"Поточний баланс",
+            1:"Назва акаунта",
             "Account management":{
                 0:"Видалити акаунт",
                 1:"Створити акаунт",
                 2:"Переназвати акаунт",
-                3:"Нове ім'я",
-                4:"Нове Прізвище",
+                3:"Нова назва акаунта",
                 "Messages":{
                     0:"Введіть ім'я і прізвище, щоб створити новий акаунт. (Використовувати те саме ім'я і прізвище не можна) ",
                     1:"Введіть нове ім'я і прізвище. "
@@ -316,15 +312,13 @@ LANGUAGES = {
             5:"Zmienić"
         },
         "Account":{
-            0:"Imię",
-            1:"Nazwisko",
-            2:"Potoczne saldo",
+            0:"Potoczne saldo",
+            1:"Nazwa konta",
             "Account management":{
                 0:"Usuń konto",
                 1:"Dodaj konto",
                 2:"Zmień nazwę konta",
-                3:"Nowe imię",
-                4:"Nowe nazwisko",
+                3:"Nowa nazwa konta",
                 "Messages":{
                     0:"Wprowadźcie imię i nazwisko, aby dodać nowe konto. (Nie wolno używać tego samego imienia i nazwiska)",
                     1:"Wprowadź nowe imię i nazwisko"

@@ -7,42 +7,40 @@ from Account import Account
 
 
 class Session:
-    Current_month = 1
-    Current_year = 2023
+    current_month = 1
+    current_year = 2023
 
-    Current_balance = 0
-    Current_total_income = 0
-    Current_total_expenses = 0
+    current_balance = 0
+    current_total_income = 0
+    current_total_expenses = 0
 
-    Accounts_list = []
-    Categories = {}
+    accounts_list = []
+    categories = {}
 
-    Switch_account = True
+    switch_account = True
 
-    Language = "Українська"
-    Theme = "Dark"
-    Account_name = ""
+    language = "Українська"
+    theme = "Dark"
+    account_name = ""
 
     account:Account = None#I added  :Account to allow my IDE to highlight the functions of Account class
 
 
     def start_session():
-        Session.Current_month = datetime.now().month
-        Session.Current_year = datetime.now().year
+        Session.current_month = datetime.now().month
+        Session.current_year = datetime.now().year
 
         with open(f"{ROOT_DIRECTORY}/User_configuration.toml") as file:
             User_conf = toml.load(f"{ROOT_DIRECTORY}/User_configuration.toml")
 
             #Load selected language 
-            Session.Language = User_conf["Language"]
-            Session.Theme = User_conf["Theme"]
+            Session.language = User_conf["Language"]
+            Session.theme = User_conf["Theme"]
             #Load last used account name 
-            Session.Account_name = User_conf["Account_name"]
+            Session.account_name = User_conf["Account_name"]
 
         
-    
-
     def update_user_config():
         with open(f"{ROOT_DIRECTORY}/User_configuration.toml","w",encoding="utf-8") as file:
-            toml.dump({"Theme":Session.Theme, "Language":Session.Language, "Account_name":Session.Account_name},file)
+            toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name}, file)
     

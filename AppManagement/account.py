@@ -11,71 +11,71 @@ from sys import exit
 
 
 def show_add_user_window():
-    change_language_add_account(Session.Language)
+    change_language_add_account(Session.language)
     AddAccountWindow.window.exec()
 
 
 def add_user():
-    name = AddAccountWindow.name.text().strip()
-    surname = AddAccountWindow.surname.text().strip()
+    account_name = AddAccountWindow.account_name.text().strip()
 
-    #For expample: Ostap  Telychko (Treatment) is allowed
-    prepared_name = name.replace(" ","").replace("(","").replace(")","")
-    prepared_surname = surname.replace(" ","").replace("(","").replace(")","")
+    if account_name == "":
+        return Errors.empty_fields_error.exec()
+    
+    account = Account(account_name)
+    
+    if account.account_exists(account_name):
+        Errors.account_alredy_exists_error.setText(LANGUAGES[Session.language]["Errors"][1])
+        return Errors.account_alredy_exists_error.exec()
 
-    if prepared_name.isalpha() and prepared_surname.isalpha():
-        full_name = name+" "+surname
-        account = Account(full_name)
+    balance = AddAccountWindow.current_balance.text()
 
-        if not account.account_exists(full_name):
-            balance = AddAccountWindow.current_balance.text()
+    def complete_adding_account():
+        AddAccountWindow.window.hide()
 
-            def complete_adding_account():
-                AddAccountWindow.window.hide()
+        Session.account_name = account_name
+        Session.account = account
+        Session.update_user_config()
 
-                Session.Account_name = full_name
-                Session.account = account
-                Session.update_user_config()
+        SettingsWindow.accounts.addItem(account_name)
+        Session.accounts_list.append(Session.account_name)
+        Session.switch_account = False
+        load_account_data(Session.account_name)
+        SettingsWindow.accounts.setCurrentText(Session.account_name)
+        change_language()     
 
-                SettingsWindow.accounts.addItem(full_name)
-                Session.Accounts_list.append(Session.Account_name)
-                Session.Switch_account = False
-                load_account_data(Session.Account_name)
-                SettingsWindow.accounts.setCurrentText(Session.Account_name)
-                change_language()
-                
+    if balance != "":
+        if balance.replace(",","").replace(".","").isdigit():
 
-            if balance != "":
-                if balance.isdigit():
-                    account.create_account(int(balance))
-                    complete_adding_account()    
+            if balance.find("."):
+                balance = float(balance)
+            elif balance.find(","):#if balance contains "," for example: 4,5 will be 4.5 
+                balance = float(".".join(balance.split(",")))
             else:
-                Errors.zero_current_balance_error.setText(LANGUAGES[Session.Language]["Errors"][2])
-                if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
-                    account.create_account(0)
-                    complete_adding_account()
-        else:
-            Errors.account_alredy_exists_error.setText(LANGUAGES[Session.Language]["Errors"][1])
-            Errors.account_alredy_exists_error.exec()
+                balance = int(balance)
+
+            account.create_account(balance)
+            complete_adding_account()    
     else:
-        Errors.incorrect_data_type_error.setText(LANGUAGES[Session.Language]["Errors"][0])
-        Errors.incorrect_data_type_error.exec()
+        Errors.zero_current_balance_error.setText(LANGUAGES[Session.language]["Errors"][2])
+        if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
+            account.create_account(0)
+            complete_adding_account()
 
 
 def load_account_data(name:str):
     #Remove loaded categories
-    for category in Session.Categories.copy():
-        Session.Categories[category]["Category window"].deleteLater()
-        Session.Categories[category]["Settings"].deleteLater()
-        Session.Categories[category]["Add transaction"].deleteLater()
-        Session.Categories[category]["Edit transaction"].deleteLater()
-        Session.Categories[category]["Delete transaction"].deleteLater()
-        del Session.Categories[category]
+    for category in Session.categories.copy():
+        Session.categories[category]["Category window"].deleteLater()
+        Session.categories[category]["Settings"].deleteLater()
+        Session.categories[category]["Add transaction"].deleteLater()
+        Session.categories[category]["Edit transaction"].deleteLater()
+        Session.categories[category]["Delete transaction"].deleteLater()
+        del Session.categories[category]
 
-    Session.Account_name = name
-    Session.account = Account(Session.Account_name)
+    Session.account_name = name
+    Session.account = Account(Session.account_name)
     Session.account.set_account_id()
-    SettingsWindow.account_created_date.setText(LANGUAGES[Session.Language]["Account"]["Info"][9] + Session.account.get_account_date())    
+    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Account"]["Info"][9] + Session.account.get_account_date())    
 
     Session.update_user_config()
     load_categories()
@@ -84,67 +84,65 @@ def load_account_data(name:str):
 
 
 def switch_account(name:str):
-    if Session.Switch_account:
-        Errors.load_account_question.setText(LANGUAGES[Session.Language]["Errors"][10].replace("account", name))
+    if Session.switch_account:
+        Errors.load_account_question.setText(LANGUAGES[Session.language]["Errors"][10].replace("account", name))
 
         if Errors.load_account_question.exec() == QMessageBox.StandardButton.Ok:
             load_account_data(name)
         else:
-            Session.Switch_account = False
-            SettingsWindow.accounts.setCurrentText(Session.Account_name)
+            Session.switch_account = False
+            SettingsWindow.accounts.setCurrentText(Session.account_name)
     else:
-        Session.Switch_account = True
+        Session.switch_account = True
 
 
 def remove_account():
-    Errors.delete_account_warning.setText(LANGUAGES[Session.Language]["Errors"][11].replace("account", Session.Account_name))
+    Errors.delete_account_warning.setText(LANGUAGES[Session.language]["Errors"][11].replace("account", Session.account_name))
 
     if Errors.delete_account_warning.exec() == QMessageBox.StandardButton.Ok:
         Session.account.delete_account()
-        Session.Switch_account = False
-        SettingsWindow.accounts.removeItem(Session.Accounts_list.index(Session.Account_name))
-        Session.Accounts_list.remove(Session.Account_name)
+        Session.switch_account = False
+        SettingsWindow.accounts.removeItem(Session.accounts_list.index(Session.account_name))
+        Session.accounts_list.remove(Session.account_name)
 
-        if len(Session.Accounts_list) != 0:
-            load_account_data(Session.Accounts_list[0])
-            Session.Switch_account = False
-            SettingsWindow.accounts.setCurrentText(Session.Accounts_list[0])
+        if len(Session.accounts_list) != 0:
+            load_account_data(Session.accounts_list[0])
+            Session.switch_account = False
+            SettingsWindow.accounts.setCurrentText(Session.accounts_list[0])
         else:#Close app if db is empty
             Session.update_user_config()
             exit()
 
 
 def show_rename_account_window():
-    full_name = SettingsWindow.accounts.currentText().split(" ")
-    RenameAccountWindow.new_name.setText(full_name[0])
-    RenameAccountWindow.new_surname.setText(full_name[1])
+    account_name = SettingsWindow.accounts.currentText().split(" ")
+    RenameAccountWindow.new_name.setText(account_name[0])
+    RenameAccountWindow.new_surname.setText(account_name[1])
     RenameAccountWindow.window.exec()
 
 
 def rename_account():
-    name = RenameAccountWindow.new_name.text().strip()
-    surname = RenameAccountWindow.new_surname.text().strip()
+    new_account_name = RenameAccountWindow.new_account_name.text().strip()
 
-    if name != " " or surname != "":
-        new_name = name+" "+surname
-        if not Session.account.account_exists(new_name):
-            Session.account.rename_account(new_name)
+    if new_account_name == "":
+        return Errors.empty_fields_error.exec()
 
-            Session.Accounts_list[Session.Accounts_list.index(Account_name)] = new_name
-            Account_name = new_name
-            Session.update_user_config()
+    if Session.account.account_exists(new_account_name):
+        return Errors.account_alredy_exists_error.exec()
 
-            Session.Switch_account = False
-            SettingsWindow.accounts.clear()
+    Session.account.rename_account(new_account_name)
 
-            Session.Switch_account = False
-            SettingsWindow.accounts.addItems(Session.Accounts_list)
+    Session.accounts_list[Session.accounts_list.index(Account_name)] = new_account_name
+    Account_name = new_account_name
+    Session.update_user_config()
 
-            Session.Switch_account = False
-            SettingsWindow.accounts.setCurrentText(Session.Account_name)
+    Session.switch_account = False
+    SettingsWindow.accounts.clear()
 
-            RenameAccountWindow.window.hide()
-        else:
-            Errors.account_alredy_exists_error.exec()
-    else:
-        Errors.empty_fields_error.exec()
+    Session.switch_account = False
+    SettingsWindow.accounts.addItems(Session.accounts_list)
+
+    Session.switch_account = False
+    SettingsWindow.accounts.setCurrentText(Session.account_name)
+
+    RenameAccountWindow.window.hide()

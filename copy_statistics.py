@@ -21,11 +21,11 @@ def copy_monthly_transactions():
         category_name = CategorySettingsWindow.window.windowTitle()
         category_id = Session.account.get_category_id(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
         
-        transactions = Session.account.get_transactions_by_month(category_id, Session.Current_year, Session.Current_month)
+        transactions = Session.account.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
         if len(transactions):
             result = ""
-            column_names = LANGUAGES[Session.Language]["Account"]["Info"]
-            result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.Language]['Months'][Session.Current_month]}\t{Session.Current_year}\n"
+            column_names = LANGUAGES[Session.language]["Account"]["Info"]
+            result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction[5]}\t\t{transaction[4]}\t{transaction[6]}\n"
             
@@ -34,7 +34,7 @@ def copy_monthly_transactions():
         else:
             app.clipboard().setText("")
             
-        show_information_message(LANGUAGES[Session.Language]["Account"]["Category management"][5])
+        show_information_message(LANGUAGES[Session.language]["Account"]["Category management"][5])
 
 
 def copy_monthly_statistics():
@@ -47,7 +47,7 @@ def copy_monthly_statistics():
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][29])
+        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][29])
 
 
 def copy_quarterly_statistics():
@@ -67,7 +67,7 @@ def copy_quarterly_statistics():
             result+= "\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][31])
+        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][31])
 
 
 def copy_yearly_statistics():
@@ -83,5 +83,5 @@ def copy_yearly_statistics():
             result += "\n\n\n"
 
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.Language]["Account"]["Info"]["Statistics"][33])
+        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][33])
 
