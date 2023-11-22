@@ -214,23 +214,23 @@ def close_dialog(event:QEvent):
 
 
 class Errors():
-    incorrect_data_type_error = create_error(False,QMessageBox.Icon.Warning)
-    account_alredy_exists_error  = create_error(False,QMessageBox.Icon.Warning)
-    zero_current_balance_error = create_error(True,QMessageBox.Icon.Question)
-    category_exists_error = create_error(False,QMessageBox.Icon.Warning)
-    delete_category_question = create_error(True,QMessageBox.Icon.Question)
-    unselected_row_error = create_error(False,QMessageBox.Icon.Warning)
-    only_one_row_error = create_error(False,QMessageBox.Icon.Warning)
-    empty_fields_error = create_error(False,QMessageBox.Icon.Warning)
-    day_out_range_error = create_error(False,QMessageBox.Icon.Critical)
-    delete_transaction_question = create_error(True,QMessageBox.Icon.Question)
-    load_account_question =  create_error(True,QMessageBox.Icon.Question)
-    delete_account_warning = create_error(True,QMessageBox.Icon.Critical)
-    empty_expression_error = create_error(False,QMessageBox.Icon.Information)
-    forbidden_calculator_word_error = create_error(False,QMessageBox.Icon.Critical)
-    no_category_error = create_error(False,QMessageBox.Icon.Information)
-    no_transactions_error = create_error(False,QMessageBox.Icon.Information)
-    no_category_name_error = create_error(False,QMessageBox.Icon.Information)
+    incorrect_data_type = create_error(False, QMessageBox.Icon.Warning)
+    account_alredy_exists  = create_error(False, QMessageBox.Icon.Warning)
+    zero_current_balance = create_error(True, QMessageBox.Icon.Question)
+    category_exists = create_error(False, QMessageBox.Icon.Warning)
+    delete_category_question = create_error(True, QMessageBox.Icon.Question)
+    unselected_row = create_error(False, QMessageBox.Icon.Warning)
+    only_one_row = create_error(False, QMessageBox.Icon.Warning)
+    empty_fields = create_error(False, QMessageBox.Icon.Warning)
+    day_out_range = create_error(False, QMessageBox.Icon.Critical)
+    delete_transaction_question = create_error(True, QMessageBox.Icon.Question)
+    load_account_question =  create_error(True, QMessageBox.Icon.Question)
+    delete_account_warning = create_error(True, QMessageBox.Icon.Critical)
+    empty_expression = create_error(False, QMessageBox.Icon.Information)
+    forbidden_calculator_word = create_error(False, QMessageBox.Icon.Critical)
+    no_category = create_error(False, QMessageBox.Icon.Information)
+    no_transactions = create_error(False, QMessageBox.Icon.Information)
+    no_category_name = create_error(False, QMessageBox.Icon.Information)
 
 
 
@@ -466,14 +466,9 @@ class AddAccountWindow():
 
     account_name = QLineEdit()
     account_name.setPlaceholderText("Account Name")
-    # name = QLineEdit()
-    # name.setPlaceholderText("Name")
-    # surname = QLineEdit()
-    # surname.setPlaceholderText("Surname")
 
     account_name_layout = QHBoxLayout()
     account_name_layout.addWidget(account_name, alignment=ALIGMENT.AlignCenter )
-    # Full_name_layout.addWidget(surname, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
 
     button = create_button("", (140,50))
     current_balance = QLineEdit()
@@ -505,12 +500,9 @@ class RenameAccountWindow():
     message = QLabel()
     message.setFont(BASIC_FONT)
 
-    # new_name = QLineEdit("New name")
-    # new_surname = QLineEdit("New Surname")
     new_account_name = QLineEdit()
     account_name_layout = QHBoxLayout()
     account_name_layout.addWidget(new_account_name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    # full_name_layout.addWidget(new_surname,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
 
     button = create_button("Update", (160,40))
 

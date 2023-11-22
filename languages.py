@@ -31,8 +31,8 @@ LANGUAGES = {
                 2:"Rename account",
                 3:"New account name",
                 "Messages":{
-                    0:"Enter name and surname to create a new account. (You can't use the same full name)",
-                    1:"Enter new name and surname. "
+                    0:"Enter account name to create a new account. (You can't use an exsisting account name)",
+                    1:"Enter account name. "
                 }
             },
             "Info":{
@@ -176,7 +176,7 @@ LANGUAGES = {
                 2:"Переназвати акаунт",
                 3:"Нова назва акаунта",
                 "Messages":{
-                    0:"Введіть ім'я і прізвище, щоб створити новий акаунт. (Використовувати те саме ім'я і прізвище не можна) ",
+                    0:"Введіть назву акаунта, щоб створити новий акаунт. (Використовувати назву існуючого акаунта  не можна) ",
                     1:"Введіть нове ім'я і прізвище. "
                 }
             },
@@ -320,7 +320,7 @@ LANGUAGES = {
                 2:"Zmień nazwę konta",
                 3:"Nowa nazwa konta",
                 "Messages":{
-                    0:"Wprowadźcie imię i nazwisko, aby dodać nowe konto. (Nie wolno używać tego samego imienia i nazwiska)",
+                    0:"Wprowadźcie nazwę konta, aby dodać nowe konto. (Nie wolno używać nazwę konta które istnieje)",
                     1:"Wprowadź nowe imię i nazwisko"
                 }
             },

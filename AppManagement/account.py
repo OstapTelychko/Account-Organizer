@@ -19,13 +19,13 @@ def add_user():
     account_name = AddAccountWindow.account_name.text().strip()
 
     if account_name == "":
-        return Errors.empty_fields_error.exec()
+        return Errors.empty_fields.exec()
     
     account = Account(account_name)
     
     if account.account_exists(account_name):
-        Errors.account_alredy_exists_error.setText(LANGUAGES[Session.language]["Errors"][1])
-        return Errors.account_alredy_exists_error.exec()
+        Errors.account_alredy_exists.setText(LANGUAGES[Session.language]["Errors"][1])
+        return Errors.account_alredy_exists.exec()
 
     balance = AddAccountWindow.current_balance.text()
 
@@ -56,8 +56,8 @@ def add_user():
             account.create_account(balance)
             complete_adding_account()    
     else:
-        Errors.zero_current_balance_error.setText(LANGUAGES[Session.language]["Errors"][2])
-        if Errors.zero_current_balance_error.exec() == QMessageBox.StandardButton.Ok:
+        Errors.zero_current_balance.setText(LANGUAGES[Session.language]["Errors"][2])
+        if Errors.zero_current_balance.exec() == QMessageBox.StandardButton.Ok:
             account.create_account(0)
             complete_adding_account()
 
@@ -115,9 +115,9 @@ def remove_account():
 
 
 def show_rename_account_window():
-    account_name = SettingsWindow.accounts.currentText().split(" ")
-    RenameAccountWindow.new_name.setText(account_name[0])
-    RenameAccountWindow.new_surname.setText(account_name[1])
+    # account_name = SettingsWindow.accounts.currentText().split(" ")
+    RenameAccountWindow.new_account_name.setText(Session.account_name)
+    # RenameAccountWindow.new_surname.setText(account_name[1])
     RenameAccountWindow.window.exec()
 
 
@@ -125,10 +125,10 @@ def rename_account():
     new_account_name = RenameAccountWindow.new_account_name.text().strip()
 
     if new_account_name == "":
-        return Errors.empty_fields_error.exec()
+        return Errors.empty_fields.exec()
 
     if Session.account.account_exists(new_account_name):
-        return Errors.account_alredy_exists_error.exec()
+        return Errors.account_alredy_exists.exec()
 
     Session.account.rename_account(new_account_name)
 

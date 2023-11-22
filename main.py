@@ -56,9 +56,9 @@ def calculate_expression():
                 result = str(ex)
             MainWindow.mini_calculator_text.setText(result)
         else:
-            Errors.forbidden_calculator_word_error.exec()
+            Errors.forbidden_calculator_word.exec()
     else:
-        Errors.empty_expression_error.exec()
+        Errors.empty_expression.exec()
 
 
 def main():

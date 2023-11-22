@@ -53,10 +53,10 @@ def create_category():
     category_name = AddCategoryWindow.category_name.text().strip()
 
     if category_name == "":
-        return Errors.no_category_name_error.exec()
+        return Errors.no_category_name.exec()
     
     if Session.account.category_exists(category_name, category_type):
-        return Errors.category_exists_error.exec()
+        return Errors.category_exists.exec()
     
     Session.account.create_category(category_name, category_type)
     category_id = Session.account.get_category_id(category_name, category_type) 
@@ -110,7 +110,7 @@ def rename_category():
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
 
     if Session.account.category_exists(new_category_name, category_type):
-        return Errors.category_exists_error.exec()
+        return Errors.category_exists.exec()
 
     for category in Session.categories:
         if Session.categories[category]["Name"] == current_name and Session.categories[category]["Type"] == category_type:

@@ -157,11 +157,11 @@ def show_monthly_statistics():
                 StatisticsWindow.window.done(1)
                 MonthlyStatistics.window.exec()
             else:
-                Errors.no_transactions_error.exec()
+                Errors.no_transactions.exec()
         else:
-            Errors.no_category_error.exec()
+            Errors.no_category.exec()
     else:
-        Errors.no_category_error.exec()
+        Errors.no_category.exec()
 
 
 def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Statistic_words:dict, month_statistics:QListWidget, current_month:str):
@@ -274,14 +274,14 @@ def show_quarterly_statistics():
                     if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                         add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"], current_month)
                     else:
-                        QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"].addItem(Errors.no_transactions_error.text())
+                        QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"].addItem(Errors.no_transactions.text())
 
             StatisticsWindow.window.done(1)
             QuarterlyStatistics.window.exec()
         else:
-            Errors.no_category_error.exec()
+            Errors.no_category.exec()
     else:
-        Errors.no_category_error.exec()
+        Errors.no_category.exec()
 
 
 def show_yearly_statistics():
@@ -362,13 +362,13 @@ def show_yearly_statistics():
                 if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                     add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, YearlyStatistics.statistics[month]["Statistic Data"], month)
                 else:
-                    YearlyStatistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions_error.text())
+                    YearlyStatistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions.text())
 
             StatisticsWindow.window.done(1)
             YearlyStatistics.window.exec()
         else:
-            Errors.no_category_error.exec()
+            Errors.no_category.exec()
     else:
-        Errors.no_category_error.exec()
+        Errors.no_category.exec()
 
             
