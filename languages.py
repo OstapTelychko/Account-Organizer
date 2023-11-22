@@ -32,7 +32,7 @@ LANGUAGES = {
                 3:"New account name",
                 "Messages":{
                     0:"Enter account name to create a new account. (You can't use an exsisting account name)",
-                    1:"Enter account name. "
+                    1:"Enter new account name. "
                 }
             },
             "Info":{
@@ -177,7 +177,7 @@ LANGUAGES = {
                 3:"Нова назва акаунта",
                 "Messages":{
                     0:"Введіть назву акаунта, щоб створити новий акаунт. (Використовувати назву існуючого акаунта  не можна) ",
-                    1:"Введіть нове ім'я і прізвище. "
+                    1:"Введіть нову назву акаунта. "
                 }
             },
             "Info":{
@@ -321,7 +321,7 @@ LANGUAGES = {
                 3:"Nowa nazwa konta",
                 "Messages":{
                     0:"Wprowadźcie nazwę konta, aby dodać nowe konto. (Nie wolno używać nazwę konta które istnieje)",
-                    1:"Wprowadź nowe imię i nazwisko"
+                    1:"Wprowadź nową nazwę konta"
                 }
             },
             "Info":{
