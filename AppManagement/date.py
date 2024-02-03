@@ -1,4 +1,4 @@
-from Session import Session
+from AppObjects.Session import Session
 from GUI import MainWindow
 from languages import LANGUAGES
 from AppManagement.category import load_categories_data

@@ -1,8 +1,10 @@
 from datetime import datetime
 import toml
+from decimal import getcontext
 
 from project_configuration import ROOT_DIRECTORY
-from Account import Account
+from AppObjects.Account import Account
+from AppObjects.Category import Category
 
 
 
@@ -15,7 +17,7 @@ class Session:
     current_total_expenses = 0
 
     accounts_list = []
-    categories = {}
+    categories:dict[int, Category] = {}
 
     switch_account = True
 
@@ -27,6 +29,11 @@ class Session:
 
 
     def start_session():
+        #Set the precision for calculations in the app
+        getcontext().prec = 2
+
+
+        #Set current date
         Session.current_month = datetime.now().month
         Session.current_year = datetime.now().year
 

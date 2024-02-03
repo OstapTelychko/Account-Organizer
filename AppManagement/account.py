@@ -1,5 +1,5 @@
-from Session import Session
-from Account import Account
+from AppObjects.Session import Session
+from AppObjects.Account import Account
 from languages import LANGUAGES
 from GUI import QMessageBox, AddAccountWindow, RenameAccountWindow, SettingsWindow, Errors
 
@@ -65,11 +65,11 @@ def add_user():
 def load_account_data(name:str):
     #Remove loaded categories
     for category in Session.categories.copy():
-        Session.categories[category]["Category window"].deleteLater()
-        Session.categories[category]["Settings"].deleteLater()
-        Session.categories[category]["Add transaction"].deleteLater()
-        Session.categories[category]["Edit transaction"].deleteLater()
-        Session.categories[category]["Delete transaction"].deleteLater()
+        Session.categories[category].window.deleteLater()
+        Session.categories[category].settings.deleteLater()
+        Session.categories[category].add_transaction.deleteLater()
+        Session.categories[category].edit_transaction.deleteLater()
+        Session.categories[category].delete_transaction.deleteLater()
         del Session.categories[category]
 
     Session.account_name = name

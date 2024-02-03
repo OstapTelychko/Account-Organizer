@@ -1,4 +1,4 @@
-from Session import Session
+from AppObjects.Session import Session
 from GUI import QTableWidget, QTableWidgetItem, Qt, QMessageBox, QHeaderView, TransactionManagementWindow, Errors, MainWindow, ALIGMENT
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
@@ -42,6 +42,11 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             else:
                 Session.current_total_expenses += values_difference
                 Session.current_balance -=  values_difference
+            
+            Session.current_balance = round(Session.current_balance, 2)
+            Session.current_total_income = round(Session.current_total_income, 2)
+            Session.current_total_expenses = round(Session.current_total_expenses, 2)
+
             category_data.item(row,2).setData(Qt.ItemDataRole.EditRole, transaction_value)
 
 
@@ -60,11 +65,11 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     Session.account.add_transaction(category_id, Session.current_year, Session.current_month, transaction_day, transaction_value, transaction_name)
 
     if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
-        Session.current_total_income += transaction_value
-        Session.current_balance += transaction_value
+        Session.current_total_income = round(Session.current_total_income + transaction_value, 2)
+        Session.current_balance = round(Session.current_balance + transaction_value, 2)
     else:
-        Session.current_total_expenses += transaction_value
-        Session.current_balance -= transaction_value
+        Session.current_total_expenses = round(Session.current_total_expenses + transaction_value, 2)
+        Session.current_balance = round(Session.current_balance - transaction_value, 2)
 
     row = category_data.rowCount()
     category_data.setRowCount(row+1)
@@ -99,7 +104,7 @@ def transaction_data_handler():
     transaction_value = TransactionManagementWindow.transaction_value.text()
     transaction_id = TransactionManagementWindow.transaction_id
     category_id = Session.account.get_category_id(TransactionManagementWindow.window.windowTitle(), CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
-    category_data = Session.categories[category_id]["Category data"]
+    category_data = Session.categories[category_id].table_data
 
     max_month_day = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
 
@@ -167,6 +172,11 @@ def remove_transaction(category_data:QTableWidget, category_id:int):
         else:
             Session.current_total_expenses -= transaction_value
             Session.current_balance += transaction_value
+        
+        Session.current_balance = round(Session.current_balance, 2)
+        Session.current_total_income = round(Session.current_total_income, 2)
+        Session.current_total_expenses = round(Session.current_total_expenses, 2)
+
         update_account_balance()
 
         row = category_data.verticalHeader()

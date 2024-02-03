@@ -7,7 +7,8 @@ from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
 
 from languages import LANGUAGES
-from Account import Account
+from AppObjects.Account import Account
+from AppObjects.Category import Category
 from project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
 
@@ -58,7 +59,7 @@ def create_button(button_text:str, size:tuple[int])->QPushButton:
     return button
 
 
-def load_category(category_type:str, name:str, account:Account, category_id:int, year:int, month:int, Language:str, theme:str) -> dict:
+def load_category(category_type:str, name:str, account:Account, category_id:int, year:int, month:int, Language:str, theme:str) -> Category:
     """Add category to user window
 
         Arguments
@@ -79,29 +80,21 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
 
         Returns
         ------
-            `category` (dict): Dictionary with category name, type and links on add, delete, rename transaction buttons
+            `category` (Category): Category object  (name, type and links on add, delete, rename transaction buttons)
     """
-
-    category = {}
-    category["Type"] = category_type
-
     category_window = QWidget()
     category_window.setMaximumWidth(1000)
     category_layout = QVBoxLayout()
 
     category_total_value = QLabel("")
     category_total_value.setFont(BASIC_FONT)
-    category["Total value"] = category_total_value
 
     category_name = QLabel(name)
     category_name.setFont(BASIC_FONT)
-    category["Name"] = name
-    category["Name label"] = category_name
 
     category_settings = QToolButton()
     category_settings.setIcon(QIcon(f"{ROOT_DIRECTORY}/Images/Settings icon.png"))
     category_settings.setIconSize(QSize(30,30))
-    category["Settings"] = category_settings
 
     Category_general_info = QHBoxLayout()
     Category_general_info.addWidget(category_total_value, alignment=ALIGMENT.AlignLeft)
@@ -109,7 +102,6 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
     Category_general_info.addWidget(category_settings,alignment=ALIGMENT.AlignRight)
 
     category_data = QTableWidget()
-    category["Category data"] = category_data
 
     category_data.setMinimumWidth(600)
     category_data.setMinimumHeight(270)
@@ -182,10 +174,6 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
     edit_transaction.setIcon(EDIT_TRANSACTION_ICON)
     edit_transaction.setIconSize(ICON_SIZE)
     
-    category["Add transaction"] = add_transaction
-    category["Delete transaction"] = delete_transaction
-    category["Edit transaction"] = edit_transaction
-
     transactions_managment = QHBoxLayout()
     transactions_managment.addWidget(add_transaction)
     transactions_managment.addWidget(delete_transaction)
@@ -198,14 +186,27 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
     category_layout.addStretch(1)
 
     category_window.setLayout(category_layout)
-    category["Category window"] = category_window
 
     if category_type == "Incomes":
         MainWindow.Incomes_window_layout.addWidget(category_window)
     else:
         MainWindow.Expenses_window_layout.addWidget(category_window)
 
-    return category
+
+    return Category(
+        category_id,
+        category_type,
+        name,
+
+        category_total_value,
+        category_name,
+        category_settings,
+        category_data,
+        add_transaction,
+        delete_transaction,
+        edit_transaction,
+        category_window
+    )
 
 
 def close_dialog(event:QEvent):

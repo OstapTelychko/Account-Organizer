@@ -1,4 +1,4 @@
-from Session import Session
+from AppObjects.Session import Session
 from GUI import InformationMessage, MainWindow, CategorySettingsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, app
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES

@@ -1,10 +1,11 @@
 from functools import partial
+from decimal import Decimal
 
-from Session import Session
+from AppObjects.Session import Session
 from GUI import QTableWidgetItem, Qt, QMessageBox, MainWindow, AddCategoryWindow, Errors, CategorySettingsWindow, RenameCategoryWindow, load_category, ALIGMENT
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
-from copy_statistics import show_information_message
+from Statistics.copy_statistics import show_information_message
 from AppManagement.balance import calculate_current_balance
 from AppManagement.transaction import show_add_transaction_window, show_edit_transaction_window, remove_transaction
 
@@ -13,7 +14,7 @@ from AppManagement.transaction import show_add_transaction_window, show_edit_tra
 
 def load_categories_data():
     for category in Session.categories:
-        category_data = Session.categories[category]["Category data"]
+        category_data = Session.categories[category].table_data
         if category_data.rowCount() != 0:#Remove current category transactions if it exist
             for row in range(1,category_data.rowCount()+1):
                 category_data.removeRow(row)
@@ -34,7 +35,7 @@ def load_categories_data():
 
                 value = QTableWidgetItem()
                 value.setTextAlignment(ALIGMENT.AlignCenter)
-                value.setData(Qt.ItemDataRole.EditRole,transaction[5])
+                value.setData(Qt.ItemDataRole.EditRole, transaction[5])
                 value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 transaction_id = QTableWidgetItem()
@@ -44,12 +45,13 @@ def load_categories_data():
                 category_data.setItem(row,1,day)
                 category_data.setItem(row,2,value)
                 category_data.setItem(row,3,transaction_id)
-                total_value += transaction[5]
-        Session.categories[category]["Total value"].setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(round(total_value, 2)))
+                total_value += Decimal(transaction[5])
+
+        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(total_value)))
 
 
 def create_category():
-    category_type = "Incomes" if MainWindow.Incomes_and_expenses.currentIndex() == 0 else "Expenses"
+    category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
     category_name = AddCategoryWindow.category_name.text().strip()
 
     if category_name == "":
@@ -63,10 +65,10 @@ def create_category():
     Session.categories[category_id] = load_category(category_type, category_name, Session.account, category_id, Session.current_year, Session.current_month, Session.language, Session.theme)
 
     #Activate Category
-    Session.categories[category_id]["Settings"].clicked.connect(partial(show_category_settings, Session.categories[category_id]["Name"]))
-    Session.categories[category_id]["Add transaction"].clicked.connect(partial(show_add_transaction_window, Session.categories[category_id]["Name"]))
-    Session.categories[category_id]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window,Session.categories[category_id]["Name"], Session.categories[category_id]["Category data"]))
-    Session.categories[category_id]["Delete transaction"].clicked.connect(partial(remove_transaction, Session.categories[category_id]["Category data"], category_id))
+    Session.categories[category_id].settings.clicked.connect(partial(show_category_settings, Session.categories[category_id].name))
+    Session.categories[category_id].add_transaction.clicked.connect(partial(show_add_transaction_window, Session.categories[category_id].name))
+    Session.categories[category_id].edit_transaction.clicked.connect(partial(show_edit_transaction_window, Session.categories[category_id].name, Session.categories[category_id].table_data))
+    Session.categories[category_id].delete_transaction.clicked.connect(partial(remove_transaction, Session.categories[category_id].table_data, category_id))
 
     AddCategoryWindow.category_name.setText("")
     AddCategoryWindow.window.hide()
@@ -93,11 +95,11 @@ def remove_category():
         CategorySettingsWindow.window.setWindowTitle(" ")
         CategorySettingsWindow.window.hide()
 
-        Session.categories[category_id]["Category window"].deleteLater()
-        Session.categories[category_id]["Settings"].deleteLater()
-        Session.categories[category_id]["Add transaction"].deleteLater()
-        Session.categories[category_id]["Edit transaction"].deleteLater()
-        Session.categories[category_id]["Delete transaction"].deleteLater()
+        Session.categories[category_id].window.deleteLater()
+        Session.categories[category_id].settings.deleteLater()
+        Session.categories[category_id].add_transaction.deleteLater()
+        Session.categories[category_id].edit_transaction.deleteLater()
+        Session.categories[category_id].delete_transaction.deleteLater()
         del Session.categories[category_id]
 
         calculate_current_balance()
@@ -113,17 +115,18 @@ def rename_category():
         return Errors.category_exists.exec()
 
     for category in Session.categories:
-        if Session.categories[category]["Name"] == current_name and Session.categories[category]["Type"] == category_type:
-            Session.categories[category].update({"Name":new_category_name})
+        if Session.categories[category].name == current_name and Session.categories[category].type == category_type:
+            Session.categories[category].name = new_category_name
 
             #Update connections
-            Session.categories[category]["Settings"].clicked.disconnect()
-            Session.categories[category]["Add transaction"].clicked.disconnect()
-            Session.categories[category]["Edit transaction"].clicked.disconnect()
-            Session.categories[category]["Settings"].clicked.connect(partial(show_category_settings, new_category_name))
-            Session.categories[category]["Add transaction"].clicked.connect(partial(show_add_transaction_window, new_category_name))
-            Session.categories[category]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window, new_category_name, Session.categories[category]["Category data"]))
-            Session.categories[category]["Name label"].setText(new_category_name)
+            Session.categories[category].settings.clicked.disconnect()
+            Session.categories[category].add_transaction.clicked.disconnect()
+            Session.categories[category].edit_transaction.clicked.disconnect()
+
+            Session.categories[category].settings.clicked.connect(partial(show_category_settings, new_category_name))
+            Session.categories[category].add_transaction.clicked.connect(partial(show_add_transaction_window, new_category_name))
+            Session.categories[category].edit_transaction.clicked.connect(partial(show_edit_transaction_window, new_category_name, Session.categories[category].table_data))
+            Session.categories[category].name_label.setText(new_category_name)
 
             Session.account.rename_category(category, new_category_name)
             RenameCategoryWindow.window.hide()
@@ -138,13 +141,13 @@ def update_category_total_value(category_id:int):
 
     if len(transactions) != 0:
         for transaction in transactions:
-            total_value += transaction[5]
-    Session.categories[category_id]["Total value"].setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(round(total_value, 2)))
+            total_value += Decimal(transaction[5])
+    Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(total_value)))
 
 
 def activate_categories():
     for category in Session.categories:
-        Session.categories[category]["Settings"].clicked.connect(partial(show_category_settings, Session.categories[category]["Name"]))
-        Session.categories[category]["Add transaction"].clicked.connect(partial(show_add_transaction_window, Session.categories[category]["Name"]))
-        Session.categories[category]["Edit transaction"].clicked.connect(partial(show_edit_transaction_window, Session.categories[category]["Name"], Session.categories[category]["Category data"]))
-        Session.categories[category]["Delete transaction"].clicked.connect(partial(remove_transaction, Session.categories[category]["Category data"], category))
+        Session.categories[category].settings.clicked.connect(partial(show_category_settings, Session.categories[category].name))
+        Session.categories[category].add_transaction.clicked.connect(partial(show_add_transaction_window, Session.categories[category].name))
+        Session.categories[category].edit_transaction.clicked.connect(partial(show_edit_transaction_window, Session.categories[category].name, Session.categories[category].table_data))
+        Session.categories[category].delete_transaction.clicked.connect(partial(remove_transaction, Session.categories[category].table_data, category))

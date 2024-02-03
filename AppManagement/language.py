@@ -1,4 +1,4 @@
-from Session import Session
+from AppObjects.Session import Session
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LANGUAGES
 from GUI import *
@@ -78,14 +78,14 @@ def change_language():
             error.button(QMessageBox.StandardButton.Cancel).setText(LANGUAGES[Session.language]["General management"][4])
     
     for category in Session.categories:
-        Session.categories[category]["Add transaction"].setText(LANGUAGES[Session.language]["Account"]["Transactions management"][0])
-        Session.categories[category]["Delete transaction"].setText(LANGUAGES[Session.language]["Account"]["Transactions management"][1])
-        Session.categories[category]["Edit transaction"].setText(LANGUAGES[Session.language]["Account"]["Transactions management"][2])
-        Session.categories[category]["Category data"].setHorizontalHeaderLabels((LANGUAGES[Session.language]["Account"]["Info"][0], LANGUAGES[Session.language]["Account"]["Info"][1], LANGUAGES[Session.language]["Account"]["Info"][2]))
-        total_value = Session.categories[category]["Total value"].text().split(" ")[1]
-        Session.categories[category]["Total value"].setText(LANGUAGES[Session.language]["Account"]["Info"][6] + total_value)
+        Session.categories[category].add_transaction.setText(LANGUAGES[Session.language]["Account"]["Transactions management"][0])
+        Session.categories[category].delete_transaction.setText(LANGUAGES[Session.language]["Account"]["Transactions management"][1])
+        Session.categories[category].edit_transaction.setText(LANGUAGES[Session.language]["Account"]["Transactions management"][2])
+        Session.categories[category].table_data.setHorizontalHeaderLabels((LANGUAGES[Session.language]["Account"]["Info"][0], LANGUAGES[Session.language]["Account"]["Info"][1], LANGUAGES[Session.language]["Account"]["Info"][2]))
+        total_value = Session.categories[category].total_value_label.text().split(" ")[1]
+        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6] + total_value)
     
-    MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Account"]["Info"][3]+str(round(Session.current_balance, 2)))
+    MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Account"]["Info"][3]+str(Session.current_balance))
     Incomes = SettingsWindow.total_income.text().split(" ")[2]
     SettingsWindow.total_income.setText(LANGUAGES[Session.language]["Account"]["Info"][7]+str(Incomes))
     Expenses = SettingsWindow.total_expense.text().split(" ")[2]

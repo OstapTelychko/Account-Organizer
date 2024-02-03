@@ -2,11 +2,11 @@
 from sys import exit
 
 from GUI import *
-from Session import Session
+from AppObjects.Session import Session
 from languages import LANGUAGES
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
-from Statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics
-from copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
+from Statistics.Statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics
+from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
 from AppManagement.language import load_language, change_language_add_account
 from AppManagement.balance import load_account_balance
