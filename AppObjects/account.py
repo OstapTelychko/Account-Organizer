@@ -1,4 +1,6 @@
 import sqlite3
+
+from AppObjects.transaction import Transaction
 from project_configuration import ROOT_DIRECTORY
 
 
@@ -119,25 +121,36 @@ class Account():
             id = self.cursor.execute("SELECT id FROM 'Transactions' ORDER BY id DESC").fetchone()[0]
             return id
     
-    def get_transactions_by_month(self, category_id:int, year:int, month:int) -> list:
+    def get_transactions_by_month(self, category_id:int, year:int, month:int) -> list[Transaction]:
         with self.connection:
             transactions = self.cursor.execute("SELECT * FROM 'Transactions' WHERE category_id=? AND year=? AND month=?",(category_id, year, month,)).fetchall()
-            return transactions
+            
+            return [
+                Transaction(
+                id=transaction[0],
+                year=transaction[2],
+                month=transaction[3],
+                day=transaction[4],
+                value=transaction[5],
+                name=transaction[6]
+                )
+
+                for transaction in transactions]
         
-    def get_all_transactions(self, category_id:int) -> list:
+    def get_all_transactions(self, category_id:int) -> list[Transaction]:
 
         with self.connection:
             transactions = self.cursor.execute("SELECT * FROM 'Transactions' WHERE category_id=?",(category_id,)).fetchall()
-            return transactions
+
+            return [
+                Transaction(
+                id=transaction[0],
+                year=transaction[2],
+                month=transaction[3],
+                day=transaction[4],
+                value=transaction[5],
+                name=transaction[6]
+                )
+                
+                for transaction in transactions]
     
-
-
-    
-
-# account = Account("Accounts.sqlite","Hranutel3")
-# # account.create_account()
-# # account.create_category("Products","expenses")
-# account.account_id = account.get_account_id()
-# category_id = account.get_category_id("Products","expenses")
-# account.create_transaction(category_id,2023,4,18,100,"Ковбаса")
-# print(account.account_exists())

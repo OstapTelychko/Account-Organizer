@@ -1,5 +1,5 @@
-from AppObjects.Session import Session
-from AppObjects.Account import Account
+from AppObjects.session import Session
+from AppObjects.account import Account
 from languages import LANGUAGES
 from GUI import QMessageBox, AddAccountWindow, RenameAccountWindow, SettingsWindow, Errors
 

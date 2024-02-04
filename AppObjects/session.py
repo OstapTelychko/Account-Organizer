@@ -2,8 +2,8 @@ from datetime import datetime
 import toml
 
 from project_configuration import ROOT_DIRECTORY
-from AppObjects.Account import Account
-from AppObjects.Category import Category
+from AppObjects.account import Account
+from AppObjects.category import Category
 
 
 

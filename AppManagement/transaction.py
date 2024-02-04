@@ -1,4 +1,4 @@
-from AppObjects.Session import Session
+from AppObjects.session import Session
 from GUI import QTableWidget, QTableWidgetItem, Qt, QMessageBox, QHeaderView, TransactionManagementWindow, Errors, MainWindow, ALIGMENT
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE

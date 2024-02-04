@@ -1,4 +1,4 @@
-from AppObjects.Session import Session
+from AppObjects.session import Session
 from GUI import MainWindow, SettingsWindow
 from languages import LANGUAGES
 
@@ -11,11 +11,11 @@ def calculate_current_balance():
 
         if category[1] == "Incomes":
             for transaction in Session.account.get_all_transactions(category[0]):
-                Session.current_total_income += transaction[5]
+                Session.current_total_income += transaction.value
 
         elif category[1] == "Expenses":
             for transaction in Session.account.get_all_transactions(category[0]):
-                Session.current_total_expenses += transaction[5]
+                Session.current_total_expenses += transaction.value
     
     Session.current_total_income = round(Session.current_total_income, 2)
     Session.current_total_expenses = round(Session.current_total_expenses, 2)

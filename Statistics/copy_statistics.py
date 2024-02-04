@@ -1,4 +1,4 @@
-from AppObjects.Session import Session
+from AppObjects.session import Session
 from GUI import InformationMessage, MainWindow, CategorySettingsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, app
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
@@ -27,7 +27,7 @@ def copy_monthly_transactions():
             column_names = LANGUAGES[Session.language]["Account"]["Info"]
             result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
             for index,transaction in enumerate(transactions):
-                result += f"{index}\t{transaction[5]}\t\t{transaction[4]}\t{transaction[6]}\n"
+                result += f"{index}\t{transaction.value}\t\t{transaction.day}\t{transaction.name}\n"
             
 
             app.clipboard().setText(result)

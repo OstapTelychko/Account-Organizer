@@ -1,6 +1,6 @@
 from functools import partial
 
-from AppObjects.Session import Session
+from AppObjects.session import Session
 from GUI import QTableWidgetItem, Qt, QMessageBox, MainWindow, AddCategoryWindow, Errors, CategorySettingsWindow, RenameCategoryWindow, load_category, ALIGMENT
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
@@ -24,27 +24,27 @@ def load_categories_data():
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
-                name = QTableWidgetItem(transaction[6])
+                name = QTableWidgetItem(transaction.name)
                 name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 day = QTableWidgetItem()
                 day.setTextAlignment(ALIGMENT.AlignCenter)
-                day.setData(Qt.ItemDataRole.EditRole, transaction[4])
+                day.setData(Qt.ItemDataRole.EditRole, transaction.day)
                 day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 value = QTableWidgetItem()
                 value.setTextAlignment(ALIGMENT.AlignCenter)
-                value.setData(Qt.ItemDataRole.EditRole, transaction[5])
+                value.setData(Qt.ItemDataRole.EditRole, transaction.value)
                 value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 transaction_id = QTableWidgetItem()
-                transaction_id.setData(Qt.ItemDataRole.EditRole, transaction[0])
+                transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
 
                 category_data.setItem(row,0,name)
                 category_data.setItem(row,1,day)
                 category_data.setItem(row,2,value)
                 category_data.setItem(row,3,transaction_id)
-                total_value += transaction[5]
+                total_value += transaction.value
 
         Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(round(total_value, 2))))
 
@@ -140,7 +140,7 @@ def update_category_total_value(category_id:int):
 
     if len(transactions) != 0:
         for transaction in transactions:
-            total_value += transaction[5]
+            total_value += transaction.value
     Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(round(total_value, 2)))
 
 

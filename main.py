@@ -2,7 +2,7 @@
 from sys import exit
 
 from GUI import *
-from AppObjects.Session import Session
+from AppObjects.session import Session
 from languages import LANGUAGES
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from Statistics.Statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics
@@ -136,7 +136,7 @@ def main():
     activate_categories()
 
     #Add accounts to list
-    [Session.accounts_list.append(item[0]) for item in Session.account.get_all_accounts() if item[0] not in Session.accounts_list]
+    [Session.accounts_list.append(account[0]) for account in Session.account.get_all_accounts() if account[0] not in Session.accounts_list]
 
     SettingsWindow.accounts.clear()
     SettingsWindow.accounts.addItems(Session.accounts_list)

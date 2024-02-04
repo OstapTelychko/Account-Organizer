@@ -1,4 +1,4 @@
-from AppObjects.Session import Session
+from AppObjects.session import Session
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LANGUAGES
 from GUI import *

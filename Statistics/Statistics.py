@@ -1,4 +1,5 @@
-from AppObjects.Session import Session
+from AppObjects.session import Session
+from AppObjects.transaction import Transaction
 from GUI import *
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS
@@ -9,15 +10,15 @@ def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> t
     Categories_total_values = {}
 
     for category in unsorted_categories:
-        Categories_total_values[category] = round(sum([transaction[5] for transaction in Session.account.get_transactions_by_month(category, Session.current_year, current_month)]), 2)
+        Categories_total_values[category] = round(sum([transaction.value for transaction in Session.account.get_transactions_by_month(category, Session.current_year, current_month)]), 2)
 
     highest_total_value = max([total_value for total_value in Categories_total_values.values()])
 
 
-    def get_min_and_max_transactions(transactions:dict):
+    def get_min_and_max_transactions(transactions:list[Transaction]):
         #Highest transactions
-        highest_transaction_value = max([transaction[5] for transaction in transactions])
-        transactions_with_highest_value = [transaction[6] for transaction in transactions if transaction[5] == highest_transaction_value]
+        highest_transaction_value = max([transaction.value for transaction in transactions])
+        transactions_with_highest_value = [transaction.name for transaction in transactions if transaction.value == highest_transaction_value]
 
         transactions_names = [name for name in transactions_with_highest_value]
         transactions_with_highest_value = {}
@@ -26,8 +27,8 @@ def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> t
         transactions_with_highest_value["Highest value"] = highest_transaction_value
         
         #Lowest transactions
-        lowest_transaction_value = min([transaction[5] for transaction in transactions])
-        transactions_with_lowest_value = [transaction[6] for transaction in transactions if transaction[5] == lowest_transaction_value]
+        lowest_transaction_value = min([transaction.value for transaction in transactions])
+        transactions_with_lowest_value = [transaction.name for transaction in transactions if transaction.value == lowest_transaction_value]
 
         transactions_names = [name for name in transactions_with_lowest_value]
         transactions_with_lowest_value = {}
@@ -216,14 +217,14 @@ def show_quarterly_statistics():
                     Incomes_categories_total_values[income_category] = []
 
                     for month in range(3):
-                        Incomes_categories_total_values[income_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year, month_numbers[quarter-1][month])), 2))
+                        Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year, month_numbers[quarter-1][month])), 2))
                     Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
                 
                 for expenses_category in Expenses_categories:
                     Expenses_categories_total_values[expenses_category] = []
 
                     for month in range(3):
-                        Expenses_categories_total_values[expenses_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year, month_numbers[quarter-1][month])), 2))
+                        Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year, month_numbers[quarter-1][month])), 2))
                     Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
                 #Entire quarter statistics
@@ -305,14 +306,14 @@ def show_yearly_statistics():
                 Incomes_categories_total_values[income_category] = []
 
                 for month in range(1,13):
-                    Incomes_categories_total_values[income_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year,month)), 2))
+                    Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year,month)), 2))
                 Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
             
             for expenses_category in Expenses_categories:
                 Expenses_categories_total_values[expenses_category] = []
 
                 for month in range(1,13):
-                    Expenses_categories_total_values[expenses_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year,month)), 2))
+                    Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year,month)), 2))
                 Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
             #Entire year statistics

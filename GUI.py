@@ -7,8 +7,8 @@ from PySide6.QtGui import QIcon,QFont
 from qdarktheme._style_loader import load_stylesheet
 
 from languages import LANGUAGES
-from AppObjects.Account import Account
-from AppObjects.Category import Category
+from AppObjects.account import Account
+from AppObjects.category import Category
 from project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
 
@@ -137,19 +137,19 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
 
             transaction_day = QTableWidgetItem()
             transaction_day.setTextAlignment(ALIGMENT.AlignCenter)
-            transaction_day.setData(Qt.ItemDataRole.EditRole, transaction[4])
+            transaction_day.setData(Qt.ItemDataRole.EditRole, transaction.day)
             transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
 
             transaction_value = QTableWidgetItem()
             transaction_value.setTextAlignment(ALIGMENT.AlignCenter)
-            transaction_value.setData(Qt.ItemDataRole.EditRole, transaction[5])
+            transaction_value.setData(Qt.ItemDataRole.EditRole, transaction.value)
             transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             transaction_id = QTableWidgetItem()
-            transaction_id.setData(Qt.ItemDataRole.EditRole, transaction[0])
+            transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
             transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-            transaction_name = QTableWidgetItem(transaction[6])
+            transaction_name = QTableWidgetItem(transaction.name)
             transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
 
@@ -157,7 +157,7 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
             category_data.setItem(index, 1, transaction_day)
             category_data.setItem(index, 2, transaction_value)
             category_data.setItem(index, 3, transaction_id)
-            total_value += transaction[5]
+            total_value += transaction.value
             
     category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
     category_data.setSortingEnabled(True)
