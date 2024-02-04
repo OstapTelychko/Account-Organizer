@@ -6,3 +6,5 @@
 /User_configuration.toml
 /Accounts.sqlite
 /AppManagement/__pycache__
+Accounts.sqlite
+User_configuration.toml

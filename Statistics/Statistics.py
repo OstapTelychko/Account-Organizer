@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from AppObjects.Session import Session
 from GUI import *
 from languages import LANGUAGES
@@ -11,7 +9,7 @@ def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> t
     Categories_total_values = {}
 
     for category in unsorted_categories:
-        Categories_total_values[category] = float(sum([Decimal(transaction[5]) for transaction in Session.account.get_transactions_by_month(category, Session.current_year, current_month)]))
+        Categories_total_values[category] = round(sum([transaction[5] for transaction in Session.account.get_transactions_by_month(category, Session.current_year, current_month)]), 2)
 
     highest_total_value = max([total_value for total_value in Categories_total_values.values()])
 
@@ -139,17 +137,17 @@ def show_monthly_statistics():
                 Incomes_statistic = get_min_and_max_categories(Incomes_categories, Session.current_month)
                 Expenses_statistic = get_min_and_max_categories(Expenses_categories, Session.current_month)
 
-                total_income = sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]])
-                total_expense = sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]])
+                total_income = round(sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]]), 2)
+                total_expense = round(sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]]), 2)
                 days_amount = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
 
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][4]+str(total_income))
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][5]+str(float(Decimal(total_income)/days_amount)))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][5]+str(round(total_income/days_amount, 2)))
                 MonthlyStatistics.statistics.addItem("")
                 MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][6]+str(total_expense))
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][7]+str(float(Decimal(total_expense)/days_amount)))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][7]+str(round(total_expense/days_amount, 2)))
                 MonthlyStatistics.statistics.addItem("")
-                MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][8]+str(float(Decimal(total_income) - Decimal(total_expense))))
+                MonthlyStatistics.statistics.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][8]+str(round(total_income - total_expense, 2)))
 
                 MonthlyStatistics.statistics.addItem("")
                 MonthlyStatistics.statistics.addItem("")
@@ -174,17 +172,17 @@ def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Stat
     Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)
     Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)
 
-    total_income = float(sum([Decimal(Incomes_statistic[2][total_value]) for total_value in Incomes_statistic[2]]))
-    total_expense = float(sum([Decimal(Expenses_statistic[2][total_value]) for total_value in Expenses_statistic[2]]))
+    total_income = round(sum([Incomes_statistic[2][total_value] for total_value in Incomes_statistic[2]]), 2)
+    total_expense = round(sum([Expenses_statistic[2][total_value] for total_value in Expenses_statistic[2]]), 2)
     days_amount = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
 
     month_statistics.addItem(Statistic_words[4]+str(total_income))
-    month_statistics.addItem(Statistic_words[5]+str(float(Decimal(total_income)/days_amount)))
+    month_statistics.addItem(Statistic_words[5]+str(round(total_income/days_amount, 2)))
     month_statistics.addItem("")
     month_statistics.addItem(Statistic_words[6]+str(total_expense))
-    month_statistics.addItem(Statistic_words[7]+str(float(Decimal(total_expense)/days_amount)))
+    month_statistics.addItem(Statistic_words[7]+str(round(total_expense/days_amount, 2)))
     month_statistics.addItem("")
-    month_statistics.addItem(Statistic_words[8]+str(float(Decimal(total_income) - Decimal(total_expense))))
+    month_statistics.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 
     month_statistics.addItem("")
     month_statistics.addItem("")
@@ -218,31 +216,31 @@ def show_quarterly_statistics():
                     Incomes_categories_total_values[income_category] = []
 
                     for month in range(3):
-                        Incomes_categories_total_values[income_category].append(float(sum(Decimal(transaction[5]) for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year, month_numbers[quarter-1][month]))))
-                    Incomes_categories_total_values[income_category] = sum(Incomes_categories_total_values[income_category])
+                        Incomes_categories_total_values[income_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year, month_numbers[quarter-1][month])), 2))
+                    Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
                 
                 for expenses_category in Expenses_categories:
                     Expenses_categories_total_values[expenses_category] = []
 
                     for month in range(3):
-                        Expenses_categories_total_values[expenses_category].append(float(sum(Decimal(transaction[5]) for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year, month_numbers[quarter-1][month]))))
-                    Expenses_categories_total_values[expenses_category] = sum(Expenses_categories_total_values[expenses_category])
+                        Expenses_categories_total_values[expenses_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year, month_numbers[quarter-1][month])), 2))
+                    Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
                 #Entire quarter statistics
-                total_income = float(sum(Decimal(total_value) for total_value in Incomes_categories_total_values.values()))
-                total_expense = float(sum(Decimal(total_value) for total_value in Expenses_categories_total_values.values()))
+                total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
+                total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
                 days_amount = sum(MONTHS_DAYS[:3]) if quarter == 0 else sum(MONTHS_DAYS[3:6]) if quarter ==  1 else sum(MONTHS_DAYS[6:9]) if MONTHS_DAYS == 2 else sum(MONTHS_DAYS[9:12])
 
                 Total_statistic_list = QuarterlyStatistics.statistics[quarter][0]["Statistic Data"]
                 Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
 
                 Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
-                Total_statistic_list.addItem(Statistic_words[5]+str(float(Decimal(total_income)/days_amount)))
+                Total_statistic_list.addItem(Statistic_words[5]+str(round(total_income/days_amount, 2)))
                 Total_statistic_list.addItem("")
                 Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
-                Total_statistic_list.addItem(Statistic_words[7]+str(float(Decimal(total_expense)/days_amount)))
+                Total_statistic_list.addItem(Statistic_words[7]+str(round(total_expense/days_amount), 2))
                 Total_statistic_list.addItem("")
-                Total_statistic_list.addItem(Statistic_words[8]+str(float(Decimal(total_income) - Decimal(total_expense))))
+                Total_statistic_list.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 
                 def add_total_statistics(statistic:dict,words:list):
                     max_total_value  = max(total_value for total_value in statistic.values())
@@ -298,6 +296,7 @@ def show_yearly_statistics():
     if len(Session.categories) >= 2:
         Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
         Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
+
         if len(Expenses_categories) >= 1 and len(Incomes_categories) >= 1:
             Incomes_categories_total_values = {}
             Expenses_categories_total_values = {}
@@ -306,33 +305,33 @@ def show_yearly_statistics():
                 Incomes_categories_total_values[income_category] = []
 
                 for month in range(1,13):
-                    Incomes_categories_total_values[income_category].append(float(sum(Decimal(transaction[5]) for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year,month))))
-                Incomes_categories_total_values[income_category] = sum(Incomes_categories_total_values[income_category])
+                    Incomes_categories_total_values[income_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year,month)), 2))
+                Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
             
             for expenses_category in Expenses_categories:
                 Expenses_categories_total_values[expenses_category] = []
 
                 for month in range(1,13):
-                    Expenses_categories_total_values[expenses_category].append(float(sum(Decimal(transaction[5]) for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year,month))))
-                Expenses_categories_total_values[expenses_category] = sum(Expenses_categories_total_values[expenses_category])
+                    Expenses_categories_total_values[expenses_category].append(round(sum(transaction[5] for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year,month)), 2))
+                Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
             #Entire year statistics
-            total_income = float(sum(Decimal(total_value) for total_value in Incomes_categories_total_values.values()))
-            total_expense = float(sum(Decimal(total_value) for total_value in Expenses_categories_total_values.values()))
+            total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
+            total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
             days_amount = 365 if Session.current_year % 4 != 0 else 366# 365 days if year is not leap
 
             Total_statistic_list = YearlyStatistics.statistics[0]["Statistic Data"]
             Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
 
             Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
-            Total_statistic_list.addItem(Statistic_words[25]+str(float(Decimal(total_income)/12)))
-            Total_statistic_list.addItem(Statistic_words[24]+str(float(Decimal(total_income)/days_amount)))
+            Total_statistic_list.addItem(Statistic_words[25]+str(round(total_income/12, 2)))
+            Total_statistic_list.addItem(Statistic_words[24]+str(round(total_income/days_amount, 2)))
             Total_statistic_list.addItem("")
             Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
-            Total_statistic_list.addItem(Statistic_words[27]+str(float(Decimal(total_expense)/12)))
-            Total_statistic_list.addItem(Statistic_words[26]+str(float(Decimal(total_expense)/Decimal(days_amount))))
+            Total_statistic_list.addItem(Statistic_words[27]+str(round(total_expense/12, 2)))
+            Total_statistic_list.addItem(Statistic_words[26]+str(round(total_expense/days_amount, 2)))
             Total_statistic_list.addItem("")
-            Total_statistic_list.addItem(Statistic_words[8]+f"{float(Decimal(total_income)-Decimal(total_expense))}")
+            Total_statistic_list.addItem(Statistic_words[8]+f"{round(total_income - total_expense, 2)}")
 
             def add_total_statistics(statistic:dict,words:list):
                 max_total_value  = max(total_value for total_value in statistic.values())

@@ -1,5 +1,4 @@
 from functools import partial
-from decimal import Decimal
 
 from AppObjects.Session import Session
 from GUI import QTableWidgetItem, Qt, QMessageBox, MainWindow, AddCategoryWindow, Errors, CategorySettingsWindow, RenameCategoryWindow, load_category, ALIGMENT
@@ -30,7 +29,7 @@ def load_categories_data():
 
                 day = QTableWidgetItem()
                 day.setTextAlignment(ALIGMENT.AlignCenter)
-                day.setData(Qt.ItemDataRole.EditRole,transaction[4])
+                day.setData(Qt.ItemDataRole.EditRole, transaction[4])
                 day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 value = QTableWidgetItem()
@@ -39,15 +38,15 @@ def load_categories_data():
                 value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 transaction_id = QTableWidgetItem()
-                transaction_id.setData(Qt.ItemDataRole.EditRole,transaction[0])
+                transaction_id.setData(Qt.ItemDataRole.EditRole, transaction[0])
 
                 category_data.setItem(row,0,name)
                 category_data.setItem(row,1,day)
                 category_data.setItem(row,2,value)
                 category_data.setItem(row,3,transaction_id)
-                total_value += Decimal(transaction[5])
+                total_value += transaction[5]
 
-        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(total_value)))
+        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(round(total_value, 2))))
 
 
 def create_category():
@@ -141,8 +140,8 @@ def update_category_total_value(category_id:int):
 
     if len(transactions) != 0:
         for transaction in transactions:
-            total_value += Decimal(transaction[5])
-    Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(total_value)))
+            total_value += transaction[5]
+    Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(round(total_value, 2)))
 
 
 def activate_categories():

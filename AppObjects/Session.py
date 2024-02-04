@@ -1,6 +1,5 @@
 from datetime import datetime
 import toml
-from decimal import getcontext
 
 from project_configuration import ROOT_DIRECTORY
 from AppObjects.Account import Account
@@ -29,9 +28,6 @@ class Session:
 
 
     def start_session():
-        #Set the precision for calculations in the app
-        getcontext().prec = 2
-
 
         #Set current date
         Session.current_month = datetime.now().month
