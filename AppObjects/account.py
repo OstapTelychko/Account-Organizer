@@ -34,7 +34,7 @@ class Account():
 
     def create_account(self, balance:float|int=0):
         with self.connection:
-            self.cursor.execute("INSERT INTO 'Accounts' ('account_name','current_balance','current_total_income','current_total_expenses') VALUES(?,?,0,0)",(self.account_name, balance,))
+            self.cursor.execute("INSERT INTO 'Accounts' ('account_name','current_balance','current_total_income','current_total_expenses','start_balance') VALUES(?,0,0,0,?)",(self.account_name, balance,))
             self.set_account_id()
 
 
@@ -51,6 +51,13 @@ class Account():
             current_total_expenses = self.cursor.execute("SELECT current_total_expenses FROM 'Accounts' WHERE account_name=?",(self.account_name,)).fetchone()[0]
 
             return current_balance, current_total_income, current_total_expenses
+
+
+    def get_account_start_balance(self) -> int | float:
+        with self.connection:
+            start_balance = self.cursor.execute("SELECT start_balance FROM 'Accounts' WHERE account_name=?", (self.account_name,)).fetchone()[0]
+
+            return start_balance
 
 
     def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float):

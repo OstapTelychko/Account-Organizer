@@ -22,11 +22,7 @@ def calculate_current_balance():
     Session.current_total_income = round(Session.current_total_income, 2)
     Session.current_total_expenses = round(Session.current_total_expenses, 2)
 
-    # If user created account recently with balance not 0 and he don't have transactions yet
-    if Session.current_total_income == 0 and Session.current_total_expenses == 0 and Session.account.get_account_balance()[0] != 0:
-        Session.current_balance = Session.account.get_account_balance()[0]
-    else:
-        Session.current_balance = round(Session.current_total_income - Session.current_total_expenses, 2)
+    Session.current_balance = Session.account.get_account_start_balance() + round(Session.current_total_income - Session.current_total_expenses, 2)
 
     Session.account.update_account_balance(Session.current_balance, Session.current_total_income, Session.current_total_expenses)
     MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Account"]["Info"][3]+str(Session.current_balance))
