@@ -8,6 +8,7 @@ class Category:
             id:int,
             type:str,
             name:str,
+            position:int,
 
             total_value_label:QLabel,
             name_label:QLabel,
@@ -22,6 +23,7 @@ class Category:
         self.id = id
         self.type = type
         self.name = name
+        self.position = position
 
         self.total_value_label = total_value_label
         self.name_label = name_label

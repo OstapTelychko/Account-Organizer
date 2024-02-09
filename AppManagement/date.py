@@ -1,5 +1,5 @@
 from AppObjects.session import Session
-from GUI import MainWindow
+from GUI.windows.main import MainWindow
 from languages import LANGUAGES
 from AppManagement.category import load_categories_data
 

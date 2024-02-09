@@ -1,7 +1,6 @@
 /test.py
 __pycache__
 /setup.py
-/__init__.py
 /account-organizer.desktop
 /User_configuration.toml
 /Accounts.sqlite

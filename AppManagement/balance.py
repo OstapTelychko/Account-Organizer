@@ -1,6 +1,8 @@
 from AppObjects.session import Session
-from GUI import MainWindow, SettingsWindow
+from GUI.windows.main import MainWindow, SettingsWindow
 from languages import LANGUAGES
+
+
 
 
 def calculate_current_balance():

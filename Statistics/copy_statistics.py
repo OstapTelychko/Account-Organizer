@@ -1,9 +1,14 @@
+from threading import Thread
+
 from AppObjects.session import Session
-from GUI import InformationMessage, MainWindow, CategorySettingsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, app
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
-from threading import Thread
+from GUI.windows.main import MainWindow, app
+from GUI.windows.information_message import InformationMessage
+from GUI.windows.category import CategorySettingsWindow 
+from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+
 
 
 def show_information_message(text:str):

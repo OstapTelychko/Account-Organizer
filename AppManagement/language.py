@@ -1,8 +1,15 @@
+from PySide6.QtWidgets import QMessageBox
+
 from AppObjects.session import Session
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LANGUAGES
-from GUI import *
 
+from GUI.windows.main import MainWindow, SettingsWindow
+from GUI.windows.account import AddAccountWindow, RenameAccountWindow
+from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
+from GUI.windows.errors import errors_list
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.transaction import TransactionManagementWindow
 
 def change_language():
     Language = LANGUAGES[Session.language]
@@ -35,6 +42,9 @@ def change_language():
     CategorySettingsWindow.delete_category.setText(Language["Account"]["Category management"][1])
     CategorySettingsWindow.rename_category.setText(Language["Account"]["Category management"][2])
     CategorySettingsWindow.copy_transactions.setText(Language["Account"]["Category management"][4])
+    CategorySettingsWindow.change_category_position.setText(Language["Account"]["Category management"][9])
+
+    ChangeCategoryPositionWindow.enter_new_position.setText(Language["General management"][6])
 
     RenameCategoryWindow.new_category_name.setPlaceholderText(Language["Account"]["Category management"][3])
     RenameCategoryWindow.button.setText(Language["General management"][2])

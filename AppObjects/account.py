@@ -12,6 +12,7 @@ class Account():
         self.account_name = user_name
 
 
+    #Account
     def account_exists(self, name:str) -> bool:
         with self.connection:
             result = self.cursor.execute("SELECT * FROM 'Accounts' WHERE account_name=?",(name,)).fetchone()
@@ -68,26 +69,40 @@ class Account():
             self.cursor.execute("DELETE  FROM 'Accounts' WHERE account_name=?",(self.account_name,))
     
 
+
+    #Category
     def category_exists(self, category_name:str, category_type:str) -> bool:
         with self.connection:
             result = self.cursor.execute("SELECT * FROM 'Categories' WHERE category_name=? AND category_type=? AND account_id=?",(category_name, category_type, self.account_id,)).fetchone()
             return bool(result)
 
 
-    def create_category(self, catagory_name:str, category_type:str):
+    def create_category(self, catagory_name:str, category_type:str, position:int):
         with self.connection:
-            self.cursor.execute("INSERT INTO 'Categories' (category_type, category_name, account_id) VALUES (?,?,?)",(category_type, catagory_name, self.account_id,))
-    
+            self.cursor.execute("INSERT INTO 'Categories' (category_type, category_name, account_id, position) VALUES (?,?,?,?)",(category_type, catagory_name, self.account_id, position,))
 
-    def get_category_id(self, catagory_name:str, category_type:str) -> int:
+
+    def get_last_category_position(self, category_type:str) -> int:
         with self.connection:
-            category_id = self.cursor.execute("SELECT id FROM 'Categories' WHERE category_name=? AND category_type=? AND account_id=?",(catagory_name, category_type, self.account_id,)).fetchone()[0]
+            position = self.cursor.execute("SELECT position FROM 'Categories' WHERE category_type=? AND account_id=? ORDER BY position DESC LIMIT 1",(category_type, self.account_id)).fetchone()[0]
+
+            return position
+
+
+    def change_category_position(self, position:int, category_id:int):
+        with self.connection:
+            self.cursor.execute("UPDATE Categories SET position=? WHERE id=?", (position, category_id,))
+
+
+    def get_category_id(self, category_name:str, category_type:str) -> int:
+        with self.connection:
+            category_id = self.cursor.execute("SELECT id FROM 'Categories' WHERE category_name=? AND category_type=? AND account_id=?",(category_name, category_type, self.account_id,)).fetchone()[0]
             return category_id
     
 
     def get_all_categories(self) -> list:
         with self.connection:
-            categories = self.cursor.execute("SELECT * FROM 'Categories' WHERE account_id=?",(self.account_id,)).fetchall()
+            categories = self.cursor.execute("SELECT * FROM 'Categories' WHERE account_id=? ORDER BY position",(self.account_id,)).fetchall()
             return categories
 
 
@@ -101,6 +116,8 @@ class Account():
             self.cursor.execute("DELETE FROM 'Categories' WHERE id=?",(category_id,))
 
 
+
+    #Transaction
     def delete_transaction(self, transaction_id:int):
         with self.connection:
             self.cursor.execute("DELETE  FROM 'Transactions' WHERE id=?",(transaction_id,))

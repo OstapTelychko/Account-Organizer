@@ -1,13 +1,18 @@
+from sys import exit
+from PySide6.QtWidgets import QMessageBox
+
 from AppObjects.session import Session
 from AppObjects.account import Account
 from languages import LANGUAGES
-from GUI import QMessageBox, AddAccountWindow, RenameAccountWindow, SettingsWindow, Errors
+
+from GUI.windows.main import SettingsWindow
+from GUI.windows.account import AddAccountWindow, RenameAccountWindow
+from GUI.windows.errors import Errors
 
 from AppManagement.balance import load_account_balance
-from AppManagement.category import load_categories, activate_categories
+from AppManagement.category import remove_categories_from_list, load_categories, activate_categories
 from AppManagement.language import change_language_add_account, change_language
 
-from sys import exit
 
 
 def show_add_user_window():
@@ -64,13 +69,7 @@ def add_user():
 
 def load_account_data(name:str):
     #Remove loaded categories
-    for category in Session.categories.copy():
-        Session.categories[category].window.deleteLater()
-        Session.categories[category].settings.deleteLater()
-        Session.categories[category].add_transaction.deleteLater()
-        Session.categories[category].edit_transaction.deleteLater()
-        Session.categories[category].delete_transaction.deleteLater()
-        del Session.categories[category]
+    remove_categories_from_list()
 
     Session.account_name = name
     Session.account = Account(Session.account_name)

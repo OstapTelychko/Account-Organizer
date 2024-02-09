@@ -20,7 +20,8 @@ LANGUAGES = {
             2:"Rename",
             3:"Ok",
             4:"Cancel",
-            5:"Update"
+            5:"Update",
+            6:"Save"
         },
         "Account":{
             0:"Current balance",
@@ -107,7 +108,8 @@ LANGUAGES = {
                 5:"Month transactions have copied",
                 6:"Name of category has updated",
                 7:"Category has removed",
-                8:"Category has created"
+                8:"Category has created",
+                9:"Change position"
             }
         },
         "Errors":{
@@ -127,7 +129,9 @@ LANGUAGES = {
             13:"You have used forbidden word in expression",
             14:"You should have at least one category for income and one for expenses to see monthly statistics",
             15:"You should have at least one income transaction and one expense transaction to see monthly statistics",
-            16:"Name of category can't be empty field"
+            16:"Name of category can't be empty field",
+            17:"The position must be within 0-max_position",
+            18:"The position can't be the same",
         },
         "Mini calculator":{
             0:"Mini calculator",
@@ -165,7 +169,8 @@ LANGUAGES = {
             2:"Переназвати",
             3:"Ок",
             4:"Скасувати",
-            5:"Оновити"
+            5:"Оновити",
+            6:"Зберегти"
         },
         "Account":{
             0:"Поточний баланс",
@@ -251,7 +256,8 @@ LANGUAGES = {
                 5:"Місячні транзакції скопійовані",
                 6:"Назва категорії обновлена",
                 7:"Категорія видалена",
-                8:"Категорія створена"
+                8:"Категорія створена",
+                9:"Змінити позицію"
             }
         },
         "Errors":{
@@ -271,7 +277,9 @@ LANGUAGES = {
             13:"Ви використали заборонені слова в виразі",
             14:"Ви повинні мати принаймні одну категорію для доходів і одну для витрат, щоб побачити місячну статистику",
             15:"Ви повинні мати принаймні одну транзакцію доходу і одну витрат, щоб побачити місячну статистику",
-            16:"Назвою категорії не може бути пусте поле"
+            16:"Назвою категорії не може бути пусте поле",
+            17:"Позиція повинна бути в діапазоні 0-max_position",
+            18:"Не можна встановити ту саму позицію"
         },
         "Mini calculator":{
             0:"Міні калькулятор",
@@ -309,7 +317,8 @@ LANGUAGES = {
             2:"Zmienić nazwę",
             3:"Ok",
             4:"Anulować",
-            5:"Zmienić"
+            5:"Zmienić",
+            6:"Zapisz"
         },
         "Account":{
             0:"Potoczne saldo",
@@ -395,13 +404,14 @@ LANGUAGES = {
                 5:"Miesięczne transakcje są skopiowane",
                 6:"Nazwa kategorii zmieniona",
                 7:"Kategoria usunięta",
-                8:"Kategoria dodana"
+                8:"Kategoria dodana",
+                9:"Zmienić pozycję"
             }
         },
         "Errors":{
             0:"Wpisaliscie nie korektny typ danych, sprawdź wpisane dane znow",
             1:"Konto z takim imieniem już istnieje",
-            2:"Nie podałeś aktualnego salda, saldo będzie równe 0 (jeśli to nieprawdziwe , wystąpi rozbieżność między rzeczywistym a saldem w programie). Kontynuować?",
+            2:"Nie podałeś aktualnego salda, saldo będzie równe 0 (jeśli to nieprawdziwe znaczenie, wystąpi rozbieżność między rzeczywistym saldem a saldem w programie). Kontynuować?",
             3:"Ta kategoria już istnieje",
             4:"Czy na pewno chcecie usunąć kategorię? Utracisz WSZYSTKIE transakcje zarejestrowane w tej kategorii, a bieżące saldo zostanie przeliczone",
             5:"Wybierzcie transakcję. (aby wybrać transakcję, kliknij na jej numer)",
@@ -415,7 +425,9 @@ LANGUAGES = {
             13:"W wyrażeniu użyłeś zabronionych słów",
             14:"Aby zobaczyć statystyki miesięczne, musisz mieć co najmniej jedną kategorię dochodów i jedną kategorię wydatków",
             15:"Aby zobaczyć miesięczne statystyki, musisz mieć co najmniej jedną transakcję dochodu i jedną transakcję wydatkóws",
-            16:"Nazwą kategorii nie morze być puste pole"
+            16:"Nazwą kategorii nie morze być puste pole",
+            17:"Pozycja powinna być w zasięgu 0-max_position",
+            18:"Nie można zastosować tej samej pozycji"
         },
         "Mini calculator":{
             0:"Mały kalkulator",

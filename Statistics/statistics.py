@@ -1,8 +1,13 @@
+from PySide6.QtWidgets import QListWidget
+
 from AppObjects.session import Session
 from AppObjects.transaction import Transaction
-from GUI import *
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS
+
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.errors import Errors
+
 
 
 
@@ -239,7 +244,7 @@ def show_quarterly_statistics():
                 Total_statistic_list.addItem(Statistic_words[5]+str(round(total_income/days_amount, 2)))
                 Total_statistic_list.addItem("")
                 Total_statistic_list.addItem(Statistic_words[6]+str(total_expense))
-                Total_statistic_list.addItem(Statistic_words[7]+str(round(total_expense/days_amount), 2))
+                Total_statistic_list.addItem(Statistic_words[7]+str(round(total_expense/days_amount, 2)))
                 Total_statistic_list.addItem("")
                 Total_statistic_list.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 

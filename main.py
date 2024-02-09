@@ -1,44 +1,34 @@
 #!/usr/bin/env python3
 from sys import exit
 
-from GUI import *
-from AppObjects.session import Session
-from languages import LANGUAGES
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
-from Statistics.Statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics
+from languages import LANGUAGES
+from AppObjects.account import Account
+from AppObjects.session import Session
+
+
+from GUI.windows.main import app, MainWindow, SettingsWindow
+from GUI.windows.account import AddAccountWindow, RenameAccountWindow
+from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
+from GUI.windows.errors import Errors
+from GUI.windows.information_message import InformationMessage
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.transaction import TransactionManagementWindow
+from GUI.theme import swith_theme, load_theme
+
+from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics
 from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
 from AppManagement.language import load_language, change_language_add_account
 from AppManagement.balance import load_account_balance
-from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories
+from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
 
 
 
-def swith_theme():
-    if Session.theme == "Dark":
-        app.setStyleSheet(LIGHT_THEME)
-        SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
 
-        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(200,200,200);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-        if len(Session.categories) != 0:
-            for category in Session.categories:
-                Session.categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(205,205,205)}")
-        Session.theme = "Light"
-
-    elif Session.theme == "Light":
-        app.setStyleSheet(DARK_THEME)
-        SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
-
-        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(40,40,40);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-        if len(Session.categories) != 0:
-            for category in Session.categories:
-                Session.categories[category]["Category data"].setStyleSheet("QTableWidget{background-color:rgb(45,45,45)}")
-        Session.theme = "Dark"
-
-    Session.update_user_config()
 
 
 def calculate_expression():
@@ -64,16 +54,7 @@ def calculate_expression():
 def main():
     Session.start_session()
 
-    #Set selected theme
-    if Session.theme == "Dark":
-        app.setStyleSheet(DARK_THEME)
-        SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
-        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(40,40,40);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-    if Session.theme == "Light":
-        app.setStyleSheet(LIGHT_THEME)
-        SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
-        InformationMessage.message.setStyleSheet("QWidget{background-color:rgb(200, 200, 200);border-top-left-radius:15px;border-bottom-left-radius:15px;border-top-right-radius:15px;border-bottom-right-radius:15px;}")
-
+    load_theme()
 
     #Set current month and year
     MainWindow.current_year.setText(str(Session.current_year))
@@ -102,8 +83,10 @@ def main():
     #Category settings
     CategorySettingsWindow.delete_category.clicked.connect(remove_category)
     CategorySettingsWindow.rename_category.clicked.connect(lambda: (RenameCategoryWindow.window.setWindowTitle(CategorySettingsWindow.window.windowTitle()), RenameCategoryWindow.window.exec()))
+    CategorySettingsWindow.change_category_position.clicked.connect(lambda: show_change_category_position(CategorySettingsWindow.window.windowTitle()))
     CategorySettingsWindow.copy_transactions.clicked.connect(copy_monthly_transactions)
     RenameCategoryWindow.button.clicked.connect(rename_category)
+    ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
     TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
     
     #Date management
