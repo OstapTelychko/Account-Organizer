@@ -2,6 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from project_configuration import ROOT_DIRECTORY
 from .models import Account, Category, Transaction
 
 
@@ -9,7 +10,7 @@ class DBController():
 
     def __init__(self, user_name:str):
         # Init db connection 
-        engine = create_engine("sqlite:///Accounts.sqlite")
+        engine = create_engine(f"sqlite:///{ROOT_DIRECTORY}/Accounts.sqlite")
         self.session = sessionmaker(bind=engine)()
         self.account_name = user_name
 
