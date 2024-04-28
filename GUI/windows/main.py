@@ -45,7 +45,7 @@ class MainWindow():
     window = QWidget()
     window.resize(1500,750)
     window.setMinimumHeight(685)
-    window.setMinimumWidth(1150)
+    window.setMinimumWidth(900)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
     window.setObjectName("main_window")
@@ -157,7 +157,7 @@ class MainWindow():
     mini_calculator_label.setFont(BASIC_FONT)
     mini_calculator_text = QLineEdit()
     mini_calculator_text.setPlaceholderText("2 * 3 = 6;  3 / 2 = 1.5;  3 + 2 = 5;  2 - 3 = -1;  4 ** 2 = 16")
-    mini_calculator_text.setMinimumWidth(600)
+    mini_calculator_text.setMinimumWidth(400)
 
     calculate = create_button("=",(100,40))
     calculate.setProperty("class", "button")

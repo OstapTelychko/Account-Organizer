@@ -102,7 +102,7 @@ def change_language():
     SettingsWindow.total_income.setText(Language["Account"]["Info"][7]+str(Incomes))
     Expenses = SettingsWindow.total_expense.text().split(" ")[2]
     SettingsWindow.total_expense.setText(Language["Account"]["Info"][8]+str(Expenses))
-    SettingsWindow.account_created_date.setText(Language["Account"]["Info"][9]+Session.account.get_account_date())  
+    SettingsWindow.account_created_date.setText(Language["Account"]["Info"][9] + str(Session.db.get_account().created_date))  
 
 
 def change_language_add_account(language: int | str):

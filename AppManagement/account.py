@@ -2,7 +2,7 @@ from sys import exit
 from PySide6.QtWidgets import QMessageBox
 
 from AppObjects.session import Session
-from AppObjects.account import Account
+from AppObjects.db_controller import DBController
 from languages import LANGUAGES
 
 from GUI.windows.main import SettingsWindow
@@ -26,9 +26,9 @@ def add_user():
     if account_name == "":
         return Errors.empty_fields.exec()
     
-    account = Account(account_name)
+    db = DBController(account_name)
     
-    if account.account_exists(account_name):
+    if db.account_exists(account_name):
         Errors.account_alredy_exists.setText(LANGUAGES[Session.language]["Errors"][1])
         return Errors.account_alredy_exists.exec()
 
@@ -38,7 +38,7 @@ def add_user():
         AddAccountWindow.window.hide()
 
         Session.account_name = account_name
-        Session.account = account
+        Session.db = db
         Session.update_user_config()
 
         SettingsWindow.accounts.addItem(account_name)
@@ -58,12 +58,12 @@ def add_user():
             else:
                 balance = int(balance)
 
-            account.create_account(balance)
+            db.create_account(balance)
             complete_adding_account()    
     else:
         Errors.zero_current_balance.setText(LANGUAGES[Session.language]["Errors"][2])
         if Errors.zero_current_balance.exec() == QMessageBox.StandardButton.Ok:
-            account.create_account(0)
+            db.create_account(0)
             complete_adding_account()
 
 
@@ -72,10 +72,10 @@ def load_account_data(name:str):
     remove_categories_from_list()
 
     Session.account_name = name
-    Session.account = Account(Session.account_name)
-    Session.account.set_account_id()
-    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Account"]["Info"][9] + Session.account.get_account_date())    
-
+    Session.db = DBController(Session.account_name)
+    Session.db.set_account_id()
+    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Account"]["Info"][9] + str(Session.db.get_account().created_date))    
+    
     Session.update_user_config()
     load_categories()
     activate_categories()
@@ -99,7 +99,7 @@ def remove_account():
     Errors.delete_account_warning.setText(LANGUAGES[Session.language]["Errors"][11].replace("account", Session.account_name))
 
     if Errors.delete_account_warning.exec() == QMessageBox.StandardButton.Ok:
-        Session.account.delete_account()
+        Session.db.delete_account()
         Session.switch_account = False
         SettingsWindow.accounts.removeItem(Session.accounts_list.index(Session.account_name))
         Session.accounts_list.remove(Session.account_name)
@@ -126,13 +126,13 @@ def rename_account():
     if new_account_name == "":
         return Errors.empty_fields.exec()
 
-    if Session.account.account_exists(new_account_name):
+    if Session.db.account_exists(new_account_name):
         return Errors.account_alredy_exists.exec()
 
-    Session.account.rename_account(new_account_name)
+    Session.db.rename_account(new_account_name)
 
-    Session.accounts_list[Session.accounts_list.index(Account_name)] = new_account_name
-    Account_name = new_account_name
+    Session.accounts_list[Session.accounts_list.index(Session.account_name)] = new_account_name
+    Session.account_name = new_account_name
     Session.update_user_config()
 
     Session.switch_account = False

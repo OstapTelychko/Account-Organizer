@@ -15,7 +15,7 @@ def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> t
     Categories_total_values = {}
 
     for category in unsorted_categories:
-        Categories_total_values[category] = round(sum([transaction.value for transaction in Session.account.get_transactions_by_month(category, Session.current_year, current_month)]), 2)
+        Categories_total_values[category] = round(sum([transaction.value for transaction in Session.db.get_transactions_by_month(category, Session.current_year, current_month)]), 2)
 
     highest_total_value = max([total_value for total_value in Categories_total_values.values()])
 
@@ -48,7 +48,7 @@ def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> t
     Categories_with_highest_total_value = {}
     for category in Categories_total_values:
         if Categories_total_values[category] == highest_total_value:
-            transactions = Session.account.get_transactions_by_month(category, Session.current_year, current_month)
+            transactions = Session.db.get_transactions_by_month(category, Session.current_year, current_month)
             transactions_statistic = get_min_and_max_transactions(transactions)
             Categories_with_highest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
     Categories_with_highest_total_value["Highest total value"] = highest_total_value
@@ -63,7 +63,7 @@ def get_min_and_max_categories(unsorted_categories:list, current_month:str) -> t
         Categories_with_lowest_total_value = {}
         for category in Categories_total_values:
             if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
-                transactions = Session.account.get_transactions_by_month(category, Session.current_year, current_month)
+                transactions = Session.db.get_transactions_by_month(category, Session.current_year, current_month)
                 transactions_statistic = get_min_and_max_transactions(transactions)
                 Categories_with_lowest_total_value[category] = [transactions_statistic[0], transactions_statistic[1]]
         Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
@@ -135,8 +135,8 @@ def show_monthly_statistics():
     if len(Session.categories) >= 2:
         Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
         Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
-        Incomes_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Incomes_categories])
-        Expenses_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Expenses_categories])
+        Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Incomes_categories])
+        Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Expenses_categories])
 
         if  len(Incomes_categories) >= 1 and  len(Expenses_categories) >= 1:
             if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
@@ -222,14 +222,14 @@ def show_quarterly_statistics():
                     Incomes_categories_total_values[income_category] = []
 
                     for month in range(3):
-                        Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year, month_numbers[quarter-1][month])), 2))
+                        Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(income_category, Session.current_year, month_numbers[quarter-1][month])), 2))
                     Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
                 
                 for expenses_category in Expenses_categories:
                     Expenses_categories_total_values[expenses_category] = []
 
                     for month in range(3):
-                        Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year, month_numbers[quarter-1][month])), 2))
+                        Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(expenses_category, Session.current_year, month_numbers[quarter-1][month])), 2))
                     Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
                 #Entire quarter statistics
@@ -278,8 +278,8 @@ def show_quarterly_statistics():
                 #Months statistics
                 for month in range(3):
                     current_month = month_numbers[quarter-1][month]
-                    Incomes_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.current_year, current_month))) for category in Incomes_categories])
-                    Expenses_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.current_year, current_month))) for category in Expenses_categories])
+                    Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, current_month))) for category in Incomes_categories])
+                    Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, current_month))) for category in Expenses_categories])
 
                     if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                         add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, QuarterlyStatistics.statistics[quarter][month+1]["Statistic Data"], current_month)
@@ -311,14 +311,14 @@ def show_yearly_statistics():
                 Incomes_categories_total_values[income_category] = []
 
                 for month in range(1,13):
-                    Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(income_category, Session.current_year,month)), 2))
+                    Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(income_category, Session.current_year,month)), 2))
                 Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
             
             for expenses_category in Expenses_categories:
                 Expenses_categories_total_values[expenses_category] = []
 
                 for month in range(1,13):
-                    Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.account.get_transactions_by_month(expenses_category, Session.current_year,month)), 2))
+                    Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(expenses_category, Session.current_year,month)), 2))
                 Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
             #Entire year statistics
@@ -367,8 +367,8 @@ def show_yearly_statistics():
             add_total_statistics(Expenses_categories_total_values, [17,20])
 
             for month in range(1,13):
-                Incomes_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.current_year, month))) for category in Incomes_categories])
-                Expenses_categories_have_transactions = any([bool(len(Session.account.get_transactions_by_month(category, Session.current_year, month))) for category in Expenses_categories])
+                Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month))) for category in Incomes_categories])
+                Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month))) for category in Expenses_categories])
 
                 if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                     add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, YearlyStatistics.statistics[month]["Statistic Data"], month)

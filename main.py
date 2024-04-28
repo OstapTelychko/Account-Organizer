@@ -3,7 +3,7 @@ from sys import exit
 
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LANGUAGES
-from AppObjects.account import Account
+from AppObjects.db_controller import DBController
 from AppObjects.session import Session
 
 
@@ -105,21 +105,21 @@ def main():
     AddAccountWindow.button.clicked.connect(add_user)
     AddAccountWindow.languages.currentIndexChanged.connect(change_language_add_account)
     #Connect to db
-    if not Account(Session.account_name).account_exists(Session.account_name):
+    if not DBController(Session.account_name).account_exists(Session.account_name):
         show_add_user_window()
-        if not Session.account:
+        if not Session.db:
             exit() 
-    Session.account = Account(Session.account_name)
-    Session.account.set_account_id()
+    Session.db = DBController(Session.account_name)
+    Session.db.set_account_id()
     
 
     #Load categories if they exists
-    if len(Session.account.get_all_categories()) > 0:
+    if len(Session.db.get_all_categories()) > 0:
         load_categories()
     activate_categories()
 
     #Add accounts to list
-    [Session.accounts_list.append(account[0]) for account in Session.account.get_all_accounts() if account[0] not in Session.accounts_list]
+    [Session.accounts_list.append(account.name) for account in Session.db.get_all_accounts() if account.name not in Session.accounts_list]
 
     SettingsWindow.accounts.clear()
     SettingsWindow.accounts.addItems(Session.accounts_list)

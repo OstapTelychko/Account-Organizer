@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon
 from project_configuration import ROOT_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
-from AppObjects.account import Account
+from AppObjects.db_controller import DBController
 from GUI.windows.main import BASIC_FONT, ALIGMENT, ICON_SIZE, create_button, MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
@@ -16,7 +16,7 @@ EDIT_TRANSACTION_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/edit transaction.png")
 
 
 
-def load_category(category_type:str, name:str, account:Account, category_id:int, position:int, year:int, month:int, Language:str, theme:str) -> Category:
+def load_category(category_type:str, name:str, db:DBController, category_id:int, position:int, year:int, month:int, Language:str) -> Category:
     """Add category to user window
 
         Arguments
@@ -86,7 +86,7 @@ def load_category(category_type:str, name:str, account:Account, category_id:int,
     row = category_data.horizontalHeader()
     row.setFont(BASIC_FONT)
 
-    transactions = account.get_transactions_by_month(category_id, year, month)
+    transactions = db.get_transactions_by_month(category_id, year, month)
     total_value = 0
     
     if len(transactions) > 0: #Check if transactions are in db

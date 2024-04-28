@@ -1,8 +1,10 @@
-from datetime import datetime
 import toml
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
 
 from project_configuration import ROOT_DIRECTORY
-from AppObjects.account import Account
+from AppObjects.db_controller import DBController
 from AppObjects.category import Category
 
 
@@ -24,7 +26,7 @@ class Session:
     theme = "Dark"
     account_name = ""
 
-    account:Account = None#I added  :Account to allow my IDE to highlight the functions of Account class
+    db:DBController = None
 
 
     def start_session():
@@ -41,6 +43,8 @@ class Session:
             Session.theme = User_conf["Theme"]
             #Load last used account name 
             Session.account_name = User_conf["Account_name"]
+        
+        
 
         
     def update_user_config():
