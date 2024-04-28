@@ -73,13 +73,13 @@ class DBController():
         self.session.commit()
 
 
-    def get_last_category_position(self, category_type:str) -> int:
+    def get_available_position(self, category_type:str) -> int:
         last_category = self.session.query(Category).filter_by(category_type=category_type, account_id=self.account_id).order_by(Category.position).first()
 
         if last_category is None:
             return 0
         
-        return last_category.position
+        return last_category.position + 1
 
 
     def change_category_position(self, position:int, category_id:int):
@@ -94,7 +94,7 @@ class DBController():
     
 
     def get_all_categories(self) -> list[Category]:
-        return self.session.query(Category).filter_by(account_id=self.account_id).all()
+        return self.session.query(Category).filter_by(account_id=self.account_id).order_by(Category.position).all()
 
 
     def rename_category(self, category_id:int, new_name:str):

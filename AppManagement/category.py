@@ -75,7 +75,7 @@ def create_category():
     if Session.db.category_exists(category_name, category_type):
         return Errors.category_exists.exec()
     
-    position = Session.db.get_last_category_position(category_type) + 1
+    position = Session.db.get_available_position(category_type) 
 
     Session.db.create_category(category_name, category_type, position)
     category_id = Session.db.get_category_id(category_name, category_type) 
@@ -192,7 +192,7 @@ def change_category_position():
         return Errors.incorrect_data_type.exec()
     new_position = int(new_position)
 
-    if not 0 <= new_position < categories[-1].position:
+    if not 0 <= new_position <= categories[-1].position:
         Errors.position_out_range.setText(LANGUAGES[Session.language]["Errors"][17].replace("max_position", str(categories[-1].position)))
         return Errors.position_out_range.exec()
     
