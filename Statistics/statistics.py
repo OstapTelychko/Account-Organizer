@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QListWidget
 
 from AppObjects.session import Session
-from AppObjects.transaction import Transaction
+from backend.models import Transaction
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS
 
