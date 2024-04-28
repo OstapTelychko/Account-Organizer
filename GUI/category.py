@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon
 from project_configuration import ROOT_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
-from AppObjects.db_controller import DBController
+from backend.db_controller import DBController
 from GUI.windows.main import BASIC_FONT, ALIGMENT, ICON_SIZE, create_button, MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 

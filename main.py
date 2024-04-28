@@ -3,7 +3,7 @@ from sys import exit
 
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LANGUAGES
-from AppObjects.db_controller import DBController
+from backend.db_controller import DBController
 from AppObjects.session import Session
 
 

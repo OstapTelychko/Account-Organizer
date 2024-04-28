@@ -2,7 +2,7 @@ from sys import exit
 from PySide6.QtWidgets import QMessageBox
 
 from AppObjects.session import Session
-from AppObjects.db_controller import DBController
+from backend.db_controller import DBController
 from languages import LANGUAGES
 
 from GUI.windows.main import SettingsWindow

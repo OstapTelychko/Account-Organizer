@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
 from project_configuration import ROOT_DIRECTORY
-from AppObjects.db_controller import DBController
+from backend.db_controller import DBController
 from AppObjects.category import Category
 
 

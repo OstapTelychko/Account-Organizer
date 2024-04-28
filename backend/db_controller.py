@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.models import Account, Category, Transaction
+from .models import Account, Category, Transaction
 
 
 class DBController():
