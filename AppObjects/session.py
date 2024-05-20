@@ -1,6 +1,5 @@
 import toml
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import os
 from datetime import datetime
 
 from project_configuration import ROOT_DIRECTORY
@@ -16,6 +15,8 @@ class Session:
     current_balance = 0
     current_total_income = 0
     current_total_expenses = 0
+
+    user_conf_path = f"{ROOT_DIRECTORY}/User_configuration.toml"
 
     accounts_list = []
     categories:dict[int, Category] = {}
@@ -34,20 +35,33 @@ class Session:
         #Set current date
         Session.current_month = datetime.now().month
         Session.current_year = datetime.now().year
+        
+        
+        if not os.path.exists(Session.user_conf_path):
+            Session.create_user_config()
 
-        with open(f"{ROOT_DIRECTORY}/User_configuration.toml") as file:
-            User_conf = toml.load(f"{ROOT_DIRECTORY}/User_configuration.toml")
+        with open(Session.user_conf_path) as file:
+            User_conf = toml.load(Session.user_conf_path)
 
             #Load selected language 
             Session.language = User_conf["Language"]
             Session.theme = User_conf["Theme"]
             #Load last used account name 
             Session.account_name = User_conf["Account_name"]
-        
-        
+    
+
+    def create_user_config():
+        default_user_configuration = {
+            "Theme":"Dark",
+            "Language":"English",
+            "Account_name":""
+        }
+
+        with open(Session.user_conf_path, "w", encoding="utf-8") as file:
+            toml.dump(default_user_configuration, file)
 
         
     def update_user_config():
-        with open(f"{ROOT_DIRECTORY}/User_configuration.toml","w",encoding="utf-8") as file:
+        with open(Session.user_conf_path, "w", encoding="utf-8") as file:
             toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name}, file)
     
