@@ -1,4 +1,5 @@
-from PySide6.QtWidgets import QLabel, QPushButton, QTableWidget, QToolButton, QWidget
+from PySide6.QtWidgets import QLabel, QPushButton, QToolButton, QWidget
+from CustomWidgets.table_widget import CustomTableWidget
 
 
 class Category:
@@ -13,7 +14,7 @@ class Category:
             total_value_label:QLabel,
             name_label:QLabel,
             settings:QToolButton,
-            table_data:QTableWidget,
+            table_data:CustomTableWidget,
             add_transaction:QPushButton,
             delete_transaction:QPushButton,
             edit_transaction:QPushButton,

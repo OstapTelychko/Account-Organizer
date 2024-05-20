@@ -1,7 +1,8 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QTableWidget, QTableWidgetItem, QHeaderView
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon
 
+from CustomWidgets.table_widget import CustomTableWidget, CustomTableWidgetItem
 from project_configuration import ROOT_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
@@ -63,7 +64,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     Category_general_info.addWidget(category_name, alignment=ALIGMENT.AlignHCenter)
     Category_general_info.addWidget(category_settings,alignment=ALIGMENT.AlignRight)
 
-    category_data = QTableWidget()
+    category_data = CustomTableWidget()
     category_data.setProperty("class", "category_data")
 
     category_data.setMinimumWidth(600)
@@ -93,21 +94,21 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
         category_data.setRowCount(len(transactions))
         for index,transaction in enumerate(transactions):
 
-            transaction_day = QTableWidgetItem()
+            transaction_day = CustomTableWidgetItem(str(transaction.day))
             transaction_day.setTextAlignment(ALIGMENT.AlignCenter)
-            transaction_day.setData(Qt.ItemDataRole.EditRole, transaction.day)
+            # transaction_day.setData(Qt.ItemDataRole.EditRole, transaction.day)
             transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
 
-            transaction_value = QTableWidgetItem()
+            transaction_value = CustomTableWidgetItem(str(transaction.value))
             transaction_value.setTextAlignment(ALIGMENT.AlignCenter)
-            transaction_value.setData(Qt.ItemDataRole.EditRole, transaction.value)
+            # transaction_value.setData(Qt.ItemDataRole.EditRole, transaction.value)
             transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-            transaction_id = QTableWidgetItem()
-            transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
+            transaction_id = CustomTableWidgetItem(str(transaction.id))
+            # transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
             transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-            transaction_name = QTableWidgetItem(transaction.name)
+            transaction_name = CustomTableWidgetItem(transaction.name)
             transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
 

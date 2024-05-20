@@ -21,13 +21,6 @@ class InformationMessage:
     message = QWidget()
     message.setProperty("class", "information_message")
     message.resize(250,50)
-    # message.setStyleSheet("""QWidget{
-    #             background:rgb(40, 40, 40);
-    #             border-top-left-radius:15px;
-    #             border-bottom-left-radius:15px;
-    #             border-top-right-radius:15px;
-    #             border-bottom-right-radius:15px;}
-    #             """)
 
     message_text = QLabel("Statisctics has been copied")
     message_text.setFont(BASIC_FONT)

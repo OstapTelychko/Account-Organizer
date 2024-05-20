@@ -2,7 +2,7 @@ import toml
 import os
 from datetime import datetime
 
-from project_configuration import ROOT_DIRECTORY
+from project_configuration import USER_CONF_PATH
 from backend.db_controller import DBController
 from AppObjects.category import Category
 
@@ -15,8 +15,6 @@ class Session:
     current_balance = 0
     current_total_income = 0
     current_total_expenses = 0
-
-    user_conf_path = f"{ROOT_DIRECTORY}/User_configuration.toml"
 
     accounts_list = []
     categories:dict[int, Category] = {}
@@ -37,11 +35,11 @@ class Session:
         Session.current_year = datetime.now().year
         
         
-        if not os.path.exists(Session.user_conf_path):
+        if not os.path.exists(USER_CONF_PATH):
             Session.create_user_config()
 
-        with open(Session.user_conf_path) as file:
-            User_conf = toml.load(Session.user_conf_path)
+        with open(USER_CONF_PATH) as file:
+            User_conf = toml.load(USER_CONF_PATH)
 
             #Load selected language 
             Session.language = User_conf["Language"]
@@ -57,11 +55,11 @@ class Session:
             "Account_name":""
         }
 
-        with open(Session.user_conf_path, "w", encoding="utf-8") as file:
+        with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
             toml.dump(default_user_configuration, file)
 
         
     def update_user_config():
-        with open(Session.user_conf_path, "w", encoding="utf-8") as file:
+        with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
             toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name}, file)
     

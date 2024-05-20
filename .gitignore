@@ -1,9 +1,6 @@
 /test.py
 __pycache__
 /setup.py
-/account-organizer.desktop
-/User_configuration.toml
-/Accounts.sqlite
 /AppManagement/__pycache__
 Accounts.sqlite
 User_configuration.toml

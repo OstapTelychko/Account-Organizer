@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox, QHeaderView
+from PySide6.QtWidgets import QMessageBox, QHeaderView
 from PySide6.QtCore import Qt
 
 
@@ -7,13 +7,14 @@ from GUI.windows.errors import Errors
 from GUI.windows.transaction import TransactionManagementWindow
 
 from AppObjects.session import Session
+from CustomWidgets.table_widget import CustomTableWidgetItem, CustomTableWidget
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 from AppManagement.balance import update_account_balance
 
 
 
-def show_edit_transaction_window(category_name:str, category_data:QTableWidget):
+def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget):
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
@@ -32,7 +33,7 @@ def show_edit_transaction_window(category_name:str, category_data:QTableWidget):
     TransactionManagementWindow.window.exec()
 
 
-def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:QTableWidget):
+def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget):
     Session.db.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
                 
     for row in range(category_data.rowCount()):
@@ -68,7 +69,7 @@ def show_add_transaction_window(category_name:str):
     TransactionManagementWindow.window.exec()
 
 
-def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:QTableWidget, category_id:int):
+def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget, category_id:int):
     transaction = Session.db.add_transaction(category_id, Session.current_year, Session.current_month, transaction_day, transaction_value, transaction_name)
 
     if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
@@ -81,21 +82,18 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     row = category_data.rowCount()
     category_data.setRowCount(row+1)
 
-    day = QTableWidgetItem()
+    day = CustomTableWidgetItem(str(transaction.day))
     day.setTextAlignment(ALIGMENT.AlignCenter)
-    day.setData(Qt.ItemDataRole.EditRole, transaction_day)
     day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes in this case cells in table can't be edited
 
-    value = QTableWidgetItem()
+    value = CustomTableWidgetItem(str(transaction.value))
     value.setTextAlignment(ALIGMENT.AlignCenter)
-    value.setData(Qt.ItemDataRole.EditRole, transaction_value)
     value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-    transaction_id = QTableWidgetItem()
-    transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
+    transaction_id = CustomTableWidgetItem(str(transaction.id))
     transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-    name = QTableWidgetItem(transaction_name)
+    name = CustomTableWidgetItem(transaction_name)
     name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
     category_data.setItem(row, 0, name)
@@ -123,46 +121,46 @@ def transaction_data_handler():
     else:
         return Errors.incorrect_data_type.exec()
 
-    if 0 < transaction_day <= max_month_day:
-
-        if transaction_value.find(","):#if transaction_value contains "," for example: 4,5 will be 4.5 
-            transaction_value = float(".".join(transaction_value.split(",")))
-        elif transaction_value.find("."):
-            transaction_value = float(transaction_value)
-        else:
-            transaction_value = int(transaction_value)
-
-        if TransactionManagementWindow.button.text() == LANGUAGES[Session.language]["General management"][5]: #Update 
-            update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
-        else: #Add
-            add_transaction(transaction_name, transaction_day, transaction_value, category_data, category_id)
-
-        try:
-            update_category_total_value
-        except UnboundLocalError:
-            from AppManagement.category import update_category_total_value
-        update_category_total_value(category_id)
-        
-        update_account_balance()
-        TransactionManagementWindow.window.hide()
-    else:
+    if not 0 < transaction_day <= max_month_day:
         Errors.day_out_range.setText(LANGUAGES[Session.language]["Errors"][8]+f"1-{max_month_day}")
         return Errors.day_out_range.exec()
 
+    if transaction_value.find(","):#if transaction_value contains "," for example: 4,5 will be 4.5 
+        transaction_value = float(".".join(transaction_value.split(",")))
+    elif transaction_value.find("."):
+        transaction_value = float(transaction_value)
+    else:
+        transaction_value = int(transaction_value)
 
-def remove_transaction(category_data:QTableWidget, category_id:int):
+    if TransactionManagementWindow.button.text() == LANGUAGES[Session.language]["General management"][5]: #Update 
+        update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
+    else: #Add
+        add_transaction(transaction_name, transaction_day, transaction_value, category_data, category_id)
+
+    try:
+        update_category_total_value
+    except UnboundLocalError:
+        from AppManagement.category import update_category_total_value
+    update_category_total_value(category_id)
+    
+    update_account_balance()
+    TransactionManagementWindow.window.hide()
+        
+
+
+def remove_transaction(category_data:CustomTableWidget, category_id:int):
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
         return Errors.unselected_row.exec()
     
     if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
-        transaction_id = category_data.item(selected_row[0].row(), 3).data(Qt.ItemDataRole.EditRole)
+        transaction_id = int(category_data.item(selected_row[0].row(), 3).text())
     else:
         return Errors.only_one_row.exec()
 
     if Errors.delete_transaction_question.exec() == QMessageBox.StandardButton.Ok:
-        transaction_value = selected_row[2].data(Qt.ItemDataRole.EditRole)
+        transaction_value = float(selected_row[2].text())
         Session.db.delete_transaction(transaction_id)
 
         category_data.removeRow(selected_row[0].row())

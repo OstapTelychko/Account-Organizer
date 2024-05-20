@@ -11,7 +11,6 @@ from GUI.windows.main import app, MainWindow, SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors
-from GUI.windows.information_message import InformationMessage
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.theme import swith_theme, load_theme

@@ -1,5 +1,5 @@
 from functools import partial
-from PySide6.QtWidgets import QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt
 
 from AppObjects.session import Session
@@ -12,6 +12,7 @@ from GUI.windows.errors import Errors
 from GUI.category import load_category, add_category_to_position_list
 
 from Statistics.copy_statistics import show_information_message
+from CustomWidgets.table_widget import CustomTableWidgetItem
 from AppManagement.balance import calculate_current_balance
 from AppManagement.transaction import show_add_transaction_window, show_edit_transaction_window, remove_transaction
 
@@ -40,21 +41,21 @@ def load_categories_data():
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
-                name = QTableWidgetItem(transaction.name)
+                name = CustomTableWidgetItem(transaction.name)
                 name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-                day = QTableWidgetItem()
+                day = CustomTableWidgetItem(str(transaction.day))
                 day.setTextAlignment(ALIGMENT.AlignCenter)
-                day.setData(Qt.ItemDataRole.EditRole, transaction.day)
+                # day.setData(Qt.ItemDataRole.EditRole, transaction.day)
                 day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-                value = QTableWidgetItem()
+                value = CustomTableWidgetItem(str(transaction.value))
                 value.setTextAlignment(ALIGMENT.AlignCenter)
-                value.setData(Qt.ItemDataRole.EditRole, transaction.value)
+                # value.setData(Qt.ItemDataRole.EditRole, transaction.value)
                 value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-                transaction_id = QTableWidgetItem()
-                transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
+                transaction_id = CustomTableWidgetItem(str(transaction.id))
+                # transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
 
                 category_data.setItem(row,0,name)
                 category_data.setItem(row,1,day)
