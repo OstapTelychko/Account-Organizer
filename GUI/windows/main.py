@@ -3,10 +3,10 @@ from sys import platform
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
                                QLabel, QPushButton, QScrollArea, QApplication,
                                QTabWidget, QToolButton, QComboBox, QDialog,
-                               QSizePolicy)
+                               QSizePolicy, QGraphicsDropShadowEffect)
 
-from PySide6.QtCore import Qt,QSize, QEvent
-from PySide6.QtGui import QIcon,QFont
+from PySide6.QtCore import Qt, QSize, QEvent
+from PySide6.QtGui import QIcon, QFont, QColor
 
 from project_configuration import ROOT_DIRECTORY, AVAILABLE_LANGUAGES
 
@@ -20,6 +20,7 @@ ALIGMENT = Qt.AlignmentFlag
 ICON_SIZE = QSize(30, 30)
 APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
 
+SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
 
 if platform == "linux":
     BASIC_FONT = QFont("C059 [urw]", pointSize=12)
@@ -27,7 +28,7 @@ else:#Windows
     BASIC_FONT = QFont("Georgia", pointSize=12)
 
 
-def create_button(button_text:str, size:tuple[int])->QPushButton:
+def create_button(button_text:str, size:tuple[int]) -> QPushButton:
     button = QPushButton(text=button_text)
     button.setFont(BASIC_FONT)
     button.setMinimumSize(*size)
@@ -207,6 +208,19 @@ class SettingsWindow():
     for language in range(len(AVAILABLE_LANGUAGES)):
         languages.setItemIcon(language, QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
 
+    gui_settings_wrapper_layout = QVBoxLayout()
+    gui_settings_wrapper_layout.addWidget(switch_themes_button, alignment=ALIGMENT.AlignHCenter)
+    gui_settings_wrapper_layout.addWidget(languages, alignment=ALIGMENT.AlignHCenter)
+
+    gui_settings_wrapper = QWidget()
+    gui_settings_wrapper.setProperty("class", "wrapper")
+    gui_settings_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(gui_settings_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+    gui_settings_wrapper.setLayout(gui_settings_wrapper_layout)
+    gui_settings_wrapper.setMinimumHeight(220)
+    gui_settings_wrapper.setMinimumWidth(250)
+
+
+
     accounts = QComboBox()
     accounts.setFont(BASIC_FONT)
     accounts.setMinimumWidth(250)
@@ -215,37 +229,59 @@ class SettingsWindow():
     add_account = create_button("Add account",(180,50))
     add_account.setProperty("class", "button")
 
-    delete_account = create_button("Delete account",(180,50))
-    delete_account.setStyleSheet("QPushButton{color:rgba(255,0,0,150); border-color:red;}")
-
     rename_account = create_button("Rename account",(180,50))
     rename_account.setProperty("class", "button")
 
+    delete_account = create_button("Delete account",(180,50))
+    delete_account.setStyleSheet("QPushButton{color:rgba(255,0,0,150); border-color:red;}")
+
+    account_management_wrapper_layout = QVBoxLayout()
+    account_management_wrapper_layout.addWidget(accounts, alignment=ALIGMENT.AlignHCenter)
+    account_management_wrapper_layout.addWidget(add_account, alignment=ALIGMENT.AlignHCenter)
+    account_management_wrapper_layout.addWidget(rename_account, alignment=ALIGMENT.AlignHCenter)
+    account_management_wrapper_layout.addWidget(delete_account, alignment=ALIGMENT.AlignHCenter)
+
+    account_management_wrapper = QWidget()
+    account_management_wrapper.setLayout(account_management_wrapper_layout)
+    account_management_wrapper.setProperty("class", "wrapper")
+    account_management_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(account_management_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
+
     total_income = QLabel()
+    total_income.setProperty("class", "account-info")
     total_income.setFont(BASIC_FONT)
+
     total_expense = QLabel()
     total_expense.setFont(BASIC_FONT)
+    total_expense.setProperty("class", "account-info")
+
     account_created_date = QLabel()
     account_created_date.setFont(BASIC_FONT)
+    account_created_date.setProperty("class", "account-info")
+
+    account_info_wrapper_layout = QVBoxLayout()
+    account_info_wrapper_layout.addWidget(total_income, alignment=ALIGMENT.AlignHCenter)
+    account_info_wrapper_layout.addWidget(total_expense, alignment=ALIGMENT.AlignHCenter)
+    account_info_wrapper_layout.addWidget(account_created_date, alignment=ALIGMENT.AlignHCenter)
+
+    account_info_wrapper = QWidget()
+    account_info_wrapper.setProperty("class", "wrapper")
+    account_info_wrapper.setLayout(account_info_wrapper_layout)
+    account_info_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(account_info_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
+
+    gui_settings_and_account_management = QHBoxLayout()
+    gui_settings_and_account_management.addStretch(1)
+    gui_settings_and_account_management.addWidget(gui_settings_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    gui_settings_and_account_management.addStretch(1)
+    gui_settings_and_account_management.addWidget(account_management_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    gui_settings_and_account_management.addStretch(1)
 
     main_layout = QVBoxLayout()
-    main_layout.addStretch(2)
-    main_layout.addWidget(switch_themes_button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.setSpacing(20)
     main_layout.addStretch(1)
-    main_layout.addWidget(languages,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addLayout(gui_settings_and_account_management)
+    main_layout.addWidget(account_info_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     main_layout.addStretch(1)
-    main_layout.addWidget(accounts,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addStretch(5)
-    main_layout.addWidget(add_account,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addStretch(1)
-    main_layout.addWidget(rename_account,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addStretch(1)
-    main_layout.addWidget(delete_account,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addStretch(5)
-    main_layout.addWidget(total_income,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
-    main_layout.addStretch(1)
-    main_layout.addWidget(total_expense,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
-    main_layout.addStretch(1)
-    main_layout.addWidget(account_created_date,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignBottom)
 
     window.setLayout(main_layout)

@@ -31,7 +31,19 @@ DARK_THEME = load_stylesheet("dark")+"""
     background-color:rgb(40, 40, 40);
     border-radius:15px;
 }
+.wrapper{
+    background-color:rgb(45,45,45);
+    border-radius:10px;
+}
 
+.button, .button:active, button:focus{
+    background-color:rgb(50, 50, 50);
+    border:1px solid black;
+    color:rgb(130, 170, 255)
+}
+.button:hover, .button:focus:hover, .button:active:hover{
+    background-color:rgb(45, 45, 45)
+}
 """
 DARK_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
 
@@ -58,25 +70,31 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
     border-color:rgb(60, 60, 60)
 }
 
-QWidget .button{
-    background-color:rgb(130, 130, 160);
-    color:rgb(240, 240, 240);
-    border-color:rgb(50, 50, 50);
-}
-
-QWidget .button:target{
-    background-color:red;
-}
 .category > QLabel{
     color:rgb(240, 240, 240);
 }
-
-
 
 .information_message{
     background-color:rgb(200,200,200);
     color:white;
     border-radius:15px;
+}
+.wrapper{
+    background-color:rgb(100, 120, 100);
+    border-radius:10px;
+}
+
+.account-info{
+    color:rgb(240, 240, 240);
+}
+
+.button, .button:active, button:focus{
+    background-color:rgb(100, 130, 100);
+    color:rgb(240, 240, 240);
+    border:1px solid black;
+}
+.button:hover, .button:focus:hover, .button:active:hover{
+    background-color:rgb(90, 120, 90);
 }
 """
 LIGHT_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Light theme.png")

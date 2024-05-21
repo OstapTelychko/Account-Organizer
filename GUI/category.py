@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon
 
@@ -7,7 +7,7 @@ from project_configuration import ROOT_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
 from backend.db_controller import DBController
-from GUI.windows.main import BASIC_FONT, ALIGMENT, ICON_SIZE, create_button, MainWindow
+from GUI.windows.main import BASIC_FONT, ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
 
@@ -46,6 +46,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_window.setMaximumWidth(1000)
     category_window.setProperty("class", "category")
     category_window.setContentsMargins(10, 0, 10, 0)
+    category_window.setGraphicsEffect(QGraphicsDropShadowEffect(category_window, **SHADOW_EFFECT_ARGUMENTS))
 
     category_layout = QVBoxLayout()
 
@@ -96,16 +97,13 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
             transaction_day = CustomTableWidgetItem(str(transaction.day))
             transaction_day.setTextAlignment(ALIGMENT.AlignCenter)
-            # transaction_day.setData(Qt.ItemDataRole.EditRole, transaction.day)
             transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
 
             transaction_value = CustomTableWidgetItem(str(transaction.value))
             transaction_value.setTextAlignment(ALIGMENT.AlignCenter)
-            # transaction_value.setData(Qt.ItemDataRole.EditRole, transaction.value)
             transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             transaction_id = CustomTableWidgetItem(str(transaction.id))
-            # transaction_id.setData(Qt.ItemDataRole.EditRole, transaction.id)
             transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             transaction_name = CustomTableWidgetItem(transaction.name)
@@ -186,6 +184,6 @@ def add_category_to_position_list(category:Category):
     category_container.setMinimumWidth(350)
     category_container.setContentsMargins(50, 0, 50, 0)
     category_container.setProperty("class", "category_list_item")
-    category_container.setLayout((category_layout))
+    category_container.setLayout(category_layout)
 
     ChangeCategoryPositionWindow.categories_list_layout.addWidget(category_container)

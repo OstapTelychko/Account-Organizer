@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt
 
-from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, create_button, close_dialog
+from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, close_dialog
 
 
 
@@ -23,11 +23,38 @@ class StatisticsWindow():
     yearly_statistics = create_button("Yearly", (150,40))
     yearly_statistics.setProperty("class", "button")
 
+    statistics_wrapper_layout = QVBoxLayout()
+    statistics_wrapper_layout.setSpacing(40)
+    statistics_wrapper_layout.addWidget(monthly_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    statistics_wrapper_layout.addWidget(quarterly_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    statistics_wrapper_layout.addWidget(yearly_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    statistics_wrapper_layout.setContentsMargins(30, 30, 30, 30)
+    
+    statistics_wrapper = QWidget()
+    statistics_wrapper.setLayout(statistics_wrapper_layout)
+    statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+    statistics_wrapper.setProperty("class", "wrapper")
+
+
+    custom_statistics_button = create_button("Custom date range", (180, 40))
+    custom_statistics_button.setProperty("class", "button")
+
+    custom_statistics_wrapper_layout = QVBoxLayout()
+    custom_statistics_wrapper_layout.addWidget(custom_statistics_button, alignment=ALIGMENT.AlignVCenter | ALIGMENT.AlignHCenter)
+    custom_statistics_wrapper_layout.setContentsMargins(17, 30, 17, 30)
+
+    custom_statistics_wrapper = QWidget()
+    custom_statistics_wrapper.setLayout(custom_statistics_wrapper_layout)
+    custom_statistics_wrapper.setProperty("class", "wrapper")
+    custom_statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
+
     main_layout = QVBoxLayout()
-    main_layout.addSpacing(50)
-    main_layout.addWidget(monthly_statistics,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    main_layout.addWidget(quarterly_statistics,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    main_layout.addWidget(yearly_statistics,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.setSpacing(20)
+    main_layout.addStretch(1)
+    main_layout.addWidget(statistics_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(custom_statistics_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addStretch(1)
 
     window.setLayout(main_layout)
 
