@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QDialog, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QDialog, QSizePolicy, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt
 
-from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, create_button, close_dialog
+from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, close_dialog
 
 
 
@@ -68,9 +68,14 @@ class ChangeCategoryPositionWindow():
     window.closeEvent = close_dialog
 
     preview_category_position = QLabel()
+    preview_category_position.setProperty("class", "category_list_item")
+    
     preview_category_name = QLabel()
+    preview_category_name.setProperty("class", "light-text")
+
     preview_category_container = QWidget()
     preview_category_container.setProperty("class", "category_list_item")
+    preview_category_container.setGraphicsEffect(QGraphicsDropShadowEffect(preview_category_container, **SHADOW_EFFECT_ARGUMENTS))
 
     preview_category_layout = QHBoxLayout()
     preview_category_layout.addWidget(preview_category_position, alignment=ALIGMENT.AlignRight)
@@ -94,17 +99,11 @@ class ChangeCategoryPositionWindow():
     categories_list_scroll.setWidgetResizable(True)
     categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     categories_list_scroll.setMinimumHeight(350)
-    categories_list_scroll.setStyleSheet(
-        """QScrollArea{
-            border:none;
-            background-color:rgb(43, 43, 43);
-            border-radius:10px;
-            padding:5px;
-            margin-left:0px;
-            margin-top:10px;
-            margin-right:10px;
-            margin-bottom:10px}""")
+    categories_list_scroll.setMinimumWidth(400)
+    categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
     categories_list_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
+    categories_list_scroll.setProperty("class", "wrapper")
+    categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
     
 
     main_layout = QVBoxLayout()

@@ -81,8 +81,8 @@ LANGUAGES = {
                     30:"Copy quarterly statistics",
                     31:"Quarterly statistics has copied",
                     32:"Copy yearly statistics",
-                    33:"Yearly statistics has copied"
-
+                    33:"Yearly statistics has copied",
+                    34:"Custom range",
                 }
             },
             "Transactions management":{
@@ -230,7 +230,8 @@ LANGUAGES = {
                     30:"Скопіювати квартальну статистику",
                     31:"Квартальна статистика скопійована",
                     32:"Скопіювати річну статистику",
-                    33:"Річна статистика скопійована"
+                    33:"Річна статистика скопійована",
+                    34:"Власний діапазон"
                 }
             },
             "Transactions management":{
@@ -378,7 +379,8 @@ LANGUAGES = {
                     30:"Kopiować kwartalną statystykę",
                     31:"Kwartalna statystyka skopiowana",
                     32:"Kopiować roczną statystykę",
-                    33:"Roczna statystyka skopiowana"
+                    33:"Roczna statystyka skopiowana",
+                    34:"Własny zakres"
                 }  
             },
             "Transactions management":{

@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget, QGraphicsDropShadowEffect
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget, QGraphicsDropShadowEffect, QDateEdit
+from PySide6.QtCore import Qt, QDate
 
 from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, close_dialog
 
@@ -36,11 +36,11 @@ class StatisticsWindow():
     statistics_wrapper.setProperty("class", "wrapper")
 
 
-    custom_statistics_button = create_button("Custom date range", (180, 40))
-    custom_statistics_button.setProperty("class", "button")
+    custom_range_statistics = create_button("Custom date range", (180, 40))
+    custom_range_statistics.setProperty("class", "button")
 
     custom_statistics_wrapper_layout = QVBoxLayout()
-    custom_statistics_wrapper_layout.addWidget(custom_statistics_button, alignment=ALIGMENT.AlignVCenter | ALIGMENT.AlignHCenter)
+    custom_statistics_wrapper_layout.addWidget(custom_range_statistics, alignment=ALIGMENT.AlignVCenter | ALIGMENT.AlignHCenter)
     custom_statistics_wrapper_layout.setContentsMargins(17, 30, 17, 30)
 
     custom_statistics_wrapper = QWidget()
@@ -234,3 +234,55 @@ class YearlyStatistics():
     main_layout = QVBoxLayout()
     main_layout.addWidget(statistics_scroll)
     window.setLayout(main_layout)
+
+
+
+class CustomRangeStatistics():
+    window = QDialog()
+    window.resize(600,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("April")
+    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.closeEvent = close_dialog
+
+    selected_categories_label = QLabel()
+    selected_categories_label.setFont(BASIC_FONT)
+    selected_categories_label.setGraphicsEffect(QGraphicsDropShadowEffect(selected_categories_label, **SHADOW_EFFECT_ARGUMENTS))
+    selected_categories_label.setWordWrap(True)
+
+    categories_list_layout = QVBoxLayout()
+    categories_list_window = QWidget()
+    categories_list_window.setLayout(categories_list_layout)
+
+    categories_list_scroll = QScrollArea()
+    categories_list_scroll.setWidget(categories_list_window)
+    categories_list_scroll.setWidgetResizable(True)
+    categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    categories_list_scroll.setMinimumHeight(350)
+    categories_list_scroll.setMinimumWidth(400)
+    categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
+    categories_list_scroll.setProperty("class", "wrapper")
+    categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+
+    from_date = QDateEdit()
+    from_date.setDisplayFormat("dd/MM/yyyy")
+    from_date.setCalendarPopup(True)
+    from_date.setDate(QDate.currentDate())
+
+    to_date = QDateEdit()
+    to_date.setDisplayFormat("dd/MM/yyyy")
+    to_date.setCalendarPopup(True)
+    to_date.setDate(QDate.currentDate())
+    
+    show_statistics = create_button("Statistics", (150, 40))
+
+    main_layout = QVBoxLayout()
+    main_layout.addWidget(selected_categories_label, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(categories_list_scroll, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(from_date, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(to_date, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(show_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+
+    window.setLayout(main_layout)
+
+

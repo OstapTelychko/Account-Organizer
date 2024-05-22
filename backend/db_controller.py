@@ -1,5 +1,5 @@
 # import sqlite3
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc, and_
 from sqlalchemy.orm import sessionmaker
 
 from project_configuration import ROOT_DIRECTORY
@@ -74,7 +74,7 @@ class DBController():
 
 
     def get_available_position(self, category_type:str) -> int:
-        last_category = self.session.query(Category).filter_by(category_type=category_type, account_id=self.account_id).order_by(Category.position).first()
+        last_category = self.session.query(Category).filter_by(category_type=category_type, account_id=self.account_id).order_by(desc(Category.position)).first()
 
         if last_category is None:
             return 0
@@ -82,15 +82,30 @@ class DBController():
         return last_category.position + 1
 
 
-    def change_category_position(self, position:int, category_id:int):
-        category = self.session.query(Category).filter_by(id=category_id).first()
-        category.position = position
+    def change_category_position(self, new_position:int, old_position:int, category_id:int):
+        if new_position < old_position:
+            self.session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position)).update(
+                {Category.position: Category.position + 1}, synchronize_session=False
+            )
+        else:
+            self.session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position)).update(
+                {Category.position: Category.position - 1}, synchronize_session=False
+            )
+        self.session.query(Category).filter_by(id=category_id).update({Category.position: new_position}, synchronize_session=False)
         self.session.commit()
 
 
-    def get_category_id(self, name:str, category_type:str) -> int:
+    def remove_position(self, category_id:int):
+        position = self.session.query(Category).filter_by(id=category_id).first().position
+        self.session.query(Category).filter(Category.position > position).update(
+            {Category.position: Category.position - 1}, synchronize_session=False
+        )
+        self.session.commit()
+
+
+    def get_category(self, name:str, category_type:str) -> Category:
         category = self.session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
-        return category.id
+        return category
     
 
     def get_all_categories(self) -> list[Category]:
@@ -104,6 +119,7 @@ class DBController():
 
 
     def delete_category(self, category_id:int):
+        self.remove_position(category_id)
         self.session.delete(self.session.query(Category).filter_by(id=category_id).first())
         self.session.commit()
 

@@ -11,7 +11,7 @@ from GUI.windows.main import app, MainWindow, SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.theme import swith_theme, load_theme
 
@@ -75,6 +75,7 @@ def main():
     StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
     StatisticsWindow.quarterly_statistics.clicked.connect(show_quarterly_statistics)
     StatisticsWindow.yearly_statistics.clicked.connect(show_yearly_statistics)
+    StatisticsWindow.custom_range_statistics.clicked.connect(CustomRangeStatistics.window.exec)
     MonthlyStatistics.copy_statistics.clicked.connect(copy_monthly_statistics)
     QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)

@@ -108,7 +108,7 @@ def transaction_data_handler():
     transaction_day = TransactionManagementWindow.transaction_day.text()
     transaction_value = TransactionManagementWindow.transaction_value.text()
     transaction_id = TransactionManagementWindow.transaction_id
-    category_id = Session.db.get_category_id(TransactionManagementWindow.window.windowTitle(), CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()])
+    category_id = Session.db.get_category(TransactionManagementWindow.window.windowTitle(), CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
     category_data = Session.categories[category_id].table_data
 
     max_month_day = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap

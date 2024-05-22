@@ -169,9 +169,11 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
 def add_category_to_position_list(category:Category):
     category_position = QLabel()
+    category_position.setProperty("class", "category_list_item")
     category_position.setText(str(category.position))
 
     category_name_label = QLabel()
+    category_name_label.setProperty("class", "light-text")
     category_name_label.setText(category.name)
 
     category_layout = QHBoxLayout()
@@ -180,9 +182,9 @@ def add_category_to_position_list(category:Category):
     category_layout.addWidget(category_name_label, alignment=ALIGMENT.AlignLeft)
 
     category_container = QWidget()
-    category_container.setMaximumWidth(350)
-    category_container.setMinimumWidth(350)
-    category_container.setContentsMargins(50, 0, 50, 0)
+    category_container.setMaximumWidth(380)
+    category_container.setMinimumWidth(380)
+    category_container.setContentsMargins(20, 0, 20, 0)
     category_container.setProperty("class", "category_list_item")
     category_container.setLayout(category_layout)
 

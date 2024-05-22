@@ -36,15 +36,17 @@ DARK_THEME = load_stylesheet("dark")+"""
     border-radius:10px;
 }
 
-.button, .button:active, button:focus{
+.button, .button:active, button:focus, .button:default{
     background-color:rgb(50, 50, 50);
     border:1px solid black;
     color:rgb(130, 170, 255)
 }
-.button:hover, .button:focus:hover, .button:active:hover{
+.button:hover, .button:focus:hover, .button:active:hover, .button:default:hover{
     background-color:rgb(45, 45, 45)
 }
 """
+with open("style.css", "w") as file:
+    file.write(DARK_THEME)
 DARK_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
 
 
@@ -57,7 +59,8 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
 
 .category_list_item{
     border-radius:15px;
-    background-color:rgb(170, 190, 170);
+    background-color:rgb(130, 150, 130);
+    color:rgb(240, 240, 240);
 }
 
 .category_data{
@@ -84,16 +87,16 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
     border-radius:10px;
 }
 
-.account-info{
+.light-text{
     color:rgb(240, 240, 240);
 }
 
-.button, .button:active, button:focus{
+.button, .button:active, button:focus, .button:default{
     background-color:rgb(100, 130, 100);
     color:rgb(240, 240, 240);
     border:1px solid black;
 }
-.button:hover, .button:focus:hover, .button:active:hover{
+.button:hover, .button:focus:hover, .button:active:hover, .button:default:hover{
     background-color:rgb(90, 120, 90);
 }
 """

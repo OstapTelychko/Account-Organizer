@@ -248,16 +248,16 @@ class SettingsWindow():
 
 
     total_income = QLabel()
-    total_income.setProperty("class", "account-info")
+    total_income.setProperty("class", "light-text")
     total_income.setFont(BASIC_FONT)
 
     total_expense = QLabel()
     total_expense.setFont(BASIC_FONT)
-    total_expense.setProperty("class", "account-info")
+    total_expense.setProperty("class", "light-text")
 
     account_created_date = QLabel()
     account_created_date.setFont(BASIC_FONT)
-    account_created_date.setProperty("class", "account-info")
+    account_created_date.setProperty("class", "light-text")
 
     account_info_wrapper_layout = QVBoxLayout()
     account_info_wrapper_layout.addWidget(total_income, alignment=ALIGMENT.AlignHCenter)
