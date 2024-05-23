@@ -16,16 +16,12 @@ class CategorySettingsWindow():
     window.setFont(BASIC_FONT)
 
     rename_category = create_button("Rename category",(255,40))
-    rename_category.setProperty("class", "button")
 
     delete_category = create_button("Delete category",(255,40))
-    delete_category.setProperty("class", "button")
 
     change_category_position = create_button("Change position", (255, 40))
-    change_category_position.setProperty("class", "button")
 
     copy_transactions = create_button("Copy transactions",(275,40))
-    copy_transactions.setProperty("class", "button")
 
     main_layout = QVBoxLayout()
     main_layout.addWidget(rename_category, alignment=ALIGMENT.AlignHCenter)

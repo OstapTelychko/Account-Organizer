@@ -45,8 +45,7 @@ DARK_THEME = load_stylesheet("dark")+"""
     background-color:rgb(45, 45, 45)
 }
 """
-with open("style.css", "w") as file:
-    file.write(DARK_THEME)
+
 DARK_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
 
 

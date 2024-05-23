@@ -84,6 +84,7 @@ def change_language():
             YearlyStatistics.statistics[0]["Label"].setText(Language["Account"]["Info"][6])
     
     CustomRangeStatistics.window.setWindowTitle(Language["Account"]["Info"]["Statistics"][34])
+    CustomRangeStatistics.show_statistics.setText(Language["Account"]["Info"]["Statistics"][0])
 
 
     for index,error in enumerate(errors_list):

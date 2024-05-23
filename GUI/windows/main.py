@@ -33,6 +33,7 @@ def create_button(button_text:str, size:tuple[int]) -> QPushButton:
     button.setFont(BASIC_FONT)
     button.setMinimumSize(*size)
     button.setMaximumSize(*size)
+    button.setProperty("class", "button")
     return button
 
 
@@ -67,10 +68,8 @@ class MainWindow():
 
     #Year and month
     previous_year_button = create_button("<",(32,30))
-    previous_year_button.setProperty("class", "button")
 
     next_year_button = create_button(">",(32,30))
-    next_year_button.setProperty("class", "button")
 
     current_year = QLabel("2023")
     current_year.setFont(BASIC_FONT)
@@ -83,10 +82,8 @@ class MainWindow():
     Year_layout.addStretch(5)
 
     previous_month_button = create_button("<",(30,30))
-    previous_month_button.setProperty("class", "button")
 
     next_month_button = create_button(">",(30,30))
-    next_month_button.setProperty("class", "button")
 
     current_month = QLabel("April")
     current_month.setFont(BASIC_FONT)
@@ -108,7 +105,6 @@ class MainWindow():
     Incomes_window.setMinimumHeight(350)
     
     add_incomes_category = create_button("Create category",(170,40))
-    add_incomes_category.setProperty("class", "button")
 
     Incomes_window_layout = QHBoxLayout()
     Incomes_window_layout.addWidget(add_incomes_category)
@@ -128,7 +124,6 @@ class MainWindow():
     Expenses_window.setContentsMargins(0, 10, 0, 10)
 
     add_expenses_category = create_button("Create category",(170,40))
-    add_expenses_category.setProperty("class", "button")
 
     Expenses_window_layout = QHBoxLayout()
     Expenses_window_layout.addWidget(add_expenses_category)
@@ -152,7 +147,6 @@ class MainWindow():
 
     window_bottom = QHBoxLayout()
     statistics = create_button("Statistics",(160,40))
-    statistics.setProperty("class", "button")
 
     mini_calculator_label = QLabel("Mini-calculator")
     mini_calculator_label.setFont(BASIC_FONT)
@@ -161,7 +155,6 @@ class MainWindow():
     mini_calculator_text.setMinimumWidth(400)
 
     calculate = create_button("=",(100,40))
-    calculate.setProperty("class", "button")
 
     if platform == "linux":
         calculate.setFont(QFont("C059 [urw]", pointSize=18))
@@ -227,10 +220,8 @@ class SettingsWindow():
     accounts.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
 
     add_account = create_button("Add account",(180,50))
-    add_account.setProperty("class", "button")
 
     rename_account = create_button("Rename account",(180,50))
-    rename_account.setProperty("class", "button")
 
     delete_account = create_button("Delete account",(180,50))
     delete_account.setStyleSheet("QPushButton{color:rgba(255,0,0,150); border-color:red;}")
