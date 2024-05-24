@@ -8,7 +8,7 @@ from GUI.windows.main import MainWindow, SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import errors_list
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
 
 def change_language():
@@ -85,6 +85,9 @@ def change_language():
     
     CustomRangeStatistics.window.setWindowTitle(Language["Account"]["Info"]["Statistics"][34])
     CustomRangeStatistics.show_statistics.setText(Language["Account"]["Info"]["Statistics"][0])
+    CustomRangeStatisticsView.window.setWindowTitle(Language["Account"]["Info"]["Statistics"][34])
+    CustomRangeStatisticsView.copy_statistics.setText(Language["Account"]["Info"]["Statistics"][35])
+    CustomRangeStatisticsView.copy_transactions.setText(Language["Account"]["Info"]["Statistics"][37])
 
 
     for index,error in enumerate(errors_list):

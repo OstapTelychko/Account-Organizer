@@ -12,7 +12,7 @@ class CategorySettingsWindow():
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle(" ")
     window.closeEvent = close_dialog
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.setFont(BASIC_FONT)
 
     rename_category = create_button("Rename category",(255,40))
@@ -38,7 +38,7 @@ class AddCategoryWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Add category")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     category_name = QLineEdit()
@@ -60,7 +60,7 @@ class ChangeCategoryPositionWindow():
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Change category position")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     preview_category_position = QLabel()
@@ -118,7 +118,7 @@ class RenameCategoryWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Rename")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     new_category_name = QLineEdit()

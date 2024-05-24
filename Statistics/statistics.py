@@ -1,12 +1,15 @@
-from PySide6.QtWidgets import QListWidget, QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect
+from functools import partial
+from datetime import date
+from PySide6.QtWidgets import QListWidget, QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
 
 from AppObjects.session import Session
+from AppObjects.category import Category
 from backend.models import Transaction
 from languages import LANGUAGES
-from project_configuration import MONTHS_DAYS
+from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 
 from GUI.windows.main import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.errors import Errors
 
 
@@ -345,6 +348,8 @@ def show_custom_range_statistics_window():
         widget = CustomRangeStatistics.categories_list_layout.takeAt(0).widget()
         if widget:
             widget.setParent(None)
+    CustomRangeStatistics.selected_categories_list.clear()
+    CustomRangeStatistics.selected_categories_data.clear()
 
     categories = sorted(Session.categories.values(), key=lambda category: category.type)
 
@@ -354,9 +359,18 @@ def show_custom_range_statistics_window():
 
         remove_category_statistics_list = create_button("Remove", (100, 40))
         remove_category_statistics_list.setText(LANGUAGES[Session.language]["General management"][0])
+        remove_category_statistics_list.setDisabled(True)
 
         add_category_statistics_list = create_button("Add", (100, 40))
         add_category_statistics_list.setText(LANGUAGES[Session.language]["General management"][1])
+
+        if category.type == CATEGORY_TYPE[0]:#Income
+            category_type_translate = LANGUAGES[Session.language]["Account"]["Info"][4]
+        else:
+            category_type_translate = LANGUAGES[Session.language]["Account"]["Info"][5]
+
+        remove_category_statistics_list.clicked.connect(partial(remove_category_from_statistics_list, category, add_category_statistics_list, remove_category_statistics_list))
+        add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
 
         category_layout = QHBoxLayout()
         category_layout.addWidget(category_name, alignment=ALIGMENT.AlignHCenter)
@@ -372,3 +386,131 @@ def show_custom_range_statistics_window():
     
     StatisticsWindow.window.done(1)
     CustomRangeStatistics.window.exec()
+
+
+def add_category_to_statistics_list(category:Category, category_type_translate:str, remove_button:QPushButton, add_button:QPushButton):
+    #Reset selected categories
+    CustomRangeStatistics.selected_categories_list.clear()
+
+    # if category.id not in CustomRangeStatistics.selected_categories_data:
+    CustomRangeStatistics.selected_categories_data[category.id] = [category, category_type_translate]
+
+    selected_categories = CustomRangeStatistics.selected_categories_data
+
+    for iteration, selected_category in enumerate(selected_categories):
+        CustomRangeStatistics.selected_categories_list.addItem(
+            f"{iteration+1}. {selected_categories[selected_category][0].name} ({selected_categories[selected_category][1]})"
+        )
+    remove_button.setDisabled(False)
+    add_button.setDisabled(True)
+
+
+
+def remove_category_from_statistics_list(category:Category, add_button:QPushButton, remove_button:QPushButton):
+    #Reset selected categories
+    CustomRangeStatistics.selected_categories_list.clear()
+
+    # if category.id in CustomRangeStatistics.selected_categories_data:
+    del CustomRangeStatistics.selected_categories_data[category.id]
+
+    selected_categories = CustomRangeStatistics.selected_categories_data
+
+    for iteration, selected_category in enumerate(selected_categories):
+        CustomRangeStatistics.selected_categories_list.addItem(
+            f"{iteration+1}. {selected_categories[selected_category][0].name} ({selected_categories[selected_category][1]})"
+        )
+    remove_button.setDisabled(True)
+    add_button.setDisabled(False)
+
+
+def show_custom_range_statistics_view():
+    #Reset statistics and transactions list
+    CustomRangeStatisticsView.statistics_list.clear()
+    CustomRangeStatisticsView.transactions_list.clear()
+
+    from_date = CustomRangeStatistics.from_date.date()
+    to_date = CustomRangeStatistics.to_date.date()
+
+    if from_date >= to_date:
+        return Errors.wrong_date.exec()
+    
+    if len(CustomRangeStatistics.selected_categories_data) == 0:
+        return Errors.no_selected_category.exec()
+    
+    from_date = from_date.year()*1000 + from_date.month()*100 + from_date.day()
+    to_date = to_date.year()*1000 + to_date.month()*100 + to_date.day()
+
+    Incomes_categories = [category[0] for category in CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
+    Expenses_categories = [category[0] for category in CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
+
+    Incomes_categories_total_values = {}
+    Expenses_categories_total_values = {}
+
+    Incomes_categories_transactions = {}
+    Expenses_categories_transactions = {}
+
+    for income_cateogry in Incomes_categories:
+        transactions = Session.db.get_transaction_by_range(income_cateogry.id, from_date, to_date)
+        total_value = round(sum([transaction.value for transaction in transactions]), 2)
+
+        Incomes_categories_transactions[income_cateogry] = sorted(transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
+        Incomes_categories_total_values[income_cateogry.id] = total_value
+        
+    for expense_category in Expenses_categories:
+        transactions = Session.db.get_transaction_by_range(expense_category.id, from_date, to_date)
+        total_value = round(sum([transaction.value for transaction in transactions]), 2)
+
+        Expenses_categories_transactions[expense_category] = sorted(transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
+        Expenses_categories_total_values[expense_category.id] = total_value
+    
+    total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
+    total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
+
+    Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
+
+    CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[4]+str(total_income))
+    CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[6]+str(total_expense))
+    CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[8]+f"{round(total_income - total_expense, 2)}")
+
+    if len(Incomes_categories):
+        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][4])
+        add_total_statistics(Incomes_categories_total_values, [9,13], CustomRangeStatisticsView.statistics_list, Statistic_words)
+
+    if len(Expenses_categories):
+        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
+        add_total_statistics(Expenses_categories_total_values, [17,20], CustomRangeStatisticsView.statistics_list, Statistic_words)
+    
+    CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Account"]["Info"][4]+"\n\n")
+
+    if len(Incomes_categories_transactions):
+        for category, transactions in Incomes_categories_transactions.items():
+            CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
+
+            for transaction in transactions:
+                day = transaction.day
+                if day < 10:
+                    day = f"0{day}"
+                
+                month = transaction.month
+                if month < 10:
+                    month = f"0{month}"
+
+                CustomRangeStatisticsView.transactions_list.addItem(f"{transaction.year}/{month}/{day}\t{transaction.value}\t{transaction.name}")
+    
+    if len(Expenses_categories_transactions):
+        for category, transactions in Expenses_categories_transactions.items():
+            CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
+
+            for transaction in transactions:
+                day = transaction.day
+                if day < 10:
+                    day = f"0{day}"
+                
+                month = transaction.month
+                if month < 10:
+                    month = f"0{month}"
+
+                CustomRangeStatisticsView.transactions_list.addItem(f"{transaction.year}/{month}/{day}\t{transaction.value}\t{transaction.name}")
+        
+
+    CustomRangeStatisticsView.window.exec()

@@ -50,6 +50,7 @@ class MainWindow():
     window.setMinimumWidth(900)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
+    window.setWindowFlags(Qt.WindowType.Window)
     window.setObjectName("main_window")
 
     #Account balance and settings
@@ -188,7 +189,7 @@ class SettingsWindow():
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Settings")
     window.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     switch_themes_button = QToolButton()

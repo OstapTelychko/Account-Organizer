@@ -77,12 +77,16 @@ LANGUAGES = {
                     26:"Average expenses per day   ",
                     27:"Average expenses per month   ",
                     28:"Copy monthly statistics",
-                    29:"Monthly statistics has copied",
+                    29:"Monthly statistics have been copied",
                     30:"Copy quarterly statistics",
-                    31:"Quarterly statistics has copied",
+                    31:"Quarterly statistics heve been copied",
                     32:"Copy yearly statistics",
-                    33:"Yearly statistics has copied",
+                    33:"Yearly statistics have been copied",
                     34:"Custom range",
+                    35:"Copy statistics",
+                    36:"Statistics have been copied",
+                    37:"Copy transactions",
+                    38:"Transactions have been copied",
                 }
             },
             "Transactions management":{
@@ -107,8 +111,8 @@ LANGUAGES = {
                 4:"Copy month transactions",
                 5:"Month transactions have copied",
                 6:"Name of category has updated",
-                7:"Category has removed",
-                8:"Category has created",
+                7:"Category have been removed",
+                8:"Category have been created",
                 9:"Change position"
             }
         },
@@ -132,6 +136,8 @@ LANGUAGES = {
             16:"Name of category can't be empty field",
             17:"The position must be within 0-max_position",
             18:"The position can't be the same",
+            19:"From-date can't be bigger then to-date",
+            20:"You have to select at least one category"
         },
         "Mini calculator":{
             0:"Mini calculator",
@@ -231,7 +237,11 @@ LANGUAGES = {
                     31:"Квартальна статистика скопійована",
                     32:"Скопіювати річну статистику",
                     33:"Річна статистика скопійована",
-                    34:"Власний діапазон"
+                    34:"Власний діапазон",
+                    35:"Скопіювати статистику",
+                    36:"Статистика була скопійована",
+                    37:"Скопіювати транзакції",
+                    38:"Транзакції були скопійовані",
                 }
             },
             "Transactions management":{
@@ -280,7 +290,9 @@ LANGUAGES = {
             15:"Ви повинні мати принаймні одну транзакцію доходу і одну витрат, щоб побачити місячну статистику",
             16:"Назвою категорії не може бути пусте поле",
             17:"Позиція повинна бути в діапазоні 0-max_position",
-            18:"Не можна встановити ту саму позицію"
+            18:"Не можна встановити ту саму позицію",
+            19:"Початкова дата не може бути більшою за кінцеву",
+            20:"Ви повинні вибрати принаймні одну категорію",
         },
         "Mini calculator":{
             0:"Міні калькулятор",
@@ -380,7 +392,11 @@ LANGUAGES = {
                     31:"Kwartalna statystyka skopiowana",
                     32:"Kopiować roczną statystykę",
                     33:"Roczna statystyka skopiowana",
-                    34:"Własny zakres"
+                    34:"Własny zakres",
+                    35:"Kopiować statystykę",
+                    36:"Statystyka była skopiowana",
+                    37:"Kopiować transakcje",
+                    38:"Transakcje były skopiowane"
                 }  
             },
             "Transactions management":{
@@ -425,11 +441,13 @@ LANGUAGES = {
             11:"Czy na pewno chcecie usunąć account ? Ta czynność jest nieodwracalna",
             12:"Nie mogę obliczyć pustego wyrażenia",
             13:"W wyrażeniu użyłeś zabronionych słów",
-            14:"Aby zobaczyć statystyki miesięczne, musisz mieć co najmniej jedną kategorię dochodów i jedną kategorię wydatków",
-            15:"Aby zobaczyć miesięczne statystyki, musisz mieć co najmniej jedną transakcję dochodu i jedną transakcję wydatkóws",
+            14:"Aby zobaczyć statystykę miesięczną, musicie mieć co najmniej jedną kategorię dochodów i jedną kategorię wydatków",
+            15:"Aby zobaczyć miesięczną statystykę, musicie mieć co najmniej jedną transakcję dochodu i jedną transakcję wydatkóws",
             16:"Nazwą kategorii nie morze być puste pole",
             17:"Pozycja powinna być w zasięgu 0-max_position",
-            18:"Nie można zastosować tej samej pozycji"
+            18:"Nie można zastosować tej samej pozycji",
+            19:"Data początkowa nie może być większą od końcowej",
+            20:"Aby kontynuować, musicie wybrać co najmniej jedną kategorię"
         },
         "Mini calculator":{
             0:"Mały kalkulator",

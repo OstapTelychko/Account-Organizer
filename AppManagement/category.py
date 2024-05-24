@@ -104,7 +104,7 @@ def show_category_settings(category_name:str):
 def remove_category():
     category_name = CategorySettingsWindow.window.windowTitle()
 
-    if Errors.delete_category_question.exec() == QMessageBox.StandardButton.Ok:
+    if Errors.delete_category_confirmation.exec() == QMessageBox.StandardButton.Ok:
         category_id = Session.db.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
         Session.db.delete_category(category_id)
         CategorySettingsWindow.window.setWindowTitle(" ")

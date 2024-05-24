@@ -10,7 +10,7 @@ class TransactionManagementWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Edit")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     message = QLabel()

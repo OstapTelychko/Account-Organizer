@@ -11,7 +11,7 @@ class StatisticsWindow():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Statistics")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     monthly_statistics = create_button("Monthly", (150,40))
@@ -61,7 +61,7 @@ class MonthlyStatistics():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("April")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
     window.setStyleSheet(""" 
     QListWidget::item:hover,
@@ -89,7 +89,7 @@ class QuarterlyStatistics():
     window = QDialog()
     window.resize(800,700)
     window.setMinimumSize(800,600)
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Quarterly Statistics")
     window.closeEvent = close_dialog
@@ -99,7 +99,6 @@ class QuarterlyStatistics():
     QListWidget::item:hover:!active,
     QListWidget::item:focus
     {background: transparent}""")#Disable background color change on hover
-    window.setWindowFlags(Qt.WindowType.Window)
 
     statistics_layout = QVBoxLayout()
     statistics_window = QWidget()
@@ -175,7 +174,7 @@ class YearlyStatistics():
     window.resize(800,700)
     window.setMinimumSize(800,600)
     window.setWindowIcon(APP_ICON)
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.SubWindow)
     window.setWindowTitle("Yearly Statistics")
     window.closeEvent = close_dialog
     window.setStyleSheet(""" 
@@ -184,7 +183,6 @@ class YearlyStatistics():
     QListWidget::item:hover:!active,
     QListWidget::item:focus
     {background: transparent}""")#Disable background color change on mouseover
-    window.setWindowFlags(Qt.WindowType.Window)
     
     statistics = {}
     statistics_window = QWidget()
@@ -238,16 +236,21 @@ class CustomRangeStatistics():
     window.resize(600,600)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Custom range")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.SubWindow)
     window.closeEvent = close_dialog
 
-    selected_categories_label = QLabel()
-    selected_categories_label.setFont(BASIC_FONT)
-    selected_categories_label.setGraphicsEffect(QGraphicsDropShadowEffect(selected_categories_label, **SHADOW_EFFECT_ARGUMENTS))
-    selected_categories_label.setWordWrap(True)
+    selected_categories_data = {}
+
+    selected_categories_list = QListWidget()
+    selected_categories_list.setFont(BASIC_FONT)
+    selected_categories_list.setMinimumWidth(400)
+    selected_categories_list.setGraphicsEffect(QGraphicsDropShadowEffect(selected_categories_list, **SHADOW_EFFECT_ARGUMENTS))
+    selected_categories_list.setWordWrap(True)
 
     categories_list_layout = QVBoxLayout()
     categories_list_layout.setSpacing(20)
+    categories_list_layout.setContentsMargins(10, 10, 20, 10)
+
     categories_list_window = QWidget()
     categories_list_window.setLayout(categories_list_layout)
 
@@ -257,11 +260,10 @@ class CustomRangeStatistics():
     categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     categories_list_scroll.setMinimumHeight(350)
     categories_list_scroll.setMaximumHeight(350)
-    categories_list_scroll.setMinimumWidth(400)
+    categories_list_scroll.setMinimumWidth(430)
     categories_list_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
     categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
     categories_list_scroll.setProperty("class", "wrapper")
-    categories_list_scroll.setContentsMargins(0, 0, 200, 0)
     categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
 
     from_date = QDateEdit()
@@ -284,7 +286,8 @@ class CustomRangeStatistics():
     show_statistics = create_button("Statistics", (150, 40))
 
     main_layout = QVBoxLayout()
-    main_layout.addWidget(selected_categories_label, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.setSpacing(10)
+    main_layout.addWidget(selected_categories_list, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     main_layout.addWidget(categories_list_scroll, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     main_layout.addLayout(date_inputs_layout)
     main_layout.addWidget(show_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
@@ -292,3 +295,44 @@ class CustomRangeStatistics():
     window.setLayout(main_layout)
 
 
+
+class CustomRangeStatisticsView:
+    window = QDialog()
+    window.resize(1200,600)
+    window.setWindowIcon(APP_ICON)
+    window.setWindowTitle("Custom range")
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
+
+    statistics_list = QListWidget()
+    statistics_list.setFont(BASIC_FONT)
+    statistics_list.setMinimumWidth(500)
+    statistics_list.setMinimumHeight(350)
+    statistics_list.setGraphicsEffect(QGraphicsDropShadowEffect(statistics_list, **SHADOW_EFFECT_ARGUMENTS))
+
+    copy_statistics = create_button("Copy statistics", (200, 40))
+
+    statistics_layout = QVBoxLayout()
+    statistics_layout.addWidget(statistics_list)
+    statistics_layout.addWidget(copy_statistics, alignment=ALIGMENT.AlignHCenter)
+
+    transactions_list = QListWidget()
+    transactions_list.setFont(BASIC_FONT)
+    transactions_list.setMinimumWidth(650)
+    transactions_list.setMinimumHeight(350)
+    transactions_list.setGraphicsEffect(QGraphicsDropShadowEffect(transactions_list, **SHADOW_EFFECT_ARGUMENTS))
+
+    copy_transactions = create_button("Copy transactions", (200, 40))
+
+    transactions_layout = QVBoxLayout()
+    transactions_layout.addWidget(transactions_list)
+    transactions_layout.addWidget(copy_transactions, alignment=ALIGMENT.AlignHCenter)
+
+    main_layout = QHBoxLayout()
+    main_layout.setSpacing(20)
+    main_layout.addStretch(1)
+    main_layout.addLayout(statistics_layout)
+    main_layout.addStretch(2)
+    main_layout.addLayout(transactions_layout)
+    main_layout.addStretch(1)
+
+    window.setLayout(main_layout)

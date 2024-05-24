@@ -15,7 +15,7 @@ from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, Quarterl
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.theme import swith_theme, load_theme
 
-from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window
+from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
 from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
 
 from AppManagement.language import load_language, change_language_add_account
@@ -79,6 +79,7 @@ def main():
     MonthlyStatistics.copy_statistics.clicked.connect(copy_monthly_statistics)
     QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
+    CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
     
     #Category settings
     CategorySettingsWindow.delete_category.clicked.connect(remove_category)

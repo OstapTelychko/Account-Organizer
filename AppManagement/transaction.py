@@ -159,7 +159,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int):
     else:
         return Errors.only_one_row.exec()
 
-    if Errors.delete_transaction_question.exec() == QMessageBox.StandardButton.Ok:
+    if Errors.delete_transaction_confirmation.exec() == QMessageBox.StandardButton.Ok:
         transaction_value = float(selected_row[2].text())
         Session.db.delete_transaction(transaction_id)
 

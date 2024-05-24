@@ -12,7 +12,7 @@ class AddAccountWindow():
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Add account")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
 
     languages = QComboBox()
@@ -62,7 +62,7 @@ class RenameAccountWindow():
     window.resize(800,800)
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Rename account")
-    window.setWindowFlags(Qt.WindowType.Drawer)
+    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
     window.closeEvent = close_dialog
     
     message = QLabel()

@@ -41,6 +41,11 @@ DARK_THEME = load_stylesheet("dark")+"""
     border:1px solid black;
     color:rgb(130, 170, 255)
 }
+.button:disabled{
+    background-color:rgb(100, 100, 100);
+    color:rgb(150, 150, 150);
+}
+
 .button:hover, .button:focus:hover, .button:active:hover, .button:default:hover{
     background-color:rgb(45, 45, 45)
 }
@@ -95,6 +100,12 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
     color:rgb(240, 240, 240);
     border:1px solid black;
 }
+
+.button:disabled{
+    background-color:rgb(100, 100, 100);
+    color:rgb(150, 150, 150);
+}
+
 .button:hover, .button:focus:hover, .button:active:hover, .button:default:hover{
     background-color:rgb(90, 120, 90);
 }
