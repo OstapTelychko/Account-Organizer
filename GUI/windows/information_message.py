@@ -4,7 +4,7 @@ from time import sleep
 
 from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT
 from GUI.windows.category import CategorySettingsWindow
-from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 
 
 
@@ -57,3 +57,5 @@ class InformationMessage:
         MonthlyStatistics.copy_statistics.setEnabled(True)
         QuarterlyStatistics.copy_statistics.setEnabled(True)
         YearlyStatistics.copy_statistics.setEnabled(True)
+        CustomRangeStatisticsView.copy_statistics.setEnabled(True)
+        CustomRangeStatisticsView.copy_transactions.setEnabled(True)

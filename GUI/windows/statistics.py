@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
-from PySide6.QtCore import Qt, QDate
+from PySide6.QtCore import Qt, QDate, QEvent
 
 from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, close_dialog
 
@@ -302,6 +302,7 @@ class CustomRangeStatisticsView:
     window.setWindowIcon(APP_ICON)
     window.setWindowTitle("Custom range")
     window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
+    window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_())
 
     statistics_list = QListWidget()
     statistics_list.setFont(BASIC_FONT)

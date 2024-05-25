@@ -7,7 +7,7 @@ from languages import LANGUAGES
 from GUI.windows.main import MainWindow, app
 from GUI.windows.information_message import InformationMessage
 from GUI.windows.category import CategorySettingsWindow 
-from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 
 
 
@@ -90,3 +90,29 @@ def copy_yearly_statistics():
         app.clipboard().setText(result)
         show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][33])
 
+
+def copy_custom_range_statistics():
+    if CustomRangeStatisticsView.copy_statistics.isEnabled():
+        CustomRangeStatisticsView.copy_statistics.setEnabled(False)
+        statistics = CustomRangeStatisticsView.statistics_list
+        result = ""
+
+        for row in range(statistics.count()):
+            result += f"{statistics.item(row).text()}\n"
+        
+        app.clipboard().setText(result)
+        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][36])
+
+
+def copy_custom_range_transactions():
+    if CustomRangeStatisticsView.copy_transactions.isEnabled():
+        CustomRangeStatisticsView.copy_transactions.setEnabled(False)
+        transactions = CustomRangeStatisticsView.transactions_list
+
+        result = ""
+
+        for row in range(transactions.count()):
+            result += f"{transactions.item(row).text()}\n"
+        
+        app.clipboard().setText(result)
+        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][38])

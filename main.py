@@ -11,12 +11,12 @@ from GUI.windows.main import app, MainWindow, SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.theme import swith_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
-from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics
+from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
 from AppManagement.language import load_language, change_language_add_account
 from AppManagement.balance import load_account_balance
@@ -80,6 +80,8 @@ def main():
     QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
     CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
+    CustomRangeStatisticsView.copy_statistics.clicked.connect(copy_custom_range_statistics)
+    CustomRangeStatisticsView.copy_transactions.clicked.connect(copy_custom_range_transactions)
     
     #Category settings
     CategorySettingsWindow.delete_category.clicked.connect(remove_category)

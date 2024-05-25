@@ -405,7 +405,6 @@ def add_category_to_statistics_list(category:Category, category_type_translate:s
     add_button.setDisabled(True)
 
 
-
 def remove_category_from_statistics_list(category:Category, add_button:QPushButton, remove_button:QPushButton):
     #Reset selected categories
     CustomRangeStatistics.selected_categories_list.clear()
@@ -437,6 +436,9 @@ def show_custom_range_statistics_view():
     if len(CustomRangeStatistics.selected_categories_data) == 0:
         return Errors.no_selected_category.exec()
     
+    date_difference = date(to_date.year(), to_date.month(), to_date.day()) - date(from_date.year(), from_date.month(), from_date.day()) 
+    days_amount = date_difference.days
+
     from_date = from_date.year()*1000 + from_date.month()*100 + from_date.day()
     to_date = to_date.year()*1000 + to_date.month()*100 + to_date.day()
 
@@ -469,7 +471,11 @@ def show_custom_range_statistics_view():
     Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
 
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[4]+str(total_income))
+    CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[24]+str(round(total_income/days_amount, 2))+"\n")
+
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[6]+str(total_expense))
+    CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[26]+str(round(total_expense/days_amount, 2))+"\n")
+
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[8]+f"{round(total_income - total_expense, 2)}")
 
     if len(Incomes_categories):
@@ -495,7 +501,7 @@ def show_custom_range_statistics_view():
                 if month < 10:
                     month = f"0{month}"
 
-                CustomRangeStatisticsView.transactions_list.addItem(f"{transaction.year}/{month}/{day}\t{transaction.value}\t{transaction.name}")
+                CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
     
     if len(Expenses_categories_transactions):
         for category, transactions in Expenses_categories_transactions.items():
@@ -510,7 +516,7 @@ def show_custom_range_statistics_view():
                 if month < 10:
                     month = f"0{month}"
 
-                CustomRangeStatisticsView.transactions_list.addItem(f"{transaction.year}/{month}/{day}\t{transaction.value}\t{transaction.name}")
+                CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
         
 
     CustomRangeStatisticsView.window.exec()
