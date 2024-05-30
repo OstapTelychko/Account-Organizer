@@ -37,11 +37,11 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
     Session.db.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
                 
     for row in range(category_data.rowCount()):
-        if int(category_data.item(row,3).text()) == transaction_id:
-            category_data.item(row,0).setText(transaction_name)
-            category_data.item(row,1).setData(Qt.ItemDataRole.EditRole, transaction_day)
+        if int(category_data.item(row, 3).text()) == transaction_id:
+            category_data.item(row, 0).setText(transaction_name)
+            category_data.item(row, 1).setText(str(transaction_day))
 
-            old_value = category_data.item(row,2).data(Qt.ItemDataRole.EditRole)
+            old_value = float(category_data.item(row,2).text())
             values_difference = transaction_value - old_value
 
             if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
@@ -55,7 +55,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             Session.current_total_income = round(Session.current_total_income, 2)
             Session.current_total_expenses = round(Session.current_total_expenses, 2)
 
-            category_data.item(row,2).setData(Qt.ItemDataRole.EditRole, transaction_value)
+            category_data.item(row,2).setText(str(transaction_value))
 
 
 def show_add_transaction_window(category_name:str):
