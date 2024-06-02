@@ -138,8 +138,8 @@ def main():
     load_language(Session.language)
 
     MainWindow.window.show()
-    app.exec()
 
 
 if __name__ == "__main__":
-    main()    
+    main()
+    app.exec()
