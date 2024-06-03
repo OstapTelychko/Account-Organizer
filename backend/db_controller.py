@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, desc, and_
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
-from project_configuration import ROOT_DIRECTORY
+from project_configuration import DB_PATH, TEST_DB_PATH
 from .models import Account, Category, Transaction
 
 
@@ -11,7 +11,13 @@ class DBController():
 
     def __init__(self, user_name:str):
         # Init db connection 
-        engine = create_engine(f"sqlite:///{ROOT_DIRECTORY}/Accounts.sqlite")
+        from AppObjects.session import Session
+
+        if Session.test_mode:
+            engine = create_engine(TEST_DB_PATH)
+        else:
+            engine = create_engine(DB_PATH)
+
         self.session = sessionmaker(bind=engine)()
         self.account_name = user_name
 

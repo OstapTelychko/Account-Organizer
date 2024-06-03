@@ -26,18 +26,21 @@ class Session:
     account_name = ""
 
     db:DBController = None
+    test_mode = False
 
 
     def start_session():
-
         #Set current date
         Session.current_month = datetime.now().month
         Session.current_year = datetime.now().year
         
-        
         if not os.path.exists(USER_CONF_PATH):
             Session.create_user_config()
 
+        Session.load_user_config()
+    
+
+    def load_user_config():
         with open(USER_CONF_PATH) as file:
             User_conf = toml.load(USER_CONF_PATH)
 
@@ -46,7 +49,7 @@ class Session:
             Session.theme = User_conf["Theme"]
             #Load last used account name 
             Session.account_name = User_conf["Account_name"]
-    
+
 
     def create_user_config():
         default_user_configuration = {
