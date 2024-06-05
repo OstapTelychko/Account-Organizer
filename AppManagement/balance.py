@@ -1,5 +1,5 @@
 from AppObjects.session import Session
-from GUI.windows.main import MainWindow, SettingsWindow
+from GUI.windows.main_window import MainWindow, SettingsWindow
 from languages import LANGUAGES
 
 

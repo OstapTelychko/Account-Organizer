@@ -3,9 +3,14 @@ from unittest import TestCase
 from PySide6.QtTest import QTest
 from PySide6.QtCore import Qt, QTimer
 
+from backend.models import Category, Transaction
+
+from AppObjects.session import Session
+from GUI.category import load_category
 
 
 LEFT_BUTTON = Qt.MouseButton.LeftButton
+
 
 class TestWindowsCaseMixin():
 
@@ -22,11 +27,42 @@ class TestWindowsCaseMixin():
 
 
 
-class DataBaseTestCase(TestCase):
+class DBTestCase(TestCase):
+
+    def __init_subclass__(cls) -> None:
+        if "setUp" in cls.__dict__:
+            cls.setUp = DBTestCase.set_up_decorator(cls.setUp)
+        else:
+            cls.setUp = DBTestCase.set_up_decorator(super().setUp)
+
+    
+
+    def set_up_decorator(func):
+        def wrapper(self:DBTestCase):
+            Session.db.create_category("Test income category", "Incomes", 0)
+            Session.db.create_category("Test expenses category", "Expenses", 0)
+            
+            self.income_category = Session.db.get_category("Test income category", "Incomes")
+            self.expenses_category = Session.db.get_category("Test expenses category", "Expenses")
+
+            Session.db.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1600, "Test income transaction")
+            Session.db.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1600, "Test expenses transaction")
+
+            Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.language)
+            Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.language)
+
+        return wrapper
+    
 
     @classmethod
-    def setUpClass(cls) -> None:
-        pass
+    def setUpClass(cls):
+        cls.income_category:Category
+        cls.expenses_category:Category
+    
+
+    def tearDown(self) -> None:
+        Session.db.session.query(Category).delete()
+        Session.db.session.query(Transaction).delete()
 
 
 

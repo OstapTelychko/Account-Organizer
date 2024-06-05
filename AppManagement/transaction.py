@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QMessageBox, QHeaderView
 from PySide6.QtCore import Qt
 
 
-from GUI.windows.main import ALIGMENT, MainWindow
+from GUI.windows.main_window import ALIGMENT, MainWindow
 from GUI.windows.errors import Errors
 from GUI.windows.transaction import TransactionManagementWindow
 

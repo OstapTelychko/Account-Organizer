@@ -3,7 +3,7 @@ from qdarktheme._style_loader import load_stylesheet
 
 from project_configuration import ROOT_DIRECTORY
 from AppObjects.session import Session
-from GUI.windows.main import app, SettingsWindow
+from GUI.windows.main_window import app, SettingsWindow
 
 
 

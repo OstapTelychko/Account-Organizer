@@ -6,7 +6,7 @@ from AppObjects.session import Session
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
-from GUI.windows.main import ALIGMENT, MainWindow
+from GUI.windows.main_window import ALIGMENT, MainWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors
 from GUI.category import load_category, add_category_to_position_list

@@ -9,7 +9,10 @@ from AppObjects.session import Session
 from backend.db_controller import DBController
 from project_configuration import TEST_DB_PATH, ROOT_DIRECTORY
 
-from .test_GUI.test_main import TestMainWindow
+from test.test_GUI.test_main_window import TestMainWindow
+from test.test_GUI.test_category import TestCategory
+
+
 TEST_DB_PATH = f"{ROOT_DIRECTORY}/test_Accounts.sqlite"
 
 alembic_conf = Config("alembic.ini")
@@ -28,18 +31,17 @@ Session.db.create_account(0)
 
 main()
 
-
-
 try:
     suite = TestSuite()
     loader = TestLoader()
-    suite.addTests(makeSuite(TestMainWindow))
+    suite.addTests((makeSuite(TestMainWindow), makeSuite(TestCategory)))
 
     TextTestRunner().run(suite)
+
 except Exception as ex:
     print(ex)
+
 finally:
-    print("Bye")
     Session.account_name = previous_name
     Session.update_user_config()
 

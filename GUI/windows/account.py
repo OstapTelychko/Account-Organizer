@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComb
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 
-from GUI.windows.main import APP_ICON, BASIC_FONT, ALIGMENT, create_button, close_dialog
+from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT, create_button, close_dialog
 from project_configuration import AVAILABLE_LANGUAGES, ROOT_DIRECTORY
 
 

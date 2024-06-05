@@ -4,7 +4,7 @@ from AppObjects.session import Session
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
-from GUI.windows.main import MainWindow, app
+from GUI.windows.main_window import MainWindow, app
 from GUI.windows.information_message import InformationMessage
 from GUI.windows.category import CategorySettingsWindow 
 from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView

@@ -7,7 +7,7 @@ from project_configuration import ROOT_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
 from backend.db_controller import DBController
-from GUI.windows.main import BASIC_FONT, ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow
+from GUI.windows.main_window import BASIC_FONT, ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
 

@@ -8,7 +8,7 @@ from backend.models import Transaction
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 
-from GUI.windows.main import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button
+from GUI.windows.main_window import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.errors import Errors
 

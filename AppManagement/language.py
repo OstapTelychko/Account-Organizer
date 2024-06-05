@@ -4,7 +4,7 @@ from AppObjects.session import Session
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LANGUAGES
 
-from GUI.windows.main import MainWindow, SettingsWindow
+from GUI.windows.main_window import MainWindow, SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import errors_list

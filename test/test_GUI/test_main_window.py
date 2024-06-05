@@ -8,7 +8,7 @@ from test.tests_toolkit import TestWindowsCaseMixin, LEFT_BUTTON
 from languages import LANGUAGES
 from AppObjects.session import Session
 
-from GUI.windows.main import MainWindow, SettingsWindow
+from GUI.windows.main_window import MainWindow, SettingsWindow
 from GUI.windows.errors import Errors
 from GUI.windows.statistics import StatisticsWindow
 from GUI.windows.category import AddCategoryWindow
