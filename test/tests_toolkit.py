@@ -7,6 +7,7 @@ from backend.models import Category, Transaction
 
 from AppObjects.session import Session
 from GUI.category import load_category
+from AppManagement.category import activate_categories, remove_categories_from_list
 
 
 LEFT_BUTTON = Qt.MouseButton.LeftButton
@@ -48,8 +49,10 @@ class DBTestCase(TestCase):
             Session.db.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1600, "Test income transaction")
             Session.db.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1600, "Test expenses transaction")
 
+            remove_categories_from_list()
             Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.language)
             Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.language)
+            activate_categories()
 
         return wrapper
     

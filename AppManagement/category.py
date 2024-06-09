@@ -195,7 +195,7 @@ def change_category_position():
     if new_position == old_position:
         return Errors.same_position.exec()
 
-    Session.db.change_category_position(new_position, old_position, category.id)
+    Session.db.change_category_position(new_position, old_position, category.id, category_type)
     
     remove_categories_from_list()
     load_categories()

@@ -16,8 +16,12 @@ def show_information_message(text:str):
     screen_center = MainWindow.window.frameGeometry().center()
     InformationMessage.window.move(screen_center)
 
-    message_worker = Thread(target=InformationMessage.run)
-    message_worker.run()
+    try:
+        message_worker = Thread(target=InformationMessage.run)
+        message_worker.start()
+    except RuntimeError:
+        pass # When the program exits, this prevents a widget deletion error
+
 
 
 def copy_monthly_transactions():

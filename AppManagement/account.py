@@ -114,9 +114,7 @@ def remove_account():
 
 
 def show_rename_account_window():
-    # account_name = SettingsWindow.accounts.currentText().split(" ")
     RenameAccountWindow.new_account_name.setText(Session.account_name)
-    # RenameAccountWindow.new_surname.setText(account_name[1])
     RenameAccountWindow.window.exec()
 
 

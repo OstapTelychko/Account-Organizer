@@ -89,13 +89,13 @@ class DBController():
         return last_category.position + 1
 
 
-    def change_category_position(self, new_position:int, old_position:int, category_id:int):
+    def change_category_position(self, new_position:int, old_position:int, category_id:int, category_type:str):
         if new_position < old_position:
-            self.session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position)).update(
+            self.session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
                 {Category.position: Category.position + 1}, synchronize_session=False
             )
         else:
-            self.session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position)).update(
+            self.session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
                 {Category.position: Category.position - 1}, synchronize_session=False
             )
         self.session.query(Category).filter_by(id=category_id).update({Category.position: new_position}, synchronize_session=False)
@@ -120,29 +120,29 @@ class DBController():
 
 
     def rename_category(self, category_id:int, new_name:str):
-        category = self.session.query(Category).filter_by(id=category_id).first()
-        category.name = new_name
+        self.session.query(Category).filter_by(id=category_id).update({Category.name:new_name}, False)
         self.session.commit()
 
 
     def delete_category(self, category_id:int):
         self.remove_position(category_id)
-        self.session.delete(self.session.query(Category).filter_by(id=category_id).first())
+        self.session.query(Category).filter_by(id=category_id).delete(False)
         self.session.commit()
 
 
 
     #Transaction
     def delete_transaction(self, transaction_id:int):
-        self.session.delete(self.session.query(Transaction).filter_by(id=transaction_id).first())
+        self.session.query(Transaction).filter_by(id=transaction_id).delete(False)
         self.session.commit()
             
 
     def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int):
-        transaction = self.session.query(Transaction).filter_by(id=transaction_id).first()
-        transaction.name = transaction_name
-        transaction.day = transaction_day
-        transaction.value = transaction_value
+        self.session.query(Transaction).filter_by(id=transaction_id).update({
+            Transaction.name:transaction_name,
+            Transaction.day:transaction_day,
+            Transaction.value:transaction_value
+        }, False)
         self.session.commit()
 
 
