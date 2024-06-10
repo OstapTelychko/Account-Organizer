@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QTimer
-from test.tests_toolkit import DBTestCase
+from tests.tests_toolkit import DBTestCase
 
 from backend.models import Category
 from AppObjects.session import Session
@@ -22,12 +22,12 @@ class TestCategory(DBTestCase):
 
         QTimer.singleShot(100, lambda: add_category("Test incomes creation category"))
         MainWindow.add_incomes_category.click()
-        self.assertTrue(Session.db.session.query(Category).filter_by(name="Test incomes creation category").first(), "Incomes category hasn't been created")
+        self.assertTrue(Session.db.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
 
         QTimer.singleShot(100, lambda: add_category("Test expenses creation category"))
         MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         MainWindow.add_expenses_category.click()
-        self.assertTrue(Session.db.session.query(Category).filter_by(name="Test expenses creation category").first(), "Expenses category hasn't been created")
+        self.assertTrue(Session.db.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
     
 
     def test_category_deletion(self):
@@ -44,8 +44,8 @@ class TestCategory(DBTestCase):
             QTimer.singleShot(100, delete_category)
             category.settings.click()
 
-        self.assertFalse(Session.db.session.query(Category).filter_by(name=income_category_name).first(), "Income category hasn't been deleted")
-        self.assertFalse(Session.db.session.query(Category).filter_by(name=expenses_category_name).first(), "Expense category hasn't been deleted")
+        self.assertFalse(Session.db.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
+        self.assertFalse(Session.db.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
     
 
     def test_category_rename(self):

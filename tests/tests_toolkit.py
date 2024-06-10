@@ -3,7 +3,7 @@ from unittest import TestCase
 from PySide6.QtTest import QTest
 from PySide6.QtCore import Qt, QTimer
 
-from backend.models import Category, Transaction
+from backend.models import Category, Transaction, Account
 
 from AppObjects.session import Session
 from GUI.category import load_category
@@ -66,6 +66,8 @@ class DBTestCase(TestCase):
     def tearDown(self) -> None:
         Session.db.session.query(Category).delete()
         Session.db.session.query(Transaction).delete()
+        Session.db.session.query(Account).filter(Account.name != "Test user").delete()
+        Session.account_name = "Test user"
 
 
 

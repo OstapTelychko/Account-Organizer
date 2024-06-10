@@ -9,8 +9,9 @@ from AppObjects.session import Session
 from backend.db_controller import DBController
 from project_configuration import TEST_DB_PATH, ROOT_DIRECTORY
 
-from test.test_GUI.test_main_window import TestMainWindow
-from test.test_GUI.test_category import TestCategory
+from tests.test_GUI.test_main_window import TestMainWindow
+from tests.test_GUI.test_category import TestCategory
+from tests.test_GUI.test_account import TestAccount
 
 
 TEST_DB_PATH = f"{ROOT_DIRECTORY}/test_Accounts.sqlite"
@@ -34,7 +35,7 @@ main()
 try:
     suite = TestSuite()
     loader = TestLoader()
-    suite.addTests((makeSuite(TestMainWindow), makeSuite(TestCategory)))
+    suite.addTests((makeSuite(TestMainWindow), makeSuite(TestCategory), makeSuite(TestAccount)))
 
     TextTestRunner().run(suite)
 

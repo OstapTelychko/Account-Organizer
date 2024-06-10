@@ -1,9 +1,8 @@
 from unittest import TestCase
 from datetime import datetime
 
-from PySide6.QtTest import QTest
 from PySide6.QtCore import QTimer
-from test.tests_toolkit import TestWindowsCaseMixin, LEFT_BUTTON
+from tests.tests_toolkit import TestWindowsCaseMixin
 
 from languages import LANGUAGES
 from AppObjects.session import Session
