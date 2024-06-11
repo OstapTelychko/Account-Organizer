@@ -12,6 +12,7 @@ from project_configuration import TEST_DB_PATH, ROOT_DIRECTORY
 from tests.test_GUI.test_main_window import TestMainWindow
 from tests.test_GUI.test_category import TestCategory
 from tests.test_GUI.test_account import TestAccount
+from tests.test_GUI.test_transaction import TestTransaction
 
 
 TEST_DB_PATH = f"{ROOT_DIRECTORY}/test_Accounts.sqlite"
@@ -35,7 +36,8 @@ main()
 try:
     suite = TestSuite()
     loader = TestLoader()
-    suite.addTests((makeSuite(TestMainWindow), makeSuite(TestCategory), makeSuite(TestAccount)))
+    suite.addTests((makeSuite(TestMainWindow), makeSuite(TestCategory), makeSuite(TestAccount), makeSuite(TestTransaction)))
+    print(f"Tests found: {suite.countTestCases()}")
 
     TextTestRunner().run(suite)
 

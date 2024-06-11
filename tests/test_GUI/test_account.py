@@ -1,7 +1,6 @@
-from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QTimer
 
-from tests.tests_toolkit import DBTestCase
+from tests.tests_toolkit import DBTestCase, OK_BUTTON
 
 from AppObjects.session import Session
 from AppManagement.account import load_account_data
@@ -53,6 +52,7 @@ class TestAccount(DBTestCase):
             SettingsWindow.rename_account.click()
 
         self.open_settings(open_rename_window)
+        Session.db.rename_account("Test user")
     
 
     def test_account_deletion(self):
@@ -71,10 +71,9 @@ class TestAccount(DBTestCase):
         load_account_data(Session.account_name)
         SettingsWindow.accounts.setCurrentText(Session.account_name)
 
-
         def delete_account():
             def confirm_deletion():
-                Errors.delete_account_warning.button(QMessageBox.StandardButton.Ok).click()
+                Errors.delete_account_warning.button(OK_BUTTON).click()
                 def check_deletion():
                     self.assertFalse(Session.db.account_exists("Second test user"), "Account hasn't been removed")
                     self.assertEqual(Session.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")

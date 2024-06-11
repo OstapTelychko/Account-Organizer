@@ -1,16 +1,22 @@
 from unittest import TestCase
 
-from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt, QTimer
 
 from backend.models import Category, Transaction, Account
 
 from AppObjects.session import Session
+from AppObjects.category import Category as GUICategory
+
 from GUI.category import load_category
+from GUI.windows.main_window import MainWindow
+
+from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
 
 
 LEFT_BUTTON = Qt.MouseButton.LeftButton
+OK_BUTTON = QMessageBox.StandardButton.Ok
 
 
 class TestWindowsCaseMixin():
@@ -49,13 +55,16 @@ class DBTestCase(TestCase):
             Session.db.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1600, "Test income transaction")
             Session.db.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1600, "Test expenses transaction")
 
-            remove_categories_from_list()
             Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.language)
             Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.language)
             activate_categories()
 
         return wrapper
     
+
+    def select_correct_tab(self, category:GUICategory):
+        MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
+
 
     @classmethod
     def setUpClass(cls):
@@ -64,10 +73,16 @@ class DBTestCase(TestCase):
     
 
     def tearDown(self) -> None:
+        remove_categories_from_list()
+
+        Session.db.session.expunge_all()
         Session.db.session.query(Category).delete()
         Session.db.session.query(Transaction).delete()
-        Session.db.session.query(Account).filter(Account.name != "Test user").delete()
+        Session.db.session.query(Account).filter(Account.id != 1).delete()
+        
         Session.account_name = "Test user"
+        Session.db.account_name = Session.account_name
+        Session.db.set_account_id()
 
 
 

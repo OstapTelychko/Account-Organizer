@@ -48,10 +48,11 @@ class DBController():
 
 
     def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float):
-        account = self.session.query(Account).filter_by(id=self.account_id).first()
-        account.current_balance = balance
-        account.current_total_income = total_income
-        account.current_total_expenses = total_expenses
+        self.session.query(Account).filter_by(id=self.account_id).update({
+            Account.current_balance:balance,
+            Account.current_total_income:total_income,
+            Account.current_total_expenses:total_expenses
+        }, False)
         self.session.commit()
 
 

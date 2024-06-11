@@ -1,6 +1,5 @@
-from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QTimer
-from tests.tests_toolkit import DBTestCase
+from tests.tests_toolkit import DBTestCase, OK_BUTTON
 
 from backend.models import Category
 from AppObjects.session import Session
@@ -35,12 +34,12 @@ class TestCategory(DBTestCase):
         expenses_category_name = self.expenses_category.name
 
         for category in Session.categories.copy().values():
+            self.select_correct_tab(category)
 
             def delete_category():
-                QTimer.singleShot(100, lambda: Errors.delete_category_confirmation.button(QMessageBox.StandardButton.Ok).click())
+                QTimer.singleShot(100, lambda: Errors.delete_category_confirmation.button(OK_BUTTON).click())
                 CategorySettingsWindow.delete_category.click()
 
-            MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
             QTimer.singleShot(100, delete_category)
             category.settings.click()
 
@@ -53,6 +52,7 @@ class TestCategory(DBTestCase):
         expenses_category_name = self.expenses_category.name
 
         for category in Session.categories.copy().values():
+            self.select_correct_tab(category)
 
             def open_settings():
 
@@ -63,7 +63,6 @@ class TestCategory(DBTestCase):
                 QTimer.singleShot(100, rename_category)
                 CategorySettingsWindow.rename_category.click()
 
-            MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
             QTimer.singleShot(100, open_settings)
             category.settings.click()
 
@@ -76,6 +75,7 @@ class TestCategory(DBTestCase):
         Session.db.create_category("Second "+self.expenses_category.name, "Expenses", 1)
 
         for category in Session.categories.copy().values():
+            self.select_correct_tab(category)
 
             def open_settings():
                 def change_position():
@@ -85,7 +85,6 @@ class TestCategory(DBTestCase):
                 QTimer.singleShot(100, change_position)
                 CategorySettingsWindow.change_category_position.click()
 
-            MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
             QTimer.singleShot(100, open_settings)
             category.settings.click()
 
