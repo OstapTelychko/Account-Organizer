@@ -1,5 +1,5 @@
 # import sqlite3
-from sqlalchemy import create_engine, desc, and_
+from sqlalchemy import create_engine, desc, and_, event
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
@@ -14,11 +14,18 @@ class DBController():
         from AppObjects.session import Session
 
         if Session.test_mode:
-            engine = create_engine(TEST_DB_PATH)
+            self.engine = create_engine(TEST_DB_PATH)
         else:
-            engine = create_engine(DB_PATH)
+            self.engine = create_engine(DB_PATH)
 
-        self.session = sessionmaker(bind=engine)()
+        @event.listens_for(self.engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            # cursor.execute("PRAGMA journal_mode=WAL")
+            cursor.execute("PRAGMA synchronous=OFF")
+            cursor.close()
+
+        self.session = sessionmaker(bind=self.engine)()
         self.account_name = user_name
 
 
