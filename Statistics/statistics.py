@@ -189,10 +189,10 @@ def show_monthly_statistics():
 
 def show_quarterly_statistics():
     #Clear quarters statistics
-    for quarter in QuarterlyStatistics.statistics:
-        for statistic_list in QuarterlyStatistics.statistics[quarter]:
-            if statistic_list != "Label":
-                QuarterlyStatistics.statistics[quarter][statistic_list]["Statistic Data"].clear()
+    for quarter in QuarterlyStatistics.statistics.quarters:
+        quarter.total_quarter_statistics.data.clear()
+        for month in quarter.months:
+            month.data.clear()
 
     Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
@@ -200,30 +200,31 @@ def show_quarterly_statistics():
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
         return Errors.no_category.exec()
     
-    for quarter in QuarterlyStatistics.statistics:
+    for quarter in QuarterlyStatistics.statistics.quarters:
         Incomes_categories_total_values = {}
         Expenses_categories_total_values = {}
 
         for income_category in Incomes_categories:
             Incomes_categories_total_values[income_category] = []
 
-            for month in range(1, 4):
-                Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(income_category, Session.current_year, (quarter -1)*3 + month)), 2))
+            for month in quarter.months:
+                Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(income_category, Session.current_year, month.month_number)), 2))
             Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
         
         for expenses_category in Expenses_categories:
             Expenses_categories_total_values[expenses_category] = []
 
-            for month in range(1, 4):
-                Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(expenses_category, Session.current_year, (quarter -1)*3 + month)), 2))
+            for month in quarter.months:
+                Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(expenses_category, Session.current_year, month.month_number)), 2))
             Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
         #Entire quarter statistics
         total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
         total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
-        days_amount = sum(MONTHS_DAYS[(quarter-1)*3:quarter*3]) + (quarter == 1 and Session.current_year % 4 == 0)
+        quarter_number = quarter.quarter_number
+        days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
 
-        Total_statistic_list = QuarterlyStatistics.statistics[quarter][0]["Statistic Data"]
+        Total_statistic_list = quarter.total_quarter_statistics.data
         Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
 
         Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
@@ -241,15 +242,14 @@ def show_quarterly_statistics():
         add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, Statistic_words)
 
         #Months statistics
-        for month in range(1, 4):
-            current_month = (quarter -1)*3 + month
-            Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, current_month))) for category in Incomes_categories])
-            Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, current_month))) for category in Expenses_categories])
+        for month in quarter.months:
+            Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Incomes_categories])
+            Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Expenses_categories])
 
             if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
-                add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, QuarterlyStatistics.statistics[quarter][month]["Statistic Data"], current_month)
+                add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, month.data, month.month_number)
             else:
-                QuarterlyStatistics.statistics[quarter][month]["Statistic Data"].addItem(Errors.no_transactions.text())
+                month.data.addItem(Errors.no_transactions.text())
 
     StatisticsWindow.window.done(1)
     QuarterlyStatistics.window.exec()
@@ -257,8 +257,9 @@ def show_quarterly_statistics():
 
 def show_yearly_statistics():
     #Clear yearly statistics
-    for statistic_list in YearlyStatistics.statistics:
-        YearlyStatistics.statistics[statistic_list]["Statistic Data"].clear()
+    YearlyStatistics.statistics.total_year_statistics.data.clear()
+    for month in YearlyStatistics.statistics.months:
+        month.data.clear()
     
     Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
@@ -273,14 +274,14 @@ def show_yearly_statistics():
         Incomes_categories_total_values[income_category] = []
 
         for month in range(1,13):
-            Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(income_category, Session.current_year,month)), 2))
+            Incomes_categories_total_values[income_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(income_category, Session.current_year, month)), 2))
         Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
     
     for expenses_category in Expenses_categories:
         Expenses_categories_total_values[expenses_category] = []
 
         for month in range(1,13):
-            Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(expenses_category, Session.current_year,month)), 2))
+            Expenses_categories_total_values[expenses_category].append(round(sum(transaction.value for transaction in Session.db.get_transactions_by_month(expenses_category, Session.current_year, month)), 2))
         Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
 
     #Entire year statistics
@@ -288,7 +289,7 @@ def show_yearly_statistics():
     total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
     days_amount = 365 if Session.current_year % 4 != 0 else 366# 365 days if year is not leap
 
-    Total_statistic_list = YearlyStatistics.statistics[0]["Statistic Data"]
+    Total_statistic_list = YearlyStatistics.statistics.total_year_statistics.data
     Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
 
     Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
@@ -307,14 +308,14 @@ def show_yearly_statistics():
     Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
     add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, Statistic_words)
 
-    for month in range(1,13):
-        Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month))) for category in Incomes_categories])
-        Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month))) for category in Expenses_categories])
+    for month in YearlyStatistics.statistics.months:
+        Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Incomes_categories])
+        Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Expenses_categories])
 
         if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
-            add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, YearlyStatistics.statistics[month]["Statistic Data"], month)
+            add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, month.data, month.month_number)
         else:
-            YearlyStatistics.statistics[month]["Statistic Data"].addItem(Errors.no_transactions.text())
+            month.data.addItem(Errors.no_transactions.text())
 
     StatisticsWindow.window.done(1)
     YearlyStatistics.window.exec()
@@ -449,6 +450,7 @@ def show_custom_range_statistics_view():
 
     Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
 
+    #Custom range statistics
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[4]+str(total_income))
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[24]+str(round(total_income/days_amount, 2))+"\n")
 
@@ -465,9 +467,10 @@ def show_custom_range_statistics_view():
         CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
         add_total_statistics(Expenses_categories_total_values, [17,20], CustomRangeStatisticsView.statistics_list, Statistic_words)
     
-    CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Account"]["Info"][4]+"\n\n")
+    #Transactions list
 
     if len(Incomes_categories_transactions):
+        CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Account"]["Info"][4]+"\n\n")
         for category, transactions in Incomes_categories_transactions.items():
             CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
@@ -483,6 +486,7 @@ def show_custom_range_statistics_view():
                 CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
     
     if len(Expenses_categories_transactions):
+        CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5]+"\n\n")
         for category, transactions in Expenses_categories_transactions.items():
             CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 

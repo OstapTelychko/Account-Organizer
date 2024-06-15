@@ -1,3 +1,4 @@
+from typing import NamedTuple
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
 from PySide6.QtCore import Qt, QDate, QEvent
 
@@ -103,41 +104,51 @@ class QuarterlyStatistics():
     statistics_layout = QVBoxLayout()
     statistics_window = QWidget()
 
-    statistics = {}
+    TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", QListWidget)])
+    MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+    QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[MonthlyStatisticsView])])
+    StatisticsView = NamedTuple("StatisticsView", [("quarters", list[QuarterStatisticsView])])
+
+    quarters_statistics_list = []
     for quarter in range(1,5):
-        statistics[quarter] = {}
 
         quarter_label = QLabel()
         quarter_label.setFont(BASIC_FONT)
         quarter_label.setContentsMargins(0,50,0,0)
-        statistics[quarter]["Label"] = quarter_label
         statistics_layout.addWidget(quarter_label,alignment=ALIGMENT.AlignBottom)
 
         quarter_window = QWidget()
         quarter_layout = QHBoxLayout()
         quarter_layout.setSpacing(30)
 
-        for statistic_list in range(4):
-            statistics[quarter][statistic_list] = {}
-
+        quarter_statistics_parts_list = []
+        for statistic_list in range(4):              
             statistic_label = QLabel()
             statistic_label.setFont(BASIC_FONT)
             statistic_label_layout = QHBoxLayout()
             statistic_label_layout.addWidget(statistic_label,alignment=ALIGMENT.AlignHCenter)
-            statistics[quarter][statistic_list]["Label"] = statistic_label
 
             statistic_data = QListWidget()
             statistic_data.setFont(BASIC_FONT)
             statistic_data.setWordWrap(True)
             statistic_data.setMinimumHeight(250)
             statistic_data.setMinimumWidth(500)
-            statistics[quarter][statistic_list]["Statistic Data"] = statistic_data
 
             statistic_layout = QVBoxLayout()
             statistic_layout.addLayout(statistic_label_layout)
             statistic_layout.addWidget(statistic_data,ALIGMENT.AlignVCenter)
 
             quarter_layout.addLayout(statistic_layout)
+
+            if statistic_list == 0:
+                quarter_statistics_part = TotalQuarterStatisticsView(statistic_label, statistic_data)
+            else:
+                quarter_statistics_part = MonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
+
+            quarter_statistics_parts_list.append(quarter_statistics_part)
+        
+        quarter_statistics = QuarterStatisticsView(quarter, quarter_label, quarter_statistics_parts_list[0], quarter_statistics_parts_list[1:4])
+        quarters_statistics_list.append(quarter_statistics)
 
         quarter_window.setLayout(quarter_layout)
 
@@ -149,6 +160,8 @@ class QuarterlyStatistics():
         quarter_scroll.setMinimumHeight(350)
         quarter_scroll.setStyleSheet("QScrollArea{border:none}")
         statistics_layout.addWidget(quarter_scroll)
+
+    statistics = StatisticsView(quarters_statistics_list)
 
     copy_statistics = create_button("Copy quarterly statistics",(300,40))
     copy_statistics_layout = QHBoxLayout()
@@ -184,31 +197,40 @@ class YearlyStatistics():
     QListWidget::item:focus
     {background: transparent}""")#Disable background color change on mouseover
     
-    statistics = {}
+    TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", QListWidget)])
+    MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+    StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[MonthlyStatisticsView])])
+
     statistics_window = QWidget()
     statistics_window_layout = QVBoxLayout()
 
+    yearly_statistics_parts_list = []
     for statistics_list in range(13):
-        statistics[statistics_list] = {}
-
         statistics_label = QLabel()
         statistics_label.setFont(BASIC_FONT)
         statistics_label.setContentsMargins(0,50,0,0)
         statistics_label_layout = QHBoxLayout()
         statistics_label_layout.addWidget(statistics_label,alignment=ALIGMENT.AlignHCenter)
-        statistics[statistics_list]["Label"] = statistics_label
 
         statistics_data = QListWidget()
         statistics_data.setFont(BASIC_FONT)
         statistics_data.setMinimumHeight(400)
         statistics_data.setWordWrap(True)
-        statistics[statistics_list]["Statistic Data"] = statistics_data
 
         statistics_layout = QVBoxLayout()
         statistics_layout.addLayout(statistics_label_layout)
         statistics_layout.addWidget(statistics_data)
 
         statistics_window_layout.addLayout(statistics_layout)
+
+        if statistics_list == 0:
+            yearly_statistics_part = TotalYearStatisticsView(statistics_label, statistics_data)
+        else:
+            yearly_statistics_part = MonthlyStatisticsView(statistics_list, statistics_label, statistics_data)
+        yearly_statistics_parts_list.append(yearly_statistics_part)
+
+    statistics = StatisticsView(yearly_statistics_parts_list[0], yearly_statistics_parts_list[1:13])
+
     
     copy_statistics = create_button("Copy yearly statistics", (275,40))
     copy_statistics_layout = QHBoxLayout()

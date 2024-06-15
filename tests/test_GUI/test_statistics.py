@@ -1,4 +1,5 @@
-from PySide6.QtCore import QTimer
+from datetime import date
+from PySide6.QtCore import QTimer, QDate
 from tests.tests_toolkit import DBTestCase
 
 from languages import LANGUAGES
@@ -7,7 +8,7 @@ from AppObjects.session import Session
 
 from GUI.windows.main_window import MainWindow
 from GUI.windows.errors import Errors
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 
 
 class TestStatistics(DBTestCase):
@@ -58,8 +59,8 @@ class TestStatistics(DBTestCase):
                         expected_row, MonthlyStatistics.statistics.item(index).text(),
                         f"In month statistics row {index} expected result {expected_row} not {MonthlyStatistics.statistics.item(index).text()}"
                     )
+                    
                 MonthlyStatistics.window.done(1)
-                StatisticsWindow.window.done(1)
             
             QTimer.singleShot(100, check_monthly_statistics)
             StatisticsWindow.monthly_statistics.click()
@@ -76,70 +77,68 @@ class TestStatistics(DBTestCase):
         
         def open_quarterly_statistics_window():
             def check_quarterly_statistics():
-                for quarter in range(1, 5):
-                    days_amount = sum(MONTHS_DAYS[(quarter-1)*3:quarter*3]) 
-                    days_amount += 1 if quarter == 1 and Session.current_year % 4 == 0 else 0
+                for quarter in QuarterlyStatistics.statistics.quarters:
+                    quarter_number = quarter.quarter_number
+                    days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
 
-                    for statistic_list in range(4):
-                        statistics_data = QuarterlyStatistics.statistics[quarter][statistic_list]["Statistic Data"]
-
-                        if statistic_list == 0:
-                            if quarter != 4:
-                                total_income = 3000.0
-                                total_expense = 3000.0
-                            else:
-                                total_income = 2000.0
-                                total_expense = 2000.0
+                    if quarter_number != 4:
+                        total_income = 3000.0
+                        total_expense = 3000.0
+                    else:
+                        total_income = 2000.0
+                        total_expense = 2000.0
 
 
-                            expected_total_quarterly_statistics = [
-                                f"{self.statistics_words[4]}{total_income}",
-                                f"{self.statistics_words[5]}{round(total_income/days_amount, 2)}\n",
-                                f"{self.statistics_words[6]}{total_expense}",
-                                f"{self.statistics_words[7]}{round(total_expense/days_amount, 2)}\n",
-                                f"{self.statistics_words[8]}0.0",
-                                f"\n\n{self.translated_incomes}",
-                                f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
-                                f"{self.income_category.name} - {total_income}",
-                                f"\n\n{self.translated_expenses}",
-                                f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
-                                f"{self.expenses_category.name} - {total_expense}",
-                            ]
+                    expected_total_quarterly_statistics = [
+                        f"{self.statistics_words[4]}{total_income}",
+                        f"{self.statistics_words[5]}{round(total_income/days_amount, 2)}\n",
+                        f"{self.statistics_words[6]}{total_expense}",
+                        f"{self.statistics_words[7]}{round(total_expense/days_amount, 2)}\n",
+                        f"{self.statistics_words[8]}0.0",
+                        f"\n\n{self.translated_incomes}",
+                        f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
+                        f"{self.income_category.name} - {total_income}",
+                        f"\n\n{self.translated_expenses}",
+                        f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
+                        f"{self.expenses_category.name} - {total_expense}",
+                    ]
 
+                    statistics_data = quarter.total_quarter_statistics.data
+                    self.assertEqual(
+                        len(expected_total_quarterly_statistics), statistics_data.count(),
+                        f"Quarterly statistics have another amount of rows. Expected amount {len(expected_total_quarterly_statistics)} found {statistics_data.count()} rows"
+                    )
+
+                    for index, expected_row in enumerate(expected_total_quarterly_statistics):
+                        self.assertEqual(
+                            expected_row, statistics_data.item(index).text(),
+                            f"In quarterly statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                        )
+
+                    for month in quarter.months:
+                        statistics_data = month.data
+
+                        current_month = month.month_number
+                        month_days_amount = MONTHS_DAYS[current_month-1] + (current_month == 2 and Session.current_year % 4 == 0)
+                        expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
+
+                        if current_month != month_without_transactions:
                             self.assertEqual(
-                                len(expected_total_quarterly_statistics), statistics_data.count(),
-                                f"Quarterly statistics have another amount of rows. Expected amount {len(expected_total_quarterly_statistics)} found {statistics_data.count()} rows"
+                                len(expected_monthly_statistics), statistics_data.count(),
+                                f"Month {current_month} statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
                             )
 
-                            for index, expected_row in enumerate(expected_total_quarterly_statistics):
+                            for index, expected_row in enumerate(expected_monthly_statistics):
                                 self.assertEqual(
                                     expected_row, statistics_data.item(index).text(),
-                                    f"In quarterly statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                                    f"In quarter {quarter_number} month {current_month} statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
                                 )
 
                         else:
-                            current_month = (quarter -1)*3 + statistic_list
-                            month_days_amount = MONTHS_DAYS[current_month-1] + (current_month == 2 and Session.current_year % 4 == 0)
-                            expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
-
-                            if current_month != month_without_transactions:
-                                self.assertEqual(
-                                    len(expected_monthly_statistics), statistics_data.count(),
-                                    f"Month {current_month} statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
-                                )
-
-                                for index, expected_row in enumerate(expected_monthly_statistics):
-                                    self.assertEqual(
-                                        expected_row, statistics_data.item(index).text(),
-                                        f"In quarter {quarter} month {statistic_list} statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
-                                    )
-
-                            else:
-                                self.assertEqual(1, statistics_data.count(), f"Month {current_month} without transactions don't have 1 row in statistics")
-                                self.assertEqual(Errors.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                            self.assertEqual(1, statistics_data.count(), f"Month {current_month} without transactions don't have 1 row in statistics")
+                            self.assertEqual(Errors.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
 
                 QuarterlyStatistics.window.done(1)
-                StatisticsWindow.window.done(1)
             
             QTimer.singleShot(100, check_quarterly_statistics)
             StatisticsWindow.quarterly_statistics.click()
@@ -159,67 +158,162 @@ class TestStatistics(DBTestCase):
             def check_yearly_statistics():
                 days_amount = 365 if Session.current_year % 4 != 0 else 366
 
-                for statistic_list in range(13):
-                    statistics_data = YearlyStatistics.statistics[statistic_list]["Statistic Data"]
+                total_income = 11000.0
+                total_expense = 11000.0
 
-                    if statistic_list == 0:
-                        total_income = 11000.0
-                        total_expense = 11000.0
+                expected_yearly_statistics = [
+                    f"{self.statistics_words[4]}{total_income}",
+                    f"{self.statistics_words[25]}{round(total_income/12, 2)}",
+                    f"{self.statistics_words[24]}{round(total_income/days_amount, 2)}\n",
+                    f"{self.statistics_words[6]}{total_expense}",
+                    f"{self.statistics_words[27]}{round(total_expense/12, 2)}",
+                    f"{self.statistics_words[26]}{round(total_expense/days_amount, 2)}\n",
+                    f"{self.statistics_words[8]}0.0",
+                    f"\n\n{self.translated_incomes}",
+                    f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
+                    f"{self.income_category.name} - {total_income}",
+                    f"\n\n{self.translated_expenses}",
+                    f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
+                    f"{self.expenses_category.name} - {total_expense}"
+                ]
 
-                        expected_yearly_statistics = [
-                            f"{self.statistics_words[4]}{total_income}",
-                            f"{self.statistics_words[25]}{round(total_income/12, 2)}",
-                            f"{self.statistics_words[24]}{round(total_income/days_amount, 2)}\n",
-                            f"{self.statistics_words[6]}{total_expense}",
-                            f"{self.statistics_words[27]}{round(total_expense/12, 2)}",
-                            f"{self.statistics_words[26]}{round(total_expense/days_amount, 2)}\n",
-                            f"{self.statistics_words[8]}0.0",
-                            f"\n\n{self.translated_incomes}",
-                            f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
-                            f"{self.income_category.name} - {total_income}",
-                            f"\n\n{self.translated_expenses}",
-                            f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
-                            f"{self.expenses_category.name} - {total_expense}"
-                        ]
+                statistics_data = YearlyStatistics.statistics.total_year_statistics.data
+                self.assertEqual(
+                    len(expected_yearly_statistics), statistics_data.count(),
+                    f"Yearly statistics have another amount of rows. Expected amount {len(expected_yearly_statistics)} found {statistics_data.count()} rows"
+                )
 
+                for index, expected_row in enumerate(expected_yearly_statistics):
+                    self.assertEqual(
+                        expected_row, statistics_data.item(index).text(),
+                        f"In total year statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                    )
+
+                for month in YearlyStatistics.statistics.months:
+                    statistics_data = month.data
+
+                    month_days_amount = MONTHS_DAYS[month.month_number-1] + (month.month_number == 2 and Session.current_year % 4 == 0)
+                    expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
+
+                    if month.month_number != month_without_transactions:
                         self.assertEqual(
-                            len(expected_yearly_statistics), statistics_data.count(),
-                            f"Yearly statistics have another amount of rows. Expected amount {len(expected_yearly_statistics)} found {statistics_data.count()} rows"
+                            len(expected_monthly_statistics), statistics_data.count(),
+                            f"Month {month.month_number} statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
                         )
 
-                        for index, expected_row in enumerate(expected_yearly_statistics):
+                        for index, expected_row in enumerate(expected_monthly_statistics):
                             self.assertEqual(
                                 expected_row, statistics_data.item(index).text(),
-                                f"In quarterly statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                                f"In month {month.month_number} statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
                             )
+
                     else:
-                        month_days_amount = MONTHS_DAYS[statistic_list-1] + (statistic_list == 2 and Session.current_year % 4 == 0)
-                        expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
+                        self.assertEqual(1, statistics_data.count(), f"Month {month.month_number} without transactions don't have 1 row in statistics")
+                        self.assertEqual(Errors.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
 
-                        if statistic_list != month_without_transactions:
-                            self.assertEqual(
-                                len(expected_monthly_statistics), statistics_data.count(),
-                                f"Month {statistic_list} statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
-                            )
-
-                            for index, expected_row in enumerate(expected_monthly_statistics):
-                                self.assertEqual(
-                                    expected_row, statistics_data.item(index).text(),
-                                    f"In month {statistic_list} statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
-                                )
-
-                        else:
-                            self.assertEqual(1, statistics_data.count(), f"Month {statistic_list} without transactions don't have 1 row in statistics")
-                            self.assertEqual(Errors.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
-
-                
                 YearlyStatistics.window.done(1)
-                StatisticsWindow.window.done(1)
             
             QTimer.singleShot(100, check_yearly_statistics)
             StatisticsWindow.yearly_statistics.click()
         
         self.open_statistics_window(open_yearly_statistics_window)
+    
+
+    def test_show_custom_range_statistics(self):
+        for month in range(1, 7):
+            if month != Session.current_month:
+                Session.db.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
+                Session.db.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+        
+        def open_custom_range_statistics_window():
+
+            def select_custom_range():
+                for category in range(CustomRangeStatistics.categories_list_layout.count()):
+                    category_wrapper = CustomRangeStatistics.categories_list_layout.itemAt(category).widget()
+
+                    for category_layout_item in range(3):
+                        category_layout_item = category_wrapper.layout().itemAt(category_layout_item).widget()
+
+                        if category_layout_item.text() == LANGUAGES[Session.language]["General management"][1]:
+                            category_layout_item.click()#Add category button
+                
+                CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
+                CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))
+
+                def check_custom_range_statistics():
+                    total_income = 6000.0
+                    total_expense = 6000.0
+                    date_difference = date(Session.current_year, 6, 1) - date(Session.current_year, 1, 1)
+                    days_amount = date_difference.days
+
+                    expected_custom_range_statistics = [
+                        f"{self.statistics_words[4]}{total_income}",
+                        f"{self.statistics_words[24]}{round(total_income/days_amount, 2)}\n",
+                        f"{self.statistics_words[6]}{total_expense}",
+                        f"{self.statistics_words[26]}{round(total_expense/days_amount, 2)}\n",
+                        f"{self.statistics_words[8]}0.0",
+                        f"\n\n{self.translated_incomes}",
+                        f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
+                        f"{self.income_category.name} - {total_income}",
+                        f"\n\n{self.translated_expenses}",
+                        f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
+                        f"{self.expenses_category.name} - {total_expense}"
+                    ]
+
+                    statistics_data = CustomRangeStatisticsView.statistics_list
+                    self.assertEqual(
+                        len(expected_custom_range_statistics), statistics_data.count(),
+                        f"Custom range statistics (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) have another amount of rows. Expected amount {len(expected_custom_range_statistics)} found {statistics_data.count()} rows"
+                    )
+
+                    for index, expected_row in enumerate(expected_custom_range_statistics):
+                        self.assertEqual(
+                            expected_row, statistics_data.item(index).text(),
+                            f"In Custom range statistics (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                        )
+                    
+                    expected_transactions = [
+                        f"{self.translated_incomes}\n\n",
+                        f"\n{self.income_category.name}\n",
+                        f"01/01/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"01/02/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"01/03/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"01/04/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"01/05/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"01/06/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"\n\n\n{self.translated_expenses}\n\n",
+                        f"\n{self.expenses_category.name}\n",
+                        f"01/01/{Session.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/02/{Session.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/03/{Session.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/04/{Session.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/05/{Session.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/06/{Session.current_year}\t1000.0\tTest expenses transaction",
+                    ]
+
+                    statistics_data = CustomRangeStatisticsView.transactions_list
+                    self.assertEqual(
+                        len(expected_transactions), statistics_data.count(),
+                        f"Custom range transactions list (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) have another amount of rows. Expected amount {len(expected_transactions)} found {statistics_data.count()} rows"
+                    )
+
+                    for index, expected_row in enumerate(expected_transactions):
+                        self.assertEqual(
+                            expected_row, statistics_data.item(index).text(),
+                            f"In Custom range transactions list (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) row {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                        )
+                    
+                    CustomRangeStatisticsView.window.done(1)
+                    CustomRangeStatistics.window.done(1)
+
+                QTimer.singleShot(100, check_custom_range_statistics)
+                CustomRangeStatistics.show_statistics.click()
+
+            QTimer.singleShot(100, select_custom_range)
+            StatisticsWindow.custom_range_statistics.click()
+
+        self.open_statistics_window(open_custom_range_statistics_window)
+
 
 
 

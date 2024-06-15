@@ -65,23 +65,18 @@ def change_language():
     QuarterlyStatistics.window.setWindowTitle(Language["Windows"][5])
     QuarterlyStatistics.copy_statistics.setText(Language["Account"]["Info"]["Statistics"][30])
     quarters_numbers = ["I","II","III","IV"]
-    month_number = 1
-    for quarter in QuarterlyStatistics.statistics:
-        QuarterlyStatistics.statistics[quarter]["Label"].setText(quarters_numbers[quarter-1]+Language["Account"]["Info"]["Statistics"][23])
-        for month_list in QuarterlyStatistics.statistics[quarter]:
-            if month_list != 0 and month_list != "Label":
-                QuarterlyStatistics.statistics[quarter][month_list]["Label"].setText(Language["Months"][month_number])
-                month_number+=1
-            elif month_list == 0:
-                QuarterlyStatistics.statistics[quarter][0]["Label"].setText(Language["Account"]["Info"][6])
+    for quarter in QuarterlyStatistics.statistics.quarters:
+        quarter.label.setText(quarters_numbers[quarter.quarter_number-1]+Language["Account"]["Info"]["Statistics"][23])
+        quarter.total_quarter_statistics.label.setText(Language["Account"]["Info"][6])
+
+        for month in quarter.months:
+            month.label.setText(Language["Months"][month.month_number])
     
     YearlyStatistics.window.setWindowTitle(Language["Windows"][6])
     YearlyStatistics.copy_statistics.setText(Language["Account"]["Info"]["Statistics"][32])
-    for month_list in YearlyStatistics.statistics:
-        if month_list != 0:
-            YearlyStatistics.statistics[month_list]["Label"].setText(Language["Months"][month_list])
-        else:
-            YearlyStatistics.statistics[0]["Label"].setText(Language["Account"]["Info"][6])
+    YearlyStatistics.statistics.total_year_statistics.label.setText(Language["Account"]["Info"][6])
+    for month in YearlyStatistics.statistics.months:
+        month.label.setText(Language["Months"][month.month_number])
     
     CustomRangeStatistics.window.setWindowTitle(Language["Account"]["Info"]["Statistics"][34])
     CustomRangeStatistics.show_statistics.setText(Language["Account"]["Info"]["Statistics"][0])
