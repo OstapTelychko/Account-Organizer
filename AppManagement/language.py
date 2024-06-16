@@ -11,6 +11,8 @@ from GUI.windows.errors import errors_list
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
 
+
+
 def change_language():
     Language = LANGUAGES[Session.language]
 

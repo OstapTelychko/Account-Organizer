@@ -18,21 +18,7 @@ from AppManagement.category import activate_categories, remove_categories_from_l
 
 LEFT_BUTTON = Qt.MouseButton.LeftButton
 OK_BUTTON = QMessageBox.StandardButton.Ok
-
-
-class TestWindowsCaseMixin():
-
-    def test_windows_opening(self:TestCase):
-        for window, open_window_button in self.test_windows_open.items():
-            window_object = getattr(window, "window")
-
-            def check_window_appearance():
-                self.assertTrue(window_object.isVisible(), f"Window {window.__name__} hasn't showed after click on button {open_window_button.text()}")
-                window_object.done(1)
-
-            QTimer.singleShot(100, check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
-            open_window_button.click()
-
+    
 
 
 class DBTestCase(TestCase):

@@ -1,11 +1,11 @@
 from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, OK_BUTTON
 
+from languages import LANGUAGES
 from backend.models import Category
 from AppObjects.session import Session
-from project_configuration import CATEGORY_TYPE
 
-from GUI.windows.main_window import MainWindow
+from GUI.windows.main_window import MainWindow, app
 from GUI.windows.errors import Errors
 from GUI.windows.category import AddCategoryWindow, CategorySettingsWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 
@@ -93,3 +93,26 @@ class TestCategory(DBTestCase):
         self.assertEqual(Session.db.get_category(self.expenses_category.name, "Expenses").position, 1, "Expenses category hasn't changed position to 1")
         self.assertEqual(Session.db.get_category("Second "+self.expenses_category.name, "Expenses").position, 0, "Expenses category hasn't changed position to 1")
     
+
+    def test_copy_month_transactions(self):
+        for category in Session.categories.values():
+            def copy_transactions():
+                def check_copied_transactions():
+                    if category.type == "Incomes":
+                        transaction_type = "income"
+                    else:
+                        transaction_type = "expenses"
+
+                    column_names = LANGUAGES[Session.language]["Account"]["Info"]
+                    expected_transactions = f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
+                    expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
+
+                    self.assertEqual(expected_transactions, app.clipboard().text(), f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}")
+                    CategorySettingsWindow.window.done(1)
+
+                QTimer.singleShot(100, check_copied_transactions)
+                CategorySettingsWindow.copy_transactions.click()
+
+            QTimer.singleShot(100, copy_transactions)
+            category.settings.click()
+

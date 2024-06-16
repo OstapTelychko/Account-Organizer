@@ -2,12 +2,12 @@ from unittest import TestCase
 from datetime import datetime
 
 from PySide6.QtCore import QTimer
-from tests.tests_toolkit import TestWindowsCaseMixin
 
 from languages import LANGUAGES
+from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.session import Session
 
-from GUI.windows.main_window import MainWindow, SettingsWindow
+from GUI.windows.main_window import MainWindow, SettingsWindow, app
 from GUI.windows.errors import Errors
 from GUI.windows.statistics import StatisticsWindow
 from GUI.windows.category import AddCategoryWindow
@@ -15,10 +15,20 @@ from GUI.windows.category import AddCategoryWindow
 
 
 
-class TestMainWindow(TestCase, TestWindowsCaseMixin):
+class TestMainWindow(TestCase):
 
-    def setUp(self) -> None:
-        self.test_windows_open = {SettingsWindow:MainWindow.settings, StatisticsWindow:MainWindow.statistics, AddCategoryWindow:MainWindow.add_incomes_category}
+    def test_windows_opening(self:TestCase):
+        test_windows_open = {SettingsWindow:MainWindow.settings, StatisticsWindow:MainWindow.statistics, AddCategoryWindow:MainWindow.add_incomes_category}
+
+        for window, open_window_button in test_windows_open.items():
+            window_object = getattr(window, "window")
+
+            def check_window_appearance():
+                self.assertTrue(window_object.isVisible(), f"Window {window.__name__} hasn't showed after click on button {open_window_button.text()}")
+                window_object.done(1)
+
+            QTimer.singleShot(100, check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
+            open_window_button.click()
 
 
     def test_date_change(self):
@@ -94,3 +104,41 @@ class TestMainWindow(TestCase, TestWindowsCaseMixin):
 
         QTimer.singleShot(100, check_forbidden_expression)
         MainWindow.calculate.click()
+
+
+    def test_language_change(self):
+        all_languages = AVAILABLE_LANGUAGES.copy()
+        all_languages.remove(Session.language)
+        previous_language = Session.language
+        language_to_change = all_languages[0]
+
+        def open_settings():
+            SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
+            expected_translation = LANGUAGES[language_to_change]["Windows"][0]
+            result = SettingsWindow.window.windowTitle()
+
+            self.assertEqual(result, expected_translation, f"Language has't been changed. Expected translation {expected_translation} not {result}")
+            SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(previous_language))
+            SettingsWindow.window.done(1)
+
+        QTimer.singleShot(100, open_settings)
+        MainWindow.settings.click()
+    
+
+    def test_theme_change(self):
+        def open_settings():
+            current_theme = Session.theme
+            current_style_sheet = app.styleSheet()
+            current_theme_icon = SettingsWindow.switch_themes_button.icon()
+
+            SettingsWindow.switch_themes_button.click()
+
+            self.assertNotEqual(current_theme, Session.theme, f"Session theme hasn't changed. Theme {current_theme}")
+            self.assertNotEqual(current_style_sheet, app.styleSheet(), f"App style sheet hasn't changed.")
+            self.assertNotEqual(current_theme_icon, SettingsWindow.switch_themes_button.icon(), f"Theme icon  hasn't changed.")
+
+            SettingsWindow.switch_themes_button.click()
+            SettingsWindow.window.done(1)
+        
+        QTimer.singleShot(100, open_settings)
+        MainWindow.settings.click()
