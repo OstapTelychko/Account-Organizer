@@ -5,7 +5,8 @@ from tests.tests_toolkit import DBTestCase, OK_BUTTON
 from AppObjects.session import Session
 from AppManagement.account import load_account_data
 
-from GUI.windows.main_window import MainWindow, SettingsWindow
+from GUI.windows.main_window import MainWindow
+from GUI.windows.settings import SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.errors import Errors
 

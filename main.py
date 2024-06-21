@@ -7,7 +7,8 @@ from backend.db_controller import DBController
 from AppObjects.session import Session
 
 
-from GUI.windows.main_window import app, MainWindow, SettingsWindow
+from GUI.windows.main_window import app, MainWindow
+from GUI.windows.settings import SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors

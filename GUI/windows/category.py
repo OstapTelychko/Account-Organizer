@@ -1,19 +1,14 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QDialog, QSizePolicy, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt
 
-from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, close_dialog
+from GUI.windows.main_window import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button
+from CustomWidgets.sub_window import SubWindow
 
 
 
 
 class CategorySettingsWindow():
-    window = QDialog()
-    window.resize(600,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle(" ")
-    window.closeEvent = close_dialog
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.setFont(BASIC_FONT)
+    window = SubWindow()
 
     rename_category = create_button("Rename category",(255,40))
 
@@ -24,22 +19,20 @@ class CategorySettingsWindow():
     copy_transactions = create_button("Copy transactions",(275,40))
 
     main_layout = QVBoxLayout()
+    main_layout.setSpacing(20)
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(rename_category, alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(delete_category, alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(change_category_position, alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(copy_transactions,alignment=ALIGMENT.AlignHCenter)
+    main_layout.setContentsMargins(30, 10, 30, 20)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class AddCategoryWindow():
-    window = QDialog()
-    window.resize(600,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Add category")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
 
     category_name = QLineEdit()
     category_name.setPlaceholderText("Category name")
@@ -47,21 +40,18 @@ class AddCategoryWindow():
     button = create_button("Add category", (160,40))
 
     main_layout = QVBoxLayout()
-
+    main_layout.setSpacing(30)
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(category_name,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.setContentsMargins(30, 10, 30, 30)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class ChangeCategoryPositionWindow():
-    window = QDialog()
-    window.resize(800,800)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Change category position")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
 
     preview_category_position = QLabel()
     preview_category_position.setProperty("class", "category_list_item")
@@ -103,23 +93,20 @@ class ChangeCategoryPositionWindow():
     
 
     main_layout = QVBoxLayout()
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addStretch(1)
     main_layout.addWidget(preview_category_container, alignment=ALIGMENT.AlignHCenter)
     main_layout.addLayout(new_position_layout)
     main_layout.addWidget(categories_list_scroll, alignment=ALIGMENT.AlignHCenter)
     main_layout.addStretch(1)
+    main_layout.setContentsMargins(30, 10, 30, 20)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class RenameCategoryWindow():
-    window = QDialog()
-    window.resize(600,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Rename")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
 
     new_category_name = QLineEdit()
     new_category_name.setMinimumWidth(150)
@@ -127,7 +114,10 @@ class RenameCategoryWindow():
     button = create_button("Rename", (170,40))
 
     main_layout = QVBoxLayout()
+    main_layout.setSpacing(30)
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(new_category_name,alignment=ALIGMENT.AlignHCenter)
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.setContentsMargins(40, 10, 40, 20)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)

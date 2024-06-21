@@ -2,18 +2,14 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComb
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 
-from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT, create_button, close_dialog
 from project_configuration import AVAILABLE_LANGUAGES, ROOT_DIRECTORY
+from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT, create_button, close_dialog
+from CustomWidgets.sub_window import SubWindow
 
 
 
 class AddAccountWindow():
-    window = QDialog()
-    window.resize(800,800)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Add account")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
 
     languages = QComboBox()
     languages.setFont(BASIC_FONT)
@@ -42,6 +38,8 @@ class AddAccountWindow():
     current_balance.setPlaceholderText("Current balance")
 
     main_layout = QVBoxLayout()
+    main_layout.setSpacing(20)
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addLayout(languages_layout)
     main_layout.addStretch(1)
     main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)    
@@ -52,18 +50,14 @@ class AddAccountWindow():
     main_layout.addStretch(1)
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
     main_layout.addStretch(1)
+    main_layout.setContentsMargins(50, 10, 50, 30)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class RenameAccountWindow():
-    window = QDialog()
-    window.resize(800,800)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Rename account")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
     
     message = QLabel()
     message.setFont(BASIC_FONT)
@@ -75,6 +69,8 @@ class RenameAccountWindow():
     button = create_button("Update", (160,40))
 
     main_layout = QVBoxLayout()
+    main_layout.setSpacing(20)
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addStretch(1)
     main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)
     main_layout.addStretch(1)
@@ -82,5 +78,6 @@ class RenameAccountWindow():
     main_layout.addStretch(1)
     main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
     main_layout.addStretch(1)
+    main_layout.setContentsMargins(50, 10, 50, 30)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)

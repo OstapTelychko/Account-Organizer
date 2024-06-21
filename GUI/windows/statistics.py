@@ -1,19 +1,15 @@
 from typing import NamedTuple
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QDialog, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
-from PySide6.QtCore import Qt, QDate, QEvent
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
+from PySide6.QtCore import Qt, QDate
 
-from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, close_dialog
-
+from GUI.windows.main_window import BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow
+from CustomWidgets.sub_window import SubWindow
 
 
 
 class StatisticsWindow():
-    window = QDialog()
-    window.resize(600,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Statistics")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
+    MainWindow.sub_windows.append(window)
 
     monthly_statistics = create_button("Monthly", (150,40))
 
@@ -33,7 +29,6 @@ class StatisticsWindow():
     statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
     statistics_wrapper.setProperty("class", "wrapper")
 
-
     custom_range_statistics = create_button("Custom date range", (180, 40))
 
     custom_statistics_wrapper_layout = QVBoxLayout()
@@ -49,21 +44,18 @@ class StatisticsWindow():
     main_layout = QVBoxLayout()
     main_layout.setSpacing(20)
     main_layout.addStretch(1)
-    main_layout.addWidget(statistics_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addLayout(window.window_menu_layout)
+    main_layout.addWidget(statistics_wrapper, alignment=ALIGMENT.AlignRight)
     main_layout.addWidget(custom_statistics_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     main_layout.addStretch(1)
+    main_layout.setContentsMargins(50, 10, 50, 20)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class MonthlyStatistics():
-    window = QDialog()
-    window.resize(600,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("April")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.closeEvent = close_dialog
+    window = SubWindow()
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -72,6 +64,8 @@ class MonthlyStatistics():
     {background: transparent}""")#Disable background color change on mouseover
     
     statistics = QListWidget()
+    statistics.setMinimumWidth(500)
+    statistics.setMinimumHeight(450)
     statistics.setFont(BASIC_FONT)
 
     copy_statistics = create_button("Copy month statistics", (275,40))
@@ -79,21 +73,17 @@ class MonthlyStatistics():
     copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
 
     main_layout = QVBoxLayout()
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(statistics)
     main_layout.addLayout(copy_statistics_layout)
+    main_layout.setContentsMargins(50, 10, 50, 20)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class QuarterlyStatistics():
-    window = QDialog()
-    window.resize(800,700)
-    window.setMinimumSize(800,600)
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Quarterly Statistics")
-    window.closeEvent = close_dialog
+    window = SubWindow()
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -177,19 +167,15 @@ class QuarterlyStatistics():
     window_scroll.setStyleSheet("QScrollArea{border:none}")
 
     main_layout = QVBoxLayout()
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(window_scroll)
-    window.setLayout(main_layout)
+
+    window.window_container.setLayout(main_layout)
 
 
 
 class YearlyStatistics():
-    window = QDialog()
-    window.resize(800,700)
-    window.setMinimumSize(800,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.SubWindow)
-    window.setWindowTitle("Yearly Statistics")
-    window.closeEvent = close_dialog
+    window = SubWindow()
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -215,6 +201,7 @@ class YearlyStatistics():
         statistics_data = QListWidget()
         statistics_data.setFont(BASIC_FONT)
         statistics_data.setMinimumHeight(400)
+        statistics_data.setMinimumWidth(500)
         statistics_data.setWordWrap(True)
 
         statistics_layout = QVBoxLayout()
@@ -248,18 +235,16 @@ class YearlyStatistics():
     statistics_scroll.setStyleSheet("QScrollArea{border:none}")
 
     main_layout = QVBoxLayout()
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(statistics_scroll)
-    window.setLayout(main_layout)
+    main_layout.setContentsMargins(30, 10, 30, 20)
+
+    window.window_container.setLayout(main_layout)
 
 
 
 class CustomRangeStatistics():
-    window = QDialog()
-    window.resize(600,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Custom range")
-    window.setWindowFlags(Qt.WindowType.SubWindow)
-    window.closeEvent = close_dialog
+    window = SubWindow()
 
     selected_categories_data = {}
 
@@ -309,21 +294,19 @@ class CustomRangeStatistics():
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(10)
+    main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(selected_categories_list, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     main_layout.addWidget(categories_list_scroll, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
     main_layout.addLayout(date_inputs_layout)
     main_layout.addWidget(show_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.setContentsMargins(30, 10, 30, 20)
 
-    window.setLayout(main_layout)
+    window.window_container.setLayout(main_layout)
 
 
 
 class CustomRangeStatisticsView:
-    window = QDialog()
-    window.resize(1200,600)
-    window.setWindowIcon(APP_ICON)
-    window.setWindowTitle("Custom range")
-    window.setWindowFlags(Qt.WindowType.Drawer & Qt.WindowType.Window)
+    window = SubWindow()
     window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_())
 
     statistics_list = QListWidget()
@@ -350,12 +333,18 @@ class CustomRangeStatisticsView:
     transactions_layout.addWidget(transactions_list)
     transactions_layout.addWidget(copy_transactions, alignment=ALIGMENT.AlignHCenter)
 
-    main_layout = QHBoxLayout()
-    main_layout.setSpacing(20)
-    main_layout.addStretch(1)
-    main_layout.addLayout(statistics_layout)
-    main_layout.addStretch(2)
-    main_layout.addLayout(transactions_layout)
-    main_layout.addStretch(1)
+    content_layout = QHBoxLayout()
+    content_layout.setSpacing(20)
+    content_layout.addStretch(1)
+    content_layout.addLayout(statistics_layout)
+    content_layout.addStretch(2)
+    content_layout.addLayout(transactions_layout)
+    content_layout.addStretch(1)
 
-    window.setLayout(main_layout)
+    main_layout = QVBoxLayout()
+    main_layout.addLayout(window.window_menu_layout)
+    main_layout.addLayout(content_layout)
+    main_layout.setContentsMargins(30, 10, 30, 20)
+
+
+    window.window_container.setLayout(main_layout)

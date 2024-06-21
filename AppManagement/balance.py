@@ -1,6 +1,8 @@
 from AppObjects.session import Session
-from GUI.windows.main_window import MainWindow, SettingsWindow
 from languages import LANGUAGES
+
+from GUI.windows.main_window import MainWindow
+from GUI.windows.settings import SettingsWindow
 
 
 

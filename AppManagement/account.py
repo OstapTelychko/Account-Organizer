@@ -5,7 +5,7 @@ from AppObjects.session import Session
 from backend.db_controller import DBController
 from languages import LANGUAGES
 
-from GUI.windows.main_window import SettingsWindow
+from GUI.windows.settings import SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.errors import Errors
 

@@ -3,7 +3,9 @@ from qdarktheme._style_loader import load_stylesheet
 
 from project_configuration import ROOT_DIRECTORY
 from AppObjects.session import Session
-from GUI.windows.main_window import app, SettingsWindow
+
+from GUI.windows.main_window import app
+from GUI.windows.settings import SettingsWindow
 
 
 
@@ -31,22 +33,39 @@ DARK_THEME = load_stylesheet("dark")+"""
     background-color:rgb(40, 40, 40);
     border-radius:15px;
 }
+
+.sub_window{
+    background-color:rgb(32, 33, 36);
+    border-radius:15px;
+}
+.sub_window_title{
+    background-color:rgb(45, 45, 45);
+    border-radius:10px;
+}
+
 .wrapper{
     background-color:rgb(45,45,45);
     border-radius:10px;
 }
 
-.button, .button:active, button:focus, .button:default{
+.button, .button:active, .button:focus, .button:default{
     background-color:rgb(50, 50, 50);
     border:1px solid black;
     color:rgb(130, 170, 255)
 }
-.button:disabled{
+
+.close_window, .close_window:active, .close_window:focus, .close_window:default{
+    background-color:rgb(50, 50, 50);
+    color:rgb(130, 170, 255)
+}
+
+.button:disabled, .close_window:disabled{
     background-color:rgb(100, 100, 100);
     color:rgb(150, 150, 150);
 }
 
-.button:hover, .button:focus:hover, .button:active:hover, .button:default:hover{
+.button:hover, .button:focus:hover, .button:active:hover, .button:default:hover
+.close_window:hover, .close_window:active:hover, .close_window:focus:hover, .close_window:default:hover{
     background-color:rgb(45, 45, 45)
 }
 """
@@ -86,6 +105,17 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
     color:white;
     border-radius:15px;
 }
+.sub_window{
+    background-color:rgb(225, 228, 230);
+    color:white;
+    border-radius:15px;
+}
+.sub_window_title{
+    background-color:rgb(100, 120, 100);
+    border-radius:10px;
+    color:rgb(240, 240, 240)
+}
+
 .wrapper{
     background-color:rgb(100, 120, 100);
     border-radius:10px;
@@ -95,18 +125,25 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
     color:rgb(240, 240, 240);
 }
 
-.button, .button:active, button:focus, .button:default{
+.button, .button:active, .button:focus, .button:default{
     background-color:rgb(100, 130, 100);
     color:rgb(240, 240, 240);
     border:1px solid black;
 }
 
-.button:disabled{
+.close_window, .close_window:active, .close_window:focus, .close_window:default{
+    background-color:rgb(100, 130, 100);
+    color:rgb(240, 240, 240);
+    border:none;
+}
+
+.button:disabled, .close_window{
     background-color:rgb(100, 100, 100);
     color:rgb(150, 150, 150);
 }
 
-.button:hover, .button:focus:hover, .button:active:hover, .button:default:hover{
+.button:hover, .button:focus:hover, .button:active:hover, .button:default:hover, 
+.close_window:hover, .close_window:active:hover, .close_window:focus:hover, .close_window:default:hover{
     background-color:rgb(90, 120, 90);
 }
 """
