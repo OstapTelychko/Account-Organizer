@@ -9,7 +9,7 @@ from GUI.windows.main_window import APP_ICON
 errors_list = []
 def create_error(type_confirm:bool, icon:QMessageBox.Icon) -> QMessageBox:
     error = QMessageBox()
-    error.setWindowFlags(Qt.WindowType.Drawer)
+    error.setWindowFlags(Qt.WindowType.Tool)
     error.addButton(QMessageBox.StandardButton.Ok)
     error.setWindowTitle("Account Organizer")
     if type_confirm:

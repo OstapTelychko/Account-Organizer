@@ -15,6 +15,7 @@ from AppManagement.balance import update_account_balance
 
 
 def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget):
+    TransactionManagementWindow.button.setDefault(True)
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
@@ -59,6 +60,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
 
 
 def show_add_transaction_window(category_name:str):
+    TransactionManagementWindow.button.setDefault(True)
     TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][1])
     TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Account"]["Transactions management"]["Messages"][1])
     TransactionManagementWindow.transaction_name.setText("")
