@@ -65,15 +65,21 @@ def copy_quarterly_statistics():
         statistics = QuarterlyStatistics.statistics
         result = ""
 
-        for quarter in statistics:
-            result += f"{statistics[quarter]['Label'].text()}\n\n"
-            for statistic_list in statistics[quarter]:
-                if statistic_list != "Label":
-                    result += f"{statistics[quarter][statistic_list]['Label'].text()}\n\n"
-                    for row in range(statistics[quarter][statistic_list]["Statistic Data"].count()):
-                        result += f"{statistics[quarter][statistic_list]['Statistic Data'].item(row).text()}\n"
-                    result += "\n"
-            result+= "\n"
+        for quarter in statistics.quarters:
+            result += f"{quarter.label.text()}\n\n"
+
+            total_quarter_statistics = quarter.total_quarter_statistics
+            result += f"{total_quarter_statistics.label.text()}\n\n"
+            for row in range(total_quarter_statistics.data.count()):
+                result += f"{total_quarter_statistics.data.item(row).text()}\n"
+            result += "\n"
+
+            for month in quarter.months:
+                result += f"{month.label.text()}\n\n"
+                for row in range(month.data.count()):
+                    result += f"{month.data.item(row).text()}\n"
+                result += "\n"
+            result+= "\n\n\n"
         
         app.clipboard().setText(result)
         show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][31])
@@ -85,10 +91,16 @@ def copy_yearly_statistics():
         statistics = YearlyStatistics.statistics
         result = ""
 
-        for statistic_list in statistics:
-            result += f"{statistics[statistic_list]['Label'].text()}\n"
-            for row in range(statistics[statistic_list]["Statistic Data"].count()):
-                result += f"{statistics[statistic_list]['Statistic Data'].item(row).text()}\n"
+        total_yearly_statistics = statistics.total_year_statistics
+        result += f"{total_yearly_statistics.label.text()}\n"
+        for row in range(total_yearly_statistics.data.count()):
+            result += f"{total_yearly_statistics.data.item(row).text()}\n"
+        result += "\n\n\n"
+
+        for month in statistics.months:
+            result += f"{month.label.text()}\n"
+            for row in range(month.data.count()):
+                result += f"{month.data.item(row).text()}\n"
             result += "\n\n\n"
 
         app.clipboard().setText(result)
