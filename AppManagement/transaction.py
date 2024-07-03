@@ -27,9 +27,12 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][5])
     TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Account"]["Transactions management"]["Messages"][0])
     TransactionManagementWindow.window.setWindowTitle(category_name)
+
     TransactionManagementWindow.transaction_name.setText(selected_row[0].text())
+    TransactionManagementWindow.transaction_name.setFocus()
     TransactionManagementWindow.transaction_day.setText(selected_row[1].text())
     TransactionManagementWindow.transaction_value.setText(selected_row[2].text())
+
     TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(), 3).text())
     TransactionManagementWindow.window.exec()
 
@@ -63,7 +66,9 @@ def show_add_transaction_window(category_name:str):
     TransactionManagementWindow.button.setDefault(True)
     TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][1])
     TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Account"]["Transactions management"]["Messages"][1])
+
     TransactionManagementWindow.transaction_name.setText("")
+    TransactionManagementWindow.transaction_name.setFocus()
     TransactionManagementWindow.transaction_day.setText("")
     TransactionManagementWindow.transaction_value.setText("")
 

@@ -72,13 +72,13 @@ def copy_quarterly_statistics():
             result += f"{total_quarter_statistics.label.text()}\n\n"
             for row in range(total_quarter_statistics.data.count()):
                 result += f"{total_quarter_statistics.data.item(row).text()}\n"
-            result += "\n"
+            result += "\n\n"
 
             for month in quarter.months:
-                result += f"{month.label.text()}\n\n"
+                result += f"{month.label.text()}\n"
                 for row in range(month.data.count()):
                     result += f"{month.data.item(row).text()}\n"
-                result += "\n"
+                result += "\n\n"
             result+= "\n\n\n"
         
         app.clipboard().setText(result)
