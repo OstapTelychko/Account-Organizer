@@ -1,9 +1,11 @@
 import toml
 import os
+from sys import exit
 from datetime import datetime
 
 from project_configuration import USER_CONF_PATH
 from backend.db_controller import DBController
+from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
 
 
@@ -26,10 +28,17 @@ class Session:
     account_name = ""
 
     db:DBController = None
+    instance_guard:SingleInstanceGuard = None
     test_mode = False
 
 
     def start_session():
+        Session.instance_guard = SingleInstanceGuard()
+
+        if Session.instance_guard.is_running:
+            print("Another instance is already running. Exiting.")
+            exit(0)
+            
         #Set current date
         Session.current_month = datetime.now().month
         Session.current_year = datetime.now().year

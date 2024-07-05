@@ -54,6 +54,11 @@ def calculate_expression():
 def main():
     Session.start_session()
 
+    #Set main window for instance guard
+    Session.instance_guard.main_window = MainWindow.window
+    # Ensure the server socket is closed when the application exits
+    app.aboutToQuit.connect(Session.instance_guard.close_sockets)
+
     load_theme()
 
     #Set current month and year

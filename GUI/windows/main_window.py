@@ -37,17 +37,6 @@ def create_button(button_text:str, size:tuple[int], css_class:str="button") -> Q
     return button
 
 
-def exec_sub_window(window:QDialog):
-    
-    QDialog.exec(window)
-
-
-
-def close_dialog(event:QEvent):
-    event.accept()
-    MainWindow.window.raise_()
-
-
 
 class MainWindow():
     window = QWidget()
