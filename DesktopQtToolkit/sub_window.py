@@ -1,14 +1,17 @@
 from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect
 
-from GUI.windows.main_window import SHADOW_EFFECT_ARGUMENTS, APP_ICON, ALIGMENT, create_button, MainWindow
+from GUI.gui_constants import ALIGMENT, APP_ICON, SHADOW_EFFECT_ARGUMENTS
+from DesktopQtToolkit.create_button import create_button
 
 
 
 class SubWindow(QDialog):
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(self, main_window:QWidget, sub_window_container:dict, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self.main_window = main_window
+        sub_window_container[id(self)] = self
 
         self.setWindowIcon(APP_ICON)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool)
@@ -54,7 +57,7 @@ class SubWindow(QDialog):
 
     def exec(self):
         def show_window():
-            main_window_center = MainWindow.window.geometry().center()
+            main_window_center = self.main_window.geometry().center()
             sub_window_geometry = self.geometry()
 
             main_window_center.setX(main_window_center.x()-sub_window_geometry.width()/2)

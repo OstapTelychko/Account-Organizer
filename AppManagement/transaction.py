@@ -1,13 +1,13 @@
 from PySide6.QtWidgets import QMessageBox, QHeaderView
 from PySide6.QtCore import Qt
 
-
-from GUI.windows.main_window import ALIGMENT, MainWindow
+from GUI.gui_constants import ALIGMENT
+from GUI.windows.main_window import MainWindow
 from GUI.windows.errors import Errors
 from GUI.windows.transaction import TransactionManagementWindow
 
 from AppObjects.session import Session
-from CustomWidgets.table_widget import CustomTableWidgetItem, CustomTableWidget
+from DesktopQtToolkit.table_widget import CustomTableWidgetItem, CustomTableWidget
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 from AppManagement.balance import update_account_balance

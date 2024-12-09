@@ -1,0 +1,5 @@
+☐ fix focus on category creation window to prevent closing window on Enter press
+☐ sub windows doesn't minimize when main window is minimized
+
+Archive:
+  ✔ fix window appearing at center of screen (settings, sub windows of statistics) @done(24-12-09 21:43)

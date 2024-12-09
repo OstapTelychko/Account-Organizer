@@ -2,12 +2,16 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolBu
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QIcon
 
-from CustomWidgets.table_widget import CustomTableWidget, CustomTableWidgetItem
 from project_configuration import ROOT_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
 from backend.db_controller import DBController
-from GUI.windows.main_window import BASIC_FONT, ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow
+
+from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
+from DesktopQtToolkit.create_button import create_button
+
+from GUI.gui_constants import ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.windows.main_window import MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
 

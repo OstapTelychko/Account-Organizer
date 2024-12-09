@@ -2,7 +2,7 @@ from unittest import TestCase
 from functools import wraps
 
 from PySide6.QtWidgets import QMessageBox
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt
 
 from backend.models import Category, Transaction, Account
 

@@ -2,7 +2,7 @@ import os
 from alembic.config import Config
 from alembic import command
 
-from unittest import  TestSuite, TestLoader, TextTestRunner, makeSuite
+from unittest import  TestSuite, TestLoader, TextTestRunner
 
 from main import main
 from AppObjects.session import Session
@@ -37,7 +37,7 @@ main()
 try:
     suite = TestSuite()
     loader = TestLoader()
-    suite.addTests((makeSuite(TestMainWindow), makeSuite(TestCategory), makeSuite(TestAccount), makeSuite(TestTransaction), makeSuite(TestStatistics)))
+    suite.addTests((loader.loadTestsFromTestCase(TestMainWindow), loader.loadTestsFromTestCase(TestCategory), loader.loadTestsFromTestCase(TestAccount), loader.loadTestsFromTestCase(TestTransaction), loader.loadTestsFromTestCase(TestStatistics)))
     print(f"Tests found: {suite.countTestCases()}")
 
     TextTestRunner().run(suite)

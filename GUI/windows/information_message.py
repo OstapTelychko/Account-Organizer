@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplic
 from PySide6.QtCore import Qt
 from time import sleep
 
-from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT
+from GUI.gui_constants import ALIGMENT, APP_ICON, BASIC_FONT
 from GUI.windows.category import CategorySettingsWindow
 from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 

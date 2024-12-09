@@ -2,14 +2,16 @@ from typing import NamedTuple
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
 from PySide6.QtCore import Qt, QDate
 
-from GUI.windows.main_window import BASIC_FONT, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow
-from CustomWidgets.sub_window import SubWindow
+from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.create_button import create_button
+
+from GUI.gui_constants import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.windows.main_window import MainWindow
 
 
 
 class StatisticsWindow():
-    window = SubWindow()
-    MainWindow.sub_windows.append(window)
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     monthly_statistics = create_button("Monthly", (150,40))
 
@@ -55,7 +57,7 @@ class StatisticsWindow():
 
 
 class MonthlyStatistics():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -83,7 +85,7 @@ class MonthlyStatistics():
 
 
 class QuarterlyStatistics():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -175,7 +177,7 @@ class QuarterlyStatistics():
 
 
 class YearlyStatistics():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet(""" 
     QListWidget::item:hover,
     QListWidget::item:disabled:hover,
@@ -244,7 +246,7 @@ class YearlyStatistics():
 
 
 class CustomRangeStatistics():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     selected_categories_data = {}
 
@@ -306,7 +308,7 @@ class CustomRangeStatistics():
 
 
 class CustomRangeStatisticsView:
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_())
 
     statistics_list = QListWidget()

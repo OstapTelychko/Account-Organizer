@@ -2,14 +2,17 @@ from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShad
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, ROOT_DIRECTORY
-from GUI.windows.main_window import BASIC_FONT, ICON_SIZE, ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button, MainWindow 
-from CustomWidgets.sub_window import SubWindow
+
+from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.create_button import create_button
+
+from GUI.gui_constants import ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.windows.main_window import MainWindow 
 
 
 
 class SettingsWindow():
-    window = SubWindow()
-    MainWindow.sub_windows.append(window)
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")
 
     switch_themes_button = QToolButton()

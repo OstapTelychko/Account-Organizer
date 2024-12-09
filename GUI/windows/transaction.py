@@ -1,13 +1,15 @@
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel
 
-from GUI.windows.main_window import BASIC_FONT, ALIGMENT, create_button, MainWindow
-from CustomWidgets.sub_window import SubWindow
+from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.create_button import create_button
+
+from GUI.gui_constants import ALIGMENT, BASIC_FONT
+from GUI.windows.main_window import MainWindow
 
 
 
 class TransactionManagementWindow():
-    window = SubWindow()
-    MainWindow.sub_windows.append(window)
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     message = QLabel()
     message.setFont(BASIC_FONT)

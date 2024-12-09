@@ -1,8 +1,7 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt
 
-from GUI.windows.main_window import APP_ICON
-
+from GUI.gui_constants import APP_ICON
 
 
 

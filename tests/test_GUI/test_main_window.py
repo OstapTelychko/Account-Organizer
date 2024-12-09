@@ -7,7 +7,8 @@ from languages import LANGUAGES
 from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.session import Session
 
-from GUI.windows.main_window import MainWindow, app
+from GUI.gui_constants import app
+from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
 from GUI.windows.errors import Errors
 from GUI.windows.statistics import StatisticsWindow

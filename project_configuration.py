@@ -1,5 +1,6 @@
 from pathlib import Path
 
+APP_NAME = "Account Organizer"
 APP_HOST = "127.0.0.1"
 APP_PORT = 6957
 

@@ -1,6 +1,4 @@
-from socket import AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR, socket
-
-from PySide6.QtCore import QObject, Qt
+from PySide6.QtCore import QObject
 from PySide6.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
 from PySide6.QtWidgets import QWidget
 

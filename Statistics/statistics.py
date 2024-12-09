@@ -2,13 +2,16 @@ from functools import partial
 from datetime import date
 from PySide6.QtWidgets import QListWidget, QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
 
-from AppObjects.session import Session
-from AppObjects.category import Category
+
 from backend.models import Transaction
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
+from DesktopQtToolkit.create_button import create_button
 
-from GUI.windows.main_window import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button
+from AppObjects.session import Session
+from AppObjects.category import Category
+
+from GUI.gui_constants import ALIGMENT, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.errors import Errors
 

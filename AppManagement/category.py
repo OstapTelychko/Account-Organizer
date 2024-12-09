@@ -6,13 +6,14 @@ from AppObjects.session import Session
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
-from GUI.windows.main_window import ALIGMENT, MainWindow
+from GUI.gui_constants import ALIGMENT
+from GUI.windows.main_window import MainWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors
 from GUI.category import load_category, add_category_to_position_list
 
 from Statistics.copy_statistics import show_information_message
-from CustomWidgets.table_widget import CustomTableWidgetItem
+from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 from AppManagement.balance import calculate_current_balance
 from AppManagement.transaction import show_add_transaction_window, show_edit_transaction_window, remove_transaction
 

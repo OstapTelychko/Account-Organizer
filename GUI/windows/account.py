@@ -2,13 +2,17 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComb
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, ROOT_DIRECTORY
-from GUI.windows.main_window import APP_ICON, BASIC_FONT, ALIGMENT, create_button
-from CustomWidgets.sub_window import SubWindow
+
+from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.create_button import create_button
+
+from GUI.gui_constants import ALIGMENT, BASIC_FONT
+from GUI.windows.main_window import MainWindow
 
 
 
 class AddAccountWindow():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     languages = QComboBox()
     languages.setFont(BASIC_FONT)
@@ -56,7 +60,7 @@ class AddAccountWindow():
 
 
 class RenameAccountWindow():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     
     message = QLabel()
     message.setFont(BASIC_FONT)

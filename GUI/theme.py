@@ -4,7 +4,7 @@ from qdarktheme._style_loader import load_stylesheet
 from project_configuration import ROOT_DIRECTORY
 from AppObjects.session import Session
 
-from GUI.windows.main_window import app
+from GUI.gui_constants import app
 from GUI.windows.settings import SettingsWindow
 
 

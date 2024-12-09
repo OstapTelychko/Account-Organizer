@@ -1,40 +1,15 @@
-from sys import platform
-
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
-                               QLabel, QPushButton, QScrollArea, QApplication,
-                               QTabWidget, QToolButton, QDialog,
+                               QLabel, QScrollArea, QTabWidget, QToolButton,
                                QSizePolicy)
 
-from PySide6.QtCore import Qt, QSize, QEvent
-from PySide6.QtGui import QIcon, QFont, QColor
+from PySide6.QtCore import Qt, QEvent
+from PySide6.QtGui import QIcon, QFont
 
 from project_configuration import ROOT_DIRECTORY
+from GUI.gui_constants import ALIGMENT, ICON_SIZE, APP_ICON, BASIC_FONT
 
-
-
-app = QApplication([])
-app.setApplicationName("Account Organizer")
-
-
-ALIGMENT = Qt.AlignmentFlag
-ICON_SIZE = QSize(30, 30)
-APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
-
-SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
-
-if platform == "linux":
-    BASIC_FONT = QFont("C059 [urw]", pointSize=12)
-else:#Windows
-    BASIC_FONT = QFont("Georgia", pointSize=12)
-
-
-def create_button(button_text:str, size:tuple[int], css_class:str="button") -> QPushButton:
-    button = QPushButton(text=button_text)
-    button.setFont(BASIC_FONT)
-    button.setMinimumSize(*size)
-    button.setMaximumSize(*size)
-    button.setProperty("class", css_class)
-    return button
+from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.create_button import create_button
 
 
 
@@ -153,11 +128,10 @@ class MainWindow():
 
     calculate = create_button("=",(100,40))
 
-    if platform == "linux":
-        calculate.setFont(QFont("C059 [urw]", pointSize=18))
-    else:#Windows
-        calculate.setFont(QFont("Georgia", pointSize=18))
-
+    calculate_font = QFont(BASIC_FONT)
+    calculate_font.setPointSize(BASIC_FONT.pointSize()+6)
+    calculate.setFont(calculate_font)
+    
     window_bottom.addStretch(1)
     window_bottom.addWidget(statistics)
     window_bottom.addStretch(5)
@@ -177,9 +151,9 @@ class MainWindow():
 
     window.setLayout(main_layout)
 
-    sub_windows:list[QDialog] = []
+    sub_windows:dict[int, SubWindow] = dict()
     def move_event(event:QEvent):
-        for sub_window in MainWindow.sub_windows:
+        for sub_window in MainWindow.sub_windows.values():
             main_window_center = MainWindow.window.geometry().center()
             sub_window_geometry = sub_window.geometry()
 

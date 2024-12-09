@@ -1,14 +1,18 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt
 
-from GUI.windows.main_window import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, create_button
-from CustomWidgets.sub_window import SubWindow
+
+from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.create_button import create_button
+
+from GUI.gui_constants import ALIGMENT, SHADOW_EFFECT_ARGUMENTS
+from GUI.windows.main_window import MainWindow
 
 
 
 
 class CategorySettingsWindow():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     rename_category = create_button("Rename category",(255,40))
 
@@ -32,7 +36,7 @@ class CategorySettingsWindow():
 
 
 class AddCategoryWindow():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     category_name = QLineEdit()
     category_name.setPlaceholderText("Category name")
@@ -51,7 +55,7 @@ class AddCategoryWindow():
 
 
 class ChangeCategoryPositionWindow():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     preview_category_position = QLabel()
     preview_category_position.setProperty("class", "category_list_item")
@@ -106,7 +110,7 @@ class ChangeCategoryPositionWindow():
 
 
 class RenameCategoryWindow():
-    window = SubWindow()
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     new_category_name = QLineEdit()
     new_category_name.setMinimumWidth(150)

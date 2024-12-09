@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLabel, QPushButton, QToolButton, QWidget
-from CustomWidgets.table_widget import CustomTableWidget
+from DesktopQtToolkit.table_widget import CustomTableWidget
 
 
 class Category:

@@ -5,3 +5,4 @@ __pycache__
 Accounts.sqlite
 test_Accounts.sqlite
 User_configuration.toml
+.vscode
