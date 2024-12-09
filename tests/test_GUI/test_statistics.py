@@ -69,6 +69,7 @@ class TestStatistics(DBTestCase):
 
     def test_show_quarterly_statistics(self):
         month_without_transactions = 12 if Session.current_month != 12 else 1
+        quarter_without_transaction = 4 if Session.current_month != 12 else 1
 
         for month in range(1, 13):
             if month not in (Session.current_month, month_without_transactions):
@@ -81,13 +82,12 @@ class TestStatistics(DBTestCase):
                     quarter_number = quarter.quarter_number
                     days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
 
-                    if quarter_number != 4:
+                    if quarter_number != quarter_without_transaction:
                         total_income = 3000.0
                         total_expense = 3000.0
                     else:
                         total_income = 2000.0
                         total_expense = 2000.0
-
 
                     expected_total_quarterly_statistics = [
                         f"{self.statistics_words[4]}{total_income}",

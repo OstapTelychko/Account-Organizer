@@ -1,7 +1,6 @@
 # import sqlite3
 from sqlalchemy import create_engine, desc, and_, event
 from sqlalchemy.orm import sessionmaker
-from datetime import date
 
 from project_configuration import DB_PATH, TEST_DB_PATH
 from .models import Account, Category, Transaction

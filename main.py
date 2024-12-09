@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from sys import exit
+from argparse import ArgumentParser
 
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LANGUAGES
@@ -25,6 +26,8 @@ from AppManagement.category import create_category, load_categories, remove_cate
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
+
+from tests.init_tests import test_main
 
 
 
@@ -147,5 +150,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-    app.exec()
+    parser = ArgumentParser()
+    parser.add_argument("--test", action="store_true")
+
+    if parser.parse_args().test:
+        test_main(main)
+    else:
+        main()
+        app.exec()
