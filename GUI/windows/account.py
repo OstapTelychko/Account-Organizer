@@ -37,6 +37,8 @@ class AddAccountWindow():
     account_name_layout.addWidget(account_name, alignment=ALIGMENT.AlignCenter )
 
     button = create_button("", (140,50))
+    button.setDefault(True)
+
     current_balance = QLineEdit()
     current_balance.setPlaceholderText("Current balance")
 
@@ -70,6 +72,7 @@ class RenameAccountWindow():
     account_name_layout.addWidget(new_account_name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
 
     button = create_button("Update", (160,40))
+    button.setDefault(True)
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(20)

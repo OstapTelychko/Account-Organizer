@@ -25,6 +25,7 @@ class TransactionManagementWindow():
     transaction_layout.addWidget(transaction_value,alignment=ALIGMENT.AlignVCenter)
 
     button = create_button("", (150,40))
+    button.setDefault(True)
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(30)

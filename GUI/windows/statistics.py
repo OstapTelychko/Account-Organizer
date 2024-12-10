@@ -293,6 +293,7 @@ class CustomRangeStatistics():
     date_inputs_layout.addStretch(1)
     
     show_statistics = create_button("Statistics", (150, 40))
+    show_statistics.setDefault(True)
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(10)

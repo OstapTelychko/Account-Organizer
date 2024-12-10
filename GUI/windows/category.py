@@ -42,6 +42,7 @@ class AddCategoryWindow():
     category_name.setPlaceholderText("Category name")
 
     button = create_button("Add category", (160,40))
+    button.setDefault(True)
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(30)
@@ -74,6 +75,7 @@ class ChangeCategoryPositionWindow():
 
     new_position = QLineEdit()
     enter_new_position = create_button("Save", (140, 30))
+    enter_new_position.setDefault(True)
 
     new_position_layout = QHBoxLayout()
     new_position_layout.addWidget(new_position, alignment=ALIGMENT.AlignHorizontal_Mask)
@@ -115,7 +117,9 @@ class RenameCategoryWindow():
     new_category_name = QLineEdit()
     new_category_name.setMinimumWidth(150)
     new_category_name.setPlaceholderText("New name")
+
     button = create_button("Rename", (170,40))
+    button.setDefault(True)
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(30)
