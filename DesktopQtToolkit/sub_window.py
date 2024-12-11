@@ -1,15 +1,15 @@
 from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect
 
-from GUI.gui_constants import ALIGMENT, APP_ICON, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICON, SHADOW_EFFECT_ARGUMENTS
 from DesktopQtToolkit.create_button import create_button
 
 
 
 class SubWindow(QDialog):
 
-    def __init__(self, main_window:QWidget, sub_window_container:dict, parent: QWidget | None = None) -> None:
-        super().__init__(parent)
+    def __init__(self, main_window:QWidget, sub_window_container:dict) -> None:
+        super().__init__(main_window)
         self.main_window = main_window
         sub_window_container[id(self)] = self
 
@@ -45,9 +45,9 @@ class SubWindow(QDialog):
         self.window_menu_layout = QHBoxLayout()
         self.window_menu_layout.addStretch(1)
         self.window_menu_layout.addSpacerItem(move_sub_title)
-        self.window_menu_layout.addWidget(self.sub_window_title, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+        self.window_menu_layout.addWidget(self.sub_window_title, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
         self.window_menu_layout.addStretch(1)
-        self.window_menu_layout.addWidget(self.close_window, alignment=ALIGMENT.AlignRight | ALIGMENT.AlignVCenter)
+        self.window_menu_layout.addWidget(self.close_window, alignment=ALIGNMENT.AlignRight | ALIGN_V_CENTER)
         self.window_menu_layout.setContentsMargins(0, 0, 0, 20)
 
         self.window_layout = QVBoxLayout()

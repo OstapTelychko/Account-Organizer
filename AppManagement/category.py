@@ -6,7 +6,7 @@ from AppObjects.session import Session
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
-from GUI.gui_constants import ALIGMENT
+from GUI.gui_constants import ALIGNMENT
 from GUI.windows.main_window import MainWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.errors import Errors
@@ -46,11 +46,11 @@ def load_categories_data():
                 name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 day = CustomTableWidgetItem(str(transaction.day))
-                day.setTextAlignment(ALIGMENT.AlignCenter)
+                day.setTextAlignment(ALIGNMENT.AlignCenter)
                 day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 value = CustomTableWidgetItem(str(transaction.value))
-                value.setTextAlignment(ALIGMENT.AlignCenter)
+                value.setTextAlignment(ALIGNMENT.AlignCenter)
                 value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 transaction_id = CustomTableWidgetItem(str(transaction.id))

@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QDate
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
-from GUI.gui_constants import ALIGMENT, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
 from GUI.windows.main_window import MainWindow
 
 
@@ -21,9 +21,9 @@ class StatisticsWindow():
 
     statistics_wrapper_layout = QVBoxLayout()
     statistics_wrapper_layout.setSpacing(40)
-    statistics_wrapper_layout.addWidget(monthly_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    statistics_wrapper_layout.addWidget(quarterly_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    statistics_wrapper_layout.addWidget(yearly_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    statistics_wrapper_layout.addWidget(monthly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+    statistics_wrapper_layout.addWidget(quarterly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+    statistics_wrapper_layout.addWidget(yearly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     statistics_wrapper_layout.setContentsMargins(30, 30, 30, 30)
     
     statistics_wrapper = QWidget()
@@ -34,7 +34,7 @@ class StatisticsWindow():
     custom_range_statistics = create_button("Custom date range", (180, 40))
 
     custom_statistics_wrapper_layout = QVBoxLayout()
-    custom_statistics_wrapper_layout.addWidget(custom_range_statistics, alignment=ALIGMENT.AlignVCenter | ALIGMENT.AlignHCenter)
+    custom_statistics_wrapper_layout.addWidget(custom_range_statistics, alignment=ALIGN_V_CENTER | ALIGN_H_CENTER)
     custom_statistics_wrapper_layout.setContentsMargins(17, 30, 17, 30)
 
     custom_statistics_wrapper = QWidget()
@@ -47,8 +47,8 @@ class StatisticsWindow():
     main_layout.setSpacing(20)
     main_layout.addStretch(1)
     main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(statistics_wrapper, alignment=ALIGMENT.AlignRight)
-    main_layout.addWidget(custom_statistics_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(statistics_wrapper, alignment=ALIGNMENT.AlignRight)
+    main_layout.addWidget(custom_statistics_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     main_layout.addStretch(1)
     main_layout.setContentsMargins(50, 10, 50, 20)
 
@@ -72,7 +72,7 @@ class MonthlyStatistics():
 
     copy_statistics = create_button("Copy month statistics", (275,40))
     copy_statistics_layout = QHBoxLayout()
-    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
+    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
 
     main_layout = QVBoxLayout()
     main_layout.addLayout(window.window_menu_layout)
@@ -107,7 +107,7 @@ class QuarterlyStatistics():
         quarter_label = QLabel()
         quarter_label.setFont(BASIC_FONT)
         quarter_label.setContentsMargins(0,50,0,0)
-        statistics_layout.addWidget(quarter_label,alignment=ALIGMENT.AlignBottom)
+        statistics_layout.addWidget(quarter_label,alignment=ALIGNMENT.AlignBottom)
 
         quarter_window = QWidget()
         quarter_layout = QHBoxLayout()
@@ -118,7 +118,7 @@ class QuarterlyStatistics():
             statistic_label = QLabel()
             statistic_label.setFont(BASIC_FONT)
             statistic_label_layout = QHBoxLayout()
-            statistic_label_layout.addWidget(statistic_label,alignment=ALIGMENT.AlignHCenter)
+            statistic_label_layout.addWidget(statistic_label, alignment=ALIGN_H_CENTER)
 
             statistic_data = QListWidget()
             statistic_data.setFont(BASIC_FONT)
@@ -128,7 +128,7 @@ class QuarterlyStatistics():
 
             statistic_layout = QVBoxLayout()
             statistic_layout.addLayout(statistic_label_layout)
-            statistic_layout.addWidget(statistic_data,ALIGMENT.AlignVCenter)
+            statistic_layout.addWidget(statistic_data, alignment=ALIGN_V_CENTER)
 
             quarter_layout.addLayout(statistic_layout)
 
@@ -157,7 +157,7 @@ class QuarterlyStatistics():
 
     copy_statistics = create_button("Copy quarterly statistics",(300,40))
     copy_statistics_layout = QHBoxLayout()
-    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
+    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
     statistics_layout.addLayout(copy_statistics_layout)
 
     statistics_window.setLayout(statistics_layout)
@@ -198,7 +198,7 @@ class YearlyStatistics():
         statistics_label.setFont(BASIC_FONT)
         statistics_label.setContentsMargins(0,50,0,0)
         statistics_label_layout = QHBoxLayout()
-        statistics_label_layout.addWidget(statistics_label,alignment=ALIGMENT.AlignHCenter)
+        statistics_label_layout.addWidget(statistics_label, alignment=ALIGN_H_CENTER)
 
         statistics_data = QListWidget()
         statistics_data.setFont(BASIC_FONT)
@@ -223,7 +223,7 @@ class YearlyStatistics():
     
     copy_statistics = create_button("Copy yearly statistics", (275,40))
     copy_statistics_layout = QHBoxLayout()
-    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGMENT.AlignCenter)
+    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
 
     statistics_window_layout.addLayout(copy_statistics_layout)
 
@@ -288,8 +288,8 @@ class CustomRangeStatistics():
     date_inputs_layout = QHBoxLayout()
     date_inputs_layout.setSpacing(20)
     date_inputs_layout.addStretch(1)
-    date_inputs_layout.addWidget(from_date, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    date_inputs_layout.addWidget(to_date, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    date_inputs_layout.addWidget(from_date, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+    date_inputs_layout.addWidget(to_date, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     date_inputs_layout.addStretch(1)
     
     show_statistics = create_button("Statistics", (150, 40))
@@ -298,10 +298,10 @@ class CustomRangeStatistics():
     main_layout = QVBoxLayout()
     main_layout.setSpacing(10)
     main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(selected_categories_list, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    main_layout.addWidget(categories_list_scroll, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+    main_layout.addWidget(categories_list_scroll, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     main_layout.addLayout(date_inputs_layout)
-    main_layout.addWidget(show_statistics, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     main_layout.setContentsMargins(30, 10, 30, 20)
 
     window.window_container.setLayout(main_layout)
@@ -322,7 +322,7 @@ class CustomRangeStatisticsView:
 
     statistics_layout = QVBoxLayout()
     statistics_layout.addWidget(statistics_list)
-    statistics_layout.addWidget(copy_statistics, alignment=ALIGMENT.AlignHCenter)
+    statistics_layout.addWidget(copy_statistics, alignment=ALIGN_H_CENTER)
 
     transactions_list = QListWidget()
     transactions_list.setFont(BASIC_FONT)
@@ -334,7 +334,7 @@ class CustomRangeStatisticsView:
 
     transactions_layout = QVBoxLayout()
     transactions_layout.addWidget(transactions_list)
-    transactions_layout.addWidget(copy_transactions, alignment=ALIGMENT.AlignHCenter)
+    transactions_layout.addWidget(copy_transactions, alignment=ALIGN_H_CENTER)
 
     content_layout = QHBoxLayout()
     content_layout.setSpacing(20)

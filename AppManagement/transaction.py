@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMessageBox, QHeaderView
 from PySide6.QtCore import Qt
 
-from GUI.gui_constants import ALIGMENT
+from GUI.gui_constants import ALIGNMENT
 from GUI.windows.main_window import MainWindow
 from GUI.windows.errors import Errors
 from GUI.windows.transaction import TransactionManagementWindow
@@ -88,11 +88,11 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     category_data.setRowCount(row+1)
 
     day = CustomTableWidgetItem(str(transaction.day))
-    day.setTextAlignment(ALIGMENT.AlignCenter)
+    day.setTextAlignment(ALIGNMENT.AlignCenter)
     day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes in this case cells in table can't be edited
 
     value = CustomTableWidgetItem(str(transaction.value))
-    value.setTextAlignment(ALIGMENT.AlignCenter)
+    value.setTextAlignment(ALIGNMENT.AlignCenter)
     value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
     transaction_id = CustomTableWidgetItem(str(transaction.id))

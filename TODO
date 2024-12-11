@@ -1,5 +1,6 @@
-☐ sub windows doesn't minimize when main window is minimized
+☐ add update option to application
 
 Archive:
+  ✔ sub windows doesn't minimize when main window is minimized @done(24-12-11 17:47)
   ✔ fix focus on category creation window to prevent closing window on Enter press @done(24-12-10 20:13)
   ✔ fix window appearing at center of screen (settings, sub windows of statistics) @done(24-12-09 21:43)

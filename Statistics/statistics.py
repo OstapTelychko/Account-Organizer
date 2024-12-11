@@ -11,7 +11,7 @@ from DesktopQtToolkit.create_button import create_button
 from AppObjects.session import Session
 from AppObjects.category import Category
 
-from GUI.gui_constants import ALIGMENT, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.errors import Errors
 
@@ -356,16 +356,16 @@ def show_custom_range_statistics_window():
         add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
 
         category_layout = QHBoxLayout()
-        category_layout.addWidget(category_name, alignment=ALIGMENT.AlignHCenter)
-        category_layout.addWidget(add_category_statistics_list, alignment=ALIGMENT.AlignRight)
-        category_layout.addWidget(remove_category_statistics_list, alignment=ALIGMENT.AlignRight)
+        category_layout.addWidget(category_name, alignment=ALIGN_H_CENTER)
+        category_layout.addWidget(add_category_statistics_list, alignment=ALIGNMENT.AlignRight)
+        category_layout.addWidget(remove_category_statistics_list, alignment=ALIGNMENT.AlignRight)
 
         category_wrapper = QWidget()
         category_wrapper.setLayout(category_layout)
         category_wrapper.setProperty("class", "category_list_item")
         category_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(category_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
-        CustomRangeStatistics.categories_list_layout.addWidget(category_wrapper, alignment=ALIGMENT.AlignVCenter)
+        CustomRangeStatistics.categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
     
     StatisticsWindow.window.done(1)
     CustomRangeStatistics.window.exec()

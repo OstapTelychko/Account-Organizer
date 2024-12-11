@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
-from GUI.gui_constants import ALIGMENT, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.main_window import MainWindow
 
 
@@ -25,10 +25,10 @@ class CategorySettingsWindow():
     main_layout = QVBoxLayout()
     main_layout.setSpacing(20)
     main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(rename_category, alignment=ALIGMENT.AlignHCenter)
-    main_layout.addWidget(delete_category, alignment=ALIGMENT.AlignHCenter)
-    main_layout.addWidget(change_category_position, alignment=ALIGMENT.AlignHCenter)
-    main_layout.addWidget(copy_transactions,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(rename_category, alignment=ALIGN_H_CENTER)
+    main_layout.addWidget(delete_category, alignment=ALIGN_H_CENTER)
+    main_layout.addWidget(change_category_position, alignment=ALIGN_H_CENTER)
+    main_layout.addWidget(copy_transactions,alignment=ALIGN_H_CENTER)
     main_layout.setContentsMargins(30, 10, 30, 20)
 
     window.window_container.setLayout(main_layout)
@@ -47,8 +47,8 @@ class AddCategoryWindow():
     main_layout = QVBoxLayout()
     main_layout.setSpacing(30)
     main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(category_name,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(category_name,alignment=ALIGN_H_CENTER)
+    main_layout.addWidget(button,alignment=ALIGN_H_CENTER)
     main_layout.setContentsMargins(30, 10, 30, 30)
 
     window.window_container.setLayout(main_layout)
@@ -69,8 +69,8 @@ class ChangeCategoryPositionWindow():
     preview_category_container.setGraphicsEffect(QGraphicsDropShadowEffect(preview_category_container, **SHADOW_EFFECT_ARGUMENTS))
 
     preview_category_layout = QHBoxLayout()
-    preview_category_layout.addWidget(preview_category_position, alignment=ALIGMENT.AlignRight)
-    preview_category_layout.addWidget(preview_category_name, alignment=ALIGMENT.AlignLeft)
+    preview_category_layout.addWidget(preview_category_position, alignment=ALIGNMENT.AlignRight)
+    preview_category_layout.addWidget(preview_category_name, alignment=ALIGNMENT.AlignLeft)
     preview_category_container.setLayout(preview_category_layout)
 
     new_position = QLineEdit()
@@ -78,8 +78,8 @@ class ChangeCategoryPositionWindow():
     enter_new_position.setDefault(True)
 
     new_position_layout = QHBoxLayout()
-    new_position_layout.addWidget(new_position, alignment=ALIGMENT.AlignHorizontal_Mask)
-    new_position_layout.addWidget(enter_new_position, alignment=ALIGMENT.AlignLeft)
+    new_position_layout.addWidget(new_position, alignment=ALIGNMENT.AlignHorizontal_Mask)
+    new_position_layout.addWidget(enter_new_position, alignment=ALIGNMENT.AlignLeft)
     new_position_layout.setContentsMargins(0, 50, 0, 50)
 
     categories_list_layout = QVBoxLayout()
@@ -101,9 +101,9 @@ class ChangeCategoryPositionWindow():
     main_layout = QVBoxLayout()
     main_layout.addLayout(window.window_menu_layout)
     main_layout.addStretch(1)
-    main_layout.addWidget(preview_category_container, alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(preview_category_container, alignment=ALIGN_H_CENTER)
     main_layout.addLayout(new_position_layout)
-    main_layout.addWidget(categories_list_scroll, alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(categories_list_scroll, alignment=ALIGN_H_CENTER)
     main_layout.addStretch(1)
     main_layout.setContentsMargins(30, 10, 30, 20)
 
@@ -124,8 +124,8 @@ class RenameCategoryWindow():
     main_layout = QVBoxLayout()
     main_layout.setSpacing(30)
     main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(new_category_name,alignment=ALIGMENT.AlignHCenter)
-    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(new_category_name,alignment=ALIGN_H_CENTER)
+    main_layout.addWidget(button,alignment=ALIGN_H_CENTER)
     main_layout.setContentsMargins(40, 10, 40, 20)
 
     window.window_container.setLayout(main_layout)

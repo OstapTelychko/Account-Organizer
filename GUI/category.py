@@ -10,7 +10,7 @@ from backend.db_controller import DBController
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
 
-from GUI.gui_constants import ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
 from GUI.windows.main_window import MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
@@ -65,9 +65,9 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_settings.setIconSize(QSize(30,30))
 
     Category_general_info = QHBoxLayout()
-    Category_general_info.addWidget(category_total_value, alignment=ALIGMENT.AlignLeft)
-    Category_general_info.addWidget(category_name, alignment=ALIGMENT.AlignHCenter)
-    Category_general_info.addWidget(category_settings,alignment=ALIGMENT.AlignRight)
+    Category_general_info.addWidget(category_total_value, alignment=ALIGNMENT.AlignLeft)
+    Category_general_info.addWidget(category_name, alignment=ALIGN_H_CENTER)
+    Category_general_info.addWidget(category_settings,alignment=ALIGNMENT.AlignRight)
 
     category_data = CustomTableWidget()
     category_data.setProperty("class", "category_data")
@@ -100,11 +100,11 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
         for index,transaction in enumerate(transactions):
 
             transaction_day = CustomTableWidgetItem(str(transaction.day))
-            transaction_day.setTextAlignment(ALIGMENT.AlignCenter)
+            transaction_day.setTextAlignment(ALIGNMENT.AlignCenter)
             transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
 
             transaction_value = CustomTableWidgetItem(str(transaction.value))
-            transaction_value.setTextAlignment(ALIGMENT.AlignCenter)
+            transaction_value.setTextAlignment(ALIGNMENT.AlignCenter)
             transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             transaction_id = CustomTableWidgetItem(str(transaction.id))
@@ -142,7 +142,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
     category_layout.addStretch(1)
     category_layout.addLayout(Category_general_info)
-    category_layout.addWidget(category_data,alignment=ALIGMENT.AlignVCenter)
+    category_layout.addWidget(category_data,alignment=ALIGN_V_CENTER)
     category_layout.addLayout(transactions_managment)
     category_layout.addStretch(1)
 
@@ -181,9 +181,9 @@ def add_category_to_position_list(category:Category):
     category_name_label.setText(category.name)
 
     category_layout = QHBoxLayout()
-    category_layout.addWidget(category_position, alignment=ALIGMENT.AlignHCenter)
+    category_layout.addWidget(category_position, alignment=ALIGN_H_CENTER)
     category_layout.addStretch(1)
-    category_layout.addWidget(category_name_label, alignment=ALIGMENT.AlignLeft)
+    category_layout.addWidget(category_name_label, alignment=ALIGNMENT.AlignLeft)
 
     category_container = QWidget()
     category_container.setMaximumWidth(380)

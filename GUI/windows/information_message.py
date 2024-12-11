@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplic
 from PySide6.QtCore import Qt
 from time import sleep
 
-from GUI.gui_constants import ALIGMENT, APP_ICON, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
 from GUI.windows.category import CategorySettingsWindow
 from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 
@@ -25,7 +25,7 @@ class InformationMessage:
     message_text = QLabel("Statisctics has been copied")
     message_text.setFont(BASIC_FONT)
     message_layout = QHBoxLayout()
-    message_layout.addWidget(message_text,alignment=ALIGMENT.AlignCenter)
+    message_layout.addWidget(message_text,alignment=ALIGNMENT.AlignCenter)
     message.setLayout(message_layout)
 
     main_layout=  QVBoxLayout()

@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QIcon, QFont
 
 from project_configuration import ROOT_DIRECTORY
-from GUI.gui_constants import ALIGMENT, ICON_SIZE, APP_ICON, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
@@ -33,9 +33,9 @@ class MainWindow():
     settings.setIconSize(ICON_SIZE)
 
     General_info.addStretch(7)
-    General_info.addWidget(account_current_balance,alignment=ALIGMENT.AlignTop| ALIGMENT.AlignHCenter)
+    General_info.addWidget(account_current_balance,alignment=ALIGNMENT.AlignTop| ALIGN_H_CENTER)
     General_info.addStretch(8)
-    General_info.addWidget(settings,alignment=ALIGMENT.AlignTop | ALIGMENT.AlignRight)
+    General_info.addWidget(settings,alignment=ALIGNMENT.AlignTop | ALIGNMENT.AlignRight)
 
 
     #Year and month
@@ -48,9 +48,9 @@ class MainWindow():
 
     Year_layout = QHBoxLayout()
     Year_layout.addStretch(4)
-    Year_layout.addWidget(previous_year_button,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignTop)
-    Year_layout.addWidget(current_year, 1, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    Year_layout.addWidget(next_year_button,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignTop)
+    Year_layout.addWidget(previous_year_button,alignment=ALIGN_H_CENTER | ALIGNMENT.AlignTop)
+    Year_layout.addWidget(current_year, 1, alignment=ALIGN_H_CENTER | ALIGNMENT.AlignVCenter)
+    Year_layout.addWidget(next_year_button,alignment=ALIGN_H_CENTER | ALIGNMENT.AlignTop)
     Year_layout.addStretch(5)
 
     previous_month_button = create_button("<",(30,30))
@@ -63,9 +63,9 @@ class MainWindow():
 
     Month_layout = QHBoxLayout()
     Month_layout.addStretch(4)
-    Month_layout.addWidget(previous_month_button,alignment=ALIGMENT.AlignHCenter)
-    Month_layout.addWidget(current_month, 1, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
-    Month_layout.addWidget(next_month_button,alignment=ALIGMENT.AlignHCenter)
+    Month_layout.addWidget(previous_month_button,alignment=ALIGN_H_CENTER)
+    Month_layout.addWidget(current_month, 1, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+    Month_layout.addWidget(next_month_button,alignment=ALIGN_H_CENTER)
     Month_layout.addStretch(5)
 
     #Income and expenses windows 

@@ -6,7 +6,7 @@ from project_configuration import AVAILABLE_LANGUAGES, ROOT_DIRECTORY
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
-from GUI.gui_constants import ALIGMENT, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT
 from GUI.windows.main_window import MainWindow
 
 
@@ -22,7 +22,7 @@ class AddAccountWindow():
         languages.setItemIcon(language, QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
 
     languages_layout = QHBoxLayout()
-    languages_layout.addWidget(languages, alignment=ALIGMENT.AlignRight)
+    languages_layout.addWidget(languages, alignment=ALIGNMENT.AlignRight)
 
     message = QLabel()
     message.setFont(BASIC_FONT)
@@ -34,7 +34,7 @@ class AddAccountWindow():
     account_name.setPlaceholderText("Account Name")
 
     account_name_layout = QHBoxLayout()
-    account_name_layout.addWidget(account_name, alignment=ALIGMENT.AlignCenter )
+    account_name_layout.addWidget(account_name, alignment=ALIGNMENT.AlignCenter )
 
     button = create_button("", (140,50))
     button.setDefault(True)
@@ -47,13 +47,13 @@ class AddAccountWindow():
     main_layout.addLayout(window.window_menu_layout)
     main_layout.addLayout(languages_layout)
     main_layout.addStretch(1)
-    main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)    
+    main_layout.addWidget(message,alignment=ALIGN_H_CENTER)    
     main_layout.addStretch(1)
     main_layout.addLayout(account_name_layout)
     main_layout.addStretch(1)
-    main_layout.addWidget(current_balance,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(current_balance,alignment=ALIGN_H_CENTER)
     main_layout.addStretch(1)
-    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(button,alignment=ALIGN_H_CENTER)
     main_layout.addStretch(1)
     main_layout.setContentsMargins(50, 10, 50, 30)
 
@@ -69,7 +69,7 @@ class RenameAccountWindow():
 
     new_account_name = QLineEdit()
     account_name_layout = QHBoxLayout()
-    account_name_layout.addWidget(new_account_name,alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    account_name_layout.addWidget(new_account_name,alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
 
     button = create_button("Update", (160,40))
     button.setDefault(True)
@@ -78,11 +78,11 @@ class RenameAccountWindow():
     main_layout.setSpacing(20)
     main_layout.addLayout(window.window_menu_layout)
     main_layout.addStretch(1)
-    main_layout.addWidget(message,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(message, alignment=ALIGN_H_CENTER)
     main_layout.addStretch(1)
     main_layout.addLayout(account_name_layout)
     main_layout.addStretch(1)
-    main_layout.addWidget(button,alignment=ALIGMENT.AlignHCenter)
+    main_layout.addWidget(button, alignment=ALIGN_H_CENTER)
     main_layout.addStretch(1)
     main_layout.setContentsMargins(50, 10, 50, 30)
 

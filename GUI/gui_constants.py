@@ -11,7 +11,10 @@ app = QApplication(argv)
 app.setApplicationName(APP_NAME)
 
 
-ALIGMENT = Qt.AlignmentFlag
+ALIGNMENT = Qt.AlignmentFlag
+ALIGN_H_CENTER = ALIGNMENT.AlignHCenter
+ALIGN_V_CENTER = ALIGNMENT.AlignVCenter
+
 ICON_SIZE = QSize(30, 30)
 APP_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/App icon.png")
 

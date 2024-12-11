@@ -6,7 +6,7 @@ from project_configuration import AVAILABLE_LANGUAGES, ROOT_DIRECTORY
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
-from GUI.gui_constants import ALIGMENT, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.gui_constants import ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
 from GUI.windows.main_window import MainWindow 
 
 
@@ -26,8 +26,8 @@ class SettingsWindow():
         languages.setItemIcon(language, QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
 
     gui_settings_wrapper_layout = QVBoxLayout()
-    gui_settings_wrapper_layout.addWidget(switch_themes_button, alignment=ALIGMENT.AlignHCenter)
-    gui_settings_wrapper_layout.addWidget(languages, alignment=ALIGMENT.AlignHCenter)
+    gui_settings_wrapper_layout.addWidget(switch_themes_button, alignment=ALIGN_H_CENTER)
+    gui_settings_wrapper_layout.addWidget(languages, alignment=ALIGN_H_CENTER)
 
     gui_settings_wrapper = QWidget()
     gui_settings_wrapper.setProperty("class", "wrapper")
@@ -51,10 +51,10 @@ class SettingsWindow():
     delete_account.setStyleSheet("QPushButton{color:rgba(255,0,0,150); border-color:red;}")
 
     account_management_wrapper_layout = QVBoxLayout()
-    account_management_wrapper_layout.addWidget(accounts, alignment=ALIGMENT.AlignHCenter)
-    account_management_wrapper_layout.addWidget(add_account, alignment=ALIGMENT.AlignHCenter)
-    account_management_wrapper_layout.addWidget(rename_account, alignment=ALIGMENT.AlignHCenter)
-    account_management_wrapper_layout.addWidget(delete_account, alignment=ALIGMENT.AlignHCenter)
+    account_management_wrapper_layout.addWidget(accounts, alignment=ALIGN_H_CENTER)
+    account_management_wrapper_layout.addWidget(add_account, alignment=ALIGN_H_CENTER)
+    account_management_wrapper_layout.addWidget(rename_account, alignment=ALIGN_H_CENTER)
+    account_management_wrapper_layout.addWidget(delete_account, alignment=ALIGN_H_CENTER)
 
     account_management_wrapper = QWidget()
     account_management_wrapper.setLayout(account_management_wrapper_layout)
@@ -75,9 +75,9 @@ class SettingsWindow():
     account_created_date.setProperty("class", "light-text")
 
     account_info_wrapper_layout = QVBoxLayout()
-    account_info_wrapper_layout.addWidget(total_income, alignment=ALIGMENT.AlignHCenter)
-    account_info_wrapper_layout.addWidget(total_expense, alignment=ALIGMENT.AlignHCenter)
-    account_info_wrapper_layout.addWidget(account_created_date, alignment=ALIGMENT.AlignHCenter)
+    account_info_wrapper_layout.addWidget(total_income, alignment=ALIGN_H_CENTER)
+    account_info_wrapper_layout.addWidget(total_expense, alignment=ALIGN_H_CENTER)
+    account_info_wrapper_layout.addWidget(account_created_date, alignment=ALIGN_H_CENTER)
 
     account_info_wrapper = QWidget()
     account_info_wrapper.setProperty("class", "wrapper")
@@ -87,9 +87,9 @@ class SettingsWindow():
 
     gui_settings_and_account_management = QHBoxLayout()
     gui_settings_and_account_management.addStretch(1)
-    gui_settings_and_account_management.addWidget(gui_settings_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    gui_settings_and_account_management.addWidget(gui_settings_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     gui_settings_and_account_management.addStretch(1)
-    gui_settings_and_account_management.addWidget(account_management_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    gui_settings_and_account_management.addWidget(account_management_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     gui_settings_and_account_management.addStretch(1)
 
     main_layout = QVBoxLayout()
@@ -97,7 +97,7 @@ class SettingsWindow():
     main_layout.addStretch(1)
     main_layout.addLayout(window.window_menu_layout)
     main_layout.addLayout(gui_settings_and_account_management)
-    main_layout.addWidget(account_info_wrapper, alignment=ALIGMENT.AlignHCenter | ALIGMENT.AlignVCenter)
+    main_layout.addWidget(account_info_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     main_layout.addStretch(1)
     main_layout.setContentsMargins(50, 10, 50, 20)
 
