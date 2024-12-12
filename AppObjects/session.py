@@ -2,6 +2,7 @@ import toml
 import os
 from sys import exit
 from datetime import datetime
+from alembic.config import Config
 
 from project_configuration import USER_CONF_PATH
 from backend.db_controller import DBController
@@ -30,6 +31,7 @@ class Session:
     db:DBController = None
     instance_guard:SingleInstanceGuard = None
     test_mode = False
+    test_alembic_config:Config = None
 
 
     def start_session():

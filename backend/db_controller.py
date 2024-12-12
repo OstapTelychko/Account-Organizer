@@ -1,9 +1,15 @@
-# import sqlite3
+import logging
 from sqlalchemy import create_engine, desc, and_, event
 from sqlalchemy.orm import sessionmaker
 
-from project_configuration import DB_PATH, TEST_DB_PATH
+from alembic.config import Config
+from alembic.script import ScriptDirectory
+from alembic.runtime import migration
+from alembic import command
+
+from project_configuration import DB_PATH, TEST_DB_PATH, ROOT_DIRECTORY
 from .models import Account, Category, Transaction
+
 
 
 class DBController():
@@ -11,9 +17,15 @@ class DBController():
     def __init__(self, user_name:str):
         # Init db connection 
         from AppObjects.session import Session
+        print(DB_PATH)
+
+        self.alebic_config = Config(f"{ROOT_DIRECTORY}/alembic.ini")
+        self.alebic_config.set_main_option("script_location", f"{ROOT_DIRECTORY}/alembic")
+        self.alebic_config.set_main_option("sqlalchemy.url", DB_PATH)
 
         if Session.test_mode:
             self.engine = create_engine(TEST_DB_PATH)
+            self.alebic_config = Session.test_alembic_config
         else:
             self.engine = create_engine(DB_PATH)
 
@@ -24,8 +36,26 @@ class DBController():
             cursor.execute("PRAGMA synchronous=OFF")
             cursor.close()
 
-        self.session = sessionmaker(bind=self.engine)()
         self.account_name = user_name
+
+        if not self.db_up_to_date():
+            print("Upgrading database")
+            command.upgrade(self.alebic_config, "head")
+
+        self.session = sessionmaker(bind=self.engine)()
+
+
+    def db_up_to_date(self) -> bool:
+        # print(self.alebic_config.get_section("alembic"))
+        directory = ScriptDirectory.from_config(self.alebic_config)
+
+        with self.engine.begin() as connection:
+            logging.getLogger("alembic.runtime.migration").setLevel(logging.WARN)
+            context = migration.MigrationContext.configure(connection)
+            logging.getLogger("alembic.runtime.migration").setLevel(logging.INFO)
+            # print(context.get_current_heads())
+            # print(directory.get_heads())
+            return set(context.get_current_heads()) == set(directory.get_heads())
 
 
     #Account

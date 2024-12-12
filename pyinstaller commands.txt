@@ -1,0 +1,2 @@
+Linux
+pyinstaller main.py --exclude-module PyQt5 --exclude-module PyQt6 --add-data "Images:Images" --add-data "alembic:alembic" --add-data "alembic.ini:." --hidden-import logging.config

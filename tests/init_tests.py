@@ -16,12 +16,13 @@ from tests.test_GUI.test_transaction import TestTransaction
 from tests.test_GUI.test_statistics import TestStatistics
 
 
-TEST_DB_PATH = f"{ROOT_DIRECTORY}/test_Accounts.sqlite"
+TEST_DB_FILE_PATH = TEST_DB_PATH.replace("sqlite:///","")
 
 def test_main(app_main:FunctionType):
-    alembic_conf = Config("alembic.ini")
-    alembic_conf.set_main_option("sqlalchemy.url", "sqlite:///test_Accounts.sqlite")
-    command.upgrade(alembic_conf, "head")
+    Session.test_alembic_config = Config(f"{ROOT_DIRECTORY}/alembic.ini")
+    Session.test_alembic_config.set_main_option("script_location", f"{ROOT_DIRECTORY}/alembic")
+    Session.test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
+    command.upgrade(Session.test_alembic_config, "head")
 
     Session.test_mode = True
     Session.load_user_config()
@@ -50,7 +51,7 @@ def test_main(app_main:FunctionType):
         Session.account_name = previous_name
         Session.update_user_config()
 
-        if os.path.exists(TEST_DB_PATH):
-            os.remove(TEST_DB_PATH)
+        if os.path.exists(TEST_DB_FILE_PATH):
+            os.remove(TEST_DB_FILE_PATH)
             
         quit()
