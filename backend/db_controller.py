@@ -17,7 +17,6 @@ class DBController():
     def __init__(self, user_name:str):
         # Init db connection 
         from AppObjects.session import Session
-        print(DB_PATH)
 
         self.alebic_config = Config(f"{ROOT_DIRECTORY}/alembic.ini")
         self.alebic_config.set_main_option("script_location", f"{ROOT_DIRECTORY}/alembic")

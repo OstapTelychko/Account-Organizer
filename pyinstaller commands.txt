@@ -1,2 +1,8 @@
 Linux
-pyinstaller main.py --exclude-module PyQt5 --exclude-module PyQt6 --add-data "Images:Images" --add-data "alembic:alembic" --add-data "alembic.ini:." --hidden-import logging.config
+rm -r "./dist/main" && \
+pyinstaller main.py --exclude-module PyQt5 --exclude-module PyQt6 --exclude-module PySide6.support --exclude-module pyparsing --exclude-module numpy --exclude-module pycparser --exclude-module mysql --exclude-module ctypes --exclude-module MySQLdb --exclude-module xml --exclude-module multiprocessing --exclude-module lzma --exclude-module http --exclude-module greenlet --exclude-module fractions --exclude-module hmac --exclude-module getopt --exclude-module bz2 --exclude-module zoneinfo --exclude-module tracemalloc --add-data "Images:Images" --add-data "alembic:alembic" --add-data "alembic.ini:." --hidden-import logging.config --strip && \
+rm -r './dist/main/_internal/PySide6/Qt/translations' && \
+rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Quick.so.6' && \
+rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Qml.so.6' && \
+rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Pdf.so.6' && \
+rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6QmlModels.so.6'
