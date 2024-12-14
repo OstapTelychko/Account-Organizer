@@ -24,10 +24,13 @@ class SettingsWindow():
 
     for language in range(len(AVAILABLE_LANGUAGES)):
         languages.setItemIcon(language, QIcon(f"{ROOT_DIRECTORY}/Images/{language}-flag.png"))
+    
+    db_management = create_button("Database management", (220, 50))
 
     gui_settings_wrapper_layout = QVBoxLayout()
     gui_settings_wrapper_layout.addWidget(switch_themes_button, alignment=ALIGN_H_CENTER)
     gui_settings_wrapper_layout.addWidget(languages, alignment=ALIGN_H_CENTER)
+    gui_settings_wrapper_layout.addWidget(db_management, alignment=ALIGN_H_CENTER)
 
     gui_settings_wrapper = QWidget()
     gui_settings_wrapper.setProperty("class", "wrapper")
@@ -35,7 +38,6 @@ class SettingsWindow():
     gui_settings_wrapper.setLayout(gui_settings_wrapper_layout)
     gui_settings_wrapper.setMinimumHeight(220)
     gui_settings_wrapper.setMinimumWidth(250)
-
 
 
     accounts = QComboBox()
@@ -74,10 +76,15 @@ class SettingsWindow():
     account_created_date.setFont(BASIC_FONT)
     account_created_date.setProperty("class", "light-text")
 
+    app_version = QLabel()
+    app_version.setFont(BASIC_FONT)
+    app_version.setProperty("class", "light-text")
+
     account_info_wrapper_layout = QVBoxLayout()
     account_info_wrapper_layout.addWidget(total_income, alignment=ALIGN_H_CENTER)
     account_info_wrapper_layout.addWidget(total_expense, alignment=ALIGN_H_CENTER)
     account_info_wrapper_layout.addWidget(account_created_date, alignment=ALIGN_H_CENTER)
+    account_info_wrapper_layout.addWidget(app_version, alignment=ALIGN_H_CENTER)
 
     account_info_wrapper = QWidget()
     account_info_wrapper.setProperty("class", "wrapper")

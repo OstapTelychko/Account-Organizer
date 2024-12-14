@@ -14,6 +14,7 @@ LANGUAGES = {
             11:"November",
             12:"December"
         },
+
         "General management":{
             0:"Delete",
             1:"Add",
@@ -23,9 +24,11 @@ LANGUAGES = {
             5:"Update",
             6:"Save"
         },
+
         "Account":{
             0:"Current balance",
             1:"Account Name",
+
             "Account management":{
                 0:"Delete account",
                 1:"Create account",
@@ -36,6 +39,7 @@ LANGUAGES = {
                     1:"Enter new account name. "
                 }
             },
+
             "Info":{
                 0:"Name",
                 1:"Date",
@@ -47,6 +51,8 @@ LANGUAGES = {
                 7:"Total income: ",
                 8:"Total expense: ",
                 9:"Created ",
+                10:"App version: ",
+
                 "Statistics":{
                     0:"Statistics",
                     1:"Monthly",
@@ -89,6 +95,11 @@ LANGUAGES = {
                     38:"Transactions have been copied",
                 }
             },
+
+            "DB management":{
+                0:"Database management",
+            },
+
             "Transactions management":{
                 0:" Add",
                 1:" Delete",
@@ -191,6 +202,7 @@ LANGUAGES = {
                     1:"Введіть нову назву акаунта. "
                 }
             },
+
             "Info":{
                 0:"Назва",
                 1:"Дата",
@@ -202,6 +214,8 @@ LANGUAGES = {
                 7:"Загальний дохід: ",
                 8:"Загальні витрати: ",
                 9:"Акаунт створенний ",
+                10:"Версія програми: ",
+
                 "Statistics":{
                     0:"Статистика",
                     1:"Місячна",
@@ -244,6 +258,11 @@ LANGUAGES = {
                     38:"Транзакції були скопійовані",
                 }
             },
+
+            "DB management":{
+                0:"Управління базою даних",
+            },
+
             "Transactions management":{
                 0:" Додати",
                 1:" Видалити",
@@ -324,6 +343,7 @@ LANGUAGES = {
             11:"Listopad",
             12:"Grudzień",
         },
+
         "General management":{
             0:"Usunąnć",
             1:"Dodać",
@@ -333,19 +353,23 @@ LANGUAGES = {
             5:"Zmienić",
             6:"Zapisz"
         },
+
         "Account":{
             0:"Potoczne saldo",
             1:"Nazwa konta",
+
             "Account management":{
                 0:"Usuń konto",
                 1:"Dodaj konto",
                 2:"Zmień nazwę konta",
                 3:"Nowa nazwa konta",
+
                 "Messages":{
                     0:"Wprowadźcie nazwę konta, aby dodać nowe konto. (Nie wolno używać nazwę konta które istnieje)",
                     1:"Wprowadź nową nazwę konta"
                 }
             },
+
             "Info":{
                 0:"Nazwa",
                 1:"Data",
@@ -357,6 +381,8 @@ LANGUAGES = {
                 7:"Całkowity dochód: ",
                 8:"Całkowite wydatki: ",
                 9:"Konto dodane ",
+                10:"Wersja aplikacji: ",
+
                 "Statistics":{
                     0:"Statystyka",
                     1:"Miesiączna",
@@ -399,6 +425,11 @@ LANGUAGES = {
                     38:"Transakcje były skopiowane"
                 }  
             },
+
+            "DB management":{
+                0:"Zarządzanie bazą danych",
+            },
+
             "Transactions management":{
                 0:" Dodać",
                 1:" Usunąć",

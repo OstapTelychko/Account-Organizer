@@ -4,7 +4,7 @@ from sys import exit
 from datetime import datetime
 from alembic.config import Config
 
-from project_configuration import USER_CONF_PATH
+from project_configuration import USER_CONF_PATH, ROOT_DIRECTORY
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -12,6 +12,8 @@ from AppObjects.category import Category
 
 
 class Session:
+    app_version:tuple = None
+
     current_month = 1
     current_year = 2023
 
@@ -40,6 +42,8 @@ class Session:
         if Session.instance_guard.is_running:
             print("Another instance is already running. Exiting.")
             exit(0)
+        
+        Session.load_app_version()
             
         #Set current date
         Session.current_month = datetime.now().month
@@ -50,6 +54,11 @@ class Session:
 
         Session.load_user_config()
     
+
+    def load_app_version():
+        with open(f"{ROOT_DIRECTORY}/app version.txt") as file:
+            Session.app_version = tuple(map(int, file.read().strip().split(".")))
+
 
     def load_user_config():
         with open(USER_CONF_PATH) as file:

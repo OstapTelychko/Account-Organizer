@@ -1,9 +1,11 @@
 import os
 
-from alembic.config import Config
-from alembic import command
 from types import FunctionType
 from unittest import  TestSuite, TestLoader, TextTestRunner
+from sys import exit
+
+from alembic.config import Config
+from alembic import command
 
 from AppObjects.session import Session
 from backend.db_controller import DBController
@@ -54,4 +56,4 @@ def test_main(app_main:FunctionType):
         if os.path.exists(TEST_DB_FILE_PATH):
             os.remove(TEST_DB_FILE_PATH)
             
-        quit()
+        exit(0)

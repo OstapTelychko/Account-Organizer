@@ -32,7 +32,15 @@ def change_language():
     SettingsWindow.delete_account.setText(Language["Account"]["Account management"][0])
     SettingsWindow.add_account.setText(Language["Account"]["Account management"][1])
     SettingsWindow.rename_account.setText(Language["Account"]["Account management"][2])
-
+    Incomes = SettingsWindow.total_income.text().split(" ")[2]
+    SettingsWindow.total_income.setText(Language["Account"]["Info"][7]+str(Incomes))
+    Expenses = SettingsWindow.total_expense.text().split(" ")[2]
+    SettingsWindow.total_expense.setText(Language["Account"]["Info"][8]+str(Expenses))
+    SettingsWindow.account_created_date.setText(Language["Account"]["Info"][9] + str(Session.db.get_account().created_date))
+    SettingsWindow.db_management.setText(Language["Account"]["DB management"][0])
+    
+    SettingsWindow.app_version.setText(Language["Account"]["Info"][10] + ".".join(map(str, Session.app_version)))
+                                       
     RenameAccountWindow.message.setText(Language["Account"]["Account management"]["Messages"][1])
     RenameAccountWindow.button.setText(Language["General management"][5])
     RenameAccountWindow.new_account_name.setPlaceholderText(Language["Account"]["Account management"][3])
@@ -103,11 +111,6 @@ def change_language():
         Session.categories[category].total_value_label.setText(Language["Account"]["Info"][6] + total_value)
     
     MainWindow.account_current_balance.setText(Language["Account"]["Info"][3]+str(Session.current_balance))
-    Incomes = SettingsWindow.total_income.text().split(" ")[2]
-    SettingsWindow.total_income.setText(Language["Account"]["Info"][7]+str(Incomes))
-    Expenses = SettingsWindow.total_expense.text().split(" ")[2]
-    SettingsWindow.total_expense.setText(Language["Account"]["Info"][8]+str(Expenses))
-    SettingsWindow.account_created_date.setText(Language["Account"]["Info"][9] + str(Session.db.get_account().created_date))  
 
 
 def change_language_add_account(language: int | str):
