@@ -191,8 +191,8 @@ def load_theme():
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
 
-
-def set_theme_mode_on_window(window:QWidget, value: ctypes.c_uint):
-    ctypes.windll.dwmapi.DwmSetWindowAttribute(
-        window.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
-    )
+if platform == "win32":
+    def set_theme_mode_on_window(window:QWidget, value: ctypes.c_uint):
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            window.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
+        )
