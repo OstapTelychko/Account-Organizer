@@ -9,7 +9,7 @@ from languages import LANGUAGES
 from GUI.gui_constants import ALIGNMENT
 from GUI.windows.main_window import MainWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 from GUI.category import load_category, add_category_to_position_list
 
 from Statistics.copy_statistics import show_information_message
@@ -69,10 +69,10 @@ def create_category():
     category_name = AddCategoryWindow.category_name.text().strip()
 
     if category_name == "":
-        return Errors.no_category_name.exec()
+        return Messages.no_category_name.exec()
     
     if Session.db.category_exists(category_name, category_type):
-        return Errors.category_exists.exec()
+        return Messages.category_exists.exec()
     
     position = Session.db.get_available_position(category_type) 
 
@@ -105,7 +105,8 @@ def show_category_settings(category_name:str):
 def remove_category():
     category_name = CategorySettingsWindow.window.windowTitle()
 
-    if Errors.delete_category_confirmation.exec() == QMessageBox.StandardButton.Ok:
+    Messages.delete_category_confirmation.exec()
+    if Messages.delete_category_confirmation.clickedButton() == Messages.delete_category_confirmation.ok_button:
         category_id = Session.db.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
         Session.db.delete_category(category_id)
         CategorySettingsWindow.window.setWindowTitle(" ")
@@ -128,7 +129,7 @@ def rename_category():
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
 
     if Session.db.category_exists(new_category_name, category_type):
-        return Errors.category_exists.exec()
+        return Messages.category_exists.exec()
 
     category = Session.categories[Session.db.get_category(current_name, category_type).id]
 
@@ -183,18 +184,18 @@ def change_category_position():
     max_position = Session.db.get_available_position(category_type)-1
 
     if new_position == "":
-        return Errors.empty_fields.exec()
+        return Messages.empty_fields.exec()
 
     if not new_position.isdigit():
-        return Errors.incorrect_data_type.exec()
+        return Messages.incorrect_data_type.exec()
     new_position = int(new_position)
 
     if not 0 <= new_position <= max_position:
-        Errors.position_out_range.setText(LANGUAGES[Session.language]["Errors"][17].replace("max_position", str(max_position)))
-        return Errors.position_out_range.exec()
+        Messages.position_out_range.setText(LANGUAGES[Session.language]["Errors"][17].replace("max_position", str(max_position)))
+        return Messages.position_out_range.exec()
     
     if new_position == old_position:
-        return Errors.same_position.exec()
+        return Messages.same_position.exec()
 
     Session.db.change_category_position(new_position, old_position, category.id, category_type)
     

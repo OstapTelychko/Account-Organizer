@@ -1,3 +1,4 @@
+from sys import platform
 from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect
 
@@ -17,7 +18,7 @@ class SubWindow(QDialog):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        self.opacity_animation = QPropertyAnimation(self, b"windowOpacity", self)
+        self.opacity_animation = QPropertyAnimation(self, b"windowOpacity", self) 
         self.opacity_animation.setDuration(100)
         self.opacity_animation.setStartValue(0.0)
         self.opacity_animation.setEndValue(1.0)
@@ -65,22 +66,24 @@ class SubWindow(QDialog):
 
             self.move(main_window_center)
 
-            initial_size = self.window_container.geometry()
-            window_width = initial_size.width()
-            window_height = initial_size.height()
+            if platform != "win32":
+                initial_size = self.window_container.geometry()
+                window_width = initial_size.width()
+                window_height = initial_size.height()
 
-            start_width = window_width*0.8
-            start_height = window_height*0.8
-            
-            smaller_size = QRect(initial_size)
-            smaller_size.setWidth(start_width)
-            smaller_size.setHeight(start_height)
+                start_width = window_width*0.8
+                start_height = window_height*0.8
+                
+                smaller_size = QRect(initial_size)
+                smaller_size.setWidth(start_width)
+                smaller_size.setHeight(start_height)
+                
+                self.size_animation.setStartValue(smaller_size)
+                self.size_animation.setEndValue(initial_size)
 
-            self.size_animation.setStartValue(smaller_size)
-            self.size_animation.setEndValue(initial_size)
+                self.animation_group.setDirection(QPropertyAnimation.Direction.Forward)
+                self.animation_group.start()
 
-            self.animation_group.setDirection(QPropertyAnimation.Direction.Forward)
-            self.animation_group.start()
         QTimer.singleShot(10, show_window)
         super().exec()
     
@@ -90,10 +93,13 @@ class SubWindow(QDialog):
             QDialog.done(self, return_code)
             self.window_container.setGeometry(self.size_animation.endValue())
 
-        self.animation_group.setDirection(QPropertyAnimation.Direction.Backward)
-        self.animation_group.start()
-        QTimer.singleShot(200, hide_window)
-    
+        if platform != "win32":
+            self.animation_group.setDirection(QPropertyAnimation.Direction.Backward)
+            self.animation_group.start()
+            QTimer.singleShot(200, hide_window)
+        else:
+            QDialog.done(self, return_code)
+
 
     def setWindowTitle(self, text:str):
         self.sub_window_title.setText(text)

@@ -13,7 +13,7 @@ from AppObjects.category import Category
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 
 
 
@@ -176,13 +176,13 @@ def show_monthly_statistics():
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
 
     if len(Session.categories) < 2 or len(Incomes_categories) < 1 or  len(Expenses_categories) < 1:
-        return Errors.no_category.exec()
+        return Messages.no_category.exec()
     
     Incomes_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Incomes_categories])
     Expenses_categories_have_transactions = any([bool(len(Session.db.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Expenses_categories])
 
     if not (Incomes_categories_have_transactions and Expenses_categories_have_transactions):
-        return Errors.no_transactions.exec()
+        return Messages.no_transactions.exec()
     
     add_month_statistics(Incomes_categories, Expenses_categories, LANGUAGES[Session.language]["Account"]["Info"]["Statistics"], MonthlyStatistics.statistics, Session.current_month)
     
@@ -201,7 +201,7 @@ def show_quarterly_statistics():
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
 
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
-        return Errors.no_category.exec()
+        return Messages.no_category.exec()
     
     for quarter in QuarterlyStatistics.statistics.quarters:
         Incomes_categories_total_values = {}
@@ -252,7 +252,7 @@ def show_quarterly_statistics():
             if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                 add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, month.data, month.month_number)
             else:
-                month.data.addItem(Errors.no_transactions.text())
+                month.data.addItem(Messages.no_transactions.text())
 
     StatisticsWindow.window.done(1)
     QuarterlyStatistics.window.exec()
@@ -268,7 +268,7 @@ def show_yearly_statistics():
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
 
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
-        return Errors.no_category.exec()
+        return Messages.no_category.exec()
     
     Incomes_categories_total_values = {}
     Expenses_categories_total_values = {}
@@ -318,7 +318,7 @@ def show_yearly_statistics():
         if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
             add_month_statistics(Incomes_categories, Expenses_categories, Statistic_words, month.data, month.month_number)
         else:
-            month.data.addItem(Errors.no_transactions.text())
+            month.data.addItem(Messages.no_transactions.text())
 
     StatisticsWindow.window.done(1)
     YearlyStatistics.window.exec()
@@ -414,10 +414,10 @@ def show_custom_range_statistics_view():
     to_date = CustomRangeStatistics.to_date.date()
 
     if from_date >= to_date:
-        return Errors.wrong_date.exec()
+        return Messages.wrong_date.exec()
     
     if len(CustomRangeStatistics.selected_categories_data) == 0:
-        return Errors.no_selected_category.exec()
+        return Messages.no_selected_category.exec()
     
     date_difference = date(to_date.year(), to_date.month(), to_date.day()) - date(from_date.year(), from_date.month(), from_date.day()) 
     days_amount = date_difference.days

@@ -1,12 +1,17 @@
+from sys import platform
+if platform == "win32":
+    import ctypes
+
+from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QIcon
 from qdarktheme._style_loader import load_stylesheet
 
 from project_configuration import ROOT_DIRECTORY
 from AppObjects.session import Session
 
-from GUI.gui_constants import app
+from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
+from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
-
 
 
 
@@ -157,10 +162,16 @@ def swith_theme():
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
         Session.theme = "Light"
 
+        if platform == "win32":
+            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
+
     elif Session.theme == "Light":
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
         Session.theme = "Dark"
+
+        if platform == "win32":
+            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
 
     Session.update_user_config()
 
@@ -170,6 +181,18 @@ def load_theme():
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
 
+        if platform == "win32":
+            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
+            
     if Session.theme == "Light":
         app.setStyleSheet(LIGHT_THEME)
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
+
+        if platform == "win32":
+            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
+
+
+def set_theme_mode_on_window(window:QWidget, value: ctypes.c_uint):
+    ctypes.windll.dwmapi.DwmSetWindowAttribute(
+        window.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
+    )

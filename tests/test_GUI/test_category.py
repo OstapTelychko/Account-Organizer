@@ -7,7 +7,7 @@ from AppObjects.session import Session
 
 from GUI.gui_constants import app
 from GUI.windows.main_window import MainWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 from GUI.windows.category import AddCategoryWindow, CategorySettingsWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 
 
@@ -38,7 +38,7 @@ class TestCategory(DBTestCase):
             self.select_correct_tab(category)
 
             def delete_category():
-                QTimer.singleShot(100, lambda: Errors.delete_category_confirmation.button(OK_BUTTON).click())
+                QTimer.singleShot(100, lambda: Messages.delete_category_confirmation.button(OK_BUTTON).click())
                 CategorySettingsWindow.delete_category.click()
 
             QTimer.singleShot(100, delete_category)

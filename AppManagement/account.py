@@ -7,7 +7,7 @@ from languages import LANGUAGES
 
 from GUI.windows.settings import SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 
 from AppManagement.balance import load_account_balance
 from AppManagement.category import remove_categories_from_list, load_categories, activate_categories
@@ -24,13 +24,13 @@ def add_user():
     account_name = AddAccountWindow.account_name.text().strip()
 
     if account_name == "":
-        return Errors.empty_fields.exec()
+        return Messages.empty_fields.exec()
     
     db = DBController(account_name)
     
     if db.account_exists(account_name):
-        Errors.account_alredy_exists.setText(LANGUAGES[Session.language]["Errors"][1])
-        return Errors.account_alredy_exists.exec()
+        Messages.account_alredy_exists.setText(LANGUAGES[Session.language]["Errors"][1])
+        return Messages.account_alredy_exists.exec()
 
     balance = AddAccountWindow.current_balance.text()
 
@@ -61,8 +61,10 @@ def add_user():
             db.create_account(balance)
             complete_adding_account()    
     else:
-        Errors.zero_current_balance.setText(LANGUAGES[Session.language]["Errors"][2])
-        if Errors.zero_current_balance.exec() == QMessageBox.StandardButton.Ok:
+        Messages.zero_current_balance.setText(LANGUAGES[Session.language]["Errors"][2])
+
+        Messages.zero_current_balance.exec()
+        if Messages.zero_current_balance.clickedButton() == Messages.zero_current_balance.ok_button:
             db.create_account(0)
             complete_adding_account()
 
@@ -84,9 +86,10 @@ def load_account_data(name:str):
 
 def switch_account(name:str):
     if Session.switch_account:
-        Errors.load_account_question.setText(LANGUAGES[Session.language]["Errors"][10].replace("account", name))
+        Messages.load_account_question.setText(LANGUAGES[Session.language]["Errors"][10].replace("account", name))
 
-        if Errors.load_account_question.exec() == QMessageBox.StandardButton.Ok:
+        Messages.load_account_question.exec()
+        if Messages.load_account_question.clickedButton() == Messages.load_account_question.ok_button:
             load_account_data(name)
         else:
             Session.switch_account = False
@@ -96,9 +99,10 @@ def switch_account(name:str):
 
 
 def remove_account():
-    Errors.delete_account_warning.setText(LANGUAGES[Session.language]["Errors"][11].replace("account", Session.account_name))
+    Messages.delete_account_warning.setText(LANGUAGES[Session.language]["Errors"][11].replace("account", Session.account_name))
 
-    if Errors.delete_account_warning.exec() == QMessageBox.StandardButton.Ok:
+    Messages.delete_account_warning.exec()
+    if Messages.delete_account_warning.clickedButton() == Messages.delete_account_warning.ok_button:
         Session.db.delete_account()
         Session.switch_account = False
         SettingsWindow.accounts.removeItem(Session.accounts_list.index(Session.account_name))
@@ -122,10 +126,10 @@ def rename_account():
     new_account_name = RenameAccountWindow.new_account_name.text().strip()
 
     if new_account_name == "":
-        return Errors.empty_fields.exec()
+        return Messages.empty_fields.exec()
 
     if Session.db.account_exists(new_account_name):
-        return Errors.account_alredy_exists.exec()
+        return Messages.account_alredy_exists.exec()
 
     Session.db.rename_account(new_account_name)
 

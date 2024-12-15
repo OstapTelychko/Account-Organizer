@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 
 from GUI.gui_constants import ALIGNMENT
 from GUI.windows.main_window import MainWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 from GUI.windows.transaction import TransactionManagementWindow
 
 from AppObjects.session import Session
@@ -18,10 +18,10 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
-        return Errors.unselected_row.exec()
+        return Messages.unselected_row.exec()
         
     if len(selected_row) > 3 or selected_row[0].row() != selected_row[1].row() or selected_row[0].row() != selected_row[2].row():
-        return Errors.only_one_row.exec()
+        return Messages.only_one_row.exec()
     
     TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][5])
     TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Account"]["Transactions management"]["Messages"][0])
@@ -119,16 +119,16 @@ def transaction_data_handler():
     max_month_day = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
 
     if transaction_day == "" or transaction_value == "":
-        return Errors.empty_fields.exec()
+        return Messages.empty_fields.exec()
     
     if transaction_value.replace(".","").replace(",","").isdigit() and transaction_day.isdigit():
         transaction_day = int(transaction_day)
     else:
-        return Errors.incorrect_data_type.exec()
+        return Messages.incorrect_data_type.exec()
 
     if not 0 < transaction_day <= max_month_day:
-        Errors.day_out_range.setText(LANGUAGES[Session.language]["Errors"][8]+f"1-{max_month_day}")
-        return Errors.day_out_range.exec()
+        Messages.day_out_range.setText(LANGUAGES[Session.language]["Errors"][8]+f"1-{max_month_day}")
+        return Messages.day_out_range.exec()
 
     if transaction_value.find(","):#if transaction_value contains "," for example: 4,5 will be 4.5 
         transaction_value = float(".".join(transaction_value.split(",")))
@@ -157,14 +157,15 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int):
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
-        return Errors.unselected_row.exec()
+        return Messages.unselected_row.exec()
     
     if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
         transaction_id = int(category_data.item(selected_row[0].row(), 3).text())
     else:
-        return Errors.only_one_row.exec()
+        return Messages.only_one_row.exec()
 
-    if Errors.delete_transaction_confirmation.exec() == QMessageBox.StandardButton.Ok:
+    Messages.delete_transaction_confirmation.exec()
+    if Messages.delete_transaction_confirmation.clickedButton() == Messages.delete_transaction_confirmation.ok_button:
         transaction_value = float(selected_row[2].text())
         Session.db.delete_transaction(transaction_id)
 

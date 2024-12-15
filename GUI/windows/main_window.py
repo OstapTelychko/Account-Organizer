@@ -1,3 +1,32 @@
+"""MIT License with Non-Monetization Clause
+
+Copyright (c) 2024 Ostap Telychko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+2. The Software and any modifications thereof shall not be sold, licensed for a fee,
+or monetized in any way. Commercial use is permitted only if the Software remains
+freely available to end users.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+
+
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
                                QLabel, QScrollArea, QTabWidget, QToolButton,
                                QSizePolicy)
@@ -9,6 +38,7 @@ from project_configuration import ROOT_DIRECTORY
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT
 
 from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.message_window import MessageWindow
 from DesktopQtToolkit.create_button import create_button
 
 
@@ -20,9 +50,8 @@ class MainWindow():
     window.setMinimumWidth(900)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
-    window.setWindowFlags(Qt.WindowType.Window)
+    window.setWindowFlags(Qt.WindowType.NoDropShadowWindowHint)
     window.setObjectName("main_window")
-    window.setAttribute(Qt.WidgetAttribute.WA_StaticContents)
 
     #Account balance and settings
     General_info = QHBoxLayout()
@@ -152,6 +181,7 @@ class MainWindow():
     window.setLayout(main_layout)
 
     sub_windows:dict[int, SubWindow] = dict()
+    message_windows:dict[int, MessageWindow] = dict()
     def move_event(event:QEvent):
         for sub_window in MainWindow.sub_windows.values():
             main_window_center = MainWindow.window.geometry().center()
@@ -161,6 +191,16 @@ class MainWindow():
             main_window_center.setY(main_window_center.y()-sub_window_geometry.height()/2)
 
             sub_window.move(main_window_center)
+        
+        for message_window in MainWindow.message_windows.values():
+            main_window_center = MainWindow.window.geometry().center()
+            message_window_geometry = message_window.geometry()
+
+            main_window_center.setX(main_window_center.x()-message_window_geometry.width()/2)
+            main_window_center.setY(main_window_center.y()-message_window_geometry.height()/2)
+
+            message_window.move(main_window_center)
+
         event.accept()
 
     window.moveEvent = move_event

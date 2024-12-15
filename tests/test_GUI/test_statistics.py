@@ -7,7 +7,7 @@ from project_configuration import MONTHS_DAYS
 from AppObjects.session import Session
 
 from GUI.windows.main_window import MainWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 
 
@@ -136,7 +136,7 @@ class TestStatistics(DBTestCase):
 
                         else:
                             self.assertEqual(1, statistics_data.count(), f"Month {current_month} without transactions don't have 1 row in statistics")
-                            self.assertEqual(Errors.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                            self.assertEqual(Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
 
                 QuarterlyStatistics.window.done(1)
             
@@ -209,7 +209,7 @@ class TestStatistics(DBTestCase):
 
                     else:
                         self.assertEqual(1, statistics_data.count(), f"Month {month.month_number} without transactions don't have 1 row in statistics")
-                        self.assertEqual(Errors.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                        self.assertEqual(Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
 
                 YearlyStatistics.window.done(1)
             

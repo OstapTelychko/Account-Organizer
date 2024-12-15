@@ -8,7 +8,6 @@ from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
-from GUI.windows.errors import errors_list
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
 
@@ -96,11 +95,11 @@ def change_language():
     CustomRangeStatisticsView.copy_transactions.setText(Language["Account"]["Info"]["Statistics"][37])
 
 
-    for index,error in enumerate(errors_list):
-        error.setText(Language["Errors"][index])
-        error.button(QMessageBox.StandardButton.Ok).setText(Language["General management"][3])
-        if error.button(QMessageBox.StandardButton.Cancel) != None:
-            error.button(QMessageBox.StandardButton.Cancel).setText(Language["General management"][4])
+    for index, message in enumerate(MainWindow.message_windows.values()):
+        message.setText(Language["Errors"][index])
+        message.button(QMessageBox.StandardButton.Ok).setText(Language["General management"][3])
+        if message.button(QMessageBox.StandardButton.Cancel) != None:
+            message.button(QMessageBox.StandardButton.Cancel).setText(Language["General management"][4])
     
     for category in Session.categories:
         Session.categories[category].add_transaction.setText(Language["Account"]["Transactions management"][0])

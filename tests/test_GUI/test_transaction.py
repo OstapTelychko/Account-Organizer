@@ -5,7 +5,7 @@ from project_configuration import CATEGORY_TYPE
 from AppObjects.session import Session
 
 from GUI.windows.main_window import MainWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 from GUI.windows.transaction import TransactionManagementWindow
 
 
@@ -54,7 +54,7 @@ class TestTransaction(DBTestCase):
             category.table_data.selectRow(0)
 
             def confirm_deletion():
-                Errors.delete_transaction_confirmation.button(OK_BUTTON).click()
+                Messages.delete_transaction_confirmation.button(OK_BUTTON).click()
 
             QTimer.singleShot(100, confirm_deletion)
             category.delete_transaction.click()

@@ -10,6 +10,7 @@ from project_configuration import APP_NAME, ROOT_DIRECTORY
 app = QApplication(argv)
 app.setApplicationName(APP_NAME)
 
+DWMWA_USE_IMMERSIVE_DARK_MODE = 20  # Attribute for dark mode
 
 ALIGNMENT = Qt.AlignmentFlag
 ALIGN_H_CENTER = ALIGNMENT.AlignHCenter

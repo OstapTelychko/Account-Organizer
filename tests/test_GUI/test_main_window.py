@@ -10,7 +10,7 @@ from AppObjects.session import Session
 from GUI.gui_constants import app
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
-from GUI.windows.errors import Errors
+from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow
 from GUI.windows.category import AddCategoryWindow
 
@@ -91,8 +91,8 @@ class TestMainWindow(TestCase):
         def check_empty_expression_error():
             result = MainWindow.mini_calculator_text.text()
             translated_error = LANGUAGES[Session.language]["Errors"][12]
-            self.assertTrue(Errors.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_error}. Result expression {result}")
-            Errors.empty_expression.done(1)
+            self.assertTrue(Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_error}. Result expression {result}")
+            Messages.empty_expression.done(1)
 
         QTimer.singleShot(100, check_empty_expression_error)
         MainWindow.calculate.click()
@@ -101,8 +101,8 @@ class TestMainWindow(TestCase):
         def check_forbidden_expression():
             result = MainWindow.mini_calculator_text.text()
             translated_error = LANGUAGES[Session.language]["Errors"][13]
-            self.assertTrue(Errors.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_error}. Result expression {result}")
-            Errors.forbidden_calculator_word.done(1)
+            self.assertTrue(Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_error}. Result expression {result}")
+            Messages.forbidden_calculator_word.done(1)
 
         QTimer.singleShot(100, check_forbidden_expression)
         MainWindow.calculate.click()
