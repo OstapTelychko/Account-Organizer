@@ -44,6 +44,19 @@ class DBController():
         self.session = sessionmaker(bind=self.engine)()
 
 
+    def close_connection(self):
+        self.session.expire_all()
+        self.session.close()
+
+        if self.engine.pool:
+            self.engine.pool.dispose()
+        self.engine.dispose(close=True)
+
+        self.engine = None
+        self.session = None
+
+
+
     def db_up_to_date(self) -> bool:
         # print(self.alebic_config.get_section("alembic"))
         directory = ScriptDirectory.from_config(self.alebic_config)

@@ -1,8 +1,6 @@
 import os
-
 from types import FunctionType
 from unittest import  TestSuite, TestLoader, TextTestRunner
-from sys import exit
 
 from alembic.config import Config
 from alembic import command
@@ -21,6 +19,9 @@ from tests.test_GUI.test_statistics import TestStatistics
 TEST_DB_FILE_PATH = TEST_DB_PATH.replace("sqlite:///","")
 
 def test_main(app_main:FunctionType):
+    if os.path.exists(TEST_DB_FILE_PATH):#Why not remove test db at the end? Because of windows file locking system (lock db even if all connections are closed)
+        os.remove(TEST_DB_FILE_PATH)
+
     Session.test_alembic_config = Config(f"{ROOT_DIRECTORY}/alembic.ini")
     Session.test_alembic_config.set_main_option("script_location", f"{ROOT_DIRECTORY}/alembic")
     Session.test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
@@ -52,8 +53,6 @@ def test_main(app_main:FunctionType):
     finally:
         Session.account_name = previous_name
         Session.update_user_config()
-
-        if os.path.exists(TEST_DB_FILE_PATH):
-            os.remove(TEST_DB_FILE_PATH)
-            
-        exit(0)
+        Session.db.close_connection()
+        os._exit(0)
+        
