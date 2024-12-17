@@ -1,3 +1,4 @@
+import json
 LANGUAGES = {
     "English":{
         "Months":{
@@ -120,7 +121,7 @@ LANGUAGES = {
                 2:"Rename category",
                 3:"New name",
                 4:"Copy month transactions",
-                5:"Month transactions have copied",
+                5:"Month transactions have been copied",
                 6:"Name of category has updated",
                 7:"Category has been removed",
                 8:"Category has been created",
@@ -496,3 +497,20 @@ LANGUAGES = {
         }
     }
 }
+from project_configuration import ROOT_DIRECTORY
+
+with open(f"{ROOT_DIRECTORY}/languages.json") as file:
+    languages_data = json.load(file)
+
+def convert_digit_keys_to_int(obj):
+    new_translation_category = {}
+    for key, value in obj.items():
+        if key.isdigit():
+            new_translation_category[int(key)] = value
+        else:
+            new_translation_category[key] = convert_digit_keys_to_int(value)
+    return new_translation_category
+
+LANGUAGES1 = convert_digit_keys_to_int(languages_data)
+print(LANGUAGES1["English"]["Windows"]["Main"]["Transactions"][2])
+print(LANGUAGES["English"]["Account"]["Info"][2])

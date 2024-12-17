@@ -1,0 +1,156 @@
+{
+    "English":{
+        "Months":{
+            "1": "January",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December"
+        },
+
+        "General management":{
+            "0":"Delete",
+            "1":"Add",
+            "2":"Rename",
+            "3":"Ok",
+            "4":"Cancel",
+            "5":"Update",
+            "6":"Save",
+            "7":"Edit"
+        },
+
+        "Windows":{
+            "Main":{
+                "0":"Balance",
+                "1":"Income",
+                "2":"Expenses",
+
+                "Transactions":{
+                    "0":"Name",
+                    "1":"Date",
+                    "2":"Value",
+                    "Messages":{
+                        "0": "Enter the values you want to chanange",
+                        "1": "\nEnter the name (optional) day and value of transaction for example:\n\tHarry Potter\t28\t13850\n\tSalary\t20\t25000"
+                    }
+                },
+
+                "Categories":{
+                    "0": "Create category",
+                    "1": "Delete category",
+                    "2": "Rename category",
+                    "3": "New name",
+                    "4": "Copy month transactions",
+                    "5": "Month transactions have been copied",
+                    "6": "Name of category has updated",
+                    "7": "Category has been removed",
+                    "8": "Category has been created",
+                    "9": "Change position",
+                    "10": "Total "
+                },
+
+                "Mini calculator":{
+                    "0":"Mini calculator",
+                    "1":"You can't divide by zero",
+                    "2":"You have entered incorrect expression"
+                }
+            },
+
+            "Settings":{
+                "0": "Settings",
+                "1": "Created ",
+                "2": "App version: ",
+
+                "DB management":{
+                    "0": "Database management"
+                },
+
+                "Account":{
+                    "0": "Delete account",
+                    "1": "Create account",
+                    "2": "Rename account",
+                    "3": "New account name",
+
+                    "Messages":{
+                        "0": "Enter account name to create a new account.",
+                        "1": "Enter new account name. "
+                    }
+                }
+            },
+
+            "Statistics":{
+                "0": "Statistics",
+                "1": "Monthly",
+                "2": "Quarterly",
+                "3": "Yearly",
+                "4": "Total income   ",
+                "5": "Average income   ",
+                "6": "Total expenses   ",
+                "7": "Average expenses   ",
+                "8": "Income with expenses   ",
+                "9": "The most lucrative category ",
+                "10": "The most lucrative categories ",
+                "11": "The most lucrative transactions:",
+                "12": "No name",
+                "13": "The least lecrative category ",
+                "14": "The least lecrative categories ",
+                "15": "The least lucrative transactions:",
+                "16": "Category ",
+                "17": "The most expensive category ",
+                "18": "The most expensive categories ",
+                "19": "The most expensive transactions ",
+                "20": "The cheapest category ",
+                "21": "The cheapest categories ",
+                "22": "The cheapest transactions ",
+                "23": " Quarter",
+                "24": "Average income per day   ",
+                "25": "Average income per month   ",
+                "26": "Average expenses per day   ",
+                "27": "Average expenses per month   ",
+                "28": "Copy monthly statistics",
+                "29": "Monthly statistics has been copied",
+                "30": "Copy quarterly statistics",
+                "31": "Quarterly statistics has been copied",
+                "32": "Copy yearly statistics",
+                "33": "Yearly statistics has been copied",
+                "34": "Custom range",
+                "35": "Copy statistics",
+                "36": "Statistics has been copied",
+                "37": "Copy transactions",
+                "38": "Transactions have been copied"
+            }
+        },
+
+        "Messages":{
+            "0": "You have entered invalid type of data, check entered fields again",
+            "1": "Account with this name alredy exists",
+            "2": "You haven't entered a current balance, current balance will count as 0 (if that's not true value there may be discrepancy between current and actual balance)",
+            "3": "This category already exists",
+            "4": "Are you sure you want to delete the category? You will lose ALL transactions added to this category and your current balance will be recalculated",
+            "5": "Select transaction. (Click on transaction number to select)",
+            "6": "Please select only 1 row",
+            "7": "You can't leave the fields empty",
+            "8": "The day must be in range ",
+            "9": "Are you sure you want to remove transaction?",
+            "10": "Would you like to load account ?",
+            "11": "Are you sure you want to remove account ? This action is irreversible",
+            "12": "I can't calculate empty expression",
+            "13": "You have used forbidden word in expression",
+            "14": "You should have at least one category for income and one for expenses to see monthly statistics",
+            "15": "You should have at least one income transaction and one expense transaction to see monthly statistics",
+            "16": "Name of category can't be empty field",
+            "17": "The position must be within 0-max_position",
+            "18": "The position can't be the same",
+            "19": "From-date can't be bigger then to-date",
+            "20": "You have to select at least one category"
+        }
+            
+    }
+}

@@ -46,7 +46,7 @@ from GUI.theme import swith_theme, load_theme
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
 from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
-from AppManagement.language import load_language, change_language_add_account
+from AppManagement.language import load_language, change_language_during_add_account
 from AppManagement.balance import load_account_balance
 from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
@@ -141,7 +141,7 @@ def main():
 
     #Create new account if it doesn't exist
     AddAccountWindow.button.clicked.connect(add_user)
-    AddAccountWindow.languages.currentIndexChanged.connect(change_language_add_account)
+    AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
     #Connect to db
     if not DBController(Session.account_name).account_exists(Session.account_name):
         show_add_user_window()

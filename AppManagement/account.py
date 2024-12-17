@@ -11,12 +11,12 @@ from GUI.windows.messages import Messages
 
 from AppManagement.balance import load_account_balance
 from AppManagement.category import remove_categories_from_list, load_categories, activate_categories
-from AppManagement.language import change_language_add_account, change_language
+from AppManagement.language import change_language_during_add_account, change_language
 
 
 
 def show_add_user_window():
-    change_language_add_account(Session.language)
+    change_language_during_add_account(Session.language)
     AddAccountWindow.window.exec()
 
 
