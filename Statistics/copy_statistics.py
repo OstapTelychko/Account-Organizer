@@ -34,7 +34,7 @@ def copy_monthly_transactions():
         transactions = Session.db.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
         if len(transactions):
             result = ""
-            column_names = LANGUAGES[Session.language]["Account"]["Info"]
+            column_names = LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]
             result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction.value}\t\t{transaction.day}\t{transaction.name}\n"
@@ -44,7 +44,7 @@ def copy_monthly_transactions():
         else:
             app.clipboard().setText("")
             
-        show_information_message(LANGUAGES[Session.language]["Account"]["Category management"][5])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][5])
 
 
 def copy_monthly_statistics():
@@ -57,7 +57,7 @@ def copy_monthly_statistics():
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][29])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][29])
 
 
 def copy_quarterly_statistics():
@@ -83,7 +83,7 @@ def copy_quarterly_statistics():
             result+= "\n\n\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][31])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][31])
 
 
 def copy_yearly_statistics():
@@ -105,7 +105,7 @@ def copy_yearly_statistics():
             result += "\n\n\n"
 
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][33])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][33])
 
 
 def copy_custom_range_statistics():
@@ -118,7 +118,7 @@ def copy_custom_range_statistics():
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][36])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][36])
 
 
 def copy_custom_range_transactions():
@@ -132,4 +132,4 @@ def copy_custom_range_transactions():
             result += f"{transactions.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][38])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][38])

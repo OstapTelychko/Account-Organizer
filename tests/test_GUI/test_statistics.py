@@ -14,9 +14,9 @@ from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, Quarterl
 class TestStatistics(DBTestCase):
 
     def setUp(self):
-        self.statistics_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
-        self.translated_incomes = LANGUAGES[Session.language]["Account"]["Info"][4]
-        self.translated_expenses = LANGUAGES[Session.language]["Account"]["Info"][5]
+        self.statistics_words = LANGUAGES[Session.language]["Windows"]["Statistics"]
+        self.translated_incomes = LANGUAGES[Session.language]["Windows"]["Main"][1]
+        self.translated_expenses = LANGUAGES[Session.language]["Windows"]["Main"][2]
 
 
     def open_statistics_window(self, func):

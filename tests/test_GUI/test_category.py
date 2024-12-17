@@ -104,7 +104,7 @@ class TestCategory(DBTestCase):
                     else:
                         transaction_type = "expenses"
 
-                    column_names = LANGUAGES[Session.language]["Account"]["Info"]
+                    column_names = LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]
                     expected_transactions = f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
                     expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
 

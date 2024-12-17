@@ -1,5 +1,4 @@
 from sys import exit
-from PySide6.QtWidgets import QMessageBox
 
 from AppObjects.session import Session
 from backend.db_controller import DBController
@@ -29,7 +28,7 @@ def add_user():
     db = DBController(account_name)
     
     if db.account_exists(account_name):
-        Messages.account_alredy_exists.setText(LANGUAGES[Session.language]["Errors"][1])
+        Messages.account_alredy_exists.setText(LANGUAGES[Session.language]["Messages"][1])
         return Messages.account_alredy_exists.exec()
 
     balance = AddAccountWindow.current_balance.text()
@@ -61,7 +60,7 @@ def add_user():
             db.create_account(balance)
             complete_adding_account()    
     else:
-        Messages.zero_current_balance.setText(LANGUAGES[Session.language]["Errors"][2])
+        Messages.zero_current_balance.setText(LANGUAGES[Session.language]["Messages"][2])
 
         Messages.zero_current_balance.exec()
         if Messages.zero_current_balance.clickedButton() == Messages.zero_current_balance.ok_button:
@@ -76,7 +75,7 @@ def load_account_data(name:str):
     Session.account_name = name
     Session.db = DBController(Session.account_name)
     Session.db.set_account_id()
-    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Account"]["Info"][9] + str(Session.db.get_account().created_date))    
+    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + str(Session.db.get_account().created_date))    
     
     Session.update_user_config()
     load_categories()
@@ -86,7 +85,7 @@ def load_account_data(name:str):
 
 def switch_account(name:str):
     if Session.switch_account:
-        Messages.load_account_question.setText(LANGUAGES[Session.language]["Errors"][10].replace("account", name))
+        Messages.load_account_question.setText(LANGUAGES[Session.language]["Messages"][10].replace("account", name))
 
         Messages.load_account_question.exec()
         if Messages.load_account_question.clickedButton() == Messages.load_account_question.ok_button:
@@ -99,7 +98,7 @@ def switch_account(name:str):
 
 
 def remove_account():
-    Messages.delete_account_warning.setText(LANGUAGES[Session.language]["Errors"][11].replace("account", Session.account_name))
+    Messages.delete_account_warning.setText(LANGUAGES[Session.language]["Messages"][11].replace("account", Session.account_name))
 
     Messages.delete_account_warning.exec()
     if Messages.delete_account_warning.clickedButton() == Messages.delete_account_warning.ok_button:

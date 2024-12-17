@@ -1,5 +1,4 @@
 from functools import partial
-from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt
 
 from AppObjects.session import Session
@@ -61,7 +60,7 @@ def load_categories_data():
                 category_data.setItem(row,3,transaction_id)
                 total_value += transaction.value
 
-        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(float(round(total_value, 2))))
+        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10]+str(float(round(total_value, 2))))
 
 
 def create_category():
@@ -88,7 +87,7 @@ def create_category():
 
     AddCategoryWindow.category_name.setText("")
     AddCategoryWindow.window.hide()
-    show_information_message(LANGUAGES[Session.language]["Account"]["Category management"][8])
+    show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][8])
 
 
 def load_categories():
@@ -120,7 +119,7 @@ def remove_category():
         del Session.categories[category_id]
 
         calculate_current_balance()
-        show_information_message(LANGUAGES[Session.language]["Account"]["Category management"][7])
+        show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][7])
 
 
 def rename_category():
@@ -149,7 +148,7 @@ def rename_category():
     RenameCategoryWindow.window.hide()
     CategorySettingsWindow.window.hide()
     RenameCategoryWindow.new_category_name.setText("")
-    show_information_message(LANGUAGES[Session.language]["Account"]["Category management"][6])
+    show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][6])
 
 
 def show_change_category_position(category_name:str):
@@ -191,7 +190,7 @@ def change_category_position():
     new_position = int(new_position)
 
     if not 0 <= new_position <= max_position:
-        Messages.position_out_range.setText(LANGUAGES[Session.language]["Errors"][17].replace("max_position", str(max_position)))
+        Messages.position_out_range.setText(LANGUAGES[Session.language]["Messages"][17].replace("max_position", str(max_position)))
         return Messages.position_out_range.exec()
     
     if new_position == old_position:
@@ -213,7 +212,7 @@ def update_category_total_value(category_id:int):
     if len(transactions) != 0:
         for transaction in transactions:
             total_value += transaction.value
-    Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Account"]["Info"][6]+str(round(total_value, 2)))
+    Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10]+str(round(total_value, 2)))
 
 
 def activate_categories():

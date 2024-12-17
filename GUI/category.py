@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView, QGraphicsDropShadowEffect
-from PySide6.QtCore import Qt,QSize
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
 from project_configuration import ROOT_DIRECTORY
@@ -88,7 +88,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     column = category_data.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-    category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Account"]["Info"][0], LANGUAGES[Language]["Account"]["Info"][1], LANGUAGES[Language]["Account"]["Info"][2]))
+    category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Windows"]["Main"]["Transactions"][0], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][1], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][2]))
     row = category_data.horizontalHeader()
     row.setFont(BASIC_FONT)
 
@@ -120,18 +120,18 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
             category_data.setItem(index, 3, transaction_id)
             total_value += transaction.value
             
-    category_total_value.setText(LANGUAGES[Language]["Account"]["Info"][6]+str(round(total_value, 2)))
+    category_total_value.setText(LANGUAGES[Language]["Windows"]["Main"]["Categories"][10]+str(round(total_value, 2)))
     category_data.setSortingEnabled(True)
 
-    add_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][0],(185,40))
+    add_transaction = create_button(LANGUAGES[Language]["General management"][1],(185,40))
     add_transaction.setIcon(ADD_TRANSACTION_ICON)
     add_transaction.setIconSize(ICON_SIZE)
 
-    delete_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][1],(185,40))
+    delete_transaction = create_button(LANGUAGES[Language]["General management"][0],(185,40))
     delete_transaction.setIcon(REMOVE_TRANSACTION_ICON)
     delete_transaction.setIconSize(ICON_SIZE)
 
-    edit_transaction = create_button(LANGUAGES[Language]["Account"]["Transactions management"][2],(210,40))
+    edit_transaction = create_button(LANGUAGES[Language]["General management"][7],(210,40))
     edit_transaction.setIcon(EDIT_TRANSACTION_ICON)
     edit_transaction.setIconSize(ICON_SIZE)
     

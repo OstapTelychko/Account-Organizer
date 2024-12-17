@@ -78,20 +78,20 @@ class TestMainWindow(TestCase):
         MainWindow.mini_calculator_text.setText("1000Money+friends")
         MainWindow.calculate.click()
         result = MainWindow.mini_calculator_text.text()
-        translated_warning = LANGUAGES[Session.language]["Mini calculator"][2]
+        translated_warning = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][2]
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for incorrect expression {result} instead of {translated_warning}")
 
         MainWindow.mini_calculator_text.setText("5/0")
         MainWindow.calculate.click()
         result = MainWindow.mini_calculator_text.text()
-        translated_warning = LANGUAGES[Session.language]["Mini calculator"][1]
+        translated_warning = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][1]
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for division by zero {result} instead of {translated_warning}")
 
         MainWindow.mini_calculator_text.setText("")
         def check_empty_expression_error():
             result = MainWindow.mini_calculator_text.text()
-            translated_error = LANGUAGES[Session.language]["Errors"][12]
-            self.assertTrue(Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_error}. Result expression {result}")
+            translated_message = LANGUAGES[Session.language]["Messages"][12]
+            self.assertTrue(Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             Messages.empty_expression.done(1)
 
         QTimer.singleShot(100, check_empty_expression_error)
@@ -100,8 +100,8 @@ class TestMainWindow(TestCase):
         MainWindow.mini_calculator_text.setText("quit()")
         def check_forbidden_expression():
             result = MainWindow.mini_calculator_text.text()
-            translated_error = LANGUAGES[Session.language]["Errors"][13]
-            self.assertTrue(Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_error}. Result expression {result}")
+            translated_message = LANGUAGES[Session.language]["Messages"][13]
+            self.assertTrue(Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             Messages.forbidden_calculator_word.done(1)
 
         QTimer.singleShot(100, check_forbidden_expression)
@@ -116,7 +116,7 @@ class TestMainWindow(TestCase):
 
         def open_settings():
             SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
-            expected_translation = LANGUAGES[language_to_change]["Windows"][0]
+            expected_translation = LANGUAGES[language_to_change]["Windows"]["Settings"][0]
             result = SettingsWindow.window.windowTitle()
 
             self.assertEqual(result, expected_translation, f"Language has't been changed. Expected translation {expected_translation} not {result}")

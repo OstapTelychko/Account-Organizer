@@ -82,50 +82,50 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
 
     def add_highest_and_lowest_transactions(category:int, statistic:dict):
         #Highest transactions
-        statistic_list.addItem("\n"+LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][words[4]])
+        statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[4]])
         for transaction_name, transaction_value in statistic[category][0].items():
             if transaction_name != "Highest value":
                 if transaction_name == "":
-                    transaction_name = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][12]
+                    transaction_name = LANGUAGES[Session.language]["Windows"]["Statistics"][12]
                 statistic_list.addItem(f"{transaction_name} - {statistic[category][0]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][0]['Highest value']}")
         
         #Lowest transactions
         if statistic[category][1]["Lowest value"] != statistic[category][0]["Highest value"]:
-            statistic_list.addItem("\n"+LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][words[5]])
+            statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[5]])
             for transaction_name,transaction_value in statistic[category][1].items():
                 if transaction_name != "Lowest value":
                     if transaction_name == "":
-                        transaction_name = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][12]
+                        transaction_name = LANGUAGES[Session.language]["Windows"]["Statistics"][12]
                     statistic_list.addItem(f"{transaction_name} - {statistic[category][1]['Lowest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][1]['Lowest value']}")
     
     #Highest category
     if len(statistic_data[0]) == 2:
         most_category = [*statistic_data[0].keys()][0]
-        statistic_list.addItem(LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][words[0]] + Session.categories[most_category].name+f"  ({statistic_data[0]['Highest total value']})")
+        statistic_list.addItem(LANGUAGES[Session.language]["Windows"]["Statistics"][words[0]] + Session.categories[most_category].name+f"  ({statistic_data[0]['Highest total value']})")
         add_highest_and_lowest_transactions(most_category,statistic_data[0])
 
     elif len(statistic_data[0]) > 2:#Highest categories
         highest_categories = [category for category in statistic_data[0] if category != "Highest total value"]
         highest_categories_names = str((*[Session.categories[category].name for category in highest_categories],)).replace("'","")
-        statistic_list.addItem(f"{LANGUAGES[Session.language]['Account']['Info']['Statistics'][words[1]]}  {highest_categories_names}  ({statistic_data[0]['Highest total value']})")
+        statistic_list.addItem(f"{LANGUAGES[Session.language]['Windows']['Statistics'][words[1]]}  {highest_categories_names}  ({statistic_data[0]['Highest total value']})")
 
         for category in highest_categories:
-            statistic_list.addItem(f"\n{LANGUAGES[Session.language]['Account']['Info']['Statistics'][16]} {Session.categories[category].name}")
+            statistic_list.addItem(f"\n{LANGUAGES[Session.language]['Windows']['Statistics'][16]} {Session.categories[category].name}")
             add_highest_and_lowest_transactions(category, statistic_data[0])
 
     #Lowest category
     if len(statistic_data[1]) == 2:
         least_category = [*statistic_data[1].keys()][0] 
-        statistic_list.addItem("\n"+LANGUAGES[Session.language]["Account"]["Info"]["Statistics"][words[2]]+Session.categories[least_category].name+f" ({statistic_data[1]['Lowest total value']})")
+        statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[2]]+Session.categories[least_category].name+f" ({statistic_data[1]['Lowest total value']})")
         add_highest_and_lowest_transactions(least_category, statistic_data[1])
 
     elif len(statistic_data[1]) > 2:#Lowest categories
         lowest_categories = [category for category in statistic_data[1] if category != "Lowest total value"]
         lowest_categories_names = str((*[Session.categories[category].name for category in lowest_categories],)).replace("'","")
-        statistic_list.addItem(f"\n\n{LANGUAGES[Session.language]['Account']['Info']['Statistics'][words[3]]}  {lowest_categories_names}  ({statistic_data[1]['Lowest total value']})")
+        statistic_list.addItem(f"\n\n{LANGUAGES[Session.language]['Windows']['Statistics'][words[3]]}  {lowest_categories_names}  ({statistic_data[1]['Lowest total value']})")
 
         for category in lowest_categories:
-            statistic_list.addItem(f"\n{LANGUAGES[Session.language]['Account']['Info']['Statistics'][16]} {Session.categories[category].name}")
+            statistic_list.addItem(f"\n{LANGUAGES[Session.language]['Windows']['Statistics'][16]} {Session.categories[category].name}")
             add_highest_and_lowest_transactions(category, statistic_data[1])
 
 
@@ -162,9 +162,9 @@ def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Stat
 
     month_statistics.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 
-    month_statistics.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][4])
+    month_statistics.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][1])
     add_statistic(month_statistics, Incomes_statistic, [9,10,13,14,11,15])
-    month_statistics.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
+    month_statistics.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][2])
     add_statistic(month_statistics, Expenses_statistic, [17,18,20,21,19,22])
 
 
@@ -184,7 +184,7 @@ def show_monthly_statistics():
     if not (Incomes_categories_have_transactions and Expenses_categories_have_transactions):
         return Messages.no_transactions.exec()
     
-    add_month_statistics(Incomes_categories, Expenses_categories, LANGUAGES[Session.language]["Account"]["Info"]["Statistics"], MonthlyStatistics.statistics, Session.current_month)
+    add_month_statistics(Incomes_categories, Expenses_categories, LANGUAGES[Session.language]["Windows"]["Statistics"], MonthlyStatistics.statistics, Session.current_month)
     
     StatisticsWindow.window.done(1)
     MonthlyStatistics.window.exec()
@@ -228,7 +228,7 @@ def show_quarterly_statistics():
         days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
 
         Total_statistic_list = quarter.total_quarter_statistics.data
-        Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
+        Statistic_words = LANGUAGES[Session.language]["Windows"]["Statistics"]
 
         Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
         Total_statistic_list.addItem(Statistic_words[5]+str(round(total_income/days_amount, 2))+"\n")
@@ -238,10 +238,10 @@ def show_quarterly_statistics():
 
         Total_statistic_list.addItem(Statistic_words[8]+str(round(total_income - total_expense, 2)))
 
-        Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][4])
+        Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][1])
         add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list, Statistic_words)
 
-        Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
+        Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][2])
         add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, Statistic_words)
 
         #Months statistics
@@ -293,7 +293,7 @@ def show_yearly_statistics():
     days_amount = 365 if Session.current_year % 4 != 0 else 366# 365 days if year is not leap
 
     Total_statistic_list = YearlyStatistics.statistics.total_year_statistics.data
-    Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
+    Statistic_words = LANGUAGES[Session.language]["Windows"]["Statistics"]
 
     Total_statistic_list.addItem(Statistic_words[4]+str(total_income))
     Total_statistic_list.addItem(Statistic_words[25]+str(round(total_income/12, 2)))
@@ -305,10 +305,10 @@ def show_yearly_statistics():
 
     Total_statistic_list.addItem(Statistic_words[8]+f"{round(total_income - total_expense, 2)}")
 
-    Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][4])
+    Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][1])
     add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list, Statistic_words)
 
-    Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
+    Total_statistic_list.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][2])
     add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, Statistic_words)
 
     for month in YearlyStatistics.statistics.months:
@@ -348,9 +348,9 @@ def show_custom_range_statistics_window():
         add_category_statistics_list.setText(LANGUAGES[Session.language]["General management"][1])
 
         if category.type == CATEGORY_TYPE[0]:#Income
-            category_type_translate = LANGUAGES[Session.language]["Account"]["Info"][4]
+            category_type_translate = LANGUAGES[Session.language]["Windows"]["Main"][1]
         else:
-            category_type_translate = LANGUAGES[Session.language]["Account"]["Info"][5]
+            category_type_translate = LANGUAGES[Session.language]["Windows"]["Main"][2]
 
         remove_category_statistics_list.clicked.connect(partial(remove_category_from_statistics_list, category, add_category_statistics_list, remove_category_statistics_list))
         add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
@@ -451,7 +451,7 @@ def show_custom_range_statistics_view():
     total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
     total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
 
-    Statistic_words = LANGUAGES[Session.language]["Account"]["Info"]["Statistics"]
+    Statistic_words = LANGUAGES[Session.language]["Windows"]["Statistics"]
 
     #Custom range statistics
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[4]+str(total_income))
@@ -463,17 +463,17 @@ def show_custom_range_statistics_view():
     CustomRangeStatisticsView.statistics_list.addItem(Statistic_words[8]+f"{round(total_income - total_expense, 2)}")
 
     if len(Incomes_categories):
-        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][4])
+        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][1])
         add_total_statistics(Incomes_categories_total_values, [9,13], CustomRangeStatisticsView.statistics_list, Statistic_words)
 
     if len(Expenses_categories):
-        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5])
+        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][2])
         add_total_statistics(Expenses_categories_total_values, [17,20], CustomRangeStatisticsView.statistics_list, Statistic_words)
     
     #Transactions list
 
     if len(Incomes_categories_transactions):
-        CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Account"]["Info"][4]+"\n\n")
+        CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Windows"]["Main"][1]+"\n\n")
         for category, transactions in Incomes_categories_transactions.items():
             CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
@@ -489,7 +489,7 @@ def show_custom_range_statistics_view():
                 CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
     
     if len(Expenses_categories_transactions):
-        CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LANGUAGES[Session.language]["Account"]["Info"][5]+"\n\n")
+        CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][2]+"\n\n")
         for category, transactions in Expenses_categories_transactions.items():
             CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 

@@ -68,9 +68,9 @@ def calculate_expression():
             try:
                 result = str(eval(expression))
             except ZeroDivisionError:
-                result = LANGUAGES[Session.language]["Mini calculator"][1]
+                result = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][1]
             except SyntaxError:
-                result = LANGUAGES[Session.language]["Mini calculator"][2]
+                result = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][2]
             except Exception as ex:
                 result = str(ex)
             MainWindow.mini_calculator_text.setText(result)
