@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('Images', 'Images'), ('alembic', 'alembic'), ('alembic.ini', '.'), ('app version.txt', '.')],
+    datas=[('Images', 'Images'), ('alembic', 'alembic'), ('alembic.ini', '.'), ('app version.txt', '.'), ('languages.json', '.')],
     hiddenimports=['logging.config'],
     hookspath=[],
     hooksconfig={},
