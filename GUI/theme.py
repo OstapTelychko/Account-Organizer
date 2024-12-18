@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QIcon
 from qdarktheme._style_loader import load_stylesheet
 
-from project_configuration import ROOT_DIRECTORY
+from project_configuration import APP_DIRECTORY
 from AppObjects.session import Session
 
 from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
@@ -75,7 +75,7 @@ DARK_THEME = load_stylesheet("dark")+"""
 }
 """
 
-DARK_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Dark theme.png")
+DARK_THEME_ICON = QIcon(f"{APP_DIRECTORY}/Images/Dark theme.png")
 
 
 LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})+"""
@@ -152,7 +152,7 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
     background-color:rgb(90, 120, 90);
 }
 """
-LIGHT_THEME_ICON = QIcon(f"{ROOT_DIRECTORY}/Images/Light theme.png")
+LIGHT_THEME_ICON = QIcon(f"{APP_DIRECTORY}/Images/Light theme.png")
 
 
 

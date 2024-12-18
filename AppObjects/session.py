@@ -4,7 +4,7 @@ from sys import exit
 from datetime import datetime
 from alembic.config import Config
 
-from project_configuration import USER_CONF_PATH, ROOT_DIRECTORY
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -56,7 +56,7 @@ class Session:
     
 
     def load_app_version():
-        with open(f"{ROOT_DIRECTORY}/app version.txt") as file:
+        with open(f"{APP_DIRECTORY}/app version.txt") as file:
             Session.app_version = tuple(map(int, file.read().strip().split(".")))
 
 

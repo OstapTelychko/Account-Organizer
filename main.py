@@ -143,12 +143,14 @@ def main():
     AddAccountWindow.button.clicked.connect(add_user)
     AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
     #Connect to db
-    if not DBController(Session.account_name).account_exists(Session.account_name):
+    if not Session.test_mode:
+        Session.db = DBController()
+        
+    if not Session.db.account_exists(Session.account_name):
         show_add_user_window()
-        if not Session.db:
+        if not Session.db.account_id:
             exit() 
-    Session.db = DBController(Session.account_name)
-    Session.db.set_account_id()
+    Session.db.set_account_id(Session.account_name)
     
 
     #Load categories if they exists

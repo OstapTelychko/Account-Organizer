@@ -71,8 +71,7 @@ class DBTestCase(TestCase):
         Session.db.session.query(Account).filter(Account.id != 1).delete()
         
         Session.account_name = "Test user"
-        Session.db.account_name = Session.account_name
-        Session.db.set_account_id()
+        Session.db.set_account_id(Session.account_name)
 
 
 

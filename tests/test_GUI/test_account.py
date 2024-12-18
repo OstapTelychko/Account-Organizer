@@ -58,8 +58,7 @@ class TestAccount(DBTestCase):
 
     def test_account_deletion(self):
         Session.account_name = "Second test user"
-        Session.db.account_name = Session.account_name
-        Session.db.create_account(100)
+        Session.db.create_account(Session.account_name, 100)
 
         Session.accounts_list.append(Session.account_name)
         Session.switch_account = False

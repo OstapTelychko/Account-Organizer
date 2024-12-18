@@ -34,7 +34,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QIcon, QFont
 
-from project_configuration import ROOT_DIRECTORY
+from project_configuration import APP_DIRECTORY
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT
 
 from DesktopQtToolkit.sub_window import SubWindow
@@ -58,7 +58,7 @@ class MainWindow():
     account_current_balance = QLabel("Balance: 0")
     account_current_balance.setFont(QFont("C059 [urw]",pointSize=15))
     settings = QToolButton()
-    settings.setIcon(QIcon(f"{ROOT_DIRECTORY}/Images/Settings icon.png"))
+    settings.setIcon(QIcon(f"{APP_DIRECTORY}/Images/Settings icon.png"))
     settings.setIconSize(ICON_SIZE)
 
     General_info.addStretch(7)

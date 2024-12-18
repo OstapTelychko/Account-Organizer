@@ -7,7 +7,7 @@ from alembic import command
 
 from AppObjects.session import Session
 from backend.db_controller import DBController
-from project_configuration import TEST_DB_PATH, ROOT_DIRECTORY
+from project_configuration import TEST_DB_PATH, APP_DIRECTORY
 
 from tests.test_GUI.test_main_window import TestMainWindow
 from tests.test_GUI.test_category import TestCategory
@@ -22,8 +22,8 @@ def test_main(app_main:FunctionType):
     if os.path.exists(TEST_DB_FILE_PATH):#Why not remove test db at the end? Because of windows file locking system (lock db even if all connections are closed)
         os.remove(TEST_DB_FILE_PATH)
 
-    Session.test_alembic_config = Config(f"{ROOT_DIRECTORY}/alembic.ini")
-    Session.test_alembic_config.set_main_option("script_location", f"{ROOT_DIRECTORY}/alembic")
+    Session.test_alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
+    Session.test_alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
     Session.test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
     command.upgrade(Session.test_alembic_config, "head")
 
@@ -34,8 +34,8 @@ def test_main(app_main:FunctionType):
     Session.account_name = user_name
     Session.update_user_config()
 
-    Session.db = DBController(user_name)
-    Session.db.create_account(0)
+    Session.db = DBController()
+    Session.db.create_account(user_name, 0)
 
     app_main()
 

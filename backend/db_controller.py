@@ -7,19 +7,19 @@ from alembic.script import ScriptDirectory
 from alembic.runtime import migration
 from alembic import command
 
-from project_configuration import DB_PATH, TEST_DB_PATH, ROOT_DIRECTORY
+from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
 from .models import Account, Category, Transaction
 
 
 
 class DBController():
 
-    def __init__(self, user_name:str):
+    def __init__(self):
         # Init db connection 
         from AppObjects.session import Session
 
-        self.alebic_config = Config(f"{ROOT_DIRECTORY}/alembic.ini")
-        self.alebic_config.set_main_option("script_location", f"{ROOT_DIRECTORY}/alembic")
+        self.alebic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
+        self.alebic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
         self.alebic_config.set_main_option("sqlalchemy.url", DB_PATH)
 
         if Session.test_mode:
@@ -35,13 +35,12 @@ class DBController():
             cursor.execute("PRAGMA synchronous=OFF")
             cursor.close()
 
-        self.account_name = user_name
-
         if not self.db_up_to_date():
             print("Upgrading database")
             command.upgrade(self.alebic_config, "head")
 
         self.session = sessionmaker(bind=self.engine)()
+        self.account_id = None
 
 
     def close_connection(self):
@@ -81,18 +80,18 @@ class DBController():
         return accounts
 
 
-    def set_account_id(self):
-        self.account_id = self.session.query(Account).filter(Account.name == self.account_name).first().id
+    def set_account_id(self, account_name:str):
+        self.account_id = self.session.query(Account).filter(Account.name == account_name).first().id
 
 
-    def create_account(self, balance:float|int=0):
-        self.session.add(Account(name=self.account_name, start_balance=balance))
+    def create_account(self, account_name:str, balance:float|int=0):
+        self.session.add(Account(name=account_name, start_balance=balance))
         self.session.commit()
-        self.set_account_id()
+        self.set_account_id(account_name)
 
 
     def get_account(self) -> Account:
-            return self.session.query(Account).filter_by(id=self.account_id).first()
+        return self.session.query(Account).filter_by(id=self.account_id).first()
 
 
     def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float):
@@ -108,7 +107,6 @@ class DBController():
         account = self.session.query(Account).filter_by(id=self.account_id).first()
         account.name = new_account_name
         self.session.commit()
-        self.account_name = new_account_name
     
 
     def delete_account(self):

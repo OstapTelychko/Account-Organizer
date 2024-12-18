@@ -1,7 +1,6 @@
 from sys import exit
 
 from AppObjects.session import Session
-from backend.db_controller import DBController
 from languages import LANGUAGES
 
 from GUI.windows.settings import SettingsWindow
@@ -24,10 +23,8 @@ def add_user():
 
     if account_name == "":
         return Messages.empty_fields.exec()
-    
-    db = DBController(account_name)
-    
-    if db.account_exists(account_name):
+        
+    if Session.db.account_exists(account_name):
         Messages.account_alredy_exists.setText(LANGUAGES[Session.language]["Messages"][1])
         return Messages.account_alredy_exists.exec()
 
@@ -37,7 +34,6 @@ def add_user():
         AddAccountWindow.window.hide()
 
         Session.account_name = account_name
-        Session.db = db
         Session.update_user_config()
 
         SettingsWindow.accounts.addItem(account_name)
@@ -57,14 +53,14 @@ def add_user():
             else:
                 balance = int(balance)
 
-            db.create_account(balance)
+            Session.db.create_account(account_name, balance)
             complete_adding_account()    
     else:
         Messages.zero_current_balance.setText(LANGUAGES[Session.language]["Messages"][2])
 
         Messages.zero_current_balance.exec()
         if Messages.zero_current_balance.clickedButton() == Messages.zero_current_balance.ok_button:
-            db.create_account(0)
+            Session.db.create_account(account_name, 0)
             complete_adding_account()
 
 
@@ -73,9 +69,8 @@ def load_account_data(name:str):
     remove_categories_from_list()
 
     Session.account_name = name
-    Session.db = DBController(Session.account_name)
-    Session.db.set_account_id()
-    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + str(Session.db.get_account().created_date))    
+    Session.db.set_account_id(Session.account_name)
+    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + str(Session.db.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
     
     Session.update_user_config()
     load_categories()
