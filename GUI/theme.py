@@ -73,6 +73,10 @@ DARK_THEME = load_stylesheet("dark")+"""
 .close_window:hover, .close_window:active:hover, .close_window:focus:hover, .close_window:default:hover{
     background-color:rgb(45, 45, 45)
 }
+
+.backups_table{
+    background-color:rgb(45, 45, 45)
+}
 """
 
 DARK_THEME_ICON = QIcon(f"{APP_DIRECTORY}/Images/Dark theme.png")

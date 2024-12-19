@@ -41,6 +41,7 @@ from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, Rena
 from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
+from GUI.windows.db_management import DBManagementWindow
 from GUI.theme import swith_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
@@ -101,6 +102,7 @@ def main():
     SettingsWindow.languages.currentIndexChanged.connect(load_language)
     SettingsWindow.add_account.clicked.connect(show_add_user_window)
     SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
+    SettingsWindow.db_management.clicked.connect(DBManagementWindow.window.exec)
 
     #Activate mini calculator
     MainWindow.calculate.clicked.connect(calculate_expression)

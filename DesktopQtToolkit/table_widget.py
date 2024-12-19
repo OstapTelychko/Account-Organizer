@@ -35,7 +35,7 @@ class CustomTableWidgetItem(QTableWidgetItem):
         super().__init__(*args, **kwargs)
     
 
-    def __lt__(self, other):
+    def __lt__(self, other:'CustomTableWidgetItem'):
         try:
             return float(self.data(Qt.ItemDataRole.EditRole)) < float(other.data(Qt.ItemDataRole.EditRole))
         except ValueError:

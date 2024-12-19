@@ -10,6 +10,7 @@ from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
+from GUI.windows.db_management import DBManagementWindow
 
 
 
@@ -111,6 +112,14 @@ def change_language():
         Session.categories[category].total_value_label.setText(Windows["Main"]["Categories"][10] + total_value)
     
     MainWindow.account_current_balance.setText(Windows["Main"][0]+str(Session.current_balance))
+
+    DBManagementWindow.window.setWindowTitle(Windows["Settings"]["DB management"][0])
+    DBManagementWindow.backups_table.setHorizontalHeaderLabels((Windows["Main"]["Transactions"][1], Windows["Settings"][2].replace(":", "")))
+    DBManagementWindow.create_backup.setText(Windows["Settings"]["DB management"][1])
+    DBManagementWindow.delete_backup.setText(Windows["Settings"]["DB management"][2])
+    DBManagementWindow.load_backup.setText(Windows["Settings"]["DB management"][3])
+    DBManagementWindow.auto_backup.setText(Windows["Settings"]["DB management"][4])
+    DBManagementWindow.auto_backup_status.setText(Windows["Settings"]["DB management"][8]+" "+Windows["Settings"]["DB management"][5])
 
 
 def change_language_during_add_account(language: int | str):

@@ -75,22 +75,20 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_data.setMinimumWidth(600)
     category_data.setMinimumHeight(270)
 
-
     category_data.setColumnCount(4)
     category_data.setColumnHidden(3, True)
 
-    header = category_data.horizontalHeader()
-    header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-    header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)# Name of transaction
-    header.setSectionResizeMode(1, QHeaderView.ResizeMode.Custom)# Day of transaction
+    row = category_data.horizontalHeader()
+    row.setFont(BASIC_FONT)
+    row.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+    row.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)# Name of transaction
+    row.setSectionResizeMode(1, QHeaderView.ResizeMode.Custom)# Day of transaction
     category_data.setColumnWidth(1, 50)
 
     column = category_data.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
     category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Windows"]["Main"]["Transactions"][0], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][1], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][2]))
-    row = category_data.horizontalHeader()
-    row.setFont(BASIC_FONT)
 
     transactions = db.get_transactions_by_month(category_id, year, month)
     total_value = 0

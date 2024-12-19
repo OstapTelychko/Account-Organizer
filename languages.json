@@ -69,7 +69,15 @@
                 "2": "App version: ",
 
                 "DB management":{
-                    "0": "Database management"
+                    "0": "Database management",
+                    "1": "Create database",
+                    "2": "Delete database",
+                    "3": "Load database",
+                    "4": "Auto backup",
+                    "5": "monthly",
+                    "6": "weekly",
+                    "7": "daily",
+                    "8": "Status"
                 },
 
                 "Account":{
@@ -227,7 +235,15 @@
                 "2": "Версія додатку: ",
 
                 "DB management":{
-                    "0": "Управління базою даних"
+                    "0": "Управління базою даних",
+                    "1": "Створити базу даних",
+                    "2": "Видалити базу даних",
+                    "3": "Завантажити базу даних",
+                    "4": "Автоматичне створення",
+                    "5": "щомісячно",
+                    "6": "щотижня",
+                    "7": "щоденно",
+                    "8": "Статус"
                 },
 
                 "Account":{
@@ -384,7 +400,15 @@
                 "2": "Wersja aplikacji: ",
 
                 "DB management":{
-                    "0": "Zarządzanie bazą danych"
+                    "0": "Zarządzanie bazą danych",
+                    "1": "Stworzyć bazę danych",
+                    "2": "Usunąć bazę danych",
+                    "3": "Załadować bazę danych",
+                    "4": "Automatyczne kopiowanie",
+                    "5": "miesięcznie",
+                    "6": "tygodniowo",
+                    "7": "dziennie",
+                    "8": "Status"
                 },
 
                 "Account":{

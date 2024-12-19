@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy import create_engine, desc, and_, event
+from sqlalchemy import create_engine, desc, and_, event, text
 from sqlalchemy.orm import sessionmaker
 
 from alembic.config import Config
@@ -57,15 +57,12 @@ class DBController():
 
 
     def db_up_to_date(self) -> bool:
-        # print(self.alebic_config.get_section("alembic"))
         directory = ScriptDirectory.from_config(self.alebic_config)
 
         with self.engine.begin() as connection:
             logging.getLogger("alembic.runtime.migration").setLevel(logging.WARN)
             context = migration.MigrationContext.configure(connection)
             logging.getLogger("alembic.runtime.migration").setLevel(logging.INFO)
-            # print(context.get_current_heads())
-            # print(directory.get_heads())
             return set(context.get_current_heads()) == set(directory.get_heads())
 
 
@@ -112,6 +109,8 @@ class DBController():
     def delete_account(self):
         account = self.session.query(Account).filter_by(id=self.account_id).first()
         self.session.delete(account)
+        self.session.commit()
+        self.session.execute(text("VACUUM"))
         self.session.commit()
     
 
@@ -174,6 +173,8 @@ class DBController():
     def delete_category(self, category_id:int):
         self.remove_position(category_id)
         self.session.query(Category).filter_by(id=category_id).delete(False)
+        self.session.commit()
+        self.session.execute(text("VACUUM"))
         self.session.commit()
 
 
