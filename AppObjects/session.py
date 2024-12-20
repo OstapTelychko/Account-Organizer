@@ -4,10 +4,11 @@ from sys import exit
 from datetime import datetime
 from alembic.config import Config
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
+
 
 
 
@@ -16,7 +17,6 @@ class Session:
 
     current_month = 1
     current_year = 2023
-
     current_balance = 0
     current_total_income = 0
     current_total_expenses = 0
@@ -53,6 +53,7 @@ class Session:
             Session.create_user_config()
 
         Session.load_user_config()
+        os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
     
 
     def load_app_version():

@@ -9,6 +9,7 @@ if APP_DIRECTORY.find("_internal")  == -1:
     ROOT_DIRECTORY = APP_DIRECTORY
 else:
     ROOT_DIRECTORY = APP_DIRECTORY.replace("/_internal","")
+BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}DB Backups"
 
 USER_CONF_PATH = f"{APP_DIRECTORY}/User_configuration.toml"
 DB_PATH = f"sqlite:///{APP_DIRECTORY}Accounts.sqlite"

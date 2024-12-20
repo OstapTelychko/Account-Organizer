@@ -9,13 +9,14 @@ from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENT
 
 
 
-class DBManagementWindow():
+class BackupManagement():
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     backups_table = CustomTableWidget()
     backups_table.setColumnCount(2)
     backups_table.setMinimumSize(500, 300)
     backups_table.setProperty("class", "backups_table")
+    backups_table.setSortingEnabled(True)
 
     column = backups_table.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)

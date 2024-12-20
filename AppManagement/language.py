@@ -10,7 +10,7 @@ from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.db_management import DBManagementWindow
+from GUI.windows.backup_management import BackupManagement
 
 
 
@@ -38,7 +38,7 @@ def change_language():
     Expenses = SettingsWindow.total_expense.text().split(":")[1].replace(" ","")
     SettingsWindow.total_expense.setText(Windows["Statistics"][6]+str(Expenses))
     SettingsWindow.account_created_date.setText(Windows["Settings"][1] + str(Session.db.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
-    SettingsWindow.db_management.setText(Windows["Settings"]["DB management"][0])
+    SettingsWindow.db_management.setText(Windows["Settings"]["Backup management"][0])
     
     SettingsWindow.app_version.setText(Windows["Settings"][2] + ".".join(map(str, Session.app_version)))
                                        
@@ -113,13 +113,13 @@ def change_language():
     
     MainWindow.account_current_balance.setText(Windows["Main"][0]+str(Session.current_balance))
 
-    DBManagementWindow.window.setWindowTitle(Windows["Settings"]["DB management"][0])
-    DBManagementWindow.backups_table.setHorizontalHeaderLabels((Windows["Main"]["Transactions"][1], Windows["Settings"][2].replace(":", "")))
-    DBManagementWindow.create_backup.setText(Windows["Settings"]["DB management"][1])
-    DBManagementWindow.delete_backup.setText(Windows["Settings"]["DB management"][2])
-    DBManagementWindow.load_backup.setText(Windows["Settings"]["DB management"][3])
-    DBManagementWindow.auto_backup.setText(Windows["Settings"]["DB management"][4])
-    DBManagementWindow.auto_backup_status.setText(Windows["Settings"]["DB management"][8]+" "+Windows["Settings"]["DB management"][5])
+    BackupManagement.window.setWindowTitle(Windows["Settings"]["Backup management"][0])
+    BackupManagement.backups_table.setHorizontalHeaderLabels((Windows["Main"]["Transactions"][1], Windows["Settings"][2].replace(":", "")))
+    BackupManagement.create_backup.setText(Windows["Settings"]["Backup management"][1])
+    BackupManagement.delete_backup.setText(Windows["Settings"]["Backup management"][2])
+    BackupManagement.load_backup.setText(Windows["Settings"]["Backup management"][3])
+    BackupManagement.auto_backup.setText(Windows["Settings"]["Backup management"][4])
+    BackupManagement.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
 
 
 def change_language_during_add_account(language: int | str):

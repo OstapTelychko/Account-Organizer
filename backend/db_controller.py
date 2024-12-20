@@ -1,4 +1,7 @@
 import logging
+import os
+from datetime import datetime
+from sqlite3 import connect as sql_connect
 from sqlalchemy import create_engine, desc, and_, event, text
 from sqlalchemy.orm import sessionmaker
 
@@ -7,7 +10,7 @@ from alembic.script import ScriptDirectory
 from alembic.runtime import migration
 from alembic import command
 
-from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
+from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY
 from .models import Account, Category, Transaction
 
 
@@ -215,3 +218,18 @@ class DBController():
             Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,
             Transaction.category_id == category_id
         )).all()
+    
+
+    #Backup
+    def create_backup(self, app_version:tuple[int, int, int]):
+        os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
+
+        app_version = ".".join(map(str, app_version))
+        timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+        backup_name = os.path.join(BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
+
+        with sql_connect(DB_PATH.replace("sqlite:///", "")) as conn:
+            conn.execute("PRAGMA VACUUM")
+
+            with sql_connect(backup_name) as backup_conn:
+                conn.backup(backup_conn)

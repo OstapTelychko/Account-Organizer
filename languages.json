@@ -68,7 +68,7 @@
                 "1": "Created ",
                 "2": "App version: ",
 
-                "DB management":{
+                "Backup management":{
                     "0": "Database management",
                     "1": "Create database",
                     "2": "Delete database",
@@ -234,7 +234,7 @@
                 "1": "Акаунт створений ",
                 "2": "Версія додатку: ",
 
-                "DB management":{
+                "Backup management":{
                     "0": "Управління базою даних",
                     "1": "Створити базу даних",
                     "2": "Видалити базу даних",
@@ -399,7 +399,7 @@
                 "1": "Konto dodane ",
                 "2": "Wersja aplikacji: ",
 
-                "DB management":{
+                "Backup management":{
                     "0": "Zarządzanie bazą danych",
                     "1": "Stworzyć bazę danych",
                     "2": "Usunąć bazę danych",

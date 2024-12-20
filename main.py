@@ -41,7 +41,7 @@ from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, Rena
 from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.db_management import DBManagementWindow
+from GUI.windows.backup_management import BackupManagement
 from GUI.theme import swith_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
@@ -53,6 +53,7 @@ from AppManagement.category import create_category, load_categories, remove_cate
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
+from AppManagement.backup_management import load_backups, create_backup
 
 from tests.init_tests import test_main
 
@@ -102,7 +103,7 @@ def main():
     SettingsWindow.languages.currentIndexChanged.connect(load_language)
     SettingsWindow.add_account.clicked.connect(show_add_user_window)
     SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
-    SettingsWindow.db_management.clicked.connect(DBManagementWindow.window.exec)
+    SettingsWindow.db_management.clicked.connect(BackupManagement.window.exec)
 
     #Activate mini calculator
     MainWindow.calculate.clicked.connect(calculate_expression)
@@ -154,6 +155,11 @@ def main():
             exit() 
     Session.db.set_account_id(Session.account_name)
     
+    #Load backups if they exists
+    load_backups()
+
+    #Backup management
+    BackupManagement.create_backup.clicked.connect(create_backup)
 
     #Load categories if they exists
     if len(Session.db.get_all_categories()) > 0:
