@@ -1,6 +1,5 @@
 import logging
 import os
-from datetime import datetime
 from sqlite3 import connect as sql_connect
 from sqlalchemy import create_engine, desc, and_, event, text
 from sqlalchemy.orm import sessionmaker
@@ -221,15 +220,13 @@ class DBController():
     
 
     #Backup
-    def create_backup(self, app_version:tuple[int, int, int]):
+    def create_backup(self, db_file_path:str):
         os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
 
-        app_version = ".".join(map(str, app_version))
-        timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-        backup_name = os.path.join(BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
+        
 
         with sql_connect(DB_PATH.replace("sqlite:///", "")) as conn:
             conn.execute("PRAGMA VACUUM")
 
-            with sql_connect(backup_name) as backup_conn:
+            with sql_connect(db_file_path) as backup_conn:
                 conn.backup(backup_conn)

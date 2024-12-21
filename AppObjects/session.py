@@ -8,6 +8,7 @@ from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTO
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
+from AppObjects.backup import Backup
 
 
 
@@ -31,6 +32,8 @@ class Session:
     account_name = ""
 
     db:DBController = None
+    backups:list[Backup] = []
+
     instance_guard:SingleInstanceGuard = None
     test_mode = False
     test_alembic_config:Config = None
@@ -54,6 +57,7 @@ class Session:
 
         Session.load_user_config()
         os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
+        Session.load_backups()
     
 
     def load_app_version():
@@ -87,3 +91,6 @@ class Session:
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
             toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name}, file)
     
+
+    def load_backups():
+        Session.backups = [Backup.parse_db_file_path(backup) for backup in os.listdir(BACKUPS_DIRECTORY)]
