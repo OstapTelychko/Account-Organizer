@@ -190,5 +190,5 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int):
 
         update_account_balance()
 
-        row = category_data.verticalHeader()
-        row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        columns = category_data.verticalHeader()
+        columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)

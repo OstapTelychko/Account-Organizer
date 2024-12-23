@@ -32,7 +32,7 @@ class Session:
     account_name = ""
 
     db:DBController = None
-    backups:list[Backup] = []
+    backups:dict[int, Backup] = {}
 
     instance_guard:SingleInstanceGuard = None
     test_mode = False
@@ -93,4 +93,6 @@ class Session:
     
 
     def load_backups():
-        Session.backups = [Backup.parse_db_file_path(backup) for backup in os.listdir(BACKUPS_DIRECTORY)]
+        for backup in os.listdir(BACKUPS_DIRECTORY):
+            backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup))
+            Session.backups[str(id(backup))] = backup

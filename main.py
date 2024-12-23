@@ -53,7 +53,7 @@ from AppManagement.category import create_category, load_categories, remove_cate
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
-from AppManagement.backup_management import load_backups, create_backup
+from AppManagement.backup_management import load_backups, create_backup, remove_backup
 
 from tests.init_tests import test_main
 
@@ -160,6 +160,7 @@ def main():
 
     #Backup management
     BackupManagement.create_backup.clicked.connect(create_backup)
+    BackupManagement.delete_backup.clicked.connect(remove_backup)
 
     #Load categories if they exists
     if len(Session.db.get_all_categories()) > 0:

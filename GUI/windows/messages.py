@@ -36,3 +36,6 @@ class Messages():
     same_position = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
     wrong_date = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
     no_selected_category = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
+
+    below_min_backups = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
+    delete_buckup_confirmation = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
