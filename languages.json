@@ -161,7 +161,9 @@
             "19": "From-date can't be bigger then to-date",
             "20": "You have to select at least one category",
             "21": "After deletion database, number of backups will be less than recommended",
-            "22": "Are you sure you want to delete database? This action is irreversible"
+            "22": "Are you sure you want to delete database? This action is irreversible",
+            "23": "Different app versions detected. Downgrade the app to target version",
+            "24": "Are you sure you want to load this timestamp backup?"
         }
             
     },
@@ -329,7 +331,9 @@
             "19": "Початкова дата не може бути більшою за кінцеву",
             "20": "Ви повинні вибрати принаймні одну категорію",
             "21": "При видалині бази даних, кількість резервних копій буде нищою від рекомендованої кількості",
-            "22": "Ви впевнені, що хочете видалити базу даних? Ця дія є незворотньою"
+            "22": "Ви впевнені, що хочете видалити базу даних? Ця дія є незворотньою",
+            "23": "Виявлено різні версії додатку. Понизьте версію додатку до цільової версії",
+            "24": "Ви впевнені, що хочете завантажити цю резервну копію timestamp?"
         }
     },
     
@@ -496,7 +500,9 @@
             "19": "Data początkowa nie może być większą od końcowej",
             "20": "Aby kontynuować, musicie wybrać co najmniej jedną kategorię",
             "21": "Przy usuwaniu bazy danych liczba kopii zapasowych będzie mniejsza niż zalecana",
-            "22": "Czy na pewno chcecie usunąć bazę danych? Ta czynność jest nieodwracalna"
+            "22": "Czy na pewno chcecie usunąć bazę danych? Ta czynność jest nieodwracalna",
+            "23": "Wykryto różne wersje aplikacji. Zmniejsz wersję aplikacji do docelowej wersji",
+            "24": "Czy na pewno chcecie załadować tę kopię zapasową z timestamp?"
         }
     }
 }
