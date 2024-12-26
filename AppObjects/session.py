@@ -14,6 +14,12 @@ from AppObjects.backup import Backup
 
 
 class Session:
+
+    class AutoBackupStatus:
+        MONTHLY = "monthly"
+        WEEKLY = "weekly"
+        DAILY = "daily"
+
     app_version:tuple = None
 
     current_month = 1
@@ -33,6 +39,7 @@ class Session:
 
     db:DBController = None
     backups:dict[int, Backup] = {}
+    auto_backup_status:AutoBackupStatus = AutoBackupStatus.MONTHLY
 
     instance_guard:SingleInstanceGuard = None
     test_mode = False
@@ -74,13 +81,16 @@ class Session:
             Session.theme = User_conf["Theme"]
             #Load last used account name 
             Session.account_name = User_conf["Account_name"]
+            #Load auto backup status
+            Session.auto_backup_status = User_conf["Auto_backup_status"]
 
 
     def create_user_config():
         default_user_configuration = {
             "Theme":"Dark",
             "Language":"English",
-            "Account_name":""
+            "Account_name":"",
+            "Auto_backup_status":Session.AutoBackupStatus.MONTHLY
         }
 
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
@@ -89,7 +99,7 @@ class Session:
         
     def update_user_config():
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
-            toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name}, file)
+            toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name, "Auto_backup_status":Session.auto_backup_status}, file)
     
 
     def load_backups():

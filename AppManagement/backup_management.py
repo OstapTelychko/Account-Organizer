@@ -1,7 +1,7 @@
 import os
 import shutil
 from datetime import datetime
-from PySide6.QtWidgets import QHeaderView
+from PySide6.QtWidgets import QHeaderView, QCheckBox
 from PySide6.QtCore import QTimer, Qt
 
 from languages import LANGUAGES
@@ -14,17 +14,17 @@ from AppObjects.session import Session
 from AppObjects.backup import Backup
 
 from GUI.gui_constants import ALIGNMENT
-from GUI.windows.backup_management import BackupManagement
+from GUI.windows.backup_management import BackupManagement, AutoBackupWindow
 from GUI.windows.messages import Messages
 from GUI.windows.settings import SettingsWindow
 
 
 def load_backups():
-    BackupManagement.backups_table.sortItems(-1, Qt.SortOrder.DescendingOrder)
     BackupManagement.backups_table.setRowCount(0)
     BackupManagement.backups_table.setRowCount(len(Session.backups))
-
-    for row, (backup_id, backup) in enumerate(Session.backups.items()):
+    
+    backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"), reverse=True)
+    for row, (backup_id, backup) in enumerate(backups):
         data = CustomTableWidgetItem(backup.timestamp)
         data.setFlags(~ Qt.ItemFlag.ItemIsEditable)
         data.setTextAlignment(ALIGNMENT.AlignCenter)
@@ -33,12 +33,9 @@ def load_backups():
         app_version.setFlags(~ Qt.ItemFlag.ItemIsEditable)
         app_version.setTextAlignment(ALIGNMENT.AlignCenter)
 
-
         BackupManagement.backups_table.setItem(row, 0, data)
         BackupManagement.backups_table.setItem(row, 1, app_version)
         BackupManagement.backups_table.setItem(row, 2, CustomTableWidgetItem(backup_id))
-
-    BackupManagement.backups_table.sortItems(0, Qt.SortOrder.DescendingOrder)
 
 
 def create_backup():
@@ -135,4 +132,66 @@ def load_backup():
     load_account_data(Session.account_name)
     BackupManagement.window.done(0)
     SettingsWindow.window.done(0)
+
+
+def auto_backup():
+    if len(Session.backups) == 0:
+        create_backup()
+        return
     
+    backup = Session.backups[BackupManagement.backups_table.item(0, 2).text()]
+    backup_date = datetime.strptime(backup.timestamp, "%d-%m-%Y_%H:%M:%S")
+    current_date = datetime.now()
+    
+
+    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY and backup_date.month != current_date.month:
+        create_backup()
+
+    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY and current_date.isocalendar()[1] != backup_date.isocalendar()[1]:#Week number
+        create_backup()
+
+    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY and (current_date - backup_date).days >= 1:
+        create_backup()
+
+
+def prevent_same_auto_backup_status(status_checkbox: QCheckBox, state: int):
+    if state == 2:#Checked
+        if status_checkbox is AutoBackupWindow.monthly:
+            AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+
+        elif status_checkbox is AutoBackupWindow.weekly:
+            AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+
+        else:
+            AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+
+
+def save_auto_backup_status():
+    if AutoBackupWindow.monthly.isChecked():
+        Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
+
+    elif AutoBackupWindow.weekly.isChecked():
+        Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY
+
+    else:
+        Session.auto_backup_status = Session.AutoBackupStatus.DAILY
+
+    Backup_management = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"]
+    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY:
+        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[5])
+        BackupManagement.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[5])
+
+    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY:
+        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[6])
+        BackupManagement.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[6])
+
+    else:
+        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[7])
+        BackupManagement.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[7])
+
+    auto_backup()
+    Session.update_user_config()
+    AutoBackupWindow.window.done(0)

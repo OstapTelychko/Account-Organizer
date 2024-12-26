@@ -10,7 +10,7 @@ from GUI.windows.account import AddAccountWindow, RenameAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.backup_management import BackupManagement
+from GUI.windows.backup_management import BackupManagement, AutoBakcupWindow
 
 
 
@@ -120,6 +120,23 @@ def change_language():
     BackupManagement.load_backup.setText(Windows["Settings"]["Backup management"][3])
     BackupManagement.auto_backup.setText(Windows["Settings"]["Backup management"][4])
     BackupManagement.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
+
+    AutoBakcupWindow.window.setWindowTitle(Windows["Settings"]["Backup management"][4])
+    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY:
+        AutoBakcupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
+        BackupManagement.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
+
+    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY:
+        AutoBakcupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][6])
+        BackupManagement.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][6])
+
+    else:
+        AutoBakcupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][7])
+        BackupManagement.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][7])
+    AutoBakcupWindow.monthly.setText(Windows["Settings"]["Backup management"][9])
+    AutoBakcupWindow.weekly.setText(Windows["Settings"]["Backup management"][10])
+    AutoBakcupWindow.daily.setText(Windows["Settings"]["Backup management"][11])
+    AutoBakcupWindow.save.setText(Language["General management"][6])
 
 
 def change_language_during_add_account(language: int | str):

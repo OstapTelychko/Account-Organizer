@@ -77,7 +77,10 @@
                     "5": "monthly",
                     "6": "weekly",
                     "7": "daily",
-                    "8": "Status"
+                    "8": "Status",
+                    "9": "Monthly backup (low disk space)",
+                    "10": "Weekly backup (recommended)",
+                    "11": "Daily backup (high disk space)"
                 },
 
                 "Account":{
@@ -247,7 +250,10 @@
                     "5": "щомісячно",
                     "6": "щотижня",
                     "7": "щоденно",
-                    "8": "Статус"
+                    "8": "Статус",
+                    "9": "Щомісячне створення резервної копії (низьке використання диска)",
+                    "10": "Щотижневе створення резервної копії (рекомендовано)",
+                    "11": "Щоденне створення резервної копії (високе використання диска)"
                 },
 
                 "Account":{
@@ -416,7 +422,10 @@
                     "5": "miesięcznie",
                     "6": "tygodniowo",
                     "7": "dziennie",
-                    "8": "Status"
+                    "8": "Status",
+                    "9": "Miesięczne kopiowanie zapasowe (małe użycie dysku)",
+                    "10": "Tygodniowe kopiowanie zapasowe (zalecane)",
+                    "11": "Dzienne kopiowanie zapasowe (wysokie użycie dysku) "                    
                 },
 
                 "Account":{

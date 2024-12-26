@@ -27,6 +27,7 @@ SOFTWARE."""
 
 from sys import exit
 from argparse import ArgumentParser
+from functools import partial
 
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LANGUAGES
@@ -41,7 +42,7 @@ from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, Rena
 from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.backup_management import BackupManagement
+from GUI.windows.backup_management import BackupManagement, AutoBakcupWindow
 from GUI.theme import swith_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
@@ -53,7 +54,7 @@ from AppManagement.category import create_category, load_categories, remove_cate
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
-from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup
+from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, auto_backup, prevent_same_auto_backup_status, save_auto_backup_status
 
 from tests.init_tests import test_main
 
@@ -157,11 +158,18 @@ def main():
     
     #Load backups if they exists
     load_backups()
+    auto_backup()
 
     #Backup management
     BackupManagement.create_backup.clicked.connect(create_backup)
     BackupManagement.delete_backup.clicked.connect(remove_backup)
     BackupManagement.load_backup.clicked.connect(load_backup)
+    BackupManagement.auto_backup.clicked.connect(AutoBakcupWindow.window.exec)
+
+    AutoBakcupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBakcupWindow.monthly))
+    AutoBakcupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBakcupWindow.weekly))
+    AutoBakcupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBakcupWindow.daily))
+    AutoBakcupWindow.save.clicked.connect(save_auto_backup_status)
 
     #Load categories if they exists
     if len(Session.db.get_all_categories()) > 0:
