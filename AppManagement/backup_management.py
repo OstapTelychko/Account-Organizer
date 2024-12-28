@@ -6,7 +6,7 @@ from PySide6.QtCore import QTimer, Qt
 
 from languages import LANGUAGES
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
-from project_configuration import BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH
+from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH
 from backend.db_controller import DBController
 from AppManagement.account import load_account_data
 
@@ -14,14 +14,14 @@ from AppObjects.session import Session
 from AppObjects.backup import Backup
 
 from GUI.gui_constants import ALIGNMENT
-from GUI.windows.backup_management import BackupManagement, AutoBackupWindow
+from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
 from GUI.windows.messages import Messages
 from GUI.windows.settings import SettingsWindow
 
 
 def load_backups():
-    BackupManagement.backups_table.setRowCount(0)
-    BackupManagement.backups_table.setRowCount(len(Session.backups))
+    BackupManagementWindow.backups_table.setRowCount(0)
+    BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
     
     backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"), reverse=True)
     for row, (backup_id, backup) in enumerate(backups):
@@ -33,30 +33,34 @@ def load_backups():
         app_version.setFlags(~ Qt.ItemFlag.ItemIsEditable)
         app_version.setTextAlignment(ALIGNMENT.AlignCenter)
 
-        BackupManagement.backups_table.setItem(row, 0, data)
-        BackupManagement.backups_table.setItem(row, 1, app_version)
-        BackupManagement.backups_table.setItem(row, 2, CustomTableWidgetItem(backup_id))
+        BackupManagementWindow.backups_table.setItem(row, 0, data)
+        BackupManagementWindow.backups_table.setItem(row, 1, app_version)
+        BackupManagementWindow.backups_table.setItem(row, 2, CustomTableWidgetItem(backup_id))
 
 
 def create_backup():
     app_version = ".".join(map(str, Session.app_version))
     timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-    backup_name = os.path.join(BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
+
+    if Session.test_mode:
+        backup_name = os.path.join(TEST_BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
+    else:
+        backup_name = os.path.join(BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
 
     Session.db.create_backup(backup_name)
     backup = Backup(backup_name, timestamp, app_version)
     Session.backups[str(id(backup))] = backup
 
     def enable_button():
-        BackupManagement.create_backup.setEnabled(True)
-    BackupManagement.create_backup.setEnabled(False)
+        BackupManagementWindow.create_backup.setEnabled(True)
+    BackupManagementWindow.create_backup.setEnabled(False)
 
     load_backups()
     QTimer.singleShot(1000, enable_button)
 
 
 def remove_backup():
-    selected_items = BackupManagement.backups_table.selectedItems()
+    selected_items = BackupManagementWindow.backups_table.selectedItems()
 
     if len(selected_items) == 0 or len(selected_items) < 2:
         return Messages.unselected_row.exec()
@@ -75,19 +79,19 @@ def remove_backup():
             return
     
     row = selected_items[0].row()
-    backup = Session.backups[BackupManagement.backups_table.item(row, 2).text()]
+    backup = Session.backups[BackupManagementWindow.backups_table.item(row, 2).text()]
 
 
     os.remove(backup.db_file_path)
     del Session.backups[str(id(backup))]
-    BackupManagement.backups_table.removeRow(row)
+    BackupManagementWindow.backups_table.removeRow(row)
     
-    columns = BackupManagement.backups_table.verticalHeader()
+    columns = BackupManagementWindow.backups_table.verticalHeader()
     columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
 
 def load_backup():
-    selected_items = BackupManagement.backups_table.selectedItems()
+    selected_items = BackupManagementWindow.backups_table.selectedItems()
 
     if len(selected_items) == 0 or len(selected_items) < 2:
         return Messages.unselected_row.exec()
@@ -96,7 +100,7 @@ def load_backup():
         return Messages.only_one_row.exec()
 
     row = selected_items[0].row()
-    backup = Session.backups[BackupManagement.backups_table.item(row, 2).text()]
+    backup = Session.backups[BackupManagementWindow.backups_table.item(row, 2).text()]
 
     if backup.app_version != ".".join(map(str, Session.app_version)):
         return Messages.different_app_version.exec()
@@ -114,7 +118,7 @@ def load_backup():
     else:
         shutil.copy(backup.db_file_path, DB_FILE_PATH)
     Session.db = DBController()
-
+    
     backup_accounts = Session.db.get_all_accounts()
     if Session.account_name not in [account.name for account in backup_accounts]:
         Session.account_name = backup_accounts[0].name
@@ -130,7 +134,7 @@ def load_backup():
 
     load_backups()
     load_account_data(Session.account_name)
-    BackupManagement.window.done(0)
+    BackupManagementWindow.window.done(0)
     SettingsWindow.window.done(0)
 
 
@@ -139,7 +143,7 @@ def auto_backup():
         create_backup()
         return
     
-    backup = Session.backups[BackupManagement.backups_table.item(0, 2).text()]
+    backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
     backup_date = datetime.strptime(backup.timestamp, "%d-%m-%Y_%H:%M:%S")
     current_date = datetime.now()
     
@@ -182,15 +186,15 @@ def save_auto_backup_status():
     Backup_management = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"]
     if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY:
         AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[5])
-        BackupManagement.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[5])
+        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[5])
 
     elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY:
         AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[6])
-        BackupManagement.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[6])
+        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[6])
 
     else:
         AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[7])
-        BackupManagement.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[7])
+        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[7])
 
     auto_backup()
     Session.update_user_config()

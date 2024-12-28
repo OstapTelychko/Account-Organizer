@@ -45,7 +45,7 @@ class TestAccount(DBTestCase):
 
                 def check_account_name():
                     self.assertEqual(Session.db.get_account().name, "Test user rename test", "Test user hasn't been renamed")
-                    SettingsWindow.window.done(1)
+                    SettingsWindow.window.done(0)
                 QTimer.singleShot(100, check_account_name)
                 RenameAccountWindow.button.click()
 

@@ -4,7 +4,7 @@ from sys import exit
 from datetime import datetime
 from alembic.config import Config
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -63,7 +63,10 @@ class Session:
             Session.create_user_config()
 
         Session.load_user_config()
-        os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
+        if Session.test_mode:
+            os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
+        else:
+            os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
         Session.load_backups()
     
 
@@ -103,6 +106,9 @@ class Session:
     
 
     def load_backups():
-        for backup in os.listdir(BACKUPS_DIRECTORY):
-            backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup))
+        for backup in os.listdir(BACKUPS_DIRECTORY) if not Session.test_mode else os.listdir(TEST_BACKUPS_DIRECTORY):
+            if Session.test_mode:
+                backup = Backup.parse_db_file_path(os.path.join(TEST_BACKUPS_DIRECTORY, backup))
+            else:
+                backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup))
             Session.backups[str(id(backup))] = backup

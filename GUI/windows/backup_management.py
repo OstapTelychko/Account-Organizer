@@ -9,7 +9,7 @@ from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENT
 
 
 
-class BackupManagement():
+class BackupManagementWindow():
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     backups_table = CustomTableWidget()

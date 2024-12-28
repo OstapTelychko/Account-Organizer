@@ -1,4 +1,5 @@
 import os
+import shutil
 from types import FunctionType
 from unittest import  TestSuite, TestLoader, TextTestRunner
 
@@ -7,13 +8,14 @@ from alembic import command
 
 from AppObjects.session import Session
 from backend.db_controller import DBController
-from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH
+from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY
 
-from tests.test_GUI.test_main_window import TestMainWindow
-from tests.test_GUI.test_category import TestCategory
-from tests.test_GUI.test_account import TestAccount
-from tests.test_GUI.test_transaction import TestTransaction
-from tests.test_GUI.test_statistics import TestStatistics
+from tests.app_tests.test_main_window import TestMainWindow
+from tests.app_tests.test_category import TestCategory
+from tests.app_tests.test_account import TestAccount
+from tests.app_tests.test_transaction import TestTransaction
+from tests.app_tests.test_statistics import TestStatistics
+from tests.app_tests.test_backups_management import TestBackupsManagement
 
 
 
@@ -21,7 +23,7 @@ from tests.test_GUI.test_statistics import TestStatistics
 def test_main(app_main:FunctionType):
     if os.path.exists(TEST_DB_FILE_PATH):#Why not remove test db at the end? Because of windows file locking system (lock db even if all connections are closed)
         os.remove(TEST_DB_FILE_PATH)
-
+    
     Session.test_alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
     Session.test_alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
     Session.test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
@@ -42,7 +44,14 @@ def test_main(app_main:FunctionType):
     try:
         suite = TestSuite()
         loader = TestLoader()
-        suite.addTests((loader.loadTestsFromTestCase(TestMainWindow), loader.loadTestsFromTestCase(TestCategory), loader.loadTestsFromTestCase(TestAccount), loader.loadTestsFromTestCase(TestTransaction), loader.loadTestsFromTestCase(TestStatistics)))
+        suite.addTests((
+        loader.loadTestsFromTestCase(TestMainWindow),
+        loader.loadTestsFromTestCase(TestCategory),
+        loader.loadTestsFromTestCase(TestAccount),
+        loader.loadTestsFromTestCase(TestTransaction),
+        loader.loadTestsFromTestCase(TestStatistics),
+        loader.loadTestsFromTestCase(TestBackupsManagement)
+        ))
         print(f"Tests found: {suite.countTestCases()}")
 
         TextTestRunner().run(suite)
@@ -54,5 +63,9 @@ def test_main(app_main:FunctionType):
         Session.account_name = previous_name
         Session.update_user_config()
         Session.db.close_connection()
+
+        if os.path.exists(TEST_BACKUPS_DIRECTORY):
+            shutil.rmtree(TEST_BACKUPS_DIRECTORY)
+
         os._exit(0)
         

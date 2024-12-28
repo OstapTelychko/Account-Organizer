@@ -42,7 +42,7 @@ from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, Rena
 from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.backup_management import BackupManagement, AutoBakcupWindow
+from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
 from GUI.theme import swith_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
@@ -104,7 +104,7 @@ def main():
     SettingsWindow.languages.currentIndexChanged.connect(load_language)
     SettingsWindow.add_account.clicked.connect(show_add_user_window)
     SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
-    SettingsWindow.db_management.clicked.connect(BackupManagement.window.exec)
+    SettingsWindow.backup_management.clicked.connect(BackupManagementWindow.window.exec)
 
     #Activate mini calculator
     MainWindow.calculate.clicked.connect(calculate_expression)
@@ -158,18 +158,20 @@ def main():
     
     #Load backups if they exists
     load_backups()
-    auto_backup()
+
+    if not Session.test_mode:
+        auto_backup()
 
     #Backup management
-    BackupManagement.create_backup.clicked.connect(create_backup)
-    BackupManagement.delete_backup.clicked.connect(remove_backup)
-    BackupManagement.load_backup.clicked.connect(load_backup)
-    BackupManagement.auto_backup.clicked.connect(AutoBakcupWindow.window.exec)
+    BackupManagementWindow.create_backup.clicked.connect(create_backup)
+    BackupManagementWindow.delete_backup.clicked.connect(remove_backup)
+    BackupManagementWindow.load_backup.clicked.connect(load_backup)
+    BackupManagementWindow.auto_backup.clicked.connect(AutoBackupWindow.window.exec)
 
-    AutoBakcupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBakcupWindow.monthly))
-    AutoBakcupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBakcupWindow.weekly))
-    AutoBakcupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBakcupWindow.daily))
-    AutoBakcupWindow.save.clicked.connect(save_auto_backup_status)
+    AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.monthly))
+    AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.weekly))
+    AutoBackupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.daily))
+    AutoBackupWindow.save.clicked.connect(save_auto_backup_status)
 
     #Load categories if they exists
     if len(Session.db.get_all_categories()) > 0:

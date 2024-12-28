@@ -25,12 +25,12 @@ class SettingsWindow():
     for language in range(len(AVAILABLE_LANGUAGES)):
         languages.setItemIcon(language, QIcon(f"{APP_DIRECTORY}/Images/{language}-flag.png"))
     
-    db_management = create_button("Database management", (220, 50))
+    backup_management = create_button("Database management", (220, 50))
 
     gui_settings_wrapper_layout = QVBoxLayout()
     gui_settings_wrapper_layout.addWidget(switch_themes_button, alignment=ALIGN_H_CENTER)
     gui_settings_wrapper_layout.addWidget(languages, alignment=ALIGN_H_CENTER)
-    gui_settings_wrapper_layout.addWidget(db_management, alignment=ALIGN_H_CENTER)
+    gui_settings_wrapper_layout.addWidget(backup_management, alignment=ALIGN_H_CENTER)
 
     gui_settings_wrapper = QWidget()
     gui_settings_wrapper.setProperty("class", "wrapper")

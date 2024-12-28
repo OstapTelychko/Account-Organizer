@@ -9,7 +9,7 @@ from alembic.script import ScriptDirectory
 from alembic.runtime import migration
 from alembic import command
 
-from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY
+from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
 from .models import Account, Category, Transaction
 
 
@@ -220,13 +220,10 @@ class DBController():
     
 
     #Backup
-    def create_backup(self, db_file_path:str):
-        os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
-
-        
-
-        with sql_connect(DB_PATH.replace("sqlite:///", "")) as conn:
+    def create_backup(self, backup_file_path:str):
+        db_file_path = self.engine.url.database.replace("sqlite:///", "")
+        with sql_connect(db_file_path) as conn:
             conn.execute("PRAGMA VACUUM")
 
-            with sql_connect(db_file_path) as backup_conn:
+            with sql_connect(backup_file_path) as backup_conn:
                 conn.backup(backup_conn)
