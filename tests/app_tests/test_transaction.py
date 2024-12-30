@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QEventLoop
 from tests.tests_toolkit import DBTestCase, OK_BUTTON
 
 from project_configuration import CATEGORY_TYPE
@@ -27,6 +27,10 @@ class TestTransaction(DBTestCase):
         self.assertEqual(len(Session.db.get_all_transactions(self.income_category.id)), 2, "Income transaction hasn't been added")
         self.assertEqual(len(Session.db.get_all_transactions(self.expenses_category.id)), 2, "Expense transaction hasn't been added")
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
     
 
     def test_update_transaction(self):
@@ -46,6 +50,10 @@ class TestTransaction(DBTestCase):
         self.assertEqual(Session.db.get_all_transactions(self.income_category.id)[0].name, "Updated transaction name", "Income transaction hasn't been updated")
         self.assertEqual(Session.db.get_all_transactions(self.expenses_category.id)[0].name, "Updated transaction name", "Expense transaction hasn't been updated")
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
     
 
     def test_delete_transaction(self):
@@ -62,4 +70,8 @@ class TestTransaction(DBTestCase):
         self.assertEqual(len(Session.db.get_all_transactions(self.income_category.id)), 0, "Income transaction hasn't been deleted")
         self.assertEqual(len(Session.db.get_all_transactions(self.expenses_category.id)), 0, "Expense transaction hasn't been deleted")
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
             

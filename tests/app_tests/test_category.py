@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QEventLoop
 from tests.tests_toolkit import DBTestCase, OK_BUTTON
 
 from languages import LANGUAGES
@@ -28,6 +28,10 @@ class TestCategory(DBTestCase):
         MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         MainWindow.add_expenses_category.click()
         self.assertTrue(Session.db.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
+        
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
     
 
     def test_category_deletion(self):
@@ -46,6 +50,10 @@ class TestCategory(DBTestCase):
 
         self.assertFalse(Session.db.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
         self.assertFalse(Session.db.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
+
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
     
 
     def test_category_rename(self):
@@ -69,6 +77,10 @@ class TestCategory(DBTestCase):
 
         self.assertTrue(Session.db.session.query(Category).filter_by(name=income_category_name+" rename test").first(), "Income category hasn't been renamed")
         self.assertTrue(Session.db.session.query(Category).filter_by(name=expenses_category_name+" rename test").first(), "Expense category hasn't been renamed")
+
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
     
 
     def test_category_position_change(self):
@@ -93,6 +105,10 @@ class TestCategory(DBTestCase):
         self.assertEqual(Session.db.get_category("Second "+self.income_category.name, "Incomes").position, 0, "Income category hasn't changed position to 0")
         self.assertEqual(Session.db.get_category(self.expenses_category.name, "Expenses").position, 1, "Expenses category hasn't changed position to 1")
         self.assertEqual(Session.db.get_category("Second "+self.expenses_category.name, "Expenses").position, 0, "Expenses category hasn't changed position to 1")
+
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
     
 
     def test_copy_month_transactions(self):
@@ -116,4 +132,8 @@ class TestCategory(DBTestCase):
 
             QTimer.singleShot(100, copy_transactions)
             category.settings.click()
+        
+        loop = QEventLoop()
+        QTimer.singleShot(1000, loop.quit)
+        loop.exec()
 
