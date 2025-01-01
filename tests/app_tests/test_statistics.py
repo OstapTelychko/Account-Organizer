@@ -66,7 +66,7 @@ class TestStatistics(DBTestCase):
             StatisticsWindow.monthly_statistics.click()
         self.open_statistics_window(open_monthly_statics_window)
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -148,7 +148,7 @@ class TestStatistics(DBTestCase):
         
         self.open_statistics_window(open_quarterly_statistics_window)
         loop = QEventLoop()
-        QTimer.singleShot(3000, loop.quit)
+        QTimer.singleShot(2000, loop.quit)
         loop.exec()
                         
 
@@ -224,7 +224,7 @@ class TestStatistics(DBTestCase):
         
         self.open_statistics_window(open_yearly_statistics_window)
         loop = QEventLoop()
-        QTimer.singleShot(3000, loop.quit)
+        QTimer.singleShot(2000, loop.quit)
         loop.exec()
     
 
@@ -323,7 +323,7 @@ class TestStatistics(DBTestCase):
 
         self.open_statistics_window(open_custom_range_statistics_window)
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
 
 

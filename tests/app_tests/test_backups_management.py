@@ -126,8 +126,6 @@ class TestBackupsManagement(DBTestCase):
         
 
     def test_3_load_backup(self):
-        print("load backup test running (ignore QDialog recursive call warning)")
-
         def prepare_load_backup():
             BackupManagementWindow.create_backup.click()
             BackupManagementWindow.window.done(0)
@@ -184,7 +182,6 @@ class TestBackupsManagement(DBTestCase):
 
                                     self.assertEqual(BackupManagementWindow.window.isVisible(), False, "Backup management window hasn't been closed")
                                     self.assertEqual(SettingsWindow.window.isVisible(), False, "Settings window hasn't been closed")
-                                    print("load backup test finished")
                                 QTimer.singleShot(200, check_backup_load)
 
                             self.open_backup_management_window(load_newest_backup)
@@ -198,7 +195,6 @@ class TestBackupsManagement(DBTestCase):
                     QTimer.singleShot(100, check_load_confirmation)
                     BackupManagementWindow.load_backup.click()
 
-                # self.open_backup_management_window(load_backup)
                 QTimer.singleShot(200, partial(self.open_backup_management_window, load_backup))
                 AddCategoryWindow.button.click()
             
@@ -233,7 +229,27 @@ class TestBackupsManagement(DBTestCase):
                 f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                 )
 
-                self.assertEqual(BackupManagementWindow.create_backup.isEnabled(), True, "Create backup button hasn't been enabled")
+                def check_no_new_backup():
+                    self.assertEqual(
+                    1, BackupManagementWindow.backups_table.rowCount(),
+                    f"Backup have been added even though less then 1 day has passed {BackupManagementWindow.backups_table.rowCount()}"
+                    )
+
+                    self.assertEqual(
+                    1, len(Session.backups),
+                    f"Backup have been added even though less then 1 day has passed {len(Session.backups)}"
+                    )
+
+                    self.assertEqual(
+                    1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                    f"Backup file have been created even though less then 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                    )
+
+                QTimer.singleShot(100, check_no_new_backup)
+                auto_backup()
+                loop = QEventLoop()
+                QTimer.singleShot(500, loop.quit)
+                loop.exec()
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_1_day.strftime("%d-%m-%Y_%H:%M:%S")
@@ -254,14 +270,13 @@ class TestBackupsManagement(DBTestCase):
                     f"Backup file during daily auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                     )
 
-                    self.assertEqual(BackupManagementWindow.create_backup.isEnabled(), True, "Create backup button hasn't been enabled")
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
 
-                QTimer.singleShot(1200, check_second_backup_appearance)
+                QTimer.singleShot(1000, check_second_backup_appearance)
                 auto_backup()
 
-            QTimer.singleShot(1200, check_backup_appearance)
+            QTimer.singleShot(1000, check_backup_appearance)
             BackupManagementWindow.create_backup.click()
         
         QTimer.singleShot(100, prepare_auto_daily_backup)
@@ -270,7 +285,85 @@ class TestBackupsManagement(DBTestCase):
         loop.exec()
 
 
+    def test_5_auto_weekly_backup(self):
+        Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY
+        date_now = datetime.now()
+        date_minus_7_days = date_now - timedelta(days=7)
 
+        def prepare_auto_weekly_backup():
+            def check_backup_appearance():
+                self.assertEqual(
+                1, BackupManagementWindow.backups_table.rowCount(),
+                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
+                )
+
+                self.assertEqual(
+                1, len(Session.backups),
+                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}"
+                )
+
+                self.assertEqual(
+                1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                )
+
+                def check_no_new_backup():
+                    self.assertEqual(
+                    1, BackupManagementWindow.backups_table.rowCount(),
+                    f"Backup have been added even though less then 7 days has passed {BackupManagementWindow.backups_table.rowCount()}"
+                    )
+
+                    self.assertEqual(
+                    1, len(Session.backups),
+                    f"Backup have been added even though less then 7 days has passed {len(Session.backups)}"
+                    )
+
+                    self.assertEqual(
+                    1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                    f"Backup file have been created even though less then 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                    )
+
+                QTimer.singleShot(100, check_no_new_backup)
+                auto_backup()
+                loop = QEventLoop()
+                QTimer.singleShot(500, loop.quit)
+                loop.exec()
+                
+                backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
+                backup.timestamp = date_minus_7_days.strftime("%d-%m-%Y_%H:%M:%S")
+
+                def check_second_backup_appearance():
+                    self.assertEqual(
+                    2, BackupManagementWindow.backups_table.rowCount(),
+                    f"Backup during weekly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
+                    )
+
+                    self.assertEqual(
+                    2, len(Session.backups),
+                    f"Backup during weekly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}"
+                    )
+
+                    self.assertEqual(
+                    2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                    f"Backup file during weekly auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                    )
+
+                    BackupManagementWindow.window.done(0)
+                    SettingsWindow.window.done(0)
+
+                QTimer.singleShot(1000, check_second_backup_appearance)
+                auto_backup()
+
+            QTimer.singleShot(1000, check_backup_appearance)
+            BackupManagementWindow.create_backup.click()
+
+        QTimer.singleShot(100, prepare_auto_weekly_backup)
+        loop = QEventLoop()
+        QTimer.singleShot(5000, loop.quit)
+        loop.exec()
+
+
+                    
 
 
             

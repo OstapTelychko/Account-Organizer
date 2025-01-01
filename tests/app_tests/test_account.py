@@ -21,28 +21,24 @@ class TestAccount(DBTestCase):
 
 
     def test_account_adding(self):
-        try:
-            def open_add_window():
-                def add_account():
-                    AddAccountWindow.account_name.setText("Second test user")
-                    AddAccountWindow.current_balance.setText("100")
+        def open_add_window():
+            def add_account():
+                AddAccountWindow.account_name.setText("Second test user")
+                AddAccountWindow.current_balance.setText("100")
 
-                    def check_account_existance():
-                        self.assertTrue(Session.db.account_exists("Second test user"), "Second test user hasn't been created")
-                        SettingsWindow.window.done(1)
-                    QTimer.singleShot(100, check_account_existance)
-                    AddAccountWindow.button.click()
+                def check_account_existance():
+                    self.assertTrue(Session.db.account_exists("Second test user"), "Second test user hasn't been created")
+                    SettingsWindow.window.done(1)
+                QTimer.singleShot(100, check_account_existance)
+                AddAccountWindow.button.click()
 
-                QTimer.singleShot(100, add_account)
-                SettingsWindow.add_account.click()
+            QTimer.singleShot(100, add_account)
+            SettingsWindow.add_account.click()
 
-            self.open_settings(open_add_window)
-            loop = QEventLoop()
-            QTimer.singleShot(1000, loop.quit)
-            loop.exec()
-            
-        finally:
-            Session.db.rename_account("Test user")
+        self.open_settings(open_add_window)
+        loop = QEventLoop()
+        QTimer.singleShot(500, loop.quit)
+        loop.exec()            
     
 
     def test_account_rename(self):
@@ -62,8 +58,9 @@ class TestAccount(DBTestCase):
         self.open_settings(open_rename_window)
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
+        Session.db.rename_account("Test user")
     
 
     def test_account_deletion(self):
@@ -95,7 +92,7 @@ class TestAccount(DBTestCase):
 
         self.open_settings(delete_account)
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
 
 

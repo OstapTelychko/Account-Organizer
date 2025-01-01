@@ -29,7 +29,7 @@ class TestTransaction(DBTestCase):
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -52,7 +52,7 @@ class TestTransaction(DBTestCase):
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -72,6 +72,6 @@ class TestTransaction(DBTestCase):
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
             

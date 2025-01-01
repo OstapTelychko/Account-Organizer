@@ -33,7 +33,7 @@ class TestMainWindow(TestCase):
             open_window_button.click()
         
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
 
 
@@ -49,8 +49,8 @@ class TestMainWindow(TestCase):
         MainWindow.next_month_button.click()
         current_showed_month = MainWindow.current_month.text()
         self.assertEqual(translated_next_month, current_showed_month, f"Wrong next month has been showed {current_showed_month} instead of {translated_next_month}")
-
-        translated_previous_month = months_list[current_month] if current_month != 1 else months_list[12]
+        
+        translated_previous_month = months_list[current_month]
         MainWindow.previous_month_button.click()
         current_showed_month = MainWindow.current_month.text()
         self.assertEqual(translated_previous_month, current_showed_month, f"Wrong previous month has been showed {current_showed_month} instead of {translated_previous_month}")
@@ -111,7 +111,7 @@ class TestMainWindow(TestCase):
         QTimer.singleShot(100, check_forbidden_expression)
         MainWindow.calculate.click()
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
 
 
@@ -134,7 +134,7 @@ class TestMainWindow(TestCase):
         QTimer.singleShot(100, open_settings)
         MainWindow.settings.click()
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -156,5 +156,5 @@ class TestMainWindow(TestCase):
         QTimer.singleShot(100, open_settings)
         MainWindow.settings.click()
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()

@@ -30,7 +30,7 @@ class TestCategory(DBTestCase):
         self.assertTrue(Session.db.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
         
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -52,7 +52,7 @@ class TestCategory(DBTestCase):
         self.assertFalse(Session.db.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -79,7 +79,7 @@ class TestCategory(DBTestCase):
         self.assertTrue(Session.db.session.query(Category).filter_by(name=expenses_category_name+" rename test").first(), "Expense category hasn't been renamed")
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -107,7 +107,7 @@ class TestCategory(DBTestCase):
         self.assertEqual(Session.db.get_category("Second "+self.expenses_category.name, "Expenses").position, 0, "Expenses category hasn't changed position to 1")
 
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
     
 
@@ -134,6 +134,6 @@ class TestCategory(DBTestCase):
             category.settings.click()
         
         loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(500, loop.quit)
         loop.exec()
 
