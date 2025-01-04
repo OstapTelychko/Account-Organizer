@@ -11,7 +11,7 @@ from GUI.windows.transaction import TransactionManagementWindow
 
 class TestTransaction(DBTestCase):
 
-    def test_add_transaction(self):
+    def test_1_add_transaction(self):
         for category in Session.categories.values():
             MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
 
@@ -33,7 +33,7 @@ class TestTransaction(DBTestCase):
         loop.exec()
     
 
-    def test_update_transaction(self):
+    def test_2_update_transaction(self):
         for category in Session.categories.values():
             MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
             category.table_data.selectRow(0)
@@ -56,7 +56,7 @@ class TestTransaction(DBTestCase):
         loop.exec()
     
 
-    def test_delete_transaction(self):
+    def test_3_delete_transaction(self):
         for category in Session.categories.values():
             self.select_correct_tab(category)
             category.table_data.selectRow(0)

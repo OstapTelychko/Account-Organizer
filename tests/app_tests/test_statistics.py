@@ -42,7 +42,7 @@ class TestStatistics(DBTestCase):
         ]
 
 
-    def test_show_monthly_statistics(self):
+    def test_1_show_monthly_statistics(self):
         days_amount = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)
 
         def open_monthly_statics_window():
@@ -70,7 +70,7 @@ class TestStatistics(DBTestCase):
         loop.exec()
     
 
-    def test_show_quarterly_statistics(self):
+    def test_2_show_quarterly_statistics(self):
         month_without_transactions = 12 if Session.current_month != 12 else 1
         quarter_without_transaction = 4 if Session.current_month != 12 else 1
 
@@ -152,7 +152,7 @@ class TestStatistics(DBTestCase):
         loop.exec()
                         
 
-    def test_show_yearly_statistics(self):
+    def test_3_show_yearly_statistics(self):
         month_without_transactions = 12 if Session.current_month != 12 else 1
 
         for month in range(1, 13):
@@ -228,7 +228,7 @@ class TestStatistics(DBTestCase):
         loop.exec()
     
 
-    def test_show_custom_range_statistics(self):
+    def test_4_show_custom_range_statistics(self):
         for month in range(1, 7):
             if month != Session.current_month:
                 Session.db.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")

@@ -20,7 +20,7 @@ class TestAccount(DBTestCase):
         MainWindow.settings.click()
 
 
-    def test_account_adding(self):
+    def test_1_account_adding(self):
         def open_add_window():
             def add_account():
                 AddAccountWindow.account_name.setText("Second test user")
@@ -41,15 +41,25 @@ class TestAccount(DBTestCase):
         loop.exec()            
     
 
-    def test_account_rename(self):
+    def test_2_account_rename(self):
         def open_rename_window():
             def rename_account():
                 RenameAccountWindow.new_account_name.setText("Test user rename test")
 
                 def check_account_name():
                     self.assertEqual(Session.db.get_account().name, "Test user rename test", "Test user hasn't been renamed")
-                    SettingsWindow.window.done(0)
                 QTimer.singleShot(100, check_account_name)
+                RenameAccountWindow.button.click()
+
+                loop = QEventLoop()
+                QTimer.singleShot(300, loop.quit)
+                loop.exec()
+
+                RenameAccountWindow.new_account_name.setText("Test user")
+                def rename_back():
+                    self.assertEqual(Session.db.get_account().name, "Test user", "Test user hasn't been renamed back")
+                    SettingsWindow.window.done(0)
+                QTimer.singleShot(100, rename_back)
                 RenameAccountWindow.button.click()
 
             QTimer.singleShot(100, rename_account)
@@ -58,12 +68,11 @@ class TestAccount(DBTestCase):
         self.open_settings(open_rename_window)
 
         loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
+        QTimer.singleShot(700, loop.quit)
         loop.exec()
-        Session.db.rename_account("Test user")
     
 
-    def test_account_deletion(self):
+    def test_3_account_deletion(self):
         Session.account_name = "Second test user"
         Session.db.create_account(Session.account_name, 100)
 
@@ -84,8 +93,8 @@ class TestAccount(DBTestCase):
                 def check_deletion():
                     self.assertFalse(Session.db.account_exists("Second test user"), "Account hasn't been removed")
                     self.assertEqual(Session.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
-                    SettingsWindow.window.done(1)
-                QTimer.singleShot(100, check_deletion)
+                    SettingsWindow.window.done(0)
+                QTimer.singleShot(200, check_deletion)
 
             QTimer.singleShot(100, confirm_deletion)
             SettingsWindow.delete_account.click()

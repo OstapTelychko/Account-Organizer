@@ -14,7 +14,7 @@ from GUI.windows.category import AddCategoryWindow, CategorySettingsWindow, Rena
 
 class TestCategory(DBTestCase):
 
-    def test_category_creation(self):
+    def test_1_category_creation(self):
 
         def add_category(name:str):
             AddCategoryWindow.category_name.setText(name)
@@ -34,7 +34,7 @@ class TestCategory(DBTestCase):
         loop.exec()
     
 
-    def test_category_deletion(self):
+    def test_2_category_deletion(self):
         income_category_name = self.income_category.name
         expenses_category_name = self.expenses_category.name
 
@@ -56,7 +56,7 @@ class TestCategory(DBTestCase):
         loop.exec()
     
 
-    def test_category_rename(self):
+    def test_3_category_rename(self):
         income_category_name = self.income_category.name
         expenses_category_name = self.expenses_category.name
 
@@ -83,7 +83,7 @@ class TestCategory(DBTestCase):
         loop.exec()
     
 
-    def test_category_position_change(self):
+    def test_4_category_position_change(self):
         Session.db.create_category("Second "+self.income_category.name, "Incomes", 1)
         Session.db.create_category("Second "+self.expenses_category.name, "Expenses", 1)
 
@@ -111,7 +111,7 @@ class TestCategory(DBTestCase):
         loop.exec()
     
 
-    def test_copy_month_transactions(self):
+    def test_5_copy_month_transactions(self):
         for category in Session.categories.values():
             def copy_transactions():
                 def check_copied_transactions():

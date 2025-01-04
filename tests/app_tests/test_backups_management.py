@@ -72,7 +72,7 @@ class TestBackupsManagement(DBTestCase):
         self.open_backup_management_window(create_backup)
 
         loop = QEventLoop()
-        QTimer.singleShot(5000, loop.quit)
+        QTimer.singleShot(3000, loop.quit)
         loop.exec()
     
 
@@ -184,10 +184,7 @@ class TestBackupsManagement(DBTestCase):
                                     self.assertEqual(SettingsWindow.window.isVisible(), False, "Settings window hasn't been closed")
                                 QTimer.singleShot(200, check_backup_load)
 
-                            self.open_backup_management_window(load_newest_backup)
-                            loop = QEventLoop()
-                            QTimer.singleShot(2000, loop.quit)
-                            loop.exec()
+                            QTimer.singleShot(1000, partial(self.open_backup_management_window, load_newest_backup))
 
                         QTimer.singleShot(1000, check_backup_load)
                         Messages.load_backup_confirmation.ok_button.click()
@@ -245,7 +242,7 @@ class TestBackupsManagement(DBTestCase):
                     f"Backup file have been created even though less then 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                     )
 
-                QTimer.singleShot(100, check_no_new_backup)
+                QTimer.singleShot(200, check_no_new_backup)
                 auto_backup()
                 loop = QEventLoop()
                 QTimer.singleShot(500, loop.quit)
@@ -275,11 +272,14 @@ class TestBackupsManagement(DBTestCase):
 
                 QTimer.singleShot(1000, check_second_backup_appearance)
                 auto_backup()
-
+                
+            loop = QEventLoop()
+            QTimer.singleShot(1000, loop.quit)
+            loop.exec()
             QTimer.singleShot(1000, check_backup_appearance)
             BackupManagementWindow.create_backup.click()
         
-        QTimer.singleShot(100, prepare_auto_daily_backup)
+        QTimer.singleShot(200, prepare_auto_daily_backup)
         loop = QEventLoop()
         QTimer.singleShot(5000, loop.quit)
         loop.exec()
@@ -323,7 +323,7 @@ class TestBackupsManagement(DBTestCase):
                     f"Backup file have been created even though less then 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                     )
 
-                QTimer.singleShot(100, check_no_new_backup)
+                QTimer.singleShot(200, check_no_new_backup)
                 auto_backup()
                 loop = QEventLoop()
                 QTimer.singleShot(500, loop.quit)
@@ -358,6 +358,84 @@ class TestBackupsManagement(DBTestCase):
             BackupManagementWindow.create_backup.click()
 
         QTimer.singleShot(100, prepare_auto_weekly_backup)
+        loop = QEventLoop()
+        QTimer.singleShot(5000, loop.quit)
+        loop.exec()
+    
+
+    def test_6_auto_monthly_backup(self):
+        Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
+        date_now = datetime.now()
+        date_minus_30_days = date_now - timedelta(days=30)
+
+        def prepare_auto_monthly_backup():
+            def check_backup_appearance():
+                self.assertEqual(
+                1, BackupManagementWindow.backups_table.rowCount(),
+                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
+                )
+
+                self.assertEqual(
+                1, len(Session.backups),
+                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}"
+                )
+
+                self.assertEqual(
+                1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                )
+
+                def check_no_new_backup():
+                    self.assertEqual(
+                    1, BackupManagementWindow.backups_table.rowCount(),
+                    f"Backup have been added even though less then 30 days has passed {BackupManagementWindow.backups_table.rowCount()}"
+                    )
+
+                    self.assertEqual(
+                    1, len(Session.backups),
+                    f"Backup have been added even though less then 30 days has passed {len(Session.backups)}"
+                    )
+
+                    self.assertEqual(
+                    1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                    f"Backup file have been created even though less then 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                    )
+
+                QTimer.singleShot(200, check_no_new_backup)
+                auto_backup()
+                loop = QEventLoop()
+                QTimer.singleShot(500, loop.quit)
+                loop.exec()
+                
+                backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
+                backup.timestamp = date_minus_30_days.strftime("%d-%m-%Y_%H:%M:%S")
+
+                def check_second_backup_appearance():
+                    self.assertEqual(
+                    2, BackupManagementWindow.backups_table.rowCount(),
+                    f"Backup during monthly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
+                    )
+
+                    self.assertEqual(
+                    2, len(Session.backups),
+                    f"Backup during monthly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}"
+                    )
+
+                    self.assertEqual(
+                    2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
+                    f"Backup file during monthly auto backup hasn't been created or more than 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
+                    )
+
+                    BackupManagementWindow.window.done(0)
+                    SettingsWindow.window.done(0)
+
+                QTimer.singleShot(1000, check_second_backup_appearance)
+                auto_backup()
+
+            QTimer.singleShot(1000, check_backup_appearance)
+            BackupManagementWindow.create_backup.click()
+
+        QTimer.singleShot(100, prepare_auto_monthly_backup)
         loop = QEventLoop()
         QTimer.singleShot(5000, loop.quit)
         loop.exec()

@@ -19,7 +19,7 @@ from GUI.windows.category import AddCategoryWindow
 
 class TestMainWindow(TestCase):
 
-    def test_windows_opening(self:TestCase):
+    def test_1_windows_opening(self:TestCase):
         test_windows_open = {SettingsWindow:MainWindow.settings, StatisticsWindow:MainWindow.statistics, AddCategoryWindow:MainWindow.add_incomes_category}
 
         for window, open_window_button in test_windows_open.items():
@@ -37,7 +37,7 @@ class TestMainWindow(TestCase):
         loop.exec()
 
 
-    def test_date_change(self):
+    def test_2_date_change(self):
         months_list = LANGUAGES[Session.language]["Months"]
         current_month = datetime.now().month
         translated_current_month = months_list[current_month]
@@ -68,7 +68,7 @@ class TestMainWindow(TestCase):
         self.assertEqual(str(current_year), current_showed_year, f"Wrong previous year has been showed {current_showed_year} instead of {current_year}")
     
 
-    def test_mini_calculator(self):
+    def test_3_mini_calculator(self):
         MainWindow.mini_calculator_text.setText("2*2")
         MainWindow.calculate.click()
         result = MainWindow.mini_calculator_text.text()
@@ -115,8 +115,7 @@ class TestMainWindow(TestCase):
         loop.exec()
 
 
-
-    def test_language_change(self):
+    def test_4_language_change(self):
         all_languages = AVAILABLE_LANGUAGES.copy()
         all_languages.remove(Session.language)
         previous_language = Session.language
@@ -138,7 +137,7 @@ class TestMainWindow(TestCase):
         loop.exec()
     
 
-    def test_theme_change(self):
+    def test_5_theme_change(self):
         def open_settings():
             current_theme = Session.theme
             current_style_sheet = app.styleSheet()
