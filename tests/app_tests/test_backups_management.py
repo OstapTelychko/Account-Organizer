@@ -4,6 +4,7 @@ from functools import partial
 from datetime import datetime, timedelta
 from PySide6.QtCore import QTimer, QEventLoop
 
+from languages import LANGUAGES
 from project_configuration import TEST_BACKUPS_DIRECTORY
 from tests.tests_toolkit import DBTestCase
 from AppObjects.session import Session
@@ -204,7 +205,117 @@ class TestBackupsManagement(DBTestCase):
         loop.exec()
     
 
-    def test_4_auto_daily_backup(self):
+    def test_4_auto_backup_status_change(self):
+        def set_daily_status():
+            def choose_daily_auto_backup():
+                self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
+
+                AutoBackupWindow.daily.click()
+                loop = QEventLoop()
+                QTimer.singleShot(100, loop.quit)
+                loop.exec()
+
+                self.assertEqual(AutoBackupWindow.daily.isChecked(), True, "Daily auto backup hasn't been selected")
+                self.assertEqual(AutoBackupWindow.weekly.isChecked(), False, "Weekly auto backup hasn't been deselected")
+                self.assertEqual(AutoBackupWindow.monthly.isChecked(), False, "Monthly auto backup hasn't been deselected")
+
+                AutoBackupWindow.save.click()
+                loop = QEventLoop()
+                QTimer.singleShot(200, loop.quit)
+                loop.exec()
+
+                self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
+                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.DAILY, "Auto backup status hasn't been changed to daily")
+
+                translated_daily_status = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"][7]
+                self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
+                self.assertNotEqual(BackupManagementWindow.auto_backup_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
+                BackupManagementWindow.window.done(0)
+                SettingsWindow.window.done(0)
+
+            QTimer.singleShot(100, choose_daily_auto_backup)
+            BackupManagementWindow.auto_backup.click()
+
+        self.open_backup_management_window(set_daily_status)
+
+        loop = QEventLoop()
+        QTimer.singleShot(500, loop.quit)
+        loop.exec()
+
+        def set_weekly_status():
+            def choose_weekly_auto_backup():
+                self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
+
+                AutoBackupWindow.weekly.click()
+                loop = QEventLoop()
+                QTimer.singleShot(100, loop.quit)
+                loop.exec()
+
+                self.assertEqual(AutoBackupWindow.daily.isChecked(), False, "Daily auto backup hasn't been deselected")
+                self.assertEqual(AutoBackupWindow.weekly.isChecked(), True, "Weekly auto backup hasn't been selected")
+                self.assertEqual(AutoBackupWindow.monthly.isChecked(), False, "Monthly auto backup hasn't been deselected")
+
+                AutoBackupWindow.save.click()
+                loop = QEventLoop()
+                QTimer.singleShot(200, loop.quit)
+                loop.exec()
+
+                self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
+                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.WEEKLY, "Auto backup status hasn't been changed to weekly")
+
+                translated_weekly_status = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"][6]
+                self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
+                self.assertNotEqual(BackupManagementWindow.auto_backup_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
+                BackupManagementWindow.window.done(0)
+                SettingsWindow.window.done(0)
+
+            QTimer.singleShot(100, choose_weekly_auto_backup)
+            BackupManagementWindow.auto_backup.click()
+
+        self.open_backup_management_window(set_weekly_status)
+
+        loop = QEventLoop()
+        QTimer.singleShot(500, loop.quit)
+        loop.exec()
+
+        def set_monthly_status():
+            def choose_monthly_auto_backup():
+                self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
+
+                AutoBackupWindow.monthly.click()
+                loop = QEventLoop()
+                QTimer.singleShot(100, loop.quit)
+                loop.exec()
+
+                self.assertEqual(AutoBackupWindow.daily.isChecked(), False, "Daily auto backup hasn't been deselected")
+                self.assertEqual(AutoBackupWindow.weekly.isChecked(), False, "Weekly auto backup hasn't been deselected")
+                self.assertEqual(AutoBackupWindow.monthly.isChecked(), True, "Monthly auto backup hasn't been selected")
+
+                AutoBackupWindow.save.click()
+                loop = QEventLoop()
+                QTimer.singleShot(200, loop.quit)
+                loop.exec()
+
+                self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
+                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.MONTHLY, "Auto backup status hasn't been changed to monthly")
+
+                translated_monthly_status = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"][5]
+                self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
+                self.assertNotEqual(BackupManagementWindow.auto_backup_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
+                BackupManagementWindow.window.done(0)
+                SettingsWindow.window.done(0)
+
+            QTimer.singleShot(100, choose_monthly_auto_backup)
+            BackupManagementWindow.auto_backup.click()
+
+        self.open_backup_management_window(set_monthly_status)
+
+        loop = QEventLoop()
+        QTimer.singleShot(500, loop.quit)
+        loop.exec()
+
+
+    def test_5_auto_daily_backup(self):
         Session.auto_backup_status = Session.AutoBackupStatus.DAILY
         date_now = datetime.now()
         date_minus_1_day = date_now - timedelta(days=1)
@@ -285,7 +396,7 @@ class TestBackupsManagement(DBTestCase):
         loop.exec()
 
 
-    def test_5_auto_weekly_backup(self):
+    def test_6_auto_weekly_backup(self):
         Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY
         date_now = datetime.now()
         date_minus_7_days = date_now - timedelta(days=7)
@@ -363,7 +474,7 @@ class TestBackupsManagement(DBTestCase):
         loop.exec()
     
 
-    def test_6_auto_monthly_backup(self):
+    def test_7_auto_monthly_backup(self):
         Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
         date_now = datetime.now()
         date_minus_30_days = date_now - timedelta(days=30)
