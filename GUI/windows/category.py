@@ -1,11 +1,12 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy, QGraphicsDropShadowEffect
+from PySide6.QtGui import QIntValidator
 from PySide6.QtCore import Qt
 
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.main_window import MainWindow
 
 
@@ -74,6 +75,9 @@ class ChangeCategoryPositionWindow():
     preview_category_container.setLayout(preview_category_layout)
 
     new_position = QLineEdit()
+    new_position_validator = QIntValidator(0, 1000)
+    new_position.setValidator(new_position_validator)
+    
     enter_new_position = create_button("Save", (140, 30))
     enter_new_position.setDefault(True)
 

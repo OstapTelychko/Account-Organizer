@@ -80,7 +80,10 @@
                     "8": "Status",
                     "9": "Monthly backup (low disk space)",
                     "10": "Weekly backup (recommended)",
-                    "11": "Daily backup (high disk space)"
+                    "11": "Daily backup (high disk space)",
+                    "12": "Current maximum number of backups: max_backups",
+                    "13": "This number corresponds to the number of databases that will be saved on disk. Databases will be deleted from oldest to newest when the program starts",
+                    "14": "Max number of backups"
                 },
 
                 "Account":{
@@ -163,10 +166,11 @@
             "18": "The position can't be the same",
             "19": "From-date can't be bigger then to-date",
             "20": "You have to select at least one category",
-            "21": "After deletion database, number of backups will be less than recommended",
+            "21": "Amount of backups will be less than recommended. Continue?",
             "22": "Are you sure you want to delete database? This action is irreversible",
             "23": "Different app versions detected. Downgrade the app to target version",
-            "24": "Are you sure you want to load this timestamp backup?"
+            "24": "Are you sure you want to load this timestamp backup?",
+            "25": "Amount of databases will be higher than recommended. Continue?"
         }
             
     },
@@ -253,7 +257,10 @@
                     "8": "Статус",
                     "9": "Щомісячне створення резервної копії (низьке використання диска)",
                     "10": "Щотижневе створення резервної копії (рекомендовано)",
-                    "11": "Щоденне створення резервної копії (високе використання диска)"
+                    "11": "Щоденне створення резервної копії (високе використання диска)",
+                    "12": "Поточна максимальна кількість резервних копій: max_backups",
+                    "13": "Дане число відповідає за кількість баз даних, які будуть збережені на диску. Бази даних будуть видалятися від найдавніших до новіших при запуску програми",
+                    "14": "Mакс кількість баз даних"
                 },
 
                 "Account":{
@@ -336,10 +343,11 @@
             "18": "Позиція не може бути такою самою",
             "19": "Початкова дата не може бути більшою за кінцеву",
             "20": "Ви повинні вибрати принаймні одну категорію",
-            "21": "При видалині бази даних, кількість резервних копій буде нищою від рекомендованої кількості",
+            "21": "Кількість бази даних буде нищою від рекомендованої кількості. Продовжити?",
             "22": "Ви впевнені, що хочете видалити базу даних? Ця дія є незворотньою",
             "23": "Виявлено різні версії додатку. Понизьте версію додатку до цільової версії",
-            "24": "Ви впевнені, що хочете завантажити цю резервну копію timestamp?"
+            "24": "Ви впевнені, що хочете завантажити цю резервну копію timestamp?",
+            "25": "Кількість баз даних буде більшою від рекомендованої кількості. Продовжити?"
         }
     },
     
@@ -425,7 +433,10 @@
                     "8": "Status",
                     "9": "Miesięczne kopiowanie zapasowe (małe użycie dysku)",
                     "10": "Tygodniowe kopiowanie zapasowe (zalecane)",
-                    "11": "Dzienne kopiowanie zapasowe (wysokie użycie dysku) "                    
+                    "11": "Dzienne kopiowanie zapasowe (wysokie użycie dysku) ",
+                    "12": "Aktualna maksymalna liczba kopii zapasowych: max_backups",
+                    "13": "Ta liczba odpowiada liczbie baz danych, które zostaną zapisane na dysku. Bazy danych zostaną usunięte od najstarszej do najnowszej, przy uruchomieniu aplikacji",
+                    "14": "Maks liczba baz danych"
                 },
 
                 "Account":{
@@ -508,10 +519,11 @@
             "18": "Nie można zastosować tej samej pozycji",
             "19": "Data początkowa nie może być większą od końcowej",
             "20": "Aby kontynuować, musicie wybrać co najmniej jedną kategorię",
-            "21": "Przy usuwaniu bazy danych liczba kopii zapasowych będzie mniejsza niż zalecana",
+            "21": "Ilość baz danych będzie mniejsza niż zalecana. Kontynuować?",
             "22": "Czy na pewno chcecie usunąć bazę danych? Ta czynność jest nieodwracalna",
             "23": "Wykryto różne wersje aplikacji. Zmniejsz wersję aplikacji do docelowej wersji",
-            "24": "Czy na pewno chcecie załadować tę kopię zapasową z timestamp?"
+            "24": "Czy na pewno chcecie załadować tę kopię zapasową z timestamp?",
+            "25": "Ilość baz danych będzie większa niż zalecana. Kontynuować?"
         }
     }
 }

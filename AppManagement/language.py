@@ -136,6 +136,8 @@ def change_language():
     AutoBackupWindow.monthly.setText(Windows["Settings"]["Backup management"][9])
     AutoBackupWindow.weekly.setText(Windows["Settings"]["Backup management"][10])
     AutoBackupWindow.daily.setText(Windows["Settings"]["Backup management"][11])
+    AutoBackupWindow.max_backups_label.setText(Windows["Settings"]["Backup management"][12].replace("max_backups", str(Session.max_backups)+"\n"+Windows["Settings"]["Backup management"][13]))
+    AutoBackupWindow.max_backups.setPlaceholderText(Windows["Settings"]["Backup management"][14])
     AutoBackupWindow.save.setText(Language["General management"][6])
 
 

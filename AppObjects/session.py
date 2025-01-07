@@ -4,7 +4,7 @@ from sys import exit
 from datetime import datetime
 from alembic.config import Config
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -22,7 +22,7 @@ class Session:
 
     app_version:tuple = None
 
-    current_month = 1
+    current_month = 4
     current_year = 2023
     current_balance = 0
     current_total_income = 0
@@ -40,6 +40,7 @@ class Session:
     db:DBController = None
     backups:dict[int, Backup] = {}
     auto_backup_status:AutoBackupStatus = AutoBackupStatus.MONTHLY
+    max_backups = MAX_RECOMMENDED_BACKUPS
 
     instance_guard:SingleInstanceGuard = None
     test_mode = False
@@ -79,13 +80,11 @@ class Session:
         with open(USER_CONF_PATH) as file:
             User_conf = toml.load(USER_CONF_PATH)
 
-            #Load selected language 
             Session.language = User_conf["Language"]
             Session.theme = User_conf["Theme"]
-            #Load last used account name 
             Session.account_name = User_conf["Account_name"]
-            #Load auto backup status
             Session.auto_backup_status = User_conf["Auto_backup_status"]
+            Session.max_backups = User_conf["Max_backups"]
 
 
     def create_user_config():
@@ -93,7 +92,8 @@ class Session:
             "Theme":"Dark",
             "Language":"English",
             "Account_name":"",
-            "Auto_backup_status":Session.AutoBackupStatus.MONTHLY
+            "Auto_backup_status":Session.AutoBackupStatus.MONTHLY,
+            "Max_backups":MAX_RECOMMENDED_BACKUPS
         }
 
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
@@ -102,7 +102,13 @@ class Session:
         
     def update_user_config():
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
-            toml.dump({"Theme":Session.theme, "Language":Session.language, "Account_name":Session.account_name, "Auto_backup_status":Session.auto_backup_status}, file)
+            toml.dump({
+                "Theme":Session.theme,
+                "Language":Session.language,
+                "Account_name":Session.account_name,
+                "Auto_backup_status":Session.auto_backup_status,
+                "Max_backups":Session.max_backups
+            }, file)
     
 
     def load_backups():

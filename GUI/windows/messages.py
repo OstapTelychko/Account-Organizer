@@ -37,8 +37,9 @@ class Messages():
     wrong_date = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
     no_selected_category = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
 
-    below_min_backups = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
+    below_recommended_min_backups = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
     delete_buckup_confirmation = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     different_app_version = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
 
     load_backup_confirmation = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Question, APP_NAME, APP_ICON)
+    above_recommended_max_backups = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)

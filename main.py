@@ -54,7 +54,7 @@ from AppManagement.category import create_category, load_categories, remove_cate
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
-from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, auto_backup, prevent_same_auto_backup_status, save_auto_backup_status
+from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 
 from tests.init_tests import test_main
 
@@ -161,17 +161,18 @@ def main():
 
     if not Session.test_mode:
         auto_backup()
+    auto_remove_backups()
 
     #Backup management
     BackupManagementWindow.create_backup.clicked.connect(create_backup)
     BackupManagementWindow.delete_backup.clicked.connect(remove_backup)
     BackupManagementWindow.load_backup.clicked.connect(load_backup)
-    BackupManagementWindow.auto_backup.clicked.connect(AutoBackupWindow.window.exec)
+    BackupManagementWindow.auto_backup.clicked.connect(open_auto_backup_window)
 
     AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.monthly))
     AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.weekly))
     AutoBackupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.daily))
-    AutoBackupWindow.save.clicked.connect(save_auto_backup_status)
+    AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
     #Load categories if they exists
     if len(Session.db.get_all_categories()) > 0:

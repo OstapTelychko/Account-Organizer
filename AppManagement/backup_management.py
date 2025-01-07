@@ -6,7 +6,7 @@ from PySide6.QtCore import QTimer, Qt
 
 from languages import LANGUAGES
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
-from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH
+from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH
 from backend.db_controller import DBController
 from AppManagement.account import load_account_data
 
@@ -69,8 +69,8 @@ def remove_backup():
         return Messages.only_one_row.exec()
 
     if len(Session.backups)-1 < MIN_RECOMMENDED_BACKUPS:
-        Messages.below_min_backups.exec()
-        if Messages.below_min_backups.clickedButton() != Messages.below_min_backups.ok_button:
+        Messages.below_recommended_min_backups.exec()
+        if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
             return
     
     else:
@@ -158,6 +158,23 @@ def auto_backup():
         create_backup()
 
 
+def open_auto_backup_window():
+    AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+    AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+    AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+
+    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY:
+        AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Checked)
+
+    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY:
+        AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Checked)
+
+    else:
+        AutoBackupWindow.daily.setCheckState(Qt.CheckState.Checked)
+
+    AutoBackupWindow.window.exec()
+
+
 def prevent_same_auto_backup_status(status_checkbox: QCheckBox, state: int):
     if state == 2:#Checked
         if status_checkbox is AutoBackupWindow.monthly:
@@ -173,14 +190,14 @@ def prevent_same_auto_backup_status(status_checkbox: QCheckBox, state: int):
             AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
 
 
-def save_auto_backup_status():
+def save_auto_backup_settings():
     if AutoBackupWindow.monthly.isChecked():
         Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
 
     elif AutoBackupWindow.weekly.isChecked():
         Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY
 
-    else:
+    elif AutoBackupWindow.daily.isChecked():
         Session.auto_backup_status = Session.AutoBackupStatus.DAILY
 
     Backup_management = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"]
@@ -196,6 +213,41 @@ def save_auto_backup_status():
         AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[7])
         BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[7])
 
+    new_max_backups = AutoBackupWindow.max_backups.text()
+    if new_max_backups:
+        new_max_backups = int(new_max_backups)
+
+        if new_max_backups < MIN_RECOMMENDED_BACKUPS:
+            Messages.below_recommended_min_backups.exec()
+
+            if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
+                return
+        
+        elif new_max_backups > MAX_RECOMMENDED_BACKUPS:
+            Messages.above_recommended_max_backups.exec()
+
+            if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
+                return
+        
+        Session.max_backups = new_max_backups
+        Windows = LANGUAGES[Session.language]["Windows"]
+        AutoBackupWindow.max_backups_label.setText(Windows["Settings"]["Backup management"][12].replace("max_backups", str(Session.max_backups)+"\n"+Windows["Settings"]["Backup management"][13]))
+
+            
     auto_backup()
     Session.update_user_config()
     AutoBackupWindow.window.done(0)
+
+
+def auto_remove_backups():
+    backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"))
+
+    while len(backups) > Session.max_backups:
+        backup_id, backup = backups.pop(0)
+        
+        os.remove(backup.db_file_path)
+        del Session.backups[backup_id]
+
+        BackupManagementWindow.backups_table.removeRow(BackupManagementWindow.backups_table.rowCount()-1)
+        columns = BackupManagementWindow.backups_table.verticalHeader()
+        columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)

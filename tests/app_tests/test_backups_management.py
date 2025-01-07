@@ -93,8 +93,8 @@ class TestBackupsManagement(DBTestCase):
 
             BackupManagementWindow.backups_table.selectRow(0)
             def check_below_min_backups():
-                self.assertEqual(Messages.below_min_backups.isVisible(), True, "Below min backups message hasn't been shown")
-                Messages.below_min_backups.ok_button.click()
+                self.assertEqual(Messages.below_recommended_min_backups.isVisible(), True, "Below min backups message hasn't been shown")
+                Messages.below_recommended_min_backups.ok_button.click()
             QTimer.singleShot(200, check_below_min_backups)
             BackupManagementWindow.delete_backup.click()
 
@@ -465,7 +465,7 @@ class TestBackupsManagement(DBTestCase):
                 QTimer.singleShot(1000, check_second_backup_appearance)
                 auto_backup()
 
-            QTimer.singleShot(1000, check_backup_appearance)
+            QTimer.singleShot(1200, check_backup_appearance)
             BackupManagementWindow.create_backup.click()
 
         QTimer.singleShot(100, prepare_auto_weekly_backup)
