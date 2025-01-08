@@ -1,5 +1,5 @@
-from PySide6.QtCore import QTimer, QEventLoop
-from tests.tests_toolkit import DBTestCase, OK_BUTTON
+from PySide6.QtCore import QTimer
+from tests.tests_toolkit import DBTestCase, qsleep, OK_BUTTON
 
 from project_configuration import CATEGORY_TYPE
 from AppObjects.session import Session
@@ -28,9 +28,7 @@ class TestTransaction(DBTestCase):
         self.assertEqual(len(Session.db.get_all_transactions(self.expenses_category.id)), 2, "Expense transaction hasn't been added")
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
     
 
     def test_2_update_transaction(self):
@@ -51,9 +49,7 @@ class TestTransaction(DBTestCase):
         self.assertEqual(Session.db.get_all_transactions(self.expenses_category.id)[0].name, "Updated transaction name", "Expense transaction hasn't been updated")
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
     
 
     def test_3_delete_transaction(self):
@@ -71,7 +67,5 @@ class TestTransaction(DBTestCase):
         self.assertEqual(len(Session.db.get_all_transactions(self.expenses_category.id)), 0, "Expense transaction hasn't been deleted")
         self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
             

@@ -2,7 +2,7 @@ from unittest import TestCase
 from functools import wraps
 
 from PySide6.QtWidgets import QMessageBox
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
 
@@ -19,6 +19,11 @@ from AppManagement.category import activate_categories, remove_categories_from_l
 LEFT_BUTTON = Qt.MouseButton.LeftButton
 OK_BUTTON = QMessageBox.StandardButton.Ok
     
+
+def qsleep(miliseconds:int):
+    loop = QEventLoop()
+    QTimer.singleShot(miliseconds, loop.quit)
+    loop.exec()
 
 
 class DBTestCase(TestCase):

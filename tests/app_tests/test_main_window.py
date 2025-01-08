@@ -1,11 +1,12 @@
 from unittest import TestCase
 from datetime import datetime
 
-from PySide6.QtCore import QTimer, QEventLoop
+from PySide6.QtCore import QTimer
 
 from languages import LANGUAGES
 from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.session import Session
+from tests.tests_toolkit import qsleep
 
 from GUI.gui_constants import app
 from GUI.windows.main_window import MainWindow
@@ -32,9 +33,7 @@ class TestMainWindow(TestCase):
             QTimer.singleShot(100, check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
             open_window_button.click()
         
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
 
     def test_2_date_change(self):
@@ -110,9 +109,7 @@ class TestMainWindow(TestCase):
 
         QTimer.singleShot(100, check_forbidden_expression)
         MainWindow.calculate.click()
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
 
     def test_4_language_change(self):
@@ -132,9 +129,7 @@ class TestMainWindow(TestCase):
 
         QTimer.singleShot(100, open_settings)
         MainWindow.settings.click()
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
     
 
     def test_5_theme_change(self):
@@ -154,6 +149,4 @@ class TestMainWindow(TestCase):
         
         QTimer.singleShot(100, open_settings)
         MainWindow.settings.click()
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)

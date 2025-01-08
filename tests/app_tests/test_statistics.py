@@ -1,6 +1,6 @@
 from datetime import date
-from PySide6.QtCore import QTimer, QDate, QEventLoop
-from tests.tests_toolkit import DBTestCase
+from PySide6.QtCore import QTimer, QDate
+from tests.tests_toolkit import DBTestCase, qsleep
 
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS
@@ -65,9 +65,7 @@ class TestStatistics(DBTestCase):
             QTimer.singleShot(100, check_monthly_statistics)
             StatisticsWindow.monthly_statistics.click()
         self.open_statistics_window(open_monthly_statics_window)
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
     
 
     def test_2_show_quarterly_statistics(self):
@@ -147,9 +145,7 @@ class TestStatistics(DBTestCase):
             StatisticsWindow.quarterly_statistics.click()
         
         self.open_statistics_window(open_quarterly_statistics_window)
-        loop = QEventLoop()
-        QTimer.singleShot(2000, loop.quit)
-        loop.exec()
+        qsleep(2000)
                         
 
     def test_3_show_yearly_statistics(self):
@@ -223,9 +219,7 @@ class TestStatistics(DBTestCase):
             StatisticsWindow.yearly_statistics.click()
         
         self.open_statistics_window(open_yearly_statistics_window)
-        loop = QEventLoop()
-        QTimer.singleShot(2000, loop.quit)
-        loop.exec()
+        qsleep(2000)
     
 
     def test_4_show_custom_range_statistics(self):
@@ -322,9 +316,7 @@ class TestStatistics(DBTestCase):
             StatisticsWindow.custom_range_statistics.click()
 
         self.open_statistics_window(open_custom_range_statistics_window)
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
 
 

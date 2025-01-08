@@ -1,6 +1,6 @@
-from PySide6.QtCore import QTimer, QEventLoop
+from PySide6.QtCore import QTimer
 
-from tests.tests_toolkit import DBTestCase, OK_BUTTON
+from tests.tests_toolkit import DBTestCase, qsleep, OK_BUTTON
 
 from AppObjects.session import Session
 from AppManagement.account import load_account_data
@@ -36,9 +36,7 @@ class TestAccount(DBTestCase):
             SettingsWindow.add_account.click()
 
         self.open_settings(open_add_window)
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()            
+        qsleep(500)           
     
 
     def test_2_account_rename(self):
@@ -51,9 +49,7 @@ class TestAccount(DBTestCase):
                 QTimer.singleShot(100, check_account_name)
                 RenameAccountWindow.button.click()
 
-                loop = QEventLoop()
-                QTimer.singleShot(300, loop.quit)
-                loop.exec()
+                qsleep(300)
 
                 RenameAccountWindow.new_account_name.setText("Test user")
                 def rename_back():
@@ -67,9 +63,7 @@ class TestAccount(DBTestCase):
 
         self.open_settings(open_rename_window)
 
-        loop = QEventLoop()
-        QTimer.singleShot(700, loop.quit)
-        loop.exec()
+        qsleep(700)
     
 
     def test_3_account_deletion(self):
@@ -100,9 +94,7 @@ class TestAccount(DBTestCase):
             SettingsWindow.delete_account.click()
 
         self.open_settings(delete_account)
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
 
 

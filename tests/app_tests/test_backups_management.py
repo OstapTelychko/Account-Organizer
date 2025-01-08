@@ -2,11 +2,11 @@ import shutil
 import os
 from functools import partial
 from datetime import datetime, timedelta
-from PySide6.QtCore import QTimer, QEventLoop
+from PySide6.QtCore import QTimer
 
 from languages import LANGUAGES
-from project_configuration import TEST_BACKUPS_DIRECTORY
-from tests.tests_toolkit import DBTestCase
+from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS
+from tests.tests_toolkit import DBTestCase, qsleep
 from AppObjects.session import Session
 
 from AppManagement.backup_management import auto_backup
@@ -72,9 +72,7 @@ class TestBackupsManagement(DBTestCase):
 
         self.open_backup_management_window(create_backup)
 
-        loop = QEventLoop()
-        QTimer.singleShot(3000, loop.quit)
-        loop.exec()
+        qsleep(2000)
     
 
     def test_2_remove_backup(self):
@@ -87,9 +85,7 @@ class TestBackupsManagement(DBTestCase):
             QTimer.singleShot(100, check_no_selection)
             BackupManagementWindow.delete_backup.click()
 
-            loop = QEventLoop()
-            QTimer.singleShot(1000, loop.quit)
-            loop.exec()
+            qsleep(1000)
 
             BackupManagementWindow.backups_table.selectRow(0)
             def check_below_min_backups():
@@ -121,9 +117,7 @@ class TestBackupsManagement(DBTestCase):
     
         self.open_backup_management_window(remove_backup)
 
-        loop = QEventLoop()
-        QTimer.singleShot(2000, loop.quit)
-        loop.exec()
+        qsleep(2000)
         
 
     def test_3_load_backup(self):
@@ -141,9 +135,7 @@ class TestBackupsManagement(DBTestCase):
                     QTimer.singleShot(100, check_no_selection)
                     BackupManagementWindow.load_backup.click()
 
-                    loop = QEventLoop()
-                    QTimer.singleShot(1000, loop.quit)
-                    loop.exec()
+                    qsleep(1000)
 
                     BackupManagementWindow.backups_table.selectRow(0)
 
@@ -200,9 +192,7 @@ class TestBackupsManagement(DBTestCase):
             MainWindow.add_incomes_category.click()
 
         self.open_backup_management_window(prepare_load_backup)
-        loop = QEventLoop()
-        QTimer.singleShot(5000, loop.quit)
-        loop.exec()
+        qsleep(5000)
     
 
     def test_4_auto_backup_status_change(self):
@@ -211,18 +201,14 @@ class TestBackupsManagement(DBTestCase):
                 self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
 
                 AutoBackupWindow.daily.click()
-                loop = QEventLoop()
-                QTimer.singleShot(100, loop.quit)
-                loop.exec()
+                qsleep(100)
 
                 self.assertEqual(AutoBackupWindow.daily.isChecked(), True, "Daily auto backup hasn't been selected")
                 self.assertEqual(AutoBackupWindow.weekly.isChecked(), False, "Weekly auto backup hasn't been deselected")
                 self.assertEqual(AutoBackupWindow.monthly.isChecked(), False, "Monthly auto backup hasn't been deselected")
 
                 AutoBackupWindow.save.click()
-                loop = QEventLoop()
-                QTimer.singleShot(200, loop.quit)
-                loop.exec()
+                qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
                 self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.DAILY, "Auto backup status hasn't been changed to daily")
@@ -238,27 +224,21 @@ class TestBackupsManagement(DBTestCase):
 
         self.open_backup_management_window(set_daily_status)
 
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
         def set_weekly_status():
             def choose_weekly_auto_backup():
                 self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
 
                 AutoBackupWindow.weekly.click()
-                loop = QEventLoop()
-                QTimer.singleShot(100, loop.quit)
-                loop.exec()
+                qsleep(100)
 
                 self.assertEqual(AutoBackupWindow.daily.isChecked(), False, "Daily auto backup hasn't been deselected")
                 self.assertEqual(AutoBackupWindow.weekly.isChecked(), True, "Weekly auto backup hasn't been selected")
                 self.assertEqual(AutoBackupWindow.monthly.isChecked(), False, "Monthly auto backup hasn't been deselected")
 
                 AutoBackupWindow.save.click()
-                loop = QEventLoop()
-                QTimer.singleShot(200, loop.quit)
-                loop.exec()
+                qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
                 self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.WEEKLY, "Auto backup status hasn't been changed to weekly")
@@ -274,27 +254,21 @@ class TestBackupsManagement(DBTestCase):
 
         self.open_backup_management_window(set_weekly_status)
 
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
         def set_monthly_status():
             def choose_monthly_auto_backup():
                 self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
 
                 AutoBackupWindow.monthly.click()
-                loop = QEventLoop()
-                QTimer.singleShot(100, loop.quit)
-                loop.exec()
+                qsleep(100)
 
                 self.assertEqual(AutoBackupWindow.daily.isChecked(), False, "Daily auto backup hasn't been deselected")
                 self.assertEqual(AutoBackupWindow.weekly.isChecked(), False, "Weekly auto backup hasn't been deselected")
                 self.assertEqual(AutoBackupWindow.monthly.isChecked(), True, "Monthly auto backup hasn't been selected")
 
                 AutoBackupWindow.save.click()
-                loop = QEventLoop()
-                QTimer.singleShot(200, loop.quit)
-                loop.exec()
+                qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
                 self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.MONTHLY, "Auto backup status hasn't been changed to monthly")
@@ -310,9 +284,7 @@ class TestBackupsManagement(DBTestCase):
 
         self.open_backup_management_window(set_monthly_status)
 
-        loop = QEventLoop()
-        QTimer.singleShot(500, loop.quit)
-        loop.exec()
+        qsleep(500)
 
 
     def test_5_auto_daily_backup(self):
@@ -355,9 +327,7 @@ class TestBackupsManagement(DBTestCase):
 
                 QTimer.singleShot(200, check_no_new_backup)
                 auto_backup()
-                loop = QEventLoop()
-                QTimer.singleShot(500, loop.quit)
-                loop.exec()
+                qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_1_day.strftime("%d-%m-%Y_%H:%M:%S")
@@ -384,16 +354,12 @@ class TestBackupsManagement(DBTestCase):
                 QTimer.singleShot(1000, check_second_backup_appearance)
                 auto_backup()
                 
-            loop = QEventLoop()
-            QTimer.singleShot(1000, loop.quit)
-            loop.exec()
+            qsleep(1000)
             QTimer.singleShot(1000, check_backup_appearance)
             BackupManagementWindow.create_backup.click()
         
         QTimer.singleShot(200, prepare_auto_daily_backup)
-        loop = QEventLoop()
-        QTimer.singleShot(5000, loop.quit)
-        loop.exec()
+        qsleep(5000)
 
 
     def test_6_auto_weekly_backup(self):
@@ -436,9 +402,7 @@ class TestBackupsManagement(DBTestCase):
 
                 QTimer.singleShot(200, check_no_new_backup)
                 auto_backup()
-                loop = QEventLoop()
-                QTimer.singleShot(500, loop.quit)
-                loop.exec()
+                qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_7_days.strftime("%d-%m-%Y_%H:%M:%S")
@@ -469,9 +433,7 @@ class TestBackupsManagement(DBTestCase):
             BackupManagementWindow.create_backup.click()
 
         QTimer.singleShot(100, prepare_auto_weekly_backup)
-        loop = QEventLoop()
-        QTimer.singleShot(5000, loop.quit)
-        loop.exec()
+        qsleep(5000)
     
 
     def test_7_auto_monthly_backup(self):
@@ -514,9 +476,7 @@ class TestBackupsManagement(DBTestCase):
 
                 QTimer.singleShot(200, check_no_new_backup)
                 auto_backup()
-                loop = QEventLoop()
-                QTimer.singleShot(500, loop.quit)
-                loop.exec()
+                qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_30_days.strftime("%d-%m-%Y_%H:%M:%S")
@@ -547,10 +507,83 @@ class TestBackupsManagement(DBTestCase):
             BackupManagementWindow.create_backup.click()
 
         QTimer.singleShot(100, prepare_auto_monthly_backup)
-        loop = QEventLoop()
-        QTimer.singleShot(5000, loop.quit)
-        loop.exec()
+        qsleep(5000)
 
+
+    def test_8_check_max_backups_change(self):
+        init_max_backups = Session.max_backups
+
+        def open_auto_backup_settings():
+            def set_new_max_backups():
+                def check_no_change():
+                    self.assertEqual(
+                    init_max_backups, Session.max_backups,
+                    f"Expected max backups amount in session is {init_max_backups} returned {Session.max_backups}"
+                    )
+
+                    Session.load_user_config()
+                    self.assertEqual(
+                    init_max_backups, Session.max_backups,
+                    f"Expected max backups amount in user config is {init_max_backups} returned {Session.max_backups}"
+                    )
+
+                    self.assertNotEqual(
+                    -1, AutoBackupWindow.max_backups_label.text().find(str(init_max_backups)),
+                    f"Expected max backups amount in label is {init_max_backups} returned {AutoBackupWindow.max_backups_label.text()}"
+                    )
+
+                QTimer.singleShot(100, check_no_change)
+                AutoBackupWindow.save.click()
+
+                def check_below_min_backups():
+                    self.assertEqual(Messages.below_recommended_min_backups.isVisible(), True, "Below min backups message hasn't been shown")
+                    Messages.below_recommended_min_backups.ok_button.click()
+                
+                if MIN_RECOMMENDED_BACKUPS > 1:
+                    QTimer.singleShot(200, check_below_min_backups)
+                    AutoBackupWindow.max_backups.setText(str(MIN_RECOMMENDED_BACKUPS - 1))
+                    AutoBackupWindow.save.click()
+                    qsleep(500)
+                
+                def check_above_max_backups():
+                    self.assertEqual(Messages.above_recommended_max_backups.isVisible(), True, "Above max backups message hasn't been shown")
+                    Messages.above_recommended_max_backups.ok_button.click()
+                
+                QTimer.singleShot(200, check_above_max_backups)
+                AutoBackupWindow.max_backups.setText(str(MAX_RECOMMENDED_BACKUPS + 1))
+                AutoBackupWindow.save.click()
+                qsleep(500)
+
+                def check_max_backups_change():
+                    self.assertEqual(
+                    3, Session.max_backups,
+                    f"Expected max backups amount in session is 3 returned {Session.max_backups}"
+                    )
+
+                    Session.load_user_config()
+                    self.assertEqual(
+                    3, Session.max_backups,
+                    f"Expected max backups amount in user config is 3 returned {Session.max_backups}"
+                    )
+                    
+                    self.assertNotEqual(
+                    -1, AutoBackupWindow.max_backups_label.text().find("3"),
+                    f"Expected max backups amount in label is 3 returned {AutoBackupWindow.max_backups_label.text()}"
+                    )
+
+                    AutoBackupWindow.window.done(0)
+                    BackupManagementWindow.window.done(0)
+                    SettingsWindow.window.done(0)
+
+                QTimer.singleShot(200, check_max_backups_change)
+                AutoBackupWindow.max_backups.setText("3")
+                AutoBackupWindow.save.click()
+
+            QTimer.singleShot(100, set_new_max_backups)
+            BackupManagementWindow.auto_backup.click()
+            
+        self.open_backup_management_window(open_auto_backup_settings)
+        qsleep(1000)
 
                     
 
