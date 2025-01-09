@@ -1,5 +1,5 @@
 from PySide6.QtCore import QTimer
-from tests.tests_toolkit import DBTestCase, qsleep, OK_BUTTON
+from tests.tests_toolkit import DBTestCase, qsleep
 
 from languages import LANGUAGES
 from backend.models import Category
@@ -40,7 +40,7 @@ class TestCategory(DBTestCase):
             self.select_correct_tab(category)
 
             def delete_category():
-                QTimer.singleShot(100, lambda: Messages.delete_category_confirmation.button(OK_BUTTON).click())
+                QTimer.singleShot(100, lambda: Messages.delete_category_confirmation.ok_button.click())
                 CategorySettingsWindow.delete_category.click()
 
             QTimer.singleShot(100, delete_category)

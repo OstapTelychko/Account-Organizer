@@ -15,9 +15,6 @@ from GUI.windows.main_window import MainWindow
 from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
 
-
-LEFT_BUTTON = Qt.MouseButton.LeftButton
-OK_BUTTON = QMessageBox.StandardButton.Ok
     
 
 def qsleep(miliseconds:int):

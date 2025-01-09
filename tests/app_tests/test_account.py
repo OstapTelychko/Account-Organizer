@@ -1,6 +1,6 @@
 from PySide6.QtCore import QTimer
 
-from tests.tests_toolkit import DBTestCase, qsleep, OK_BUTTON
+from tests.tests_toolkit import DBTestCase, qsleep
 
 from AppObjects.session import Session
 from AppManagement.account import load_account_data
@@ -83,7 +83,7 @@ class TestAccount(DBTestCase):
 
         def delete_account():
             def confirm_deletion():
-                Messages.delete_account_warning.button(OK_BUTTON).click()
+                Messages.delete_account_warning.ok_button.click()
                 def check_deletion():
                     self.assertFalse(Session.db.account_exists("Second test user"), "Account hasn't been removed")
                     self.assertEqual(Session.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")

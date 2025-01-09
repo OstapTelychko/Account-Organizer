@@ -1,5 +1,5 @@
 from PySide6.QtCore import QTimer
-from tests.tests_toolkit import DBTestCase, qsleep, OK_BUTTON
+from tests.tests_toolkit import DBTestCase, qsleep
 
 from project_configuration import CATEGORY_TYPE
 from AppObjects.session import Session
@@ -58,7 +58,7 @@ class TestTransaction(DBTestCase):
             category.table_data.selectRow(0)
 
             def confirm_deletion():
-                Messages.delete_transaction_confirmation.button(OK_BUTTON).click()
+                Messages.delete_transaction_confirmation.ok_button.click()
 
             QTimer.singleShot(100, confirm_deletion)
             category.delete_transaction.click()
