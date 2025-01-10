@@ -20,7 +20,7 @@ class Session:
         WEEKLY = "weekly"
         DAILY = "daily"
 
-    app_version:tuple = None
+    app_version:str = None
 
     current_month = 4
     current_year = 2023
@@ -73,7 +73,7 @@ class Session:
 
     def load_app_version():
         with open(f"{APP_DIRECTORY}/app version.txt") as file:
-            Session.app_version = tuple(map(int, file.read().strip().split(".")))
+            Session.app_version = file.read().strip()
 
 
     def load_user_config():

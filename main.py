@@ -55,6 +55,7 @@ from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
+from AppManagement.update_app import check_for_updates
 
 from tests.init_tests import test_main
 
@@ -194,6 +195,7 @@ def main():
 
     load_account_balance()
     load_language(Session.language)
+    print(check_for_updates())
 
     MainWindow.window.show()
 

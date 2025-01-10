@@ -39,7 +39,7 @@ def load_backups():
 
 
 def create_backup():
-    app_version = ".".join(map(str, Session.app_version))
+    app_version = Session.app_version
     timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
 
     if Session.test_mode:
@@ -102,7 +102,7 @@ def load_backup():
     row = selected_items[0].row()
     backup = Session.backups[BackupManagementWindow.backups_table.item(row, 2).text()]
 
-    if backup.app_version != ".".join(map(str, Session.app_version)):
+    if backup.app_version != Session.app_version:
         return Messages.different_app_version.exec()
     
     Messages.load_backup_confirmation.setText(LANGUAGES[Session.language]["Messages"][24].replace("timestamp", backup.timestamp))

@@ -40,7 +40,7 @@ def change_language():
     SettingsWindow.account_created_date.setText(Windows["Settings"][1] + str(Session.db.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
     SettingsWindow.backup_management.setText(Windows["Settings"]["Backup management"][0])
     
-    SettingsWindow.app_version.setText(Windows["Settings"][2] + ".".join(map(str, Session.app_version)))
+    SettingsWindow.app_version.setText(Windows["Settings"][2] + Session.app_version)
                                        
     RenameAccountWindow.message.setText(Windows["Settings"]["Account"]["Messages"][1])
     RenameAccountWindow.button.setText(Language["General management"][5])
