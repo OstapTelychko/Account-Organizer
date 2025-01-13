@@ -14,22 +14,25 @@ if APP_DIRECTORY.find("_internal")  == -1:
 else:
     ROOT_DIRECTORY = APP_DIRECTORY.replace("/_internal","")
     
-UPDATE_DIRECTORY = f"{ROOT_DIRECTORY}Temp Update"
-CURRENT_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Temp Current Version"
-GUI_LIBRARY = "PySide6"
-LINUX_UPDATE_ZIP = "linux_update.zip"
-WINDOWS_UPDATE_ZIP = "windows_update.zip"
-
-BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}DB Backups"
-TEST_BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}Test DB Backups"
-MIN_RECOMMENDED_BACKUPS = 2
-MAX_RECOMMENDED_BACKUPS = 15
-
 USER_CONF_PATH = f"{APP_DIRECTORY}/User_configuration.toml"
 DB_PATH = f"sqlite:///{APP_DIRECTORY}Accounts.sqlite"
 DB_FILE_PATH = DB_PATH.replace("sqlite:///","")
 TEST_DB_PATH = f"sqlite:///{APP_DIRECTORY}test_Accounts.sqlite"
 TEST_DB_FILE_PATH = TEST_DB_PATH.replace("sqlite:///","")
+
+UPDATE_DIRECTORY = f"{ROOT_DIRECTORY}Temp Update"
+CURRENT_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Temp Current Version"
+GUI_LIBRARY = "PySide6"
+LINUX_UPDATE_ZIP = "linux_update.zip"
+WINDOWS_UPDATE_ZIP = "windows_update.zip"
+VERSION_FILE_NAME = "app version.txt"
+ALEMBIC_CONFIG_FILE = "alembic.ini"
+MOVE_FILES_TO_UPDATE = (DB_FILE_PATH, USER_CONF_PATH)
+
+BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}DB Backups"
+TEST_BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}Test DB Backups"
+MIN_RECOMMENDED_BACKUPS = 2
+MAX_RECOMMENDED_BACKUPS = 15
 
 CATEGORY_TYPE = {0:"Incomes",1:"Expenses"}
 FORBIDDEN_CALCULATOR_WORDS = ["import","def","for","while","open","del","__","with","exit","raise","print","range","quit","class","try","if","input","object","global","lambda","match"]

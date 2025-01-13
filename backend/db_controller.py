@@ -1,7 +1,7 @@
 import logging
 import os
 from sqlite3 import connect as sql_connect
-from sqlalchemy import create_engine, desc, and_, event, text
+from sqlalchemy import create_engine, desc, and_, event, text, Engine
 from sqlalchemy.orm import sessionmaker
 
 from alembic.config import Config
@@ -20,13 +20,13 @@ class DBController():
         # Init db connection 
         from AppObjects.session import Session
 
-        self.alebic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
-        self.alebic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
-        self.alebic_config.set_main_option("sqlalchemy.url", DB_PATH)
+        self.alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
+        self.alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
+        self.alembic_config.set_main_option("sqlalchemy.url", DB_PATH)
 
         if Session.test_mode:
             self.engine = create_engine(TEST_DB_PATH)
-            self.alebic_config = Session.test_alembic_config
+            self.alembic_config = Session.test_alembic_config
         else:
             self.engine = create_engine(DB_PATH)
 
@@ -37,9 +37,9 @@ class DBController():
             cursor.execute("PRAGMA synchronous=OFF")
             cursor.close()
 
-        if not self.db_up_to_date():
+        if not self.db_up_to_date(self.alembic_config, self.engine):
             print("Upgrading database")
-            command.upgrade(self.alebic_config, "head")
+            command.upgrade(self.alembic_config, "head")
 
         self.session = sessionmaker(bind=self.engine)()
         self.account_id = None
@@ -57,11 +57,11 @@ class DBController():
         self.session = None
 
 
+    @staticmethod
+    def db_up_to_date(alembic_config:Config, engine:Engine) -> bool:
+        directory = ScriptDirectory.from_config(alembic_config)
 
-    def db_up_to_date(self) -> bool:
-        directory = ScriptDirectory.from_config(self.alebic_config)
-
-        with self.engine.begin() as connection:
+        with engine.begin() as connection:
             logging.getLogger("alembic.runtime.migration").setLevel(logging.WARN)
             context = migration.MigrationContext.configure(connection)
             logging.getLogger("alembic.runtime.migration").setLevel(logging.INFO)
@@ -225,5 +225,11 @@ class DBController():
         with sql_connect(db_file_path) as conn:
             conn.execute("PRAGMA VACUUM")
 
+            with sql_connect(backup_file_path) as backup_conn:
+                conn.backup(backup_conn)
+
+
+    def create_backup_based_on_external_db(self, external_db_path:str, backup_file_path:str):
+        with sql_connect(external_db_path) as conn:
             with sql_connect(backup_file_path) as backup_conn:
                 conn.backup(backup_conn)

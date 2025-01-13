@@ -1,10 +1,19 @@
 import requests as req
 import os
 import shutil
+
+from pathlib import Path
 from sys import platform
 from zipfile import ZipFile
+from sqlalchemy import create_engine
 
-from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, GUI_LIBRARY, CURRENT_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY
+from alembic import command
+from alembic.config import Config
+
+from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
+GUI_LIBRARY, CURRENT_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
+MOVE_FILES_TO_UPDATE, BACKUPS_DIRECTORY, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE
+
 from AppObjects.session import Session
 
 
@@ -64,7 +73,7 @@ def download_latest_update():
                     download_url = asset["browser_download_url"]
                     break
         
-        download_response = req.get(download_url, stream=True)
+        download_response = req.get(download_url, stream=True, timeout=15)
         download_response.raise_for_status()
 
         total_size = int(download_response.headers.get("content-length", 0))
@@ -89,6 +98,9 @@ def download_latest_update():
     except req.exceptions.HTTPError as e:
         print(f"HTTP error: {e}")
     
+    except (req.exceptions.ConnectionError, req.exceptions.Timeout):
+        print("Connection error. Check your internet connection.")
+    
     except Exception as e:
         print(f"Unexpected exception: {e}")
 
@@ -96,25 +108,60 @@ def download_latest_update():
 def prepare_update():
     if os.path.exists(CURRENT_VERSION_COPY_DIRECTORY):
         shutil.rmtree(CURRENT_VERSION_COPY_DIRECTORY)
-    # shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), CURRENT_VERSION_COPY_DIRECTORY)
-    shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
     
-    if platform == "win32":
-        shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
-        # shutil.copy2(os.path.join(ROOT_DIRECTORY, "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
+    if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
+        if platform == "win32":
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
+        else:
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main"), CURRENT_VERSION_COPY_DIRECTORY)
+
     else:
-        shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main"), CURRENT_VERSION_COPY_DIRECTORY)
-        # shutil.copy2(os.path.join(ROOT_DIRECTORY, "main"), CURRENT_VERSION_COPY_DIRECTORY)
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
+        if platform == "win32":
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
+        else:
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "main"), CURRENT_VERSION_COPY_DIRECTORY)
     
-    # shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), CURRENT_VERSION_COPY_DIRECTORY)
-    # if not os.path.exists(os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)):
     GUI_LIBRARY_PATH_CURRENT = os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal", GUI_LIBRARY)
-    # GUI_LIBRARY_PATH_CURRENT = os.path.join(CURRENT_VERSION_COPY_DIRECTORY,"dist", "main", "_internal", GUI_LIBRARY)
     GUI_LIBRARY_PATH_UPDATE = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
-    # GUI_LIBRARY_PATH_UPDATE = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
     if not os.path.exists(GUI_LIBRARY_PATH_UPDATE):#GUI library is removed from update to reduce size if it already exists it means GUI library was updated
         shutil.copytree(GUI_LIBRARY_PATH_CURRENT, GUI_LIBRARY_PATH_UPDATE)
+    
+    for file in MOVE_FILES_TO_UPDATE:
+        shutil.copy2(file, os.path.join(UPDATE_DIRECTORY, "_internal"))
+    
+    UPDATE_BACKUPS_DIRECTORY = os.path.join(UPDATE_DIRECTORY, Path(BACKUPS_DIRECTORY).name)
+    shutil.copytree(BACKUPS_DIRECTORY, UPDATE_BACKUPS_DIRECTORY)
+
+    with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as file:
+        update_version = file.read()
+
+    updated_backups_paths = []
+    for backup in Session.backups.values():
+        updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
+        Session.db.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
+        updated_backups_paths.append(updated_backup_file_path)
+    
+    for backup_path in updated_backups_paths:
+        alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
+        alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
+        alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
+
+        engine = create_engine(f"sqlite:///{backup_path}")
+        if not Session.db.db_up_to_date(alembic_config, engine):
+            command.upgrade(alembic_config, "head")
+        else:
+            print("Database is up to date.")
+
+
+
         
+        
+
+# def apply_update():
+
+
 
 
 def check_for_updates():
