@@ -6,7 +6,6 @@ APP_PORT = 6957
 
 REPOSITORY = "Account-Organizer"
 REPOSITORY_OWNER = "OstapTelychko"
-VERSION_FILE_NAME = "app version.txt"
 LATEST_RELEASE_URL = f"https://api.github.com/repos/{REPOSITORY_OWNER}/{REPOSITORY}/releases/latest"
 
 APP_DIRECTORY = __file__.replace("\\","/").replace(Path(__file__).name,"")#The first replace change windows \ to / second replace remove name of file to get path to directory
@@ -15,6 +14,12 @@ if APP_DIRECTORY.find("_internal")  == -1:
 else:
     ROOT_DIRECTORY = APP_DIRECTORY.replace("/_internal","")
     
+UPDATE_DIRECTORY = f"{ROOT_DIRECTORY}Temp Update"
+CURRENT_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Temp Current Version"
+GUI_LIBRARY = "PySide6"
+LINUX_UPDATE_ZIP = "linux_update.zip"
+WINDOWS_UPDATE_ZIP = "windows_update.zip"
+
 BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}DB Backups"
 TEST_BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}Test DB Backups"
 MIN_RECOMMENDED_BACKUPS = 2
