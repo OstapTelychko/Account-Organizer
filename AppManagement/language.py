@@ -130,9 +130,13 @@ def change_language():
         AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][6])
         BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][6])
 
-    else:
+    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY:
         AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][7])
         BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][7])
+    
+    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+        AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][20])
+        BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][20])
     AutoBackupWindow.monthly.setText(Windows["Settings"]["Backup management"][9])
     AutoBackupWindow.weekly.setText(Windows["Settings"]["Backup management"][10])
     AutoBackupWindow.daily.setText(Windows["Settings"]["Backup management"][11])
@@ -141,6 +145,7 @@ def change_language():
     AutoBackupWindow.max_backups.setPlaceholderText(Windows["Settings"]["Backup management"][14])
     AutoBackupWindow.max_legacy_backups_label.setText(Windows["Settings"]["Backup management"][17].replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+Windows["Settings"]["Backup management"][18]))
     AutoBackupWindow.max_legacy_backups.setPlaceholderText(Windows["Settings"]["Backup management"][19])
+    AutoBackupWindow.no_auto_removal.setText(Windows["Settings"]["Backup management"][16])
     AutoBackupWindow.save.setText(Language["General management"][6])
 
 

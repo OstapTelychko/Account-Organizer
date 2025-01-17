@@ -160,9 +160,11 @@ def main():
     #Load backups if they exists
     load_backups()
 
-    if not Session.test_mode:
+    if not Session.test_mode or not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
         auto_backup()
-    auto_remove_backups()
+    
+    if Session.auto_backup_removal_enabled:
+        auto_remove_backups()
 
     #Backup management
     BackupManagementWindow.create_backup.clicked.connect(create_backup)
@@ -173,6 +175,7 @@ def main():
     AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.monthly))
     AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.weekly))
     AutoBackupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.daily))
+    AutoBackupWindow.no_auto_backup.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.no_auto_backup))
     AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
     #Load categories if they exists

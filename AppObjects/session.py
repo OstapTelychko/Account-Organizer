@@ -20,6 +20,7 @@ class Session:
         WEEKLY = "weekly"
         DAILY = "daily"
         NO_AUTO_BACKUP = "no auto backup"
+    
 
     app_version:str = None
 
@@ -41,6 +42,7 @@ class Session:
     db:DBController = None
     backups:dict[int, Backup] = {}
     auto_backup_status:AutoBackupStatus = AutoBackupStatus.MONTHLY
+    auto_backup_removal_enabled:bool = True
     max_backups = MAX_RECOMMENDED_BACKUPS
     max_legacy_backups = MAX_RECOMMENDED_LEGACY_BACKUPS
 
@@ -66,6 +68,7 @@ class Session:
             Session.create_user_config()
 
         Session.load_user_config()
+        print(Session.auto_backup_status)
         if Session.test_mode:
             os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
         else:
@@ -88,6 +91,7 @@ class Session:
             Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
             Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
             Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
+            Session.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", True)
 
 
     def create_user_config():
@@ -97,7 +101,8 @@ class Session:
             "Account_name":"",
             "Auto_backup_status":Session.AutoBackupStatus.MONTHLY,
             "Max_backups":MAX_RECOMMENDED_BACKUPS,
-            "Max_legacy_backups":MAX_RECOMMENDED_LEGACY_BACKUPS
+            "Max_legacy_backups":MAX_RECOMMENDED_LEGACY_BACKUPS,
+            "Auto_backup_removal_enabled":True
         }
 
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
@@ -112,7 +117,8 @@ class Session:
                 "Account_name":Session.account_name,
                 "Auto_backup_status":Session.auto_backup_status,
                 "Max_backups":Session.max_backups,
-                "Max_legacy_backups":Session.max_legacy_backups
+                "Max_legacy_backups":Session.max_legacy_backups,
+                "Auto_backup_removal_enabled":Session.auto_backup_removal_enabled
             }, file)
     
 

@@ -43,3 +43,7 @@ class Messages():
 
     load_backup_confirmation = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Question, APP_NAME, APP_ICON)
     above_recommended_max_backups = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
+    no_auto_backup = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
+
+    no_auto_removal = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
+    auto_removal_disabled = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)

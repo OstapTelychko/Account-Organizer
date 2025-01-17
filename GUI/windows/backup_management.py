@@ -140,12 +140,18 @@ class AutoBackupWindow():
     max_legacy_backups_label.setFont(BASIC_FONT)
     max_legacy_backups_label.setProperty("class", "light-text")
 
+    no_auto_removal = QCheckBox("No auto removal")
+    no_auto_removal.setFont(BASIC_FONT)
+    no_auto_removal.setProperty("class", "light-text")
+
     max_backups_layout = QVBoxLayout()
     max_backups_layout.setContentsMargins(10, 0, 10, 10)
     max_backups_layout.addWidget(max_backups_label, alignment=ALIGN_H_CENTER)
     max_backups_layout.addWidget(max_backups, alignment=ALIGN_H_CENTER)
     max_backups_layout.addWidget(max_legacy_backups_label, alignment=ALIGN_H_CENTER)
     max_backups_layout.addWidget(max_legacy_backups, alignment=ALIGN_H_CENTER)
+    max_backups_layout.addSpacing(30)
+    max_backups_layout.addWidget(no_auto_removal, alignment=ALIGN_H_CENTER)
 
     max_backups_wrapper = QWidget()
     max_backups_wrapper.setProperty("class", "wrapper")

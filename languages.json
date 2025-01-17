@@ -88,7 +88,8 @@
                     "16": "No auto removal (unrecommended)",
                     "17": "Max legacy backups (backups not supported by the current app version): max_legacy_backups",
                     "18": "This number corresponds to the amount of legacy databases that will be saved to ensure restoration if the current version corrupts the database.",
-                    "19": "Max legacy backups"
+                    "19": "Max legacy backups",
+                    "20": "Auto backup is off"
                 },
 
                 "Account":{
@@ -175,7 +176,10 @@
             "22": "Are you sure you want to delete database? This action is irreversible",
             "23": "Different app versions detected. Downgrade the app to target version",
             "24": "Are you sure you want to load this timestamp backup?",
-            "25": "Amount of databases will be higher than recommended. Continue?"
+            "25": "Amount of databases will be higher than recommended. Continue?",
+            "26": "Are you sure you want to disable auto backup? You won’t be able to restore your data if, for example, you accidentally delete a category or an account.",
+            "27": "Are you sure you want to disable auto removal? If auto backup is enabled, the number of backups will grow, consuming disk space and increasing the app’s loading time.",
+            "28": "Auto backup removal is disabled, so you can't edit max backups or max legacy backups."
         }
             
     },
@@ -270,7 +274,8 @@
                     "16": "Без автоматичного видалення (нерекомендовано)",
                     "17": "Максимальна кількість застарілих резервних копій (резервні копії, які не підтримуються поточною версією додатку): max_legacy_backups",
                     "18": "Це число відповідає за кількість застарілих баз даних, які будуть збережені для забезпечення відновлення, якщо поточна версія пошкодить базу даних.",
-                    "19": "Макс кількість застарілих баз"
+                    "19": "Макс кількість застарілих баз",
+                    "20": "авто створення вимкнено"
                 },
 
                 "Account":{
@@ -357,7 +362,10 @@
             "22": "Ви впевнені, що хочете видалити базу даних? Ця дія є незворотньою",
             "23": "Виявлено різні версії додатку. Понизьте версію додатку до цільової версії",
             "24": "Ви впевнені, що хочете завантажити цю резервну копію timestamp?",
-            "25": "Кількість баз даних буде більшою від рекомендованої кількості. Продовжити?"
+            "25": "Кількість баз даних буде більшою від рекомендованої кількості. Продовжити?",
+            "26": "Ви впевнені, що хочете вимкнути автоматичне створення резервних копій? Ви не зможете відновити свої дані, якщо, наприклад, ви випадково видалите категорію або акаунт.",
+            "27": "Ви впевнені, що хочете вимкнути автоматичне видалення? Якщо автоматичне створення резервних копій увімкнено, кількість резервних копій зростатиме, витрачаючи місце на диску та збільшуючи час завантаження додатка.",
+            "28": "Автоматичне видалення резервних копій вимкнено, тому ви не можете редагувати максимальну кількість резервних копій або максимальну кількість застарілих баз даних."
         }
     },
     
@@ -451,7 +459,8 @@
                     "16": "Brak automatycznego usuwania (niezalecane)",
                     "17": "Aktualna maksymalna liczba zastarzałych kopii zapasowych (kopie zapasowe nieobsługiwane przez aktualną wersję aplikacji): max_legacy_backups" ,
                     "18": "Ta liczba odpowiada ilości zastarzałych baz danych, które zostaną zapisane, aby zapewnić przywrócenie, jeśli obecna wersja uszkodzi bazę danych.",
-                    "19": "Maks liczba zastarzałych baz"
+                    "19": "Maks liczba zastarzałych baz",
+                    "20": "Auto kopiowanie wyłączone"
                 },
 
                 "Account":{
@@ -538,7 +547,10 @@
             "22": "Czy na pewno chcecie usunąć bazę danych? Ta czynność jest nieodwracalna",
             "23": "Wykryto różne wersje aplikacji. Zmniejsz wersję aplikacji do docelowej wersji",
             "24": "Czy na pewno chcecie załadować tę kopię zapasową z timestamp?",
-            "25": "Ilość baz danych będzie większa niż zalecana. Kontynuować?"
+            "25": "Ilość baz danych będzie większa niż zalecana. Kontynuować?",
+            "26": "Czy na pewno chcecie wyłączyć automatyczne kopiowanie zapasowe? Nie będziecie mogli przywrócić swoich danych, jeśli na przykład przypadkowo usuniecie kategorię lub konto.",
+            "27": "Czy na pewno chcecie wyłączyć automatyczne usuwanie? Jeśli automatyczne kopiowanie zapasowe jest włączone, liczba kopii zapasowych będzie rosła, zużywając miejsce na dysku i zwiększając czas ładowania aplikacji.",
+            "28": "Automatyczne usuwanie baz danych jest wyłączone, więc nie możesz edytować maksymalnej liczby kopii zapasowych ani maksymalnej liczby zastarzałych kopii zapasowych."
         }
     }
 }

@@ -6,7 +6,7 @@ from PySide6.QtCore import QTimer, Qt
 
 from languages import LANGUAGES
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
-from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH
+from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
 from backend.db_controller import DBController
 from AppManagement.account import load_account_data
 
@@ -169,8 +169,14 @@ def open_auto_backup_window():
     elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY:
         AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Checked)
 
-    else:
+    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY:
         AutoBackupWindow.daily.setCheckState(Qt.CheckState.Checked)
+    
+    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+        AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Checked)
+    
+    if not Session.auto_backup_removal_enabled:
+        AutoBackupWindow.no_auto_removal.setCheckState(Qt.CheckState.Checked)
 
     AutoBackupWindow.window.exec()
 
@@ -180,14 +186,24 @@ def prevent_same_auto_backup_status(status_checkbox: QCheckBox, state: int):
         if status_checkbox is AutoBackupWindow.monthly:
             AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
             AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
 
         elif status_checkbox is AutoBackupWindow.weekly:
             AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
             AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
 
-        else:
+        elif status_checkbox is AutoBackupWindow.daily:
             AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
             AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
+        
+        elif status_checkbox is AutoBackupWindow.no_auto_backup:
+            AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+            AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+
+
 
 
 def save_auto_backup_settings():
@@ -199,6 +215,12 @@ def save_auto_backup_settings():
 
     elif AutoBackupWindow.daily.isChecked():
         Session.auto_backup_status = Session.AutoBackupStatus.DAILY
+    
+    elif AutoBackupWindow.no_auto_backup.isChecked():
+        Messages.no_auto_backup.exec()
+        if Messages.no_auto_backup.clickedButton() != Messages.no_auto_backup.ok_button:
+            return
+        Session.auto_backup_status = Session.AutoBackupStatus.NO_AUTO_BACKUP
 
     Backup_management = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"]
     if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY:
@@ -209,32 +231,66 @@ def save_auto_backup_settings():
         AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[6])
         BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[6])
 
-    else:
+    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY:
         AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[7])
         BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[7])
+    
+    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[20])
+        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[20])
+
+    if AutoBackupWindow.no_auto_removal.isChecked():
+        if Session.auto_backup_removal_enabled:
+            Messages.no_auto_removal.exec()
+            if Messages.no_auto_removal.clickedButton() == Messages.no_auto_removal.ok_button:
+                Session.auto_backup_removal_enabled = False
+    else:
+        Session.auto_backup_removal_enabled = True
 
     new_max_backups = AutoBackupWindow.max_backups.text()
     if new_max_backups:
-        new_max_backups = int(new_max_backups)
+        if Session.auto_backup_removal_enabled:
+            new_max_backups = int(new_max_backups)
 
-        if new_max_backups < MIN_RECOMMENDED_BACKUPS:
-            Messages.below_recommended_min_backups.exec()
-
-            if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
-                return
-        
-        elif new_max_backups > MAX_RECOMMENDED_BACKUPS:
-            Messages.above_recommended_max_backups.exec()
-
-            if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
-                return
-        
-        Session.max_backups = new_max_backups
-        Windows = LANGUAGES[Session.language]["Windows"]
-        AutoBackupWindow.max_backups_label.setText(Windows["Settings"]["Backup management"][12].replace("max_backups", str(Session.max_backups)+"\n"+Windows["Settings"]["Backup management"][13]))
-
+            if new_max_backups < MIN_RECOMMENDED_BACKUPS:
+                Messages.below_recommended_min_backups.exec()
+                if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
+                    return
             
-    auto_backup()
+            elif new_max_backups > MAX_RECOMMENDED_BACKUPS:
+                Messages.above_recommended_max_backups.exec()
+                if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
+                    return
+            
+            Session.max_backups = new_max_backups
+            Windows = LANGUAGES[Session.language]["Windows"]
+            AutoBackupWindow.max_backups_label.setText(Windows["Settings"]["Backup management"][12].replace("max_backups", str(Session.max_backups)+"\n"+Windows["Settings"]["Backup management"][13]))
+        else:
+            Messages.auto_removal_disabled.exec()
+
+    new_max_legacy_backups = AutoBackupWindow.max_legacy_backups.text()
+    if new_max_legacy_backups:
+        if Session.auto_backup_removal_enabled:
+            new_max_legacy_backups = int(new_max_legacy_backups)
+
+            if new_max_legacy_backups < MIN_RECOMMENDED_LEGACY_BACKUPS:
+                Messages.below_recommended_min_backups.exec()
+                if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
+                    return
+            
+            elif new_max_legacy_backups > MAX_RECOMMENDED_LEGACY_BACKUPS:
+                Messages.above_recommended_max_backups.exec()
+                if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
+                    return
+            
+            Session.max_legacy_backups = new_max_legacy_backups
+            Windows = LANGUAGES[Session.language]["Windows"]
+            AutoBackupWindow.max_legacy_backups_label.setText(Windows["Settings"]["Backup management"][14].replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+Windows["Settings"]["Backup management"][15]))
+        else:
+            Messages.auto_removal_disabled.exec()
+
+    if Session.auto_backup_status != Session.AutoBackupStatus.NO_AUTO_BACKUP:
+        auto_backup()
     Session.update_user_config()
     AutoBackupWindow.window.done(0)
 
