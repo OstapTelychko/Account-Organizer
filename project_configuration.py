@@ -33,6 +33,8 @@ BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}DB Backups"
 TEST_BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}Test DB Backups"
 MIN_RECOMMENDED_BACKUPS = 2
 MAX_RECOMMENDED_BACKUPS = 15
+MIN_RECOMMENDED_LEGACY_BACKUPS = 2
+MAX_RECOMMENDED_LEGACY_BACKUPS = 5
 
 CATEGORY_TYPE = {0:"Incomes",1:"Expenses"}
 FORBIDDEN_CALCULATOR_WORDS = ["import","def","for","while","open","del","__","with","exit","raise","print","range","quit","class","try","if","input","object","global","lambda","match"]

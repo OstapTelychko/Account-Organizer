@@ -132,7 +132,7 @@ def prepare_update():
         shutil.copy2(file, os.path.join(UPDATE_DIRECTORY, "_internal"))
     
     UPDATE_BACKUPS_DIRECTORY = os.path.join(UPDATE_DIRECTORY, Path(BACKUPS_DIRECTORY).name)
-    shutil.copytree(BACKUPS_DIRECTORY, UPDATE_BACKUPS_DIRECTORY)
+    os.makedirs(UPDATE_BACKUPS_DIRECTORY)
 
     with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as file:
         update_version = file.read()
@@ -151,14 +151,8 @@ def prepare_update():
         engine = create_engine(f"sqlite:///{backup_path}")
         if not Session.db.db_up_to_date(alembic_config, engine):
             command.upgrade(alembic_config, "head")
-        else:
-            print("Database is up to date.")
-
-
-
         
         
-
 # def apply_update():
 
 

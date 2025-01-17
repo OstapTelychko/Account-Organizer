@@ -7,7 +7,7 @@ from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.table_widget import CustomTableWidget
 
 from GUI.windows.main_window import MainWindow
-from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENTS, ALIGNMENT
+from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENTS, ALIGNMENT, ALIGN_V_CENTER
 
 
 
@@ -99,15 +99,24 @@ class AutoBackupWindow():
     daily.setFont(BASIC_FONT)
     daily.setProperty("class", "light-text")
 
+    no_auto_backup = QCheckBox("No auto backup")
+    no_auto_backup.setFont(BASIC_FONT)
+    no_auto_backup.setProperty("class", "light-text")
+    
     backup_status_layout = QVBoxLayout()
     backup_status_layout.addWidget(monthly)
     backup_status_layout.addWidget(weekly)
     backup_status_layout.addWidget(daily)
+    backup_status_layout.addWidget(no_auto_backup)
     
     auto_backup_status_wrapper = QWidget()
     auto_backup_status_wrapper.setProperty("class", "wrapper")
     auto_backup_status_wrapper.setLayout(backup_status_layout)
     auto_backup_status_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(auto_backup_status_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
+    status_and_auto_backup_layout = QVBoxLayout()
+    status_and_auto_backup_layout.addWidget(status_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER, stretch=10)
+    status_and_auto_backup_layout.addWidget(auto_backup_status_wrapper, alignment=ALIGNMENT.AlignTop, stretch=90)
 
     max_backups = QLineEdit()
     max_backups.setMinimumWidth(220)
@@ -120,15 +129,32 @@ class AutoBackupWindow():
     max_backups_label.setFont(BASIC_FONT)
     max_backups_label.setProperty("class", "light-text")
 
+    max_legacy_backups = QLineEdit()
+    max_legacy_backups.setMinimumWidth(250)
+    max_legacy_backups_validator = QRegularExpressionValidator(QRegularExpression("^(?:[1-9]|[1-9]\\d|100)$"))
+    max_legacy_backups.setValidator(max_legacy_backups_validator)
+
+    max_legacy_backups_label = QLabel("Max legacy backups")
+    max_legacy_backups_label.setMinimumSize(450, 150)
+    max_legacy_backups_label.setWordWrap(True)
+    max_legacy_backups_label.setFont(BASIC_FONT)
+    max_legacy_backups_label.setProperty("class", "light-text")
+
     max_backups_layout = QVBoxLayout()
     max_backups_layout.setContentsMargins(10, 0, 10, 10)
     max_backups_layout.addWidget(max_backups_label, alignment=ALIGN_H_CENTER)
     max_backups_layout.addWidget(max_backups, alignment=ALIGN_H_CENTER)
+    max_backups_layout.addWidget(max_legacy_backups_label, alignment=ALIGN_H_CENTER)
+    max_backups_layout.addWidget(max_legacy_backups, alignment=ALIGN_H_CENTER)
 
     max_backups_wrapper = QWidget()
     max_backups_wrapper.setProperty("class", "wrapper")
     max_backups_wrapper.setLayout(max_backups_layout)
     max_backups_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(max_backups_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
+    status_and_max_backup_layout = QHBoxLayout()
+    status_and_max_backup_layout.addLayout(status_and_auto_backup_layout)
+    status_and_max_backup_layout.addWidget(max_backups_wrapper)
 
     save = create_button("Save", (100, 40))
     save.setFont(BASIC_FONT)
@@ -136,9 +162,7 @@ class AutoBackupWindow():
     main_layout = QVBoxLayout()
     main_layout.addLayout(window.window_menu_layout)
     main_layout.setSpacing(25)
-    main_layout.addWidget(status_wrapper, alignment=ALIGN_H_CENTER)
-    main_layout.addWidget(auto_backup_status_wrapper, alignment=ALIGN_H_CENTER)
-    main_layout.addWidget(max_backups_wrapper, alignment=ALIGN_H_CENTER)
+    main_layout.addLayout(status_and_max_backup_layout)
     main_layout.addWidget(save, alignment=ALIGN_H_CENTER)
     main_layout.setContentsMargins(20, 10, 20, 20)
 

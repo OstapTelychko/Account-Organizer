@@ -83,7 +83,12 @@
                     "11": "Daily backup (high disk space)",
                     "12": "Current maximum number of backups: max_backups",
                     "13": "This number corresponds to the number of databases that will be saved on disk. Databases will be deleted from oldest to newest when the program starts",
-                    "14": "Max number of backups"
+                    "14": "Max number of backups",
+                    "15": "No auto backup (Strongly discouraged)",
+                    "16": "No auto removal (unrecommended)",
+                    "17": "Max legacy backups (backups not supported by the current app version): max_legacy_backups",
+                    "18": "This number corresponds to the amount of legacy databases that will be saved to ensure restoration if the current version corrupts the database.",
+                    "19": "Max legacy backups"
                 },
 
                 "Account":{
@@ -260,7 +265,12 @@
                     "11": "Щоденне створення резервної копії (високе використання диска)",
                     "12": "Поточна максимальна кількість резервних копій: max_backups",
                     "13": "Дане число відповідає за кількість баз даних, які будуть збережені на диску. Бази даних будуть видалятися від найдавніших до новіших при запуску програми",
-                    "14": "Mакс кількість баз даних"
+                    "14": "Mакс кількість баз даних",
+                    "15": "Без автоматичного створення (наполегливо не рекомендується)",
+                    "16": "Без автоматичного видалення (нерекомендовано)",
+                    "17": "Максимальна кількість застарілих резервних копій (резервні копії, які не підтримуються поточною версією додатку): max_legacy_backups",
+                    "18": "Це число відповідає за кількість застарілих баз даних, які будуть збережені для забезпечення відновлення, якщо поточна версія пошкодить базу даних.",
+                    "19": "Макс кількість застарілих баз"
                 },
 
                 "Account":{
@@ -436,7 +446,12 @@
                     "11": "Dzienne kopiowanie zapasowe (wysokie użycie dysku) ",
                     "12": "Aktualna maksymalna liczba kopii zapasowych: max_backups",
                     "13": "Ta liczba odpowiada liczbie baz danych, które zostaną zapisane na dysku. Bazy danych zostaną usunięte od najstarszej do najnowszej, przy uruchomieniu aplikacji",
-                    "14": "Maks liczba baz danych"
+                    "14": "Maks liczba baz danych",
+                    "15": "Brak automatycznego kopiowania (zdecydowanie odradzane)",
+                    "16": "Brak automatycznego usuwania (niezalecane)",
+                    "17": "Aktualna maksymalna liczba zastarzałych kopii zapasowych (kopie zapasowe nieobsługiwane przez aktualną wersję aplikacji): max_legacy_backups" ,
+                    "18": "Ta liczba odpowiada ilości zastarzałych baz danych, które zostaną zapisane, aby zapewnić przywrócenie, jeśli obecna wersja uszkodzi bazę danych.",
+                    "19": "Maks liczba zastarzałych baz"
                 },
 
                 "Account":{

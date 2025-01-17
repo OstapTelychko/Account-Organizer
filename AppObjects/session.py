@@ -4,7 +4,7 @@ from sys import exit
 from datetime import datetime
 from alembic.config import Config
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -19,6 +19,7 @@ class Session:
         MONTHLY = "monthly"
         WEEKLY = "weekly"
         DAILY = "daily"
+        NO_AUTO_BACKUP = "no auto backup"
 
     app_version:str = None
 
@@ -41,6 +42,7 @@ class Session:
     backups:dict[int, Backup] = {}
     auto_backup_status:AutoBackupStatus = AutoBackupStatus.MONTHLY
     max_backups = MAX_RECOMMENDED_BACKUPS
+    max_legacy_backups = MAX_RECOMMENDED_LEGACY_BACKUPS
 
     instance_guard:SingleInstanceGuard = None
     test_mode = False
@@ -80,11 +82,12 @@ class Session:
         with open(USER_CONF_PATH) as file:
             User_conf = toml.load(USER_CONF_PATH)
 
-            Session.language = User_conf["Language"]
-            Session.theme = User_conf["Theme"]
-            Session.account_name = User_conf["Account_name"]
-            Session.auto_backup_status = User_conf["Auto_backup_status"]
-            Session.max_backups = User_conf["Max_backups"]
+            Session.theme = User_conf.get("Theme", "Dark")
+            Session.language = User_conf.get("Language", "English")
+            Session.account_name = User_conf.get("Account_name", "")
+            Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+            Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
+            Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
 
 
     def create_user_config():
@@ -93,7 +96,8 @@ class Session:
             "Language":"English",
             "Account_name":"",
             "Auto_backup_status":Session.AutoBackupStatus.MONTHLY,
-            "Max_backups":MAX_RECOMMENDED_BACKUPS
+            "Max_backups":MAX_RECOMMENDED_BACKUPS,
+            "Max_legacy_backups":MAX_RECOMMENDED_LEGACY_BACKUPS
         }
 
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
@@ -107,7 +111,8 @@ class Session:
                 "Language":Session.language,
                 "Account_name":Session.account_name,
                 "Auto_backup_status":Session.auto_backup_status,
-                "Max_backups":Session.max_backups
+                "Max_backups":Session.max_backups,
+                "Max_legacy_backups":Session.max_legacy_backups
             }, file)
     
 
