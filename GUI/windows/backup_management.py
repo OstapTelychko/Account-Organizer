@@ -164,6 +164,7 @@ class AutoBackupWindow():
 
     save = create_button("Save", (100, 40))
     save.setFont(BASIC_FONT)
+    save.setDefault(True)
 
     main_layout = QVBoxLayout()
     main_layout.addLayout(window.window_menu_layout)

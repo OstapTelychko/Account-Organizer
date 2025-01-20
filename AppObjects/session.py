@@ -68,7 +68,6 @@ class Session:
             Session.create_user_config()
 
         Session.load_user_config()
-        print(Session.auto_backup_status)
         if Session.test_mode:
             os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
         else:

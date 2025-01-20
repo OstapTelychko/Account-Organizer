@@ -23,8 +23,9 @@ def load_backups():
     BackupManagementWindow.backups_table.setRowCount(0)
     BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
     
-    backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"), reverse=True)
-    for row, (backup_id, backup) in enumerate(backups):
+    backups_sorted_by_date = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"), reverse=True)
+    backups_sorted_by_app_version = sorted(backups_sorted_by_date, key=lambda backup: (*map(int, backup[1].app_version.split(".")),), reverse=True)
+    for row, (backup_id, backup) in enumerate(backups_sorted_by_app_version):
         data = CustomTableWidgetItem(backup.timestamp)
         data.setFlags(~ Qt.ItemFlag.ItemIsEditable)
         data.setTextAlignment(ALIGNMENT.AlignCenter)
@@ -285,7 +286,7 @@ def save_auto_backup_settings():
             
             Session.max_legacy_backups = new_max_legacy_backups
             Windows = LANGUAGES[Session.language]["Windows"]
-            AutoBackupWindow.max_legacy_backups_label.setText(Windows["Settings"]["Backup management"][14].replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+Windows["Settings"]["Backup management"][15]))
+            AutoBackupWindow.max_legacy_backups_label.setText(Windows["Settings"]["Backup management"][17].replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+Windows["Settings"]["Backup management"][18]))
         else:
             Messages.auto_removal_disabled.exec()
 
@@ -296,14 +297,43 @@ def save_auto_backup_settings():
 
 
 def auto_remove_backups():
-    backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"))
+    sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"))
+    backups = [backup for backup in sorted_backups if backup[1].app_version == Session.app_version]
+    legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != Session.app_version]
 
-    while len(backups) > Session.max_backups:
-        backup_id, backup = backups.pop(0)
+    if len(backups) != 0:
+        for row in range(BackupManagementWindow.backups_table.rowCount()):
+            backup_id = BackupManagementWindow.backups_table.item(row, 2).text()
+            if backup_id == backups[0][0]:
+                supported_backups_row = row
+
+        while len(backups) > Session.max_backups:
+            backup_id, backup = backups.pop(0)
+            
+            os.remove(backup.db_file_path)
+            del Session.backups[backup_id]
+
+            BackupManagementWindow.backups_table.removeRow(supported_backups_row)
+            columns = BackupManagementWindow.backups_table.verticalHeader()
+            columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+            supported_backups_row -= 1
+    
+
+    if len(legacy_backups) == 0:
+        return
+    
+    for row in range(BackupManagementWindow.backups_table.rowCount()):
+        backup_id = BackupManagementWindow.backups_table.item(row, 2).text()
+        if backup_id == legacy_backups[0][0]:
+            legacy_backups_row = row
+
+    while len(legacy_backups) > Session.max_legacy_backups:
+        backup_id, backup = legacy_backups.pop(0)
         
         os.remove(backup.db_file_path)
         del Session.backups[backup_id]
 
-        BackupManagementWindow.backups_table.removeRow(BackupManagementWindow.backups_table.rowCount()-1)
+        BackupManagementWindow.backups_table.removeRow(legacy_backups_row)
         columns = BackupManagementWindow.backups_table.verticalHeader()
         columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        legacy_backups_row -= 1
