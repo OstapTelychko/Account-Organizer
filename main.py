@@ -198,7 +198,7 @@ def main():
 
     load_account_balance()
     load_language(Session.language)
-    # print(check_for_updates())
+    print(check_for_updates())
 
     MainWindow.window.show()
 

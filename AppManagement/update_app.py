@@ -1,6 +1,7 @@
 import requests as req
 import os
 import shutil
+import concurrent.futures
 
 from pathlib import Path
 from sys import platform
@@ -15,6 +16,7 @@ GUI_LIBRARY, CURRENT_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
 MOVE_FILES_TO_UPDATE, BACKUPS_DIRECTORY, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE
 
 from AppObjects.session import Session
+from AppObjects.backup import Backup
 
 
 
@@ -137,13 +139,16 @@ def prepare_update():
     with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as file:
         update_version = file.read()
 
-    updated_backups_paths = []
-    for backup in Session.backups.values():
+    def _create_single_backup(backup:Backup):
         updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
         Session.db.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
-        updated_backups_paths.append(updated_backup_file_path)
+        return updated_backup_file_path
     
-    for backup_path in updated_backups_paths:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = {executor.submit(_create_single_backup, backup): backup for backup in Session.backups.values()}
+        updated_backups_paths = [future.result() for future in futures]
+
+    def _migrate_single_backup(backup_path:str):
         alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
         alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
         alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
@@ -151,6 +156,11 @@ def prepare_update():
         engine = create_engine(f"sqlite:///{backup_path}")
         if not Session.db.db_up_to_date(alembic_config, engine):
             command.upgrade(alembic_config, "head")
+    
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = {executor.submit(_migrate_single_backup, backup_path): backup_path for backup_path in updated_backups_paths}
+        for future in futures:
+            future.result()
         
         
 # def apply_update():
