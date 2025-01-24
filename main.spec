@@ -10,7 +10,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['PyQt5', 'PyQt6', 'PySide6.support', 'pyparsing', 'numpy', 'pycparser', 'mysql', 'ctypes', 'MySQLdb', 'xml', 'multiprocessing', 'lzma', 'http', 'greenlet', 'fractions', 'hmac', 'getopt', 'bz2', 'zoneinfo', 'tracemalloc'],
+    excludes=['PyQt5', 'PyQt6', 'PySide6.support', 'pyparsing', 'numpy', 'pycparser', 'mysql', 'ctypes', 'MySQLdb', 'xml', 'multiprocessing', 'lzma', 'greenlet', 'fractions', 'getopt', 'bz2', 'zoneinfo', 'tracemalloc'],
     noarchive=False,
     optimize=0,
 )

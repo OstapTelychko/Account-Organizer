@@ -3,7 +3,6 @@ import os
 import shutil
 import concurrent.futures
 
-from pathlib import Path
 from sys import platform
 from zipfile import ZipFile
 from sqlalchemy import create_engine
@@ -13,7 +12,7 @@ from alembic.config import Config
 
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
 GUI_LIBRARY, CURRENT_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
-MOVE_FILES_TO_UPDATE, BACKUPS_DIRECTORY, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE
+MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
 
 from AppObjects.session import Session
 from AppObjects.backup import Backup
@@ -113,6 +112,7 @@ def prepare_update():
     
     if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
         shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         if platform == "win32":
             shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
         else:
@@ -120,6 +120,7 @@ def prepare_update():
 
     else:
         shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         if platform == "win32":
             shutil.copy2(os.path.join(ROOT_DIRECTORY, "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
         else:
@@ -127,14 +128,17 @@ def prepare_update():
     
     GUI_LIBRARY_PATH_CURRENT = os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal", GUI_LIBRARY)
     GUI_LIBRARY_PATH_UPDATE = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
-    if not os.path.exists(GUI_LIBRARY_PATH_UPDATE):#GUI library is removed from update to reduce size if it already exists it means GUI library was updated
+    if not os.path.exists(GUI_LIBRARY_PATH_UPDATE):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
         shutil.copytree(GUI_LIBRARY_PATH_CURRENT, GUI_LIBRARY_PATH_UPDATE)
     
     for file in MOVE_FILES_TO_UPDATE:
         shutil.copy2(file, os.path.join(UPDATE_DIRECTORY, "_internal"))
     
-    UPDATE_BACKUPS_DIRECTORY = os.path.join(UPDATE_DIRECTORY, Path(BACKUPS_DIRECTORY).name)
+    UPDATE_BACKUPS_DIRECTORY = os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME)
     os.makedirs(UPDATE_BACKUPS_DIRECTORY)
+
+    if platform == "linux":
+        os.chmod(os.path.join(UPDATE_DIRECTORY, "main"), 0o755)#The octal value 0o755 sets these file permissions: • Owner: Read/write/execute • Group: Read/execute • Others: Read/execute
 
     with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as file:
         update_version = file.read()
@@ -161,9 +165,36 @@ def prepare_update():
         futures = {executor.submit(_migrate_single_backup, backup_path): backup_path for backup_path in updated_backups_paths}
         for future in futures:
             future.result()
+    
+    for backup in Session.backups.values():
+        shutil.move(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
         
         
-# def apply_update():
+def apply_update():
+    if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
+        shutil.rmtree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"))
+        shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), os.path.join(ROOT_DIRECTORY, "dist", "main"))
+
+        shutil.rmtree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME))
+        shutil.move(os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(ROOT_DIRECTORY, "dist", "main"))
+
+        if platform == "win32":
+            shutil.move(os.path.join(UPDATE_DIRECTORY, "main.exe"), os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"))
+        else:
+            shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "dist", "main", "main"))
+
+    else:
+        shutil.rmtree(os.path.join(ROOT_DIRECTORY, "_internal"))
+        shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), ROOT_DIRECTORY)
+
+        shutil.rmtree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+        shutil.move(os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME), ROOT_DIRECTORY)
+
+        if platform == "win32":
+            shutil.move(os.path.join(UPDATE_DIRECTORY, "main.exe"), os.path.join(ROOT_DIRECTORY, "main.exe"))
+        else:
+            shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "main"))
+
 
 
 
@@ -175,6 +206,7 @@ def check_for_updates():
         if latest_version != Session.app_version:
             download_latest_update()
             prepare_update()
+            apply_update()
             return f"Update available: {latest_version}"
         else:
             return "No updates available."
