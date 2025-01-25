@@ -11,7 +11,7 @@ from alembic import command
 from alembic.config import Config
 
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
-GUI_LIBRARY, CURRENT_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
+GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
 MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
 
 from AppObjects.session import Session
@@ -107,26 +107,26 @@ def download_latest_update():
 
 
 def prepare_update():
-    if os.path.exists(CURRENT_VERSION_COPY_DIRECTORY):
-        shutil.rmtree(CURRENT_VERSION_COPY_DIRECTORY)
+    if os.path.exists(PREVIOUS_VERSION_COPY_DIRECTORY):
+        shutil.rmtree(PREVIOUS_VERSION_COPY_DIRECTORY)
     
     if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         if platform == "win32":
-            shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"), PREVIOUS_VERSION_COPY_DIRECTORY)
         else:
-            shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main"), CURRENT_VERSION_COPY_DIRECTORY)
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main"), PREVIOUS_VERSION_COPY_DIRECTORY)
 
     else:
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(CURRENT_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         if platform == "win32":
-            shutil.copy2(os.path.join(ROOT_DIRECTORY, "main.exe"), CURRENT_VERSION_COPY_DIRECTORY)
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "main.exe"), PREVIOUS_VERSION_COPY_DIRECTORY)
         else:
-            shutil.copy2(os.path.join(ROOT_DIRECTORY, "main"), CURRENT_VERSION_COPY_DIRECTORY)
+            shutil.copy2(os.path.join(ROOT_DIRECTORY, "main"), PREVIOUS_VERSION_COPY_DIRECTORY)
     
-    GUI_LIBRARY_PATH_CURRENT = os.path.join(CURRENT_VERSION_COPY_DIRECTORY, "_internal", GUI_LIBRARY)
+    GUI_LIBRARY_PATH_CURRENT = os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal", GUI_LIBRARY)
     GUI_LIBRARY_PATH_UPDATE = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
     if not os.path.exists(GUI_LIBRARY_PATH_UPDATE):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
         shutil.copytree(GUI_LIBRARY_PATH_CURRENT, GUI_LIBRARY_PATH_UPDATE)
@@ -194,6 +194,8 @@ def apply_update():
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main.exe"), os.path.join(ROOT_DIRECTORY, "main.exe"))
         else:
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "main"))
+    
+    shutil.rmtree(UPDATE_DIRECTORY)
 
 
 

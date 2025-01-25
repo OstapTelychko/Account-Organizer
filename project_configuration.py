@@ -21,7 +21,7 @@ TEST_DB_PATH = f"sqlite:///{APP_DIRECTORY}test_Accounts.sqlite"
 TEST_DB_FILE_PATH = TEST_DB_PATH.replace("sqlite:///","")
 
 UPDATE_DIRECTORY = f"{ROOT_DIRECTORY}Temp Update"
-CURRENT_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Temp Current Version"
+PREVIOUS_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Previous Version"
 GUI_LIBRARY = "PySide6"
 LINUX_UPDATE_ZIP = "linux_update.zip"
 WINDOWS_UPDATE_ZIP = "windows_update.zip"
