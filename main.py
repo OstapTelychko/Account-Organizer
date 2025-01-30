@@ -1,7 +1,7 @@
 """"
 MIT License with Non-Monetization Clause
 
-Copyright (c) 2024 Ostap Telychko
+Copyright (c) 2024 - present Ostap Telychko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
