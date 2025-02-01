@@ -160,7 +160,7 @@ def main():
     #Load backups if they exists
     load_backups()
 
-    if not Session.test_mode or not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+    if not Session.test_mode and not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
         auto_backup()
     
     if Session.auto_backup_removal_enabled:
@@ -198,9 +198,11 @@ def main():
 
     load_account_balance()
     load_language(Session.language)
-    print(check_for_updates())
 
     MainWindow.window.show()
+
+    if not Session.test_mode:
+        print(check_for_updates())
 
 
 if __name__ == "__main__":

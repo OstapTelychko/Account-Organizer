@@ -14,6 +14,8 @@ from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UP
 GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
 MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
 
+from GUI.windows.messages import Messages
+
 from AppObjects.session import Session
 from AppObjects.backup import Backup
 
@@ -206,9 +208,12 @@ def check_for_updates():
 
     if latest_version:
         if latest_version != Session.app_version:
-            download_latest_update()
-            prepare_update()
-            apply_update()
+            Messages.update_available.exec()
+
+            if Messages.update_available.clickedButton() == Messages.update_available.ok_button:
+                download_latest_update()
+                prepare_update()
+                apply_update()
             return f"Update available: {latest_version}"
         else:
             return "No updates available."

@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QMessageBox
 from DesktopQtToolkit.message_window import MessageWindow
 from project_configuration import APP_NAME
 
-from GUI.gui_constants import APP_ICON
+from GUI.gui_constants import APP_ICON, APP_UPGRADE_ICON
 from GUI.windows.main_window import MainWindow
 
 
@@ -12,7 +12,7 @@ class Messages():
     incorrect_data_type = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     account_alredy_exists  = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     zero_current_balance = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Question, APP_NAME, APP_ICON)
-
+    
     category_exists = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     delete_category_confirmation = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Question, APP_NAME, APP_ICON)
     unselected_row = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
@@ -47,3 +47,4 @@ class Messages():
 
     no_auto_removal = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     auto_removal_disabled = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
+    update_available = MessageWindow(MainWindow.window, MainWindow.message_windows, True, APP_UPGRADE_ICON, APP_NAME, APP_ICON)

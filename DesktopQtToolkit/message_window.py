@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMessageBox, QWidget
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtCore import Qt, QTimer
 
 from sys import platform
@@ -13,7 +13,7 @@ from AppObjects.session import Session
 
 class MessageWindow(QMessageBox):
     
-    def __init__(self, main_window:QWidget, message_windows_container:dict, type_confirm:bool, message_icon:QMessageBox.Icon, title:str, window_icon:QIcon) -> None:
+    def __init__(self, main_window:QWidget, message_windows_container:dict, type_confirm:bool, message_icon:QMessageBox.Icon | QPixmap, title:str, window_icon:QIcon, ) -> None:
         super().__init__(main_window)
         self.main_window = main_window
         message_windows_container[id(self)] = self
@@ -27,7 +27,11 @@ class MessageWindow(QMessageBox):
             self.addButton(QMessageBox.StandardButton.Cancel)  
             self.setDefaultButton(QMessageBox.StandardButton.Cancel)
 
-        self.setIcon(message_icon)
+        if type(message_icon) is QPixmap:
+            self.setIconPixmap(message_icon)
+        else:
+            self.setIcon(message_icon)
+
         self.setWindowIcon(window_icon)
     
 

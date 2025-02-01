@@ -147,7 +147,6 @@ def auto_backup():
     backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
     backup_date = datetime.strptime(backup.timestamp, "%d-%m-%Y_%H:%M:%S")
     current_date = datetime.now()
-    
 
     if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY and backup_date.month != current_date.month:
         create_backup()
@@ -203,8 +202,6 @@ def prevent_same_auto_backup_status(status_checkbox: QCheckBox, state: int):
             AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
             AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
             AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
-
-
 
 
 def save_auto_backup_settings():
