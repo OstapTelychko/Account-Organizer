@@ -10,11 +10,14 @@ from sqlalchemy import create_engine
 from alembic import command
 from alembic.config import Config
 
+from PySide6.QtCore import QTimer
+
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
 GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
 MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
 
 from GUI.windows.messages import Messages
+from GUI.windows.update_progress import UpdateProgressWindow
 
 from AppObjects.session import Session
 from AppObjects.backup import Backup
@@ -91,6 +94,7 @@ def download_latest_update():
             for chunk in download_response.iter_content(chunk_size=chunk_size):
                 download_size += len(chunk)
                 file.write(chunk)
+                UpdateProgressWindow.download_progress.setValue((download_size/total_size)*100)
                 print(f"Downloaded {download_size/total_size:.2%}")
         print("Download complete.")
 
@@ -211,9 +215,11 @@ def check_for_updates():
             Messages.update_available.exec()
 
             if Messages.update_available.clickedButton() == Messages.update_available.ok_button:
-                download_latest_update()
-                prepare_update()
-                apply_update()
+                QTimer.singleShot(500, download_latest_update)
+                # download_latest_update()
+                UpdateProgressWindow.window.exec()
+                # prepare_update()
+                # apply_update()
             return f"Update available: {latest_version}"
         else:
             return "No updates available."
