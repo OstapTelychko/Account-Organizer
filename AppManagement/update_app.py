@@ -29,12 +29,8 @@ def check_internet_connection() -> bool:
         response = req.head("https://www.google.com/", timeout=5)
         response.raise_for_status()
         return True
-    except req.exceptions.Timeout:
-        print("Request timed out. Check your internet connection.")
-        return False
-    
-    except req.exceptions.ConnectionError:
-        print("Connection error. Check your internet connection.")
+    except (req.exceptions.Timeout, req.exceptions.ConnectionError):
+        print("Check your internet connection.")
         return False
     
     except req.exceptions.TooManyRedirects:
@@ -52,7 +48,7 @@ def check_internet_connection() -> bool:
 
 def get_latest_version():
     if not check_internet_connection():
-        return 
+        return
     
     try:
         response = req.get(LATEST_RELEASE_URL)
@@ -95,8 +91,6 @@ def download_latest_update():
                 download_size += len(chunk)
                 file.write(chunk)
                 UpdateProgressWindow.download_progress.setValue((download_size/total_size)*100)
-                print(f"Downloaded {download_size/total_size:.2%}")
-        print("Download complete.")
 
         with ZipFile(f"{UPDATE_DIRECTORY}/{asset['name']}", "r") as zip_ref:
             zip_ref.extractall(UPDATE_DIRECTORY)
@@ -106,7 +100,7 @@ def download_latest_update():
         print(f"HTTP error: {e}")
     
     except (req.exceptions.ConnectionError, req.exceptions.Timeout):
-        print("Connection error. Check your internet connection.")
+        return (Messages.no_internet.exec(), UpdateProgressWindow.window.done(1))
     
     except Exception as e:
         print(f"Unexpected exception: {e}")
@@ -224,4 +218,4 @@ def check_for_updates():
         else:
             return "No updates available."
     else:
-        return "Failed to check for updates."
+        return Messages.failed_update_check.exec()

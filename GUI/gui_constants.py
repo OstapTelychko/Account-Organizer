@@ -19,6 +19,7 @@ ALIGN_V_CENTER = ALIGNMENT.AlignVCenter
 ICON_SIZE = QSize(30, 30)
 APP_ICON = QIcon(f"{APP_DIRECTORY}/Images/App icon.png")
 APP_UPGRADE_ICON = QIcon(f"{APP_DIRECTORY}/Images/App upgrade icon.svg").pixmap(64, 64)
+NO_INTERNET_ICON = QIcon(f"{APP_DIRECTORY}/Images/no internet connection.png").pixmap(64, 64)
 
 SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
 

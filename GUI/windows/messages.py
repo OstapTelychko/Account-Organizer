@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QMessageBox
 from DesktopQtToolkit.message_window import MessageWindow
 from project_configuration import APP_NAME
 
-from GUI.gui_constants import APP_ICON, APP_UPGRADE_ICON
+from GUI.gui_constants import APP_ICON, APP_UPGRADE_ICON, NO_INTERNET_ICON
 from GUI.windows.main_window import MainWindow
 
 
@@ -48,3 +48,6 @@ class Messages():
     no_auto_removal = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     auto_removal_disabled = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
     update_available = MessageWindow(MainWindow.window, MainWindow.message_windows, True, APP_UPGRADE_ICON, APP_NAME, APP_ICON)
+
+    no_internet = MessageWindow(MainWindow.window, MainWindow.message_windows, False, NO_INTERNET_ICON, APP_NAME, APP_ICON)
+    failed_update_check = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
