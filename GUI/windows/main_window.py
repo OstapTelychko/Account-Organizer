@@ -29,13 +29,13 @@ SOFTWARE.
 
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
                                QLabel, QScrollArea, QTabWidget, QToolButton,
-                               QSizePolicy)
+                               QSizePolicy, QGraphicsDropShadowEffect)
 
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QIcon, QFont
 
 from project_configuration import APP_DIRECTORY
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.message_window import MessageWindow
@@ -45,8 +45,8 @@ from DesktopQtToolkit.create_button import create_button
 
 class MainWindow():
     window = QWidget()
-    window.resize(1500,750)
-    window.setMinimumHeight(685)
+    window.resize(1500, 770)
+    window.setMinimumHeight(770)
     window.setMinimumWidth(900)
     window.setWindowTitle("Account Organizer")
     window.setWindowIcon(APP_ICON)
@@ -54,48 +54,47 @@ class MainWindow():
     window.setObjectName("main_window")
 
     #Account balance and settings
-    General_info = QHBoxLayout()
     account_current_balance = QLabel("Balance: 0")
     account_current_balance.setFont(QFont("C059 [urw]",pointSize=15))
+
     settings = QToolButton()
     settings.setIcon(QIcon(f"{APP_DIRECTORY}/Images/Settings icon.png"))
     settings.setIconSize(ICON_SIZE)
 
-    General_info.addStretch(7)
-    General_info.addWidget(account_current_balance,alignment=ALIGNMENT.AlignTop| ALIGN_H_CENTER)
-    General_info.addStretch(8)
-    General_info.addWidget(settings,alignment=ALIGNMENT.AlignTop | ALIGNMENT.AlignRight)
-
-
     #Year and month
     previous_year_button = create_button("<",(32,30))
-
     next_year_button = create_button(">",(32,30))
 
     current_year = QLabel("2023")
     current_year.setFont(BASIC_FONT)
 
     Year_layout = QHBoxLayout()
-    Year_layout.addStretch(4)
     Year_layout.addWidget(previous_year_button,alignment=ALIGN_H_CENTER | ALIGNMENT.AlignTop)
     Year_layout.addWidget(current_year, 1, alignment=ALIGN_H_CENTER | ALIGNMENT.AlignVCenter)
     Year_layout.addWidget(next_year_button,alignment=ALIGN_H_CENTER | ALIGNMENT.AlignTop)
-    Year_layout.addStretch(5)
 
     previous_month_button = create_button("<",(30,30))
-
     next_month_button = create_button(">",(30,30))
 
     current_month = QLabel("April")
     current_month.setFont(BASIC_FONT)
     current_month.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+    current_month.setMinimumWidth(100)
+    current_month.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     Month_layout = QHBoxLayout()
-    Month_layout.addStretch(4)
-    Month_layout.addWidget(previous_month_button,alignment=ALIGN_H_CENTER)
-    Month_layout.addWidget(current_month, 1, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    Month_layout.addWidget(next_month_button,alignment=ALIGN_H_CENTER)
-    Month_layout.addStretch(5)
+    Month_layout.addWidget(previous_month_button, alignment=ALIGNMENT.AlignLeft)
+    Month_layout.addWidget(current_month, alignment=ALIGN_H_CENTER)
+    Month_layout.addWidget(next_month_button, alignment=ALIGNMENT.AlignRight)
+
+    Date_management_layout = QVBoxLayout()
+    Date_management_layout.addLayout(Year_layout)
+    Date_management_layout.addLayout(Month_layout)
+
+    Date_management_wrapper = QWidget()
+    Date_management_wrapper.setProperty("class", "wrapper")
+    Date_management_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(Date_management_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+    Date_management_wrapper.setLayout(Date_management_layout)
 
     #Income and expenses windows 
     Incomes_and_expenses = QTabWidget()
@@ -170,9 +169,10 @@ class MainWindow():
     window_bottom.addStretch(1)
 
     main_layout= QVBoxLayout()
-    main_layout.addLayout(General_info)
-    main_layout.addLayout(Year_layout)
-    main_layout.addLayout(Month_layout)
+    main_layout.addWidget(settings, alignment=ALIGNMENT.AlignTop | ALIGNMENT.AlignRight)
+    main_layout.addWidget(account_current_balance, alignment=ALIGN_H_CENTER | ALIGNMENT.AlignTop)
+    main_layout.addSpacing(20)
+    main_layout.addWidget(Date_management_wrapper, alignment=ALIGN_H_CENTER)
     main_layout.addWidget(Incomes_and_expenses)
     main_layout.addStretch(1)
     main_layout.addLayout(window_bottom)

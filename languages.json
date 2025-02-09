@@ -147,6 +147,12 @@
                 "36": "Statistics has been copied",
                 "37": "Copy transactions",
                 "38": "Transactions have been copied"
+            },
+
+            "Update":{
+                "0": "Update",
+                "1": "Update progress",
+                "2": "Downloading update (update_size MB)"
             }
         },
 
@@ -336,6 +342,12 @@
                 "36": "Статистика була скопійована",
                 "37": "Скопіювати транзакції",
                 "38": "Транзакції були скопійовані"
+            },
+
+            "Update":{
+                "0": "Оновлення",
+                "1": "Прогрес оновлення",
+                "2": "Завантаження оновлення (update_size МБ)"
             }
         },
 
@@ -524,6 +536,12 @@
                 "36": "Statystyka jest skopiowana",
                 "37": "Kopiować transakcje",
                 "38": "Transakcje są skopiowane"
+            },
+
+            "Update":{
+                "0": "Aktualizacja",
+                "1": "Postęp aktualizacji",
+                "2": "Pobieranie aktualizacji (update_size MB)"
             }
         },
 

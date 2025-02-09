@@ -1,4 +1,3 @@
-import requests as req
 import os
 import shutil
 import concurrent.futures
@@ -6,6 +5,10 @@ import concurrent.futures
 from sys import platform
 from zipfile import ZipFile
 from sqlalchemy import create_engine
+
+import requests as req
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from alembic import command
 from alembic.config import Config
@@ -15,6 +18,7 @@ from PySide6.QtCore import QTimer
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
 GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
 MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
+from languages import LANGUAGES
 
 from GUI.windows.messages import Messages
 from GUI.windows.update_progress import UpdateProgressWindow
@@ -22,6 +26,21 @@ from GUI.windows.update_progress import UpdateProgressWindow
 from AppObjects.session import Session
 from AppObjects.backup import Backup
 
+try:
+    from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
+except ImportError:
+    UPDATE_API_TOKEN = None
+
+
+
+
+def requests_retry_session(retries:int = 3, backoff_factor:int = 0.3, status_forcelist:tuple = (429, 500, 502, 503, 504)):
+    request_session = req.Session()
+    retry = Retry(total=retries, read=retries, connect=retries, backoff_factor=backoff_factor, status_forcelist=status_forcelist)
+    adapter = HTTPAdapter(max_retries=retry)
+    request_session.mount("https://", adapter)
+    request_session.mount("http://", adapter)
+    return request_session
 
 
 def check_internet_connection() -> bool:
@@ -51,7 +70,11 @@ def get_latest_version():
         return
     
     try:
-        response = req.get(LATEST_RELEASE_URL)
+        request_session = requests_retry_session()
+        if UPDATE_API_TOKEN:
+            response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+        else:
+            response = request_session.get(LATEST_RELEASE_URL, timeout=15)
         response.raise_for_status()
         latest_version = response.json()["tag_name"]
         return latest_version
@@ -61,7 +84,11 @@ def get_latest_version():
 
 def download_latest_update():
     try:
-        response = req.get(LATEST_RELEASE_URL)
+        request_session = requests_retry_session()
+        if UPDATE_API_TOKEN:
+            response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+        else:
+            response = request_session.get(LATEST_RELEASE_URL, timeout=15)
         response.raise_for_status()
         assets = response.json()["assets"]
 
@@ -79,8 +106,10 @@ def download_latest_update():
         download_response.raise_for_status()
 
         total_size = int(download_response.headers.get("content-length", 0))
-        chunk_size = 1024 * 1024 #1MB
+        chunk_size = 1024 * 256 #256KB
         download_size = 0
+
+        UpdateProgressWindow.download_label.setText(LANGUAGES[Session.language]["Windows"]["Update"][2].replace("update_size", str(round(total_size/1024/1024, 2))))
 
         if os.path.exists(UPDATE_DIRECTORY):
             shutil.rmtree(UPDATE_DIRECTORY)

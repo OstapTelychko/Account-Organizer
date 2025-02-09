@@ -29,6 +29,8 @@ from sys import exit
 from argparse import ArgumentParser
 from functools import partial
 
+from PySide6.QtCore import QTimer
+
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LANGUAGES
 from backend.db_controller import DBController
@@ -202,7 +204,7 @@ def main():
     MainWindow.window.show()
 
     if not Session.test_mode:
-        print(check_for_updates())
+        QTimer.singleShot(500, check_for_updates)
 
 
 if __name__ == "__main__":

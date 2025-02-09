@@ -11,6 +11,7 @@ from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, Rena
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
+from GUI.windows.update_progress import UpdateProgressWindow
 
 
 
@@ -147,6 +148,9 @@ def change_language():
     AutoBackupWindow.max_legacy_backups.setPlaceholderText(Windows["Settings"]["Backup management"][19])
     AutoBackupWindow.no_auto_removal.setText(Windows["Settings"]["Backup management"][16])
     AutoBackupWindow.save.setText(Language["General management"][6])
+
+    UpdateProgressWindow.window.setWindowTitle(Windows["Update"][0])
+    UpdateProgressWindow.update_progress_title.setText(Windows["Update"][1])
 
 
 def change_language_during_add_account(language: int | str):
