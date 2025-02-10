@@ -12,7 +12,7 @@ class UpdateProgressWindow():
 
     update_progress_title = QLabel("Update progress")
 
-    download_label = QLabel("Downloading update...")
+    download_label = QLabel("")
     download_progress = QProgressBar()
     download_progress.setRange(0, 100)
 
@@ -26,8 +26,40 @@ class UpdateProgressWindow():
     download_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(download_wrapper, **SHADOW_EFFECT_ARGUMENTS))
     download_wrapper.setFixedWidth(300)
 
+    backups_upgrade_label = QLabel()
+    backups_upgrade_progress = QProgressBar()
+    backups_upgrade_progress.setFormat("%v/%m")
+    backups_upgrade_progress.setTextVisible(True)
+
+    backups_upgrade_layout = QVBoxLayout()
+    backups_upgrade_layout.addWidget(backups_upgrade_label)
+    backups_upgrade_layout.addWidget(backups_upgrade_progress)
+
+    backups_upgrade_wrapper = QWidget()
+    backups_upgrade_wrapper.setLayout(backups_upgrade_layout)
+    backups_upgrade_wrapper.setProperty("class", "wrapper")
+    backups_upgrade_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(backups_upgrade_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+    backups_upgrade_wrapper.setFixedWidth(300)
+
+    apply_update_label = QLabel()
+    apply_update_progress = QProgressBar()
+    apply_update_progress.setRange(0, 0)
+    apply_update_progress.hide()
+
+    apply_update_layout = QVBoxLayout()
+    apply_update_layout.addWidget(apply_update_label)
+    apply_update_layout.addWidget(apply_update_progress)
+
+    apply_update_wrapper = QWidget()
+    apply_update_wrapper.setLayout(apply_update_layout)
+    apply_update_wrapper.setProperty("class", "wrapper")
+    apply_update_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(apply_update_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+    apply_update_wrapper.setFixedWidth(300)
+
     scroll_layout = QVBoxLayout()
     scroll_layout.addWidget(download_wrapper)
+    scroll_layout.addWidget(backups_upgrade_wrapper)
+    scroll_layout.addWidget(apply_update_wrapper)
     scroll_layout.setSpacing(30)
     scroll_layout.setContentsMargins(10, 10, 30, 10)
 

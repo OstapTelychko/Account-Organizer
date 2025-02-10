@@ -3,6 +3,7 @@ import os
 from sys import exit
 from datetime import datetime
 from alembic.config import Config
+from PySide6.QtCore import QThread
 
 from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
 from backend.db_controller import DBController
@@ -21,6 +22,7 @@ class Session:
         DAILY = "daily"
         NO_AUTO_BACKUP = "no auto backup"
     
+    qthreads:dict[int, QThread] = {}
 
     app_version:str = None
 

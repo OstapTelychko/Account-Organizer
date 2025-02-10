@@ -204,7 +204,7 @@ def main():
     MainWindow.window.show()
 
     if not Session.test_mode:
-        QTimer.singleShot(500, check_for_updates)
+        QTimer.singleShot(200, check_for_updates)
 
 
 if __name__ == "__main__":

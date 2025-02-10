@@ -152,7 +152,8 @@
             "Update":{
                 "0": "Update",
                 "1": "Update progress",
-                "2": "Downloading update (update_size MB)"
+                "2": "Downloading update (update_size MB)",
+                "3": "Upgrading backups"
             }
         },
 
@@ -347,7 +348,8 @@
             "Update":{
                 "0": "Оновлення",
                 "1": "Прогрес оновлення",
-                "2": "Завантаження оновлення (update_size МБ)"
+                "2": "Завантаження оновлення (update_size МБ)",
+                "3": "Оновлення баз даних"
             }
         },
 
@@ -541,7 +543,8 @@
             "Update":{
                 "0": "Aktualizacja",
                 "1": "Postęp aktualizacji",
-                "2": "Pobieranie aktualizacji (update_size MB)"
+                "2": "Pobieranie aktualizacji (update_size MB)",
+                "3": "Aktualizacja baz danych"
             }
         },
 

@@ -10,5 +10,5 @@ build
 dist
 DB Backups
 Temp Update
-Temp Current Version
+Previous Version
 tokens_ssh_gdp_secrets.py

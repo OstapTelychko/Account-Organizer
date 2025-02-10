@@ -151,6 +151,7 @@ def change_language():
 
     UpdateProgressWindow.window.setWindowTitle(Windows["Update"][0])
     UpdateProgressWindow.update_progress_title.setText(Windows["Update"][1])
+    UpdateProgressWindow.backups_upgrade_label.setText(Windows["Update"][3])
 
 
 def change_language_during_add_account(language: int | str):
