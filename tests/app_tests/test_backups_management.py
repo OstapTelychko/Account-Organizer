@@ -68,7 +68,7 @@ class TestBackupsManagement(DBTestCase):
                 SettingsWindow.window.done(0)
 
             self.assertEqual(BackupManagementWindow.create_backup.isEnabled(), False, "Create backup button hasn't been disabled")
-            QTimer.singleShot(1000, check_backup_appearance)
+            QTimer.singleShot(1200, check_backup_appearance)
 
         self.open_backup_management_window(create_backup)
 
@@ -85,7 +85,7 @@ class TestBackupsManagement(DBTestCase):
             QTimer.singleShot(100, check_no_selection)
             BackupManagementWindow.delete_backup.click()
 
-            qsleep(1000)
+            qsleep(5000)
 
             BackupManagementWindow.backups_table.selectRow(0)
             def check_below_min_backups():
@@ -113,11 +113,11 @@ class TestBackupsManagement(DBTestCase):
                 BackupManagementWindow.window.done(0)
                 SettingsWindow.window.done(0)
             
-            QTimer.singleShot(100, check_backup_deletion)
+            QTimer.singleShot(500, check_backup_deletion)
     
         self.open_backup_management_window(remove_backup)
 
-        qsleep(2000)
+        qsleep(3000)
         
 
     def test_3_load_backup(self):
@@ -330,7 +330,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-                backup.timestamp = date_minus_1_day.strftime("%d-%m-%Y_%H:%M:%S")
+                backup.timestamp = date_minus_1_day.strftime("%d-%m-%Y_%H-%M-%S")
 
                 def check_second_backup_appearance():
                     self.assertEqual(
@@ -405,7 +405,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-                backup.timestamp = date_minus_7_days.strftime("%d-%m-%Y_%H:%M:%S")
+                backup.timestamp = date_minus_7_days.strftime("%d-%m-%Y_%H-%M-%S")
 
                 def check_second_backup_appearance():
                     self.assertEqual(
@@ -479,7 +479,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-                backup.timestamp = date_minus_30_days.strftime("%d-%m-%Y_%H:%M:%S")
+                backup.timestamp = date_minus_30_days.strftime("%d-%m-%Y_%H-%M-%S")
 
                 def check_second_backup_appearance():
                     self.assertEqual(

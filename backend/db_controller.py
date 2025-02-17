@@ -222,11 +222,17 @@ class DBController():
     #Backup
     def create_backup(self, backup_file_path:str):
         db_file_path = self.engine.url.database.replace("sqlite:///", "")
-        with sql_connect(db_file_path) as conn:
-            conn.execute("PRAGMA VACUUM")
+        try:
+            with sql_connect(db_file_path) as conn:
+                conn.execute("PRAGMA VACUUM")
 
-            with sql_connect(backup_file_path) as backup_conn:
-                conn.backup(backup_conn)
+                with sql_connect(backup_file_path) as backup_conn:
+                    conn.backup(backup_conn)
+        finally:
+            conn.close()
+            backup_conn.close()
+        # self.session.close()
+        # self.engine.dispose()
 
 
     def create_backup_based_on_external_db(self, external_db_path:str, backup_file_path:str):

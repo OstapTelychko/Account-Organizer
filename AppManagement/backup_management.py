@@ -23,7 +23,7 @@ def load_backups():
     BackupManagementWindow.backups_table.setRowCount(0)
     BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
     
-    backups_sorted_by_date = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"), reverse=True)
+    backups_sorted_by_date = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H-%M-%S"), reverse=True)
     backups_sorted_by_app_version = sorted(backups_sorted_by_date, key=lambda backup: (*map(int, backup[1].app_version.split(".")),), reverse=True)
     for row, (backup_id, backup) in enumerate(backups_sorted_by_app_version):
         data = CustomTableWidgetItem(backup.timestamp)
@@ -41,7 +41,7 @@ def load_backups():
 
 def create_backup():
     app_version = Session.app_version
-    timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
 
     if Session.test_mode:
         backup_name = os.path.join(TEST_BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
@@ -83,9 +83,9 @@ def remove_backup():
     backup = Session.backups[BackupManagementWindow.backups_table.item(row, 2).text()]
 
 
-    os.remove(backup.db_file_path)
     del Session.backups[str(id(backup))]
     BackupManagementWindow.backups_table.removeRow(row)
+    os.remove(backup.db_file_path)
     
     columns = BackupManagementWindow.backups_table.verticalHeader()
     columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -145,7 +145,7 @@ def auto_backup():
         return
     
     backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-    backup_date = datetime.strptime(backup.timestamp, "%d-%m-%Y_%H:%M:%S")
+    backup_date = datetime.strptime(backup.timestamp, "%d-%m-%Y_%H-%M-%S")
     current_date = datetime.now()
 
     if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY and backup_date.month != current_date.month:
@@ -294,7 +294,7 @@ def save_auto_backup_settings():
 
 
 def auto_remove_backups():
-    sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H:%M:%S"))
+    sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H-%M-%S"))
     backups = [backup for backup in sorted_backups if backup[1].app_version == Session.app_version]
     legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != Session.app_version]
 

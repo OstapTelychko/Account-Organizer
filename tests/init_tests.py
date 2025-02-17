@@ -23,6 +23,10 @@ from tests.app_tests.test_backups_management import TestBackupsManagement
 def test_main(app_main:FunctionType):
     if os.path.exists(TEST_DB_FILE_PATH):#Why not remove test db at the end? Because of windows file locking system (lock db even if all connections are closed)
         os.remove(TEST_DB_FILE_PATH)
+
+    print(TEST_BACKUPS_DIRECTORY)
+    if os.path.exists(TEST_BACKUPS_DIRECTORY):
+        shutil.rmtree(TEST_BACKUPS_DIRECTORY)
     
     Session.test_alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
     Session.test_alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
