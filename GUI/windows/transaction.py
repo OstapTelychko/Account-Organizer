@@ -5,6 +5,7 @@ from PySide6.QtCore import QRegularExpression
 from project_configuration import MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE
 
 from DesktopQtToolkit.sub_window import SubWindow
+from DesktopQtToolkit.strict_double_validator import StrictDoubleValidator
 from DesktopQtToolkit.create_button import create_button
 
 from GUI.gui_constants import ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT
@@ -27,8 +28,8 @@ class TransactionManagementWindow():
     transaction_day.setValidator(transaction_day_validator)
 
     transaction_value = QLineEdit()
-    transaction_value_validator = QDoubleValidator(MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, 2)
-    transaction_value_validator.setNotation(QDoubleValidator.Notation.StandardNotation)
+    transaction_value_validator = StrictDoubleValidator(MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, 2)
+    transaction_value_validator.setNotation(StrictDoubleValidator.Notation.StandardNotation)
     transaction_value.setValidator(transaction_value_validator)
 
     transaction_id = None

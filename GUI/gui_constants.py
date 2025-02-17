@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon, QColor, QFont
 
-from project_configuration import APP_NAME, APP_DIRECTORY
+from project_configuration import APP_NAME, GENERAL_ICONS_DIRECTORY
 
 
 app = QApplication(argv)
@@ -17,9 +17,9 @@ ALIGN_H_CENTER = ALIGNMENT.AlignHCenter
 ALIGN_V_CENTER = ALIGNMENT.AlignVCenter
 
 ICON_SIZE = QSize(30, 30)
-APP_ICON = QIcon(f"{APP_DIRECTORY}/Images/App icon.png")
-APP_UPGRADE_ICON = QIcon(f"{APP_DIRECTORY}/Images/App upgrade icon.svg").pixmap(64, 64)
-NO_INTERNET_ICON = QIcon(f"{APP_DIRECTORY}/Images/no internet connection.png").pixmap(64, 64)
+APP_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App icon.ico")
+APP_UPGRADE_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App upgrade icon.svg").pixmap(64, 64)
+NO_INTERNET_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/no internet connection.png").pixmap(64, 64)
 
 SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
 

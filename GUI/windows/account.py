@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox
 from PySide6.QtGui import QIcon
 
-from project_configuration import AVAILABLE_LANGUAGES, APP_DIRECTORY
+from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
@@ -19,7 +19,7 @@ class AddAccountWindow():
     languages.addItems(AVAILABLE_LANGUAGES)
 
     for language in range(len(AVAILABLE_LANGUAGES)):
-        languages.setItemIcon(language, QIcon(f"{APP_DIRECTORY}/Images/{language}-flag.png"))
+        languages.setItemIcon(language, QIcon(f"{FLAGS_DIRECTORY}/{language}-flag.png"))
 
     languages_layout = QHBoxLayout()
     languages_layout.addWidget(languages, alignment=ALIGNMENT.AlignRight)

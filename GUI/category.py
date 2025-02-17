@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolBu
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
-from project_configuration import APP_DIRECTORY
+from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
 from backend.db_controller import DBController
@@ -15,9 +15,9 @@ from GUI.windows.main_window import MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
 
-ADD_TRANSACTION_ICON = QIcon(f"{APP_DIRECTORY}/Images/add transaction.png")
-REMOVE_TRANSACTION_ICON = QIcon(f"{APP_DIRECTORY}/Images/remove transaction.png")
-EDIT_TRANSACTION_ICON = QIcon(f"{APP_DIRECTORY}/Images/edit transaction.png")
+ADD_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/add transaction.png")
+REMOVE_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/remove transaction.png")
+EDIT_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/edit transaction.png")
 
 
 
@@ -61,7 +61,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_name.setFont(BASIC_FONT)
 
     category_settings = QToolButton()
-    category_settings.setIcon(QIcon(f"{APP_DIRECTORY}/Images/Settings icon.png"))
+    category_settings.setIcon(QIcon(f"{GENERAL_ICONS_DIRECTORY}/Settings icon.png"))
     category_settings.setIconSize(QSize(30,30))
 
     Category_general_info = QHBoxLayout()

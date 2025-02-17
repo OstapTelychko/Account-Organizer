@@ -84,6 +84,8 @@ class SubWindow(QDialog):
                 self.animation_group.setDirection(QPropertyAnimation.Direction.Forward)
                 self.animation_group.start()
 
+            self.activateWindow()
+
         QTimer.singleShot(10, show_window)
         super().exec()
     

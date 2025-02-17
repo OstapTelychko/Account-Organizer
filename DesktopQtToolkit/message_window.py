@@ -54,6 +54,8 @@ class MessageWindow(QMessageBox):
             main_window_center.setY(main_window_center.y()-message_window_geometry.height()/2)
 
             self.move(main_window_center)
+            self.activateWindow()
+
 
         QTimer.singleShot(10, center_message)
         super().exec()
