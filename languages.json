@@ -189,7 +189,8 @@
             "28": "Auto backup removal is disabled, so you can't edit max backups or max legacy backups.",
             "29": "Update is available. Would you like to update?",
             "30": "No internet connection. Check connection and try again",
-            "31": "Failed to check for updates. Check connection and try again"
+            "31": "Failed to check for updates. Check connection and try again",
+            "32": "Update is successfuly applied. App will restart now"
         }
             
     },
@@ -385,7 +386,8 @@
             "28": "Автоматичне видалення резервних копій вимкнено, тому ви не можете редагувати максимальну кількість резервних копій або максимальну кількість застарілих баз даних.",
             "29": "Оновлення програми доступне. Бажаєте оновитися?",
             "30": "Немає зєднання з інтернетом. Перевірте зєднання та спробуйте знову",
-            "31": "Не вдалося перевірити на наявність оновлень. Перевірте зєднання та спробуйте знову"
+            "31": "Не вдалося перевірити на наявність оновлень. Перевірте зєднання та спробуйте знову",
+            "32": "Оновлення успішно застосовано. Додаток зараз перезапуститься"
         }
     },
     
@@ -580,7 +582,8 @@
             "28": "Automatyczne usuwanie baz danych jest wyłączone, więc nie możesz edytować maksymalnej liczby kopii zapasowych ani maksymalnej liczby zastarzałych kopii zapasowych.",
             "29": "Aktualizacja programu jest dostępna. Czy chcesz zaktualizować?",
             "30": "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie",
-            "31": "Nie udało się sprawdzić dostępności aktualizacji. Sprawdź połączenie i spróbuj ponownie"
+            "31": "Nie udało się sprawdzić dostępności aktualizacji. Sprawdź połączenie i spróbuj ponownie",
+            "32": "Aktualizacja została pomyślnie zastosowana. Aplikacja zostanie teraz ponownie uruchomiona"
         }
     }
 }

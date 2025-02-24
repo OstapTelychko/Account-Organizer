@@ -13,7 +13,7 @@ from urllib3.util.retry import Retry
 from alembic import command
 from alembic.config import Config
 
-from PySide6.QtCore import QTimer, QObject, QThread, Signal
+from PySide6.QtCore import QTimer
 
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
 GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
@@ -22,6 +22,7 @@ from languages import LANGUAGES
 
 from GUI.windows.messages import Messages
 from GUI.windows.update_progress import UpdateProgressWindow
+from GUI.windows.main_window import MainWindow
 
 from AppObjects.session import Session
 from AppObjects.backup import Backup
@@ -32,17 +33,6 @@ except ImportError:
     UPDATE_API_TOKEN = None
 
 
-
-class CheckForUpdatesWorker(QObject):
-    finished = Signal()
-    error = Signal(Exception)
-
-    def run(self, check_function):
-        try:
-            check_function()
-        except Exception as e:
-            self.error.emit(e)
-        self.finished.emit()
 
 
 
@@ -231,32 +221,48 @@ def prepare_update():
         
         
 def apply_update():
-    UpdateProgressWindow.apply_update_progress.show()
     if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"))
         shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), os.path.join(ROOT_DIRECTORY, "dist", "main"))
+        UpdateProgressWindow.apply_update_progress.setValue(1)
 
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME))
         shutil.move(os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(ROOT_DIRECTORY, "dist", "main"))
+        UpdateProgressWindow.apply_update_progress.setValue(2)
 
         if platform == "win32":
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main.exe"), os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"))
         else:
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "dist", "main", "main"))
+        UpdateProgressWindow.apply_update_progress.setValue(3)
 
     else:
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, "_internal"))
         shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), ROOT_DIRECTORY)
+        UpdateProgressWindow.apply_update_progress.setValue(1)
 
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         shutil.move(os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME), ROOT_DIRECTORY)
+        UpdateProgressWindow.apply_update_progress.setValue(2)
 
         if platform == "win32":
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main.exe"), os.path.join(ROOT_DIRECTORY, "main.exe"))
         else:
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "main"))
+        UpdateProgressWindow.apply_update_progress.setValue(3)
     
     shutil.rmtree(UPDATE_DIRECTORY)
+
+    UpdateProgressWindow.apply_update_progress.setValue(4)
+    UpdateProgressWindow.window.done(0)
+    MainWindow.window.raise_()
+    MainWindow.window.activateWindow()
+
+    Messages.update_finished.exec()
+    Session.restart_app()
+
+
+    
 
 
 
@@ -264,35 +270,19 @@ def apply_update():
 
 def check_for_updates():
 
-    def _check():
-        latest_version = get_latest_version()
+    latest_version = get_latest_version()
 
-        if latest_version:
-            if latest_version == Session.app_version:
-                return
-            
-            Messages.update_available.exec()
-            if Messages.update_available.clickedButton() == Messages.update_available.ok_button:
-                def _run_update():
-                    if download_latest_update():
-                        prepare_update()
-                        apply_update()
-                    UpdateProgressWindow.apply_update_progress.hide()
-                    UpdateProgressWindow.window.done(0)
-                QTimer.singleShot(150, _run_update)
-                UpdateProgressWindow.window.exec()
-        else:
-            return Messages.failed_update_check.exec()
-    
-    worker = CheckForUpdatesWorker()
-    thread = QThread()
-    thread_id = id(thread)
-    Session.qthreads[thread_id] = thread
-    worker.moveToThread(thread)
-    thread.started.connect(lambda: worker.run(_check))
-
-    # worker.finished.connect(thread.quit)
-    worker.finished.connect(worker.deleteLater)
-    thread.finished.connect(thread.deleteLater)
-    thread.finished.connect(lambda thread_id=thread_id: Session.qthreads.pop(thread_id))
-    thread.start()
+    if latest_version:
+        if latest_version == Session.app_version:
+            return
+        
+        Messages.update_available.exec()
+        if Messages.update_available.clickedButton() == Messages.update_available.ok_button:
+            def _run_update():
+                if download_latest_update():
+                    prepare_update()
+                    apply_update()
+            QTimer.singleShot(150, _run_update)
+            UpdateProgressWindow.window.exec()
+    else:
+        return Messages.failed_update_check.exec()

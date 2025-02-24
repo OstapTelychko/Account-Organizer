@@ -91,8 +91,8 @@ def main():
 
     #Set main window for instance guard
     Session.instance_guard.main_window = MainWindow.window
-    # Ensure the server socket is closed when the application exits
-    app.aboutToQuit.connect(Session.instance_guard.close_sockets)
+    # Ensure the safe exit when the application exits
+    app.aboutToQuit.connect(Session.end_session)
 
     load_theme()
 

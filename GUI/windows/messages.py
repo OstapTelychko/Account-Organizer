@@ -51,3 +51,4 @@ class Messages():
 
     no_internet = MessageWindow(MainWindow.window, MainWindow.message_windows, False, NO_INTERNET_ICON, APP_NAME, APP_ICON)
     failed_update_check = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
+    update_finished = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)

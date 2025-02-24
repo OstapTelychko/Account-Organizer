@@ -43,8 +43,7 @@ class UpdateProgressWindow():
 
     apply_update_label = QLabel()
     apply_update_progress = QProgressBar()
-    apply_update_progress.setRange(0, 0)
-    apply_update_progress.hide()
+    apply_update_progress.setRange(0, 4)
 
     apply_update_layout = QVBoxLayout()
     apply_update_layout.addWidget(apply_update_label)

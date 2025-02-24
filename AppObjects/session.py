@@ -1,11 +1,12 @@
 import toml
 import os
-from sys import exit
+from sys import exit, executable, argv
 from datetime import datetime
 from alembic.config import Config
-from PySide6.QtCore import QThread
+from PySide6.QtCore import QProcess
+from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, ROOT_DIRECTORY
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -22,8 +23,6 @@ class Session:
         DAILY = "daily"
         NO_AUTO_BACKUP = "no auto backup"
     
-    qthreads:dict[int, QThread] = {}
-
     app_version:str = None
 
     current_month = 4
@@ -130,3 +129,18 @@ class Session:
             else:
                 backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup))
             Session.backups[str(id(backup))] = backup
+
+
+    def end_session():
+        Session.instance_guard.close_sockets()
+        Session.db.close_connection()
+    
+
+    def restart_app():
+        Session.end_session()
+        if ROOT_DIRECTORY == APP_DIRECTORY:
+            QProcess.startDetached(executable, argv)#First argument using IDE is the path to the script that have to be run 
+        else:
+            QProcess.startDetached(executable, argv[1:])#First argument in argv is the path to the executable, the second is the list of arguments
+        QApplication.quit()
+        

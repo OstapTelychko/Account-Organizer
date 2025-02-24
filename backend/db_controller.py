@@ -46,15 +46,14 @@ class DBController():
 
 
     def close_connection(self):
-        self.session.expire_all()
-        self.session.close()
-
-        if self.engine.pool:
-            self.engine.pool.dispose()
-        self.engine.dispose(close=True)
-
-        self.engine = None
-        self.session = None
+        try:
+            self.session.commit()
+        except:
+            self.session.rollback()
+        finally:
+            self.session.expire_all()
+            self.session.close()
+            self.engine.dispose(close=True)
 
 
     @staticmethod
