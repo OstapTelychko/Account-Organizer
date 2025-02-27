@@ -17,7 +17,8 @@ from PySide6.QtCore import QTimer
 
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
 GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
-MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
+MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME,\
+DEVELOPMENT_MODE
 from languages import LANGUAGES
 
 from GUI.windows.messages import Messages
@@ -149,7 +150,7 @@ def prepare_update():
     if os.path.exists(PREVIOUS_VERSION_COPY_DIRECTORY):
         shutil.rmtree(PREVIOUS_VERSION_COPY_DIRECTORY)
     
-    if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
+    if DEVELOPMENT_MODE:#if app in development
         shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
         shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         if platform == "win32":
@@ -202,9 +203,11 @@ def prepare_update():
         alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
 
         engine = create_engine(f"sqlite:///{backup_path}")
-        if not Session.db.db_up_to_date(alembic_config, engine):
-            command.upgrade(alembic_config, "head")
-        
+        try:
+            if not Session.db.db_up_to_date(alembic_config, engine):
+                command.upgrade(alembic_config, "head")
+        finally:
+            engine.dispose()
         upgraded_backups += 1
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -214,14 +217,14 @@ def prepare_update():
             UpdateProgressWindow.backups_upgrade_progress.setValue(upgraded_backups)
     
     for backup in Session.backups.values():
-        if APP_DIRECTORY == ROOT_DIRECTORY:# I don't want to delete backups in development
+        if DEVELOPMENT_MODE:# I don't want to delete backups in development
             shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
         else:
             shutil.move(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
         
         
 def apply_update():
-    if ROOT_DIRECTORY == APP_DIRECTORY:#if app in development
+    if DEVELOPMENT_MODE:#if app in development
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"))
         shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), os.path.join(ROOT_DIRECTORY, "dist", "main"))
         UpdateProgressWindow.apply_update_progress.setValue(1)

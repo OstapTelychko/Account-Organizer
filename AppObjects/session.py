@@ -6,7 +6,7 @@ from alembic.config import Config
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, ROOT_DIRECTORY
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
@@ -138,7 +138,7 @@ class Session:
 
     def restart_app():
         Session.end_session()
-        if ROOT_DIRECTORY == APP_DIRECTORY:
+        if DEVELOPMENT_MODE:
             QProcess.startDetached(executable, argv)#First argument using IDE is the path to the script that have to be run 
         else:
             QProcess.startDetached(executable, argv[1:])#First argument in argv is the path to the executable, the second is the list of arguments
