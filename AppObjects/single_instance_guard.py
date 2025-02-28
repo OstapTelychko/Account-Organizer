@@ -2,9 +2,11 @@ from PySide6.QtCore import QObject
 from PySide6.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
 from PySide6.QtWidgets import QWidget
 
+from AppObjects.logger import get_logger
 from project_configuration import APP_HOST, APP_PORT
 
 
+logger = get_logger(__name__)
 
 class SingleInstanceGuard(QObject):
 
@@ -26,6 +28,7 @@ class SingleInstanceGuard(QObject):
             self.client_socket.flush()
             self.client_socket.waitForBytesWritten()
             self.is_running = True
+            logger.info("Another instance is running, so we are closing this one")
         else:
             # No existing instance is running, so we become the server
             self.start_server()

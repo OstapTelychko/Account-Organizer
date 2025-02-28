@@ -1,19 +1,22 @@
 import toml
 import os
-from sys import exit, executable, argv
+import sys
+from traceback import format_exception
+from types import TracebackType
 from datetime import datetime
 from alembic.config import Config
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE, ERROR_LOG_FILE
 from backend.db_controller import DBController
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
 from AppObjects.backup import Backup
+from AppObjects.logger import get_logger
 
 
-
+logger = get_logger(__name__)
 
 class Session:
 
@@ -53,11 +56,14 @@ class Session:
 
 
     def start_session():
+        logger.info("Starting session")
+        sys.excepthook = Session.custom_excepthook
         Session.instance_guard = SingleInstanceGuard()
 
         if Session.instance_guard.is_running:
             print("Another instance is already running. Exiting.")
-            exit(0)
+            logger.info("Ending session\n\n")
+            sys.exit(0)
         
         Session.load_app_version()
             
@@ -132,15 +138,22 @@ class Session:
 
 
     def end_session():
+        logger.info("Ending session\n\n")
         Session.instance_guard.close_sockets()
         Session.db.close_connection()
     
 
+    def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType):
+        logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+        logger.info(f"Ending session with critical error (see {ERROR_LOG_FILE})\n\n")
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+
+
     def restart_app():
         Session.end_session()
         if DEVELOPMENT_MODE:
-            QProcess.startDetached(executable, argv)#First argument using IDE is the path to the script that have to be run 
+            QProcess.startDetached(sys.executable, sys.argv)#First argument using IDE is the path to the script that have to be run 
         else:
-            QProcess.startDetached(executable, argv[1:])#First argument in argv is the path to the executable, the second is the list of arguments
+            QProcess.startDetached(sys.executable, sys.argv[1:])#First argument in argv is the path to the executable, the second is the list of arguments
         QApplication.quit()
         

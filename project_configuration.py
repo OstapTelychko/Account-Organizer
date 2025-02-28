@@ -37,6 +37,16 @@ VERSION_FILE_NAME = "app version.txt"
 ALEMBIC_CONFIG_FILE = "alembic.ini"
 MOVE_FILES_TO_UPDATE = (DB_FILE_PATH, USER_CONF_PATH)
 
+LOGS_DIRECTORY = f"{ROOT_DIRECTORY}Logs/"
+APP_LOG_FILE = f"{LOGS_DIRECTORY}App.log"
+ERROR_LOG_FILE = f"{LOGS_DIRECTORY}Error.log"
+MAX_LOG_SIZE = 2*1024*1024#5 MB
+MAX_ERROR_LOG_SIZE = 5*1024*1024#5 MB
+MAX_LOG_BACKUPS = 5
+APP_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+ERROR_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(pathname)s:%(lineno)d - %(message)s"
+LOG_DATE_FORMAT = "%d-%m-%Y %H:%M:%S"
+
 BACKUPS_DIRECTORY_NAME = "DB Backups"
 BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}{BACKUPS_DIRECTORY_NAME}"
 TEST_BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}Test DB Backups"
