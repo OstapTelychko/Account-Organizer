@@ -44,7 +44,7 @@ class Session:
     account_name = ""
 
     db:DBController = None
-    backups:dict[int, Backup] = {}
+    backups:dict[str, Backup] = {}
     auto_backup_status:AutoBackupStatus = AutoBackupStatus.MONTHLY
     auto_backup_removal_enabled:bool = True
     max_backups = MAX_RECOMMENDED_BACKUPS
