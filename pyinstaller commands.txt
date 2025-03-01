@@ -9,9 +9,16 @@ rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6QmlModels.so.6'
 
 Windows
 Remove-Item -Recurse -Force ".\dist\main" -ErrorAction SilentlyContinue; `
+Remove-Item -Recurse -Force ".\dist\update" -ErrorAction SilentlyContinue; `
+Remove-Item -Force ".\dist\windows_update.zip" -ErrorAction SilentlyContinue; `
 pyinstaller main.py --windowed --exclude-module PyQt5 --exclude-module PyQt6 --exclude-module PySide6.support --exclude-module pyparsing --exclude-module numpy --exclude-module pycparser --exclude-module mysql --exclude-module MySQLdb --exclude-module xml --exclude-module multiprocessing --exclude-module lzma --exclude-module greenlet --exclude-module fractions --exclude-module getopt --exclude-module bz2 --exclude-module zoneinfo --exclude-module tracemalloc --add-data "Images;Images" --add-data "alembic;alembic" --add-data "alembic.ini;." --add-data "app version.txt;." --add-data "languages.json;." --hidden-import logging.config --upx-dir 'c:\Program Files\UPX'; `
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\translations" -ErrorAction SilentlyContinue; `
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6Quick.dll" -ErrorAction SilentlyContinue; `
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6Qml.dll" -ErrorAction SilentlyContinue; `
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6Pdf.dll" -ErrorAction SilentlyContinue; `
-Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6QmlModels.dll" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6QmlModels.dll" -ErrorAction SilentlyContinue; `
+New-Item -ItemType Directory -Path ".\dist\update" -ErrorAction SilentlyContinue; `
+Copy-Item -Path ".\dist\main\*" -Destination ".\dist\update\" -Recurse; `
+Remove-Item -Recurse -Force ".\dist\update\_internal\PySide6" -ErrorAction SilentlyContinue; `
+$compress = @{Path = ".\dist\update\*"; CompressionLevel = "Optimal"; DestinationPath = ".\dist\windows_update.zip"}; `
+Compress-Archive @compress -Force
