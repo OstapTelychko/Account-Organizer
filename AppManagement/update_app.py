@@ -155,26 +155,19 @@ def prepare_update():
     
     logger.debug("Creating previous version copy directory")
     if DEVELOPMENT_MODE:#if app in development
-        # shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
         shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
-        # if platform == "win32":
-        #     shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main.exe"), PREVIOUS_VERSION_COPY_DIRECTORY)
-        # else:
-        #     shutil.copy2(os.path.join(ROOT_DIRECTORY, "dist", "main", "main"), PREVIOUS_VERSION_COPY_DIRECTORY)
-
     else:
-        # shutil.copytree(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"), symlinks=True)
         shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
-        # if platform == "win32":
-        #     shutil.copy2(os.path.join(ROOT_DIRECTORY, "main.exe"), PREVIOUS_VERSION_COPY_DIRECTORY)
-        # else:
-        #     shutil.copy2(os.path.join(ROOT_DIRECTORY, "main"), PREVIOUS_VERSION_COPY_DIRECTORY)
     logger.debug("Created previous version copy directory")
 
-    GUI_LIBRARY_PATH_CURRENT = os.path.join(ROOT_DIRECTORY, "_internal", GUI_LIBRARY)
-    GUI_LIBRARY_PATH_UPDATE = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
-    if not os.path.exists(GUI_LIBRARY_PATH_UPDATE):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
-        shutil.copytree(GUI_LIBRARY_PATH_CURRENT, GUI_LIBRARY_PATH_UPDATE)
+    if DEVELOPMENT_MODE:
+        GUI_LIBRARY_CURRENT_PATH = os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal", GUI_LIBRARY)
+    else:
+        GUI_LIBRARY_CURRENT_PATH = os.path.join(ROOT_DIRECTORY, "_internal", GUI_LIBRARY)
+
+    GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
+    if not os.path.exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
+        shutil.copytree(GUI_LIBRARY_CURRENT_PATH, GUI_LIBRARY_UPDATE_PATH)
         logger.info("Copied GUI library to update directory")
     
     for file in MOVE_FILES_TO_UPDATE:
@@ -209,18 +202,19 @@ def prepare_update():
     def _migrate_single_backup(backup_path:str):
         nonlocal upgraded_backups
 
-        alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
-        alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
-        alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
+        if not os.path.exists(backup_path):
+            alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
+            alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
+            alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
 
-        engine = create_engine(f"sqlite:///{backup_path}")
-        try:
-            if not Session.db.db_up_to_date(alembic_config, engine):
-                command.upgrade(alembic_config, "head")
-        finally:
-            engine.dispose()
-        
-        logger.debug(f"Migrated backup: {backup_path}")
+            engine = create_engine(f"sqlite:///{backup_path}")
+            try:
+                if not Session.db.db_up_to_date(alembic_config, engine):
+                    command.upgrade(alembic_config, "head")
+            finally:
+                engine.dispose()
+            
+            logger.debug(f"Migrated backup: {backup_path}")
         upgraded_backups += 1
     
     with concurrent.futures.ThreadPoolExecutor() as executor:

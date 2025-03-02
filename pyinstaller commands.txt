@@ -1,11 +1,17 @@
 Linux
-rm -r "./dist/main" && \
+rm -rf "./dist/main" && \
+rm -rf "./dist/update" && \
+rm -f "./dist/linux_update.zip" && \
 pyinstaller main.py --exclude-module PyQt5 --exclude-module PyQt6 --exclude-module PySide6.support --exclude-module pyparsing --exclude-module numpy --exclude-module pycparser --exclude-module mysql --exclude-module ctypes --exclude-module MySQLdb --exclude-module xml --exclude-module multiprocessing --exclude-module lzma --exclude-module greenlet --exclude-module fractions --exclude-module getopt --exclude-module bz2 --exclude-module zoneinfo --exclude-module tracemalloc --add-data "Images:Images" --add-data "alembic:alembic" --add-data "alembic.ini:." --add-data "app version.txt:." --add-data "languages.json:." --hidden-import logging.config --strip && \
 rm -r './dist/main/_internal/PySide6/Qt/translations' && \
 rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Quick.so.6' && \
 rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Qml.so.6' && \
 rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Pdf.so.6' && \
-rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6QmlModels.so.6'
+rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6QmlModels.so.6' && \
+mkdir -p "./dist/update" && \
+cp -r ./dist/main/* ./dist/update/ && \
+rm -rf "./dist/update/_internal/PySide6" && \
+(cd "./dist/update" && zip -r "../linux_update.zip" .)
 
 Windows
 Remove-Item -Recurse -Force ".\dist\main" -ErrorAction SilentlyContinue; `
