@@ -202,19 +202,18 @@ def prepare_update():
     def _migrate_single_backup(backup_path:str):
         nonlocal upgraded_backups
 
-        if not os.path.exists(backup_path):
-            alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
-            alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
-            alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
+        alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
+        alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
+        alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
 
-            engine = create_engine(f"sqlite:///{backup_path}")
-            try:
-                if not Session.db.db_up_to_date(alembic_config, engine):
-                    command.upgrade(alembic_config, "head")
-            finally:
-                engine.dispose()
-            
-            logger.debug(f"Migrated backup: {backup_path}")
+        engine = create_engine(f"sqlite:///{backup_path}")
+        try:
+            if not Session.db.db_up_to_date(alembic_config, engine):
+                command.upgrade(alembic_config, "head")
+        finally:
+            engine.dispose()
+        
+        logger.debug(f"Migrated backup: {backup_path}")
         upgraded_backups += 1
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -226,11 +225,12 @@ def prepare_update():
     
     logger.info("Move legacy backups to update directory")
     for backup in Session.backups.values():
-        if DEVELOPMENT_MODE:# I don't want to delete backups in development
-            shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
-        else:
-            shutil.move(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
-        logger.debug(f"Moved backup: {backup.db_file_path}")
+        if not os.path.exists(backup.db_file_path):
+            if DEVELOPMENT_MODE:# I don't want to delete backups in development
+                shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
+            else:
+                shutil.move(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
+            logger.debug(f"Moved backup: {backup.db_file_path}")
     
     logger.info("Update preparation finished")
         
