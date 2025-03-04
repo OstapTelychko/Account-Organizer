@@ -2,6 +2,7 @@ from functools import partial
 from PySide6.QtCore import Qt
 
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
@@ -17,6 +18,9 @@ from AppManagement.balance import calculate_current_balance
 from AppManagement.transaction import show_add_transaction_window, show_edit_transaction_window, remove_transaction
 
 
+
+logger = get_logger(__name__)
+
 def remove_categories_from_list():
     for category in Session.categories.copy():
         Session.categories[category].window.deleteLater()
@@ -25,7 +29,6 @@ def remove_categories_from_list():
         Session.categories[category].edit_transaction.deleteLater()
         Session.categories[category].delete_transaction.deleteLater()
         del Session.categories[category]
-
 
 
 def load_categories_data():
@@ -93,6 +96,8 @@ def create_category():
 def load_categories():
     for category in Session.db.get_all_categories():
         Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.language)
+        logger.debug(f"Category {category.name} loaded")
+        
 
 
 def show_category_settings(category_name:str):
@@ -216,8 +221,9 @@ def update_category_total_value(category_id:int):
 
 
 def activate_categories():
-    for category in Session.categories:
-        Session.categories[category].settings.clicked.connect(partial(show_category_settings, Session.categories[category].name))
-        Session.categories[category].add_transaction.clicked.connect(partial(show_add_transaction_window, Session.categories[category].name))
-        Session.categories[category].edit_transaction.clicked.connect(partial(show_edit_transaction_window, Session.categories[category].name, Session.categories[category].table_data))
-        Session.categories[category].delete_transaction.clicked.connect(partial(remove_transaction, Session.categories[category].table_data, category))
+    for category_id, category in Session.categories.items():
+        category.settings.clicked.connect(partial(show_category_settings, category.name))
+        category.add_transaction.clicked.connect(partial(show_add_transaction_window, category.name))
+        category.edit_transaction.clicked.connect(partial(show_edit_transaction_window, category.name, category.table_data))
+        category.delete_transaction.clicked.connect(partial(remove_transaction, category.table_data, category_id))
+        logger.debug(f"Category {category.name} activated")

@@ -1,11 +1,12 @@
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 from languages import LANGUAGES
 
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
 
 
-
+logger = get_logger(__name__)
 
 def calculate_current_balance():
     Session.current_total_income = 0
@@ -33,17 +34,20 @@ def calculate_current_balance():
 
 
 def load_account_balance():
+    logger.info("Loading account balance")
     account = Session.db.get_account()
     Session.current_balance = account.current_balance
     Session.current_total_income = account.current_total_income
     Session.current_total_expenses = account.current_total_expenses
 
     if Session.current_total_income == 0 and Session.current_total_expenses == 0:
+        logger.info("Recalculating account balance")
         calculate_current_balance()
     
     MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Windows"]["Main"][0]+str(Session.current_balance))
     SettingsWindow.total_income.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][4]+str(Session.current_total_income))
     SettingsWindow.total_expense.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][6]+str(Session.current_total_expenses))
+    logger.info(f"Current balance: {Session.current_balance} | Total income: {Session.current_total_income} | Total expenses: {Session.current_total_expenses}")
 
 
 def update_account_balance():

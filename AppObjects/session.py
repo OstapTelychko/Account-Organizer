@@ -56,30 +56,41 @@ class Session:
 
 
     def start_session():
+        logger.info("__BREAK_LINE__")
+        logger.info("__BREAK_LINE__")
         logger.info("Starting session")
+        logger.error("__BREAK_LINE__")
+        logger.error("__BREAK_LINE__")
         sys.excepthook = Session.custom_excepthook
         Session.instance_guard = SingleInstanceGuard()
 
         if Session.instance_guard.is_running:
             print("Another instance is already running. Exiting.")
-            logger.info("Ending session\n\n")
+            logger.info("Ending session")
             sys.exit(0)
         
         Session.load_app_version()
+        logger.debug(f"App version: {Session.app_version}")
             
         #Set current date
         Session.current_month = datetime.now().month
         Session.current_year = datetime.now().year
+        logger.debug(f"Current month: {Session.current_month}, current year: {Session.current_year}")
         
         if not os.path.exists(USER_CONF_PATH):
             Session.create_user_config()
+            logger.info("User configuration file created")
 
         Session.load_user_config()
+        logger.info("User configuration loaded")
         if Session.test_mode:
             os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
         else:
             os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
+        logger.info("Backups directory created")
         Session.load_backups()
+        logger.info("Backups loaded")
+        logger.info("__BREAK_LINE__")
     
 
     def load_app_version():
@@ -135,10 +146,11 @@ class Session:
             else:
                 backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup))
             Session.backups[str(id(backup))] = backup
+            logger.debug(f"Backup loaded: {backup.db_file_path}")
 
 
     def end_session():
-        logger.info("Ending session\n\n")
+        logger.info("Ending session")
         Session.instance_guard.close_sockets()
         Session.db.close_connection()
     

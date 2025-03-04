@@ -8,12 +8,14 @@ from qdarktheme._style_loader import load_stylesheet
 
 from project_configuration import THEME_DIRECTORY
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 
 from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
 
 
+logger = get_logger(__name__)
 
 DARK_THEME_ICON = QIcon(f"{THEME_DIRECTORY}/Dark theme.png")
 DARK_THEME = load_stylesheet("dark")+"""
@@ -180,12 +182,14 @@ def swith_theme():
 
 
 def load_theme():
+    logger.info("Loading theme")
     if Session.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
 
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
+        logger.info("Dark theme loaded")
             
     if Session.theme == "Light":
         app.setStyleSheet(LIGHT_THEME)
@@ -193,6 +197,8 @@ def load_theme():
 
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
+        logger.info("Light theme loaded")
+
 
 if platform == "win32":
     def set_theme_mode_on_window(window:QWidget, value: ctypes.c_uint):

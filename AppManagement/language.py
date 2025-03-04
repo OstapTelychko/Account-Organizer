@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMessageBox
 
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LANGUAGES
 
@@ -14,6 +15,8 @@ from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWind
 from GUI.windows.update_progress import UpdateProgressWindow
 
 
+
+logger = get_logger(__name__)
 
 def change_language():
     Language = LANGUAGES[Session.language]
@@ -173,6 +176,7 @@ def change_language_during_add_account(language: int | str):
 
 
 def load_language(language):
+    logger.info("Loading language")
     if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
         Session.language = language
@@ -180,3 +184,4 @@ def load_language(language):
         Session.language = language
     Session.update_user_config()
     change_language()
+    logger.info(f"Language {Session.language} loaded")

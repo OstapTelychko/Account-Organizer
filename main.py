@@ -35,6 +35,7 @@ from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LANGUAGES
 from backend.db_controller import DBController
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 
 from GUI.gui_constants import app
 from GUI.windows.main_window import MainWindow
@@ -63,7 +64,7 @@ from tests.init_tests import test_main
 
 
 
-
+logger = get_logger(__name__)
 
 
 def calculate_expression():
@@ -150,23 +151,34 @@ def main():
     AddAccountWindow.button.clicked.connect(add_user)
     AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
     #Connect to db
+    logger.info("__BREAK_LINE__")
+    logger.info("Connecting to database")
     if not Session.test_mode:
         Session.db = DBController()
         
     if not Session.db.account_exists(Session.account_name):
+        logger.info("Account doesn't exist. Showing add account window")
         show_add_user_window()
         if not Session.db.account_id:
+            logger.info("Account wasn't created. Exiting")
             exit() 
     Session.db.set_account_id(Session.account_name)
+    logger.info("accont_id set")
+    logger.info("Connected to database")
+    logger.info("__BREAK_LINE__")
     
     #Load backups if they exists
+    logger.info("Loading backups")
     load_backups()
 
     if not Session.test_mode and not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+        logger.info("Auto backup enabled")
         auto_backup()
     
     if Session.auto_backup_removal_enabled:
+        logger.info("Auto backup removal enabled")
         auto_remove_backups()
+    logger.info("__BREAK_LINE__")
 
     #Backup management
     BackupManagementWindow.create_backup.clicked.connect(create_backup)
@@ -181,16 +193,22 @@ def main():
     AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
     #Load categories if they exists
+    logger.info("Loading categories")
     if len(Session.db.get_all_categories()) > 0:
         load_categories()
     activate_categories()
+    logger.info(f"{len(Session.categories)} categories loaded")
+    logger.info("__BREAK_LINE__")
 
     #Add accounts to list
+    logger.info("Loading accounts")
     Session.accounts_list = [account.name for account in Session.db.get_all_accounts()]
 
     SettingsWindow.accounts.clear()
     SettingsWindow.accounts.addItems(Session.accounts_list)
     SettingsWindow.accounts.setCurrentText(Session.account_name)
+    logger.info(f"{len(Session.accounts_list)} accounts loaded")
+    logger.info("__BREAK_LINE__")
 
 
     #Account management

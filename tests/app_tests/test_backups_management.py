@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from PySide6.QtCore import QTimer
 
 from languages import LANGUAGES
-from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS
+from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, BACKUPS_DATE_FORMAT
 from tests.tests_toolkit import DBTestCase, qsleep
 from AppObjects.session import Session
 
@@ -330,7 +330,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-                backup.timestamp = date_minus_1_day.strftime("%d-%m-%Y_%H-%M-%S")
+                backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
                 def check_second_backup_appearance():
                     self.assertEqual(
@@ -405,7 +405,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-                backup.timestamp = date_minus_7_days.strftime("%d-%m-%Y_%H-%M-%S")
+                backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def check_second_backup_appearance():
                     self.assertEqual(
@@ -479,7 +479,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-                backup.timestamp = date_minus_30_days.strftime("%d-%m-%Y_%H-%M-%S")
+                backup.timestamp = date_minus_30_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def check_second_backup_appearance():
                     self.assertEqual(

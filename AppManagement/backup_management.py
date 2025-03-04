@@ -6,12 +6,13 @@ from PySide6.QtCore import QTimer, Qt
 
 from languages import LANGUAGES
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
-from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
+from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, BACKUPS_DATE_FORMAT
 from backend.db_controller import DBController
 from AppManagement.account import load_account_data
 
 from AppObjects.session import Session
 from AppObjects.backup import Backup
+from AppObjects.logger import get_logger
 
 from GUI.gui_constants import ALIGNMENT
 from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
@@ -19,11 +20,14 @@ from GUI.windows.messages import Messages
 from GUI.windows.settings import SettingsWindow
 
 
+
+logger = get_logger(__name__)
+
 def load_backups():
     BackupManagementWindow.backups_table.setRowCount(0)
     BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
     
-    backups_sorted_by_date = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H-%M-%S"), reverse=True)
+    backups_sorted_by_date = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT), reverse=True)
     backups_sorted_by_app_version = sorted(backups_sorted_by_date, key=lambda backup: (*map(int, backup[1].app_version.split(".")),), reverse=True)
     for row, (backup_id, backup) in enumerate(backups_sorted_by_app_version):
         data = CustomTableWidgetItem(backup.timestamp)
@@ -37,11 +41,12 @@ def load_backups():
         BackupManagementWindow.backups_table.setItem(row, 0, data)
         BackupManagementWindow.backups_table.setItem(row, 1, app_version)
         BackupManagementWindow.backups_table.setItem(row, 2, CustomTableWidgetItem(backup_id))
+        logger.debug(f"Backup {backup.timestamp} loaded into list")
 
 
 def create_backup():
     app_version = Session.app_version
-    timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    timestamp = datetime.now().strftime(BACKUPS_DATE_FORMAT)
 
     if Session.test_mode:
         backup_name = os.path.join(TEST_BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
@@ -145,17 +150,20 @@ def auto_backup():
         return
     
     backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
-    backup_date = datetime.strptime(backup.timestamp, "%d-%m-%Y_%H-%M-%S")
+    backup_date = datetime.strptime(backup.timestamp, BACKUPS_DATE_FORMAT)
     current_date = datetime.now()
 
     if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY and backup_date.month != current_date.month:
         create_backup()
+        logger.debug("Monthly backup created")
 
     elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY and current_date.isocalendar()[1] != backup_date.isocalendar()[1]:#Week number
         create_backup()
+        logger.debug("Weekly backup created")
 
     elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY and (current_date - backup_date).days >= 1:
         create_backup()
+        logger.debug("Daily backup created")
 
 
 def open_auto_backup_window():
@@ -294,7 +302,7 @@ def save_auto_backup_settings():
 
 
 def auto_remove_backups():
-    sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, "%d-%m-%Y_%H-%M-%S"))
+    sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT))
     backups = [backup for backup in sorted_backups if backup[1].app_version == Session.app_version]
     legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != Session.app_version]
 
@@ -308,6 +316,7 @@ def auto_remove_backups():
             backup_id, backup = backups.pop(0)
             
             os.remove(backup.db_file_path)
+            logger.debug(f"Backup {backup.timestamp} removed")
             del Session.backups[backup_id]
 
             BackupManagementWindow.backups_table.removeRow(supported_backups_row)
@@ -328,6 +337,7 @@ def auto_remove_backups():
         backup_id, backup = legacy_backups.pop(0)
         
         os.remove(backup.db_file_path)
+        logger.debug(f"Legacy backup {backup.timestamp} removed")
         del Session.backups[backup_id]
 
         BackupManagementWindow.backups_table.removeRow(legacy_backups_row)

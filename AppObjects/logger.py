@@ -14,22 +14,33 @@ class InfoFilter(logging.Filter):
         return record.levelno <= logging.INFO
 
 
+
+class BreakLineFormatter(logging.Formatter):
+    #This class is used to add break lines to the log file
+
+    def format(self, record):
+        if record.getMessage() == "__BREAK_LINE__":
+            return ""
+        return super().format(record)
+
+
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 app_handler = RotatingFileHandler(APP_LOG_FILE, maxBytes=MAX_LOG_SIZE, backupCount=MAX_LOG_BACKUPS, encoding="utf-8")
-app_handler.setFormatter(logging.Formatter(APP_LOG_FORMAT, datefmt=LOG_DATE_FORMAT))
+app_handler.setFormatter(BreakLineFormatter(APP_LOG_FORMAT, datefmt=LOG_DATE_FORMAT))
 app_handler.setLevel(logging.DEBUG)
 app_handler.addFilter(InfoFilter())
 logger.addHandler(app_handler)
 
 error_handler = RotatingFileHandler(ERROR_LOG_FILE, maxBytes=MAX_ERROR_LOG_SIZE, backupCount=MAX_LOG_BACKUPS, encoding="utf-8")
-error_handler.setFormatter(logging.Formatter(ERROR_LOG_FORMAT, datefmt=LOG_DATE_FORMAT))
+error_handler.setFormatter(BreakLineFormatter(ERROR_LOG_FORMAT, datefmt=LOG_DATE_FORMAT))
 error_handler.setLevel(logging.WARNING)
 logger.addHandler(error_handler)
 
 console_handler = logging.StreamHandler()
-console_handler.setFormatter(logging.Formatter(APP_LOG_FORMAT, datefmt=LOG_DATE_FORMAT))
+console_handler.setFormatter(BreakLineFormatter(APP_LOG_FORMAT, datefmt=LOG_DATE_FORMAT))
 console_handler.setLevel(logging.WARNING)
 logger.addHandler(console_handler)
 

@@ -1,5 +1,4 @@
 import logging
-import os
 from sqlite3 import connect as sql_connect
 from sqlalchemy import create_engine, desc, and_, event, text, Engine
 from sqlalchemy.orm import sessionmaker
@@ -10,9 +9,12 @@ from alembic.runtime import migration
 from alembic import command
 
 from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
+from AppObjects.logger import get_logger
 from .models import Account, Category, Transaction
 
 
+
+logger = get_logger(__name__)
 
 class DBController():
 
@@ -20,6 +22,7 @@ class DBController():
         # Init db connection 
         from AppObjects.session import Session
 
+        logger.info("Loadin alembic config")
         self.alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
         self.alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
         self.alembic_config.set_main_option("sqlalchemy.url", DB_PATH)
@@ -29,31 +32,38 @@ class DBController():
             self.alembic_config = Session.test_alembic_config
         else:
             self.engine = create_engine(DB_PATH)
+            logger.debug("Engine created")
 
         @event.listens_for(self.engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):
             cursor = dbapi_connection.cursor()
             # cursor.execute("PRAGMA journal_mode=WAL")
             cursor.execute("PRAGMA synchronous=OFF")
+            logger.info("PRAGMA synchronous=OFF")
             cursor.close()
 
         if not self.db_up_to_date(self.alembic_config, self.engine):
-            print("Upgrading database")
+            logger.info("Upgrading database")
             command.upgrade(self.alembic_config, "head")
 
-        self.session = sessionmaker(bind=self.engine)()
         self.account_id = None
+        self.session = sessionmaker(bind=self.engine)()
+        logger.info("Db session created")
 
 
     def close_connection(self):
+        logger.info("Closing db connection")
         try:
             self.session.commit()
+            logger.info("Db session commited")
         except:
             self.session.rollback()
+            logger.error("Rollback")
         finally:
             self.session.expire_all()
             self.session.close()
             self.engine.dispose(close=True)
+            logger.info("Db connection closed")
 
 
     @staticmethod

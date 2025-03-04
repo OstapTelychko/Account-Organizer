@@ -53,23 +53,24 @@ def check_internet_connection() -> bool:
         response.raise_for_status()
         return True
     except (req.exceptions.Timeout, req.exceptions.ConnectionError):
-        print("Check your internet connection.")
+        logger.error("Check your internet connection.")
         return False
     
     except req.exceptions.TooManyRedirects:
-        print("Too many redirects.")
+        logger.error("Too many redirects.")
         return False
     
     except req.exceptions.RequestException as e:
-        print(f"Request exception: {e}")
+        logger.error(f"Request exception: {e}")
         return False
     
     except Exception as e:
-        print(f"Unexpected exception: {e}")
+        logger.error(f"Unexpected exception: {e}")
         return False
 
 
 def get_latest_version():
+    logger.info("Checking for internet connection")
     if not check_internet_connection():
         return
     
@@ -85,7 +86,7 @@ def get_latest_version():
         return latest_version
     
     except req.exceptions.HTTPError as e:
-        print(f"HTTP error: {e}")
+        logger.error(f"HTTP error: {e}")
 
 
 def download_latest_update() -> bool:
@@ -103,11 +104,15 @@ def download_latest_update() -> bool:
                 if asset["name"] == WINDOWS_UPDATE_ZIP:
                     download_url = asset["browser_download_url"]
                     total_size = int(asset["size"])
+                    logger.info(f"Starting download of {WINDOWS_UPDATE_ZIP}")
+                    logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
             else:
                 if asset["name"] == LINUX_UPDATE_ZIP:
                     download_url = asset["browser_download_url"]
                     total_size = int(asset["size"])
+                    logger.info(f"Starting download of {LINUX_UPDATE_ZIP}")
+                    logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
 
         UpdateProgressWindow.download_label.setText(LANGUAGES[Session.language]["Windows"]["Update"][2].replace("update_size", str(round(total_size/1024/1024, 2))))
@@ -119,30 +124,36 @@ def download_latest_update() -> bool:
         download_size = 0
 
         if os.path.exists(UPDATE_DIRECTORY):
+            logger.debug("Deleting previous update directory")
             shutil.rmtree(UPDATE_DIRECTORY)
         os.makedirs(UPDATE_DIRECTORY)
+        logger.debug("Created update directory")
 
+        logger.info("Saving update on disk")
         with open(f"{UPDATE_DIRECTORY}/{asset['name']}", "wb") as file:
             for chunk in download_response.iter_content(chunk_size=chunk_size):
                 download_size += len(chunk)
                 file.write(chunk)
                 UpdateProgressWindow.download_progress.setValue((download_size/total_size)*100)
+        logger.info("Update saved on disk")
 
         with ZipFile(f"{UPDATE_DIRECTORY}/{asset['name']}", "r") as zip_ref:
             zip_ref.extractall(UPDATE_DIRECTORY)
+        logger.info("Update extracted")
         return True
 
     except req.exceptions.HTTPError as e:
-        print(f"HTTP error: {e}")
+        logger.error(f"HTTP error: {e}")
         return False
     
     except (req.exceptions.ConnectionError, req.exceptions.Timeout):
+        logger.error("Internet connection was lost during download.")
         Messages.no_internet.exec()
         UpdateProgressWindow.window.done(1)
         return False
     
     except Exception as e:
-        print(f"Unexpected exception: {e}")
+        logger.error(f"Unexpected exception: {e}")
         return False
 
 
@@ -303,11 +314,14 @@ def apply_update():
 
 
 def check_for_updates():
+    logger.info("__BREAK_LINE__")
     logger.info("Checking for updates")
     latest_version = get_latest_version()
 
     if latest_version:
         if latest_version == Session.app_version:
+            logger.info("No updates available")
+            logger.info("__BREAK_LINE__")
             return
         
         logger.info(f"Latest version: {latest_version} | Current version: {Session.app_version}")
