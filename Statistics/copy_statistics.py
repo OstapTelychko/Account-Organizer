@@ -1,6 +1,7 @@
 from threading import Thread
 
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 from project_configuration import CATEGORY_TYPE
 from languages import LANGUAGES
 
@@ -11,6 +12,8 @@ from GUI.windows.category import CategorySettingsWindow
 from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 
 
+
+logger = get_logger(__name__)
 
 def show_information_message(text:str):
     InformationMessage.message_text.setText(text)
@@ -43,7 +46,8 @@ def copy_monthly_transactions():
             app.clipboard().setText(result)
         else:
             app.clipboard().setText("")
-            
+        
+        logger.info(f"Transactions for {category_name} copied | {Session.current_year}-{Session.current_month}")
         show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][5])
 
 
@@ -57,6 +61,7 @@ def copy_monthly_statistics():
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
+        logger.info(f"Monthly statistics copied | {Session.current_year}-{Session.current_month}")
         show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][29])
 
 
@@ -83,6 +88,7 @@ def copy_quarterly_statistics():
             result+= "\n\n\n"
         
         app.clipboard().setText(result)
+        logger.info(f"Quarterly statistics copied | {Session.current_year}")
         show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][31])
 
 
@@ -105,6 +111,7 @@ def copy_yearly_statistics():
             result += "\n\n\n"
 
         app.clipboard().setText(result)
+        logger.info(f"Yearly statistics copied | {Session.current_year}")
         show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][33])
 
 
@@ -132,4 +139,5 @@ def copy_custom_range_transactions():
             result += f"{transactions.item(row).text()}\n"
         
         app.clipboard().setText(result)
+        logger.info(f"Transactions for custom range copied")
         show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][38])

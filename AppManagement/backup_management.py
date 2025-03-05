@@ -62,6 +62,7 @@ def create_backup():
     BackupManagementWindow.create_backup.setEnabled(False)
 
     load_backups()
+    logger.info(f"Backup {timestamp} created")
     QTimer.singleShot(1000, enable_button)
 
 
@@ -91,6 +92,7 @@ def remove_backup():
     del Session.backups[str(id(backup))]
     BackupManagementWindow.backups_table.removeRow(row)
     os.remove(backup.db_file_path)
+    logger.debug(f"Backup {backup.timestamp} removed")
     
     columns = BackupManagementWindow.backups_table.verticalHeader()
     columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -138,6 +140,7 @@ def load_backup():
     Session.switch_account = False
     SettingsWindow.accounts.setCurrentText(Session.account_name)
 
+    logger.info(f"Backup {backup.timestamp} loaded")
     load_backups()
     load_account_data(Session.account_name)
     BackupManagementWindow.window.done(0)
@@ -299,6 +302,7 @@ def save_auto_backup_settings():
         auto_backup()
     Session.update_user_config()
     AutoBackupWindow.window.done(0)
+    logger.info("Auto backup settings saved")
 
 
 def auto_remove_backups():

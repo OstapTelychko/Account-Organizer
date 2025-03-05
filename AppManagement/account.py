@@ -1,6 +1,7 @@
 from sys import exit
 
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 from languages import LANGUAGES
 
 from GUI.windows.settings import SettingsWindow
@@ -12,6 +13,8 @@ from AppManagement.category import remove_categories_from_list, load_categories,
 from AppManagement.language import change_language_during_add_account, change_language
 
 
+
+logger = get_logger(__name__)
 
 def show_add_user_window():
     change_language_during_add_account(Session.language)
@@ -41,7 +44,8 @@ def add_user():
         Session.switch_account = False
         load_account_data(Session.account_name)
         SettingsWindow.accounts.setCurrentText(Session.account_name)
-        change_language()     
+        change_language()
+        logger.info(f"Account {account_name} added")  
 
     if balance != "":
         if balance.replace(",","").replace(".","").isdigit():
@@ -76,6 +80,7 @@ def load_account_data(name:str):
     load_categories()
     activate_categories()
     load_account_balance()
+    logger.info(f"Account {name} data loaded")
 
 
 def switch_account(name:str):
@@ -85,6 +90,7 @@ def switch_account(name:str):
         Messages.load_account_question.exec()
         if Messages.load_account_question.clickedButton() == Messages.load_account_question.ok_button:
             load_account_data(name)
+            logger.info(f"Account switched to {name}")
         else:
             Session.switch_account = False
             SettingsWindow.accounts.setCurrentText(Session.account_name)
@@ -106,8 +112,10 @@ def remove_account():
             load_account_data(Session.accounts_list[0])
             Session.switch_account = False
             SettingsWindow.accounts.setCurrentText(Session.accounts_list[0])
+            logger.info(f"Account {Session.account_name} removed")
         else:#Close app if db is empty
             Session.update_user_config()
+            logger.info("Last account removed. Closing app")
             exit()
 
 
@@ -141,3 +149,4 @@ def rename_account():
     SettingsWindow.accounts.setCurrentText(Session.account_name)
 
     RenameAccountWindow.window.hide()
+    logger.info(f"Account renamed to {new_account_name}")

@@ -10,12 +10,15 @@ from DesktopQtToolkit.create_button import create_button
 
 from AppObjects.session import Session
 from AppObjects.category import Category
+from AppObjects.logger import get_logger
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.messages import Messages
 
 
+
+logger = get_logger(__name__)
 
 
 def get_min_and_max_categories(unsorted_categories:list, current_month:int) -> tuple:
@@ -187,6 +190,7 @@ def show_monthly_statistics():
     add_month_statistics(Incomes_categories, Expenses_categories, LANGUAGES[Session.language]["Windows"]["Statistics"], MonthlyStatistics.statistics, Session.current_month)
     
     StatisticsWindow.window.done(1)
+    logger.debug(f"Monthly statistics window is shown. Current month: {LANGUAGES[Session.language]['Months'][Session.current_month]}")
     MonthlyStatistics.window.exec()
 
 
@@ -255,6 +259,7 @@ def show_quarterly_statistics():
                 month.data.addItem(Messages.no_transactions.text())
 
     StatisticsWindow.window.done(1)
+    logger.debug(f"Quarterly statistics window is shown. Current year: {Session.current_year}")
     QuarterlyStatistics.window.exec()
 
 
@@ -321,6 +326,7 @@ def show_yearly_statistics():
             month.data.addItem(Messages.no_transactions.text())
 
     StatisticsWindow.window.done(1)
+    logger.debug(f"Yearly statistics window is shown. Current year: {Session.current_year}")
     YearlyStatistics.window.exec()
         
 
@@ -504,5 +510,5 @@ def show_custom_range_statistics_view():
 
                 CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
         
-
+    logger.debug(f"Custom range statistics window is shown. From date: {from_date} To date: {to_date}")
     CustomRangeStatisticsView.window.exec()

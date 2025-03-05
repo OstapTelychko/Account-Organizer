@@ -7,12 +7,15 @@ from GUI.windows.messages import Messages
 from GUI.windows.transaction import TransactionManagementWindow
 
 from AppObjects.session import Session
+from AppObjects.logger import get_logger
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem, CustomTableWidget
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 from AppManagement.balance import update_account_balance
 
 
+
+logger = get_logger(__name__)
 
 def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget):
     selected_row = category_data.selectedItems()
@@ -139,8 +142,10 @@ def transaction_data_handler():
 
     if TransactionManagementWindow.button.text() == LANGUAGES[Session.language]["General management"][5]: #Update 
         update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
+        logger.debug(f"Transaction updated: {transaction_name} | {transaction_day} | {transaction_value} | Transaction id: {transaction_id} | Category id: {category_id}")
     else: #Add
         add_transaction(transaction_name, transaction_day, transaction_value, category_data, category_id)
+        logger.debug(f"Transaction added: {transaction_name} | {transaction_day} | {transaction_value} | Category id: {category_id}")
 
     try:
         update_category_total_value

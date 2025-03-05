@@ -163,6 +163,7 @@ def change_language_during_add_account(language: int | str):
         Session.language = language
     else:
         Session.language = language
+    logger.info(f"Language {Session.language} loaded during adding account")
     Session.update_user_config()
 
     Language = LANGUAGES[Session.language]

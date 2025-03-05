@@ -87,6 +87,7 @@ def create_category():
     Session.categories[category_id].add_transaction.clicked.connect(partial(show_add_transaction_window, Session.categories[category_id].name))
     Session.categories[category_id].edit_transaction.clicked.connect(partial(show_edit_transaction_window, Session.categories[category_id].name, Session.categories[category_id].table_data))
     Session.categories[category_id].delete_transaction.clicked.connect(partial(remove_transaction, Session.categories[category_id].table_data, category_id))
+    logger.debug(f"Category {category_name} created")
 
     AddCategoryWindow.category_name.setText("")
     AddCategoryWindow.window.hide()
@@ -122,6 +123,7 @@ def remove_category():
         Session.categories[category_id].edit_transaction.deleteLater()
         Session.categories[category_id].delete_transaction.deleteLater()
         del Session.categories[category_id]
+        logger.debug(f"Category {category_name} removed")
 
         calculate_current_balance()
         show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][7])
@@ -148,6 +150,7 @@ def rename_category():
     category.add_transaction.clicked.connect(partial(show_add_transaction_window, new_category_name))
     category.edit_transaction.clicked.connect(partial(show_edit_transaction_window, new_category_name, category.table_data))
     category.name_label.setText(new_category_name)
+    logger.debug(f"Category {current_name} renamed to {new_category_name}")
 
     Session.db.rename_category(category.id, new_category_name)
     RenameCategoryWindow.window.hide()
@@ -202,6 +205,7 @@ def change_category_position():
         return Messages.same_position.exec()
 
     Session.db.change_category_position(new_position, old_position, category.id, category_type)
+    logger.debug(f"Category {category_name} position ({old_position}) changed to {new_position}")
     
     remove_categories_from_list()
     load_categories()

@@ -169,6 +169,7 @@ def swith_theme():
 
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
+        logger.info("Theme switched to Light")
 
     elif Session.theme == "Light":
         app.setStyleSheet(DARK_THEME)
@@ -177,6 +178,7 @@ def swith_theme():
 
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
+        logger.info("Theme switched to Dark")
 
     Session.update_user_config()
 
