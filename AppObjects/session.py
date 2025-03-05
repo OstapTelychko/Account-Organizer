@@ -150,9 +150,9 @@ class Session:
 
 
     def end_session():
-        logger.info("Ending session")
         Session.instance_guard.close_sockets()
         Session.db.close_connection()
+        logger.info("Ending session")
     
 
     def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType):
