@@ -4,6 +4,7 @@ import concurrent.futures
 
 from sys import platform
 from zipfile import ZipFile
+from pathlib import Path
 from sqlalchemy import create_engine
 
 import requests as req
@@ -236,7 +237,7 @@ def prepare_update():
     
     logger.info("Move legacy backups to update directory")
     for backup in Session.backups.values():
-        if not os.path.exists(backup.db_file_path):
+        if not os.path.exists(os.path.join(UPDATE_BACKUPS_DIRECTORY, Path(backup.db_file_path).name)):
             if DEVELOPMENT_MODE:# I don't want to delete backups in development
                 shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
             else:
