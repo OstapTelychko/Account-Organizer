@@ -45,6 +45,8 @@ class SettingsWindow():
     accounts.setMinimumWidth(250)
     accounts.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
 
+    switch_account = create_button("Switch account",(180,50))
+
     add_account = create_button("Add account",(180,50))
 
     rename_account = create_button("Rename account",(180,50))
@@ -54,6 +56,7 @@ class SettingsWindow():
 
     account_management_wrapper_layout = QVBoxLayout()
     account_management_wrapper_layout.addWidget(accounts, alignment=ALIGN_H_CENTER)
+    account_management_wrapper_layout.addWidget(switch_account, alignment=ALIGN_H_CENTER)
     account_management_wrapper_layout.addWidget(add_account, alignment=ALIGN_H_CENTER)
     account_management_wrapper_layout.addWidget(rename_account, alignment=ALIGN_H_CENTER)
     account_management_wrapper_layout.addWidget(delete_account, alignment=ALIGN_H_CENTER)

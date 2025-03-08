@@ -40,6 +40,7 @@ from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SI
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.message_window import MessageWindow
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
 
 
@@ -67,6 +68,7 @@ class MainWindow():
 
     current_year = QLabel("2023")
     current_year.setFont(BASIC_FONT)
+    current_year.setProperty("class", "light-text")
 
     Year_layout = QHBoxLayout()
     Year_layout.addWidget(previous_year_button,alignment=ALIGN_H_CENTER | ALIGNMENT.AlignTop)
@@ -80,6 +82,7 @@ class MainWindow():
     current_month.setFont(BASIC_FONT)
     current_month.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
     current_month.setMinimumWidth(100)
+    current_month.setProperty("class", "light-text")
     current_month.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     Month_layout = QHBoxLayout()
@@ -112,7 +115,7 @@ class MainWindow():
     Incomes_window_layout.setSpacing(70)
     Incomes_window.setLayout(Incomes_window_layout)
 
-    Incomes_scroll = QScrollArea()
+    Incomes_scroll = HorizontalScrollArea()
     Incomes_scroll.setWidget(Incomes_window)
     Incomes_scroll.setWidgetResizable(True)
     Incomes_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
@@ -131,7 +134,7 @@ class MainWindow():
     Expenses_window_layout.setSpacing(70)
     Expenses_window.setLayout(Expenses_window_layout)
 
-    Expenses_scroll = QScrollArea()
+    Expenses_scroll = HorizontalScrollArea()
     Expenses_scroll.setWidget(Expenses_window)
     Expenses_scroll.setWidgetResizable(True)
     Expenses_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)

@@ -40,7 +40,7 @@ from AppObjects.logger import get_logger
 from GUI.gui_constants import app
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
-from GUI.windows.account import AddAccountWindow, RenameAccountWindow
+from GUI.windows.account import AddAccountWindow, RenameAccountWindow, SwitchAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
@@ -56,7 +56,7 @@ from AppManagement.balance import load_account_balance
 from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
-from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account 
+from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account, load_accounts 
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 from AppManagement.update_app import check_for_updates
 
@@ -111,6 +111,7 @@ def main():
     SettingsWindow.languages.currentIndexChanged.connect(load_language)
     SettingsWindow.add_account.clicked.connect(show_add_user_window)
     SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
+    SettingsWindow.switch_account.clicked.connect(SwitchAccountWindow.window.exec)
     SettingsWindow.backup_management.clicked.connect(BackupManagementWindow.window.exec)
 
     #Activate mini calculator
@@ -205,6 +206,7 @@ def main():
 
     #Add accounts to list
     logger.info("Loading accounts")
+    load_accounts()
     Session.accounts_list = [account.name for account in Session.db.get_all_accounts()]
 
     SettingsWindow.accounts.clear()

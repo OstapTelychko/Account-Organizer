@@ -1,12 +1,14 @@
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QScrollArea, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.main_window import MainWindow
 
 
@@ -86,4 +88,63 @@ class RenameAccountWindow():
     main_layout.addStretch(1)
     main_layout.setContentsMargins(50, 10, 50, 30)
 
+    window.window_container.setLayout(main_layout)
+
+
+
+class SwitchAccountWindow():
+    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
+
+    accounts_layout = QHBoxLayout()
+    accounts_layout.setSpacing(50)
+
+    class AccountLayoutItem():
+        def __init__(self):
+            self.account_name_label = QLabel()
+            self.account_name_label.setFont(BASIC_FONT)
+            self.account_name_label.setAlignment(ALIGN_H_CENTER)
+            self.account_name_label.setProperty("class", "light-text")
+
+            self.account_balance_label = QLabel(f"Balance: 0")
+            self.account_balance_label.setFont(BASIC_FONT)
+            self.account_balance_label.setAlignment(ALIGN_H_CENTER)
+            self.account_balance_label.setProperty("class", "light-text")
+
+            self.account_creation_date_label = QLabel("Creation date: 2023-04-01")
+            self.account_creation_date_label.setFont(BASIC_FONT)
+            self.account_creation_date_label.setAlignment(ALIGN_H_CENTER)
+            self.account_creation_date_label.setProperty("class", "light-text")
+
+            self.switch_button = create_button("Switch", (120,40))
+            self.switch_button.setDefault(True)
+
+            self.account_layout = QVBoxLayout()
+            self.account_layout.setSpacing(10)
+            self.account_layout.addWidget(self.account_name_label)
+            self.account_layout.addWidget(self.account_balance_label)
+            self.account_layout.addWidget(self.account_creation_date_label)
+            self.account_layout.addWidget(self.switch_button, alignment=ALIGN_H_CENTER)
+            self.account_layout.addStretch(1)
+
+            self.account_layout_item = QWidget()
+            self.account_layout_item.setLayout(self.account_layout)
+            self.account_layout_item.setAutoFillBackground(True)
+            self.account_layout_item.setProperty("class", "wrapper")
+            self.account_layout_item.setGraphicsEffect(QGraphicsDropShadowEffect(self.account_layout_item, **SHADOW_EFFECT_ARGUMENTS))
+
+    accounts_wrapper = QWidget()
+    accounts_wrapper.setLayout(accounts_layout)
+
+    accounts_scroll_area = HorizontalScrollArea()
+    accounts_scroll_area.setWidgetResizable(True)
+    accounts_scroll_area.setStyleSheet("QScrollArea{border:none;background-color:transparent;}")
+    accounts_scroll_area.setWidget(accounts_wrapper)
+    accounts_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    accounts_scroll_area.setMinimumHeight(220)
+
+    main_layout = QVBoxLayout()
+    main_layout.setSpacing(20)
+    main_layout.addLayout(window.window_menu_layout)
+    main_layout.addWidget(accounts_scroll_area)
+    
     window.window_container.setLayout(main_layout)

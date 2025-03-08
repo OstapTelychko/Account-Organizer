@@ -4,8 +4,9 @@ from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from languages import LANGUAGES
 
+from GUI.gui_constants import ALIGN_V_CENTER
 from GUI.windows.settings import SettingsWindow
-from GUI.windows.account import AddAccountWindow, RenameAccountWindow
+from GUI.windows.account import AddAccountWindow, RenameAccountWindow, SwitchAccountWindow
 from GUI.windows.messages import Messages
 
 from AppManagement.balance import load_account_balance
@@ -81,6 +82,20 @@ def load_account_data(name:str):
     activate_categories()
     load_account_balance()
     logger.info(f"Account {name} data loaded")
+
+
+def load_accounts():
+    Session.accounts_list = Session.db.get_all_accounts()
+
+    for account in Session.accounts_list:
+        account_layout_item = SwitchAccountWindow.AccountLayoutItem()
+        account_layout_item.account_name_label.setText(account.name)
+        account_layout_item.account_balance_label.setText(LANGUAGES[Session.language]["Windows"]["Main"][0] + str(account.current_balance))
+        account_layout_item.account_creation_date_label.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
+
+        SwitchAccountWindow.accounts_layout.addWidget(account_layout_item.account_layout_item, alignment=ALIGN_V_CENTER)
+ 
+
 
 
 def switch_account(name:str):
