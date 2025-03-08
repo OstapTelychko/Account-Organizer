@@ -134,7 +134,12 @@ def remove_account():
         load_accounts()
 
         if len(Session.accounts_list) != 0:
-            load_account_data(Session.accounts_list[0].name)
+            next_name = Session.accounts_list[0].name
+            for widget in Session.account_switch_widgets:
+                if widget.account_name_label.text() == next_name:
+                    widget.switch_button.setDisabled(True)
+
+            load_account_data(next_name)
             logger.info(f"Account {Session.account_name} removed")
         else:#Close app if db is empty
             Session.update_user_config()
