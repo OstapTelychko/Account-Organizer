@@ -4,7 +4,7 @@ from project_configuration import APP_DIRECTORY
 with open(f"{APP_DIRECTORY}/languages.json", encoding="utf-8") as file:
     languages_data = json.load(file)
 
-def convert_digit_keys_to_int(obj):
+def convert_digit_keys_to_int(obj:dict[str, str]):
     new_translation_category = {}
     for key, value in obj.items():
         if key.isdigit():

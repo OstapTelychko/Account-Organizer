@@ -1,7 +1,8 @@
+from __future__ import annotations
 import toml
 import os
 import sys
-from traceback import format_exception
+from typing import TYPE_CHECKING
 from types import TracebackType
 from datetime import datetime
 from alembic.config import Config
@@ -9,7 +10,11 @@ from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
 from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE, ERROR_LOG_FILE
-from backend.db_controller import DBController
+from backend.models import Account
+if TYPE_CHECKING:
+    from backend.db_controller import DBController
+    from GUI.windows.account import SwitchAccountWindow
+
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.category import Category
 from AppObjects.backup import Backup
@@ -34,10 +39,10 @@ class Session:
     current_total_income = 0
     current_total_expenses = 0
 
-    accounts_list = []
+    accounts_list:list[Account] = []
     categories:dict[int, Category] = {}
 
-    switch_account = True
+    account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
 
     language = "Українська"
     theme = "Dark"

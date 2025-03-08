@@ -98,7 +98,7 @@ class SwitchAccountWindow():
     accounts_layout = QHBoxLayout()
     accounts_layout.setSpacing(50)
 
-    class AccountLayoutItem():
+    class AccountSwitchWidget():
         def __init__(self):
             self.account_name_label = QLabel()
             self.account_name_label.setFont(BASIC_FONT)
@@ -126,11 +126,10 @@ class SwitchAccountWindow():
             self.account_layout.addWidget(self.switch_button, alignment=ALIGN_H_CENTER)
             self.account_layout.addStretch(1)
 
-            self.account_layout_item = QWidget()
-            self.account_layout_item.setLayout(self.account_layout)
-            self.account_layout_item.setAutoFillBackground(True)
-            self.account_layout_item.setProperty("class", "wrapper")
-            self.account_layout_item.setGraphicsEffect(QGraphicsDropShadowEffect(self.account_layout_item, **SHADOW_EFFECT_ARGUMENTS))
+            self.account_widget = QWidget()
+            self.account_widget.setLayout(self.account_layout)
+            self.account_widget.setProperty("class", "wrapper")
+            self.account_widget.setGraphicsEffect(QGraphicsDropShadowEffect(self.account_widget, **SHADOW_EFFECT_ARGUMENTS))
 
     accounts_wrapper = QWidget()
     accounts_wrapper.setLayout(accounts_layout)

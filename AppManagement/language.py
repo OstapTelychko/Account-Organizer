@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QWidget, QPushButton
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
@@ -7,7 +7,7 @@ from languages import LANGUAGES
 
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
-from GUI.windows.account import AddAccountWindow, RenameAccountWindow
+from GUI.windows.account import AddAccountWindow, RenameAccountWindow, SwitchAccountWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
@@ -37,6 +37,7 @@ def change_language():
     SettingsWindow.delete_account.setText(Windows["Settings"]["Account"][0])
     SettingsWindow.add_account.setText(Windows["Settings"]["Account"][1])
     SettingsWindow.rename_account.setText(Windows["Settings"]["Account"][2])
+    SettingsWindow.switch_account.setText(Windows["Settings"]["Account"][6])
     Incomes = SettingsWindow.total_income.text().split(":")[1].replace(" ","")
     SettingsWindow.total_income.setText(Windows["Statistics"][4]+str(Incomes))
     Expenses = SettingsWindow.total_expense.text().split(":")[1].replace(" ","")
@@ -50,6 +51,12 @@ def change_language():
     RenameAccountWindow.button.setText(Language["General management"][5])
     RenameAccountWindow.new_account_name.setPlaceholderText(Windows["Settings"]["Account"][3])
     RenameAccountWindow.window.setWindowTitle(Windows["Settings"]["Account"][2])
+
+    SwitchAccountWindow.window.setWindowTitle(Windows["Settings"]["Account"][6])
+    for account, account_switch_widget in zip(Session.accounts_list, Session.account_switch_widgets):
+        account_switch_widget.account_balance_label.setText(Windows["Main"][0] + str(account.current_balance))
+        account_switch_widget.account_creation_date_label.setText(Windows["Settings"][1] + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
+        account_switch_widget.switch_button.setText(Language["General management"][8])
 
     AddCategoryWindow.category_name.setPlaceholderText(Windows["Main"]["Transactions"][0])
     AddCategoryWindow.button.setText(Language["General management"][1])
@@ -101,8 +108,8 @@ def change_language():
     CustomRangeStatisticsView.copy_transactions.setText(Windows["Statistics"][37])
 
 
-    for index, message in enumerate(MainWindow.message_windows.values()):
-        message.setText(Language["Messages"][index])
+    for account_layout_item, message in enumerate(MainWindow.message_windows.values()):
+        message.setText(Language["Messages"][account_layout_item])
         message.button(QMessageBox.StandardButton.Ok).setText(Language["General management"][3])
         if message.button(QMessageBox.StandardButton.Cancel) != None:
             message.button(QMessageBox.StandardButton.Cancel).setText(Language["General management"][4])

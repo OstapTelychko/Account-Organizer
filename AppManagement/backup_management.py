@@ -8,7 +8,7 @@ from languages import LANGUAGES
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, BACKUPS_DATE_FORMAT
 from backend.db_controller import DBController
-from AppManagement.account import load_account_data
+from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
 from AppObjects.session import Session
 from AppObjects.backup import Backup
@@ -131,14 +131,8 @@ def load_backup():
     if Session.account_name not in [account.name for account in backup_accounts]:
         Session.account_name = backup_accounts[0].name
 
-    Session.switch_account = False
-    SettingsWindow.accounts.clear()
-    Session.accounts_list = [account.name for account in backup_accounts]
-    
-    Session.switch_account = False
-    SettingsWindow.accounts.addItems(Session.accounts_list)
-    Session.switch_account = False
-    SettingsWindow.accounts.setCurrentText(Session.account_name)
+    clear_accounts_layout()
+    load_accounts()
 
     logger.info(f"Backup {backup.timestamp} loaded")
     load_backups()

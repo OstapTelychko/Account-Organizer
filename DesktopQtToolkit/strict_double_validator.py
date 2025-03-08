@@ -23,7 +23,6 @@ class StrictDoubleValidator(QDoubleValidator):
         
         # Instead of a potential Intermediate state, we return Invalid
         if not self.bottom() < value < self.top():
-            print(self.bottom()< value < self.top())
             return QValidator.State.Invalid, input_str, pos
         
         return state, input_str, pos

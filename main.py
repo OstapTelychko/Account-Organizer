@@ -56,7 +56,7 @@ from AppManagement.balance import load_account_balance
 from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
-from AppManagement.account import show_add_user_window, add_user, switch_account, remove_account, show_rename_account_window, rename_account, load_accounts 
+from AppManagement.account import show_add_user_window, add_acccount, switch_account, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 from AppManagement.update_app import check_for_updates
 
@@ -152,7 +152,7 @@ def main():
 
 
     #Create new account if it doesn't exist
-    AddAccountWindow.button.clicked.connect(add_user)
+    AddAccountWindow.button.clicked.connect(add_acccount)
     AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
     #Connect to db
     logger.info("__BREAK_LINE__")
@@ -206,18 +206,13 @@ def main():
 
     #Add accounts to list
     logger.info("Loading accounts")
+    clear_accounts_layout()
     load_accounts()
-    Session.accounts_list = [account.name for account in Session.db.get_all_accounts()]
-
-    SettingsWindow.accounts.clear()
-    SettingsWindow.accounts.addItems(Session.accounts_list)
-    SettingsWindow.accounts.setCurrentText(Session.account_name)
     logger.info(f"{len(Session.accounts_list)} accounts loaded")
     logger.info("__BREAK_LINE__")
 
 
     #Account management
-    SettingsWindow.accounts.currentTextChanged.connect(switch_account)
     SettingsWindow.delete_account.clicked.connect(remove_account)
     RenameAccountWindow.button.clicked.connect(rename_account)
 

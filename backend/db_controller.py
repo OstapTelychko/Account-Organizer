@@ -10,6 +10,7 @@ from alembic import command
 
 from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
 from AppObjects.logger import get_logger
+from AppObjects.session import Session
 from .models import Account, Category, Transaction
 
 
@@ -20,7 +21,6 @@ class DBController():
 
     def __init__(self):
         # Init db connection 
-        from AppObjects.session import Session
 
         logger.info("Loadin alembic config")
         self.alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")

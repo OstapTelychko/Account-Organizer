@@ -39,23 +39,14 @@ class SettingsWindow():
     gui_settings_wrapper.setMinimumHeight(220)
     gui_settings_wrapper.setMinimumWidth(250)
 
-
-    accounts = QComboBox()
-    accounts.setFont(BASIC_FONT)
-    accounts.setMinimumWidth(250)
-    accounts.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
-
     switch_account = create_button("Switch account",(180,50))
-
     add_account = create_button("Add account",(180,50))
-
     rename_account = create_button("Rename account",(180,50))
 
     delete_account = create_button("Delete account",(180,50))
     delete_account.setStyleSheet("QPushButton{color:rgba(255,0,0,150); border-color:red;}")
 
     account_management_wrapper_layout = QVBoxLayout()
-    account_management_wrapper_layout.addWidget(accounts, alignment=ALIGN_H_CENTER)
     account_management_wrapper_layout.addWidget(switch_account, alignment=ALIGN_H_CENTER)
     account_management_wrapper_layout.addWidget(add_account, alignment=ALIGN_H_CENTER)
     account_management_wrapper_layout.addWidget(rename_account, alignment=ALIGN_H_CENTER)
@@ -65,7 +56,6 @@ class SettingsWindow():
     account_management_wrapper.setLayout(account_management_wrapper_layout)
     account_management_wrapper.setProperty("class", "wrapper")
     account_management_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(account_management_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-
 
     total_income = QLabel()
     total_income.setProperty("class", "light-text")

@@ -3,7 +3,7 @@ from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, qsleep
 
 from AppObjects.session import Session
-from AppManagement.account import load_account_data
+from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
@@ -70,16 +70,9 @@ class TestAccount(DBTestCase):
         Session.account_name = "Second test user"
         Session.db.create_account(Session.account_name, 100)
 
-        Session.accounts_list.append(Session.account_name)
-        Session.switch_account = False
-        SettingsWindow.accounts.clear()
-
-        Session.switch_account = False
-        SettingsWindow.accounts.addItems(Session.accounts_list)
-
-        Session.switch_account = False
+        clear_accounts_layout()
+        load_accounts()
         load_account_data(Session.account_name)
-        SettingsWindow.accounts.setCurrentText(Session.account_name)
 
         def delete_account():
             def confirm_deletion():

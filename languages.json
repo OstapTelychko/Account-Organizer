@@ -23,7 +23,9 @@
             "4":"Cancel",
             "5":"Update",
             "6":"Save",
-            "7":"Edit"
+            "7":"Edit",
+            "8":"Load"
+
         },
 
         "Windows":{
@@ -99,6 +101,7 @@
                     "3": "New account name",
                     "4": "Current balance",
                     "5": "Account Name",
+                    "6": "Switch account",
 
                     "Messages":{
                         "0": "Enter account name to create a new account.",
@@ -219,7 +222,8 @@
             "4":"Скасувати",
             "5":"Оновити",
             "6":"Зберегти",
-            "7":"Редагувати"
+            "7":"Редагувати",
+            "8":"Завантажити"
         },
 
         "Windows":{
@@ -296,6 +300,7 @@
                     "3": "Нова назва акаунта",
                     "4": "Поточний баланс",
                     "5": "Назва акаунта",
+                    "6": "Змінити акаунт",
 
                     "Messages":{
                         "0": "Введіть назву акаунта для створення нового акаунта.",
@@ -415,7 +420,8 @@
             "4": "Anulować",
             "5": "Aktualizować",
             "6": "Zapisz",
-            "7": "Edytować"
+            "7": "Edytować",
+            "8": "Załaduj"
         },
 
         "Windows":{
@@ -492,6 +498,7 @@
                     "3": "Nowa nazwa konta",
                     "4": "Potoczne saldo",
                     "5": "Nazwa konta",
+                    "6": "Zmienić konto",
 
                     "Messages":{
                         "0": "Wprowadź nazwę konta, aby dodać nowe konto.",
