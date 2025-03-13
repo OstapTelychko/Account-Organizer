@@ -40,7 +40,6 @@ def load_categories_data():
         category_data.setRowCount(0)
 
         transactions = Session.db.get_transactions_by_month(category, Session.current_year, Session.current_month)
-        total_value = 0
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
@@ -61,9 +60,8 @@ def load_categories_data():
                 category_data.setItem(row,1,day)
                 category_data.setItem(row,2,value)
                 category_data.setItem(row,3,transaction_id)
-                total_value += transaction.value
 
-        Session.categories[category].total_value_label.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10]+str(float(round(total_value, 2))))
+        update_category_total_value(category)
 
 
 def create_category():
@@ -215,13 +213,9 @@ def change_category_position():
 
 
 def update_category_total_value(category_id:int):
-    transactions = Session.db.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
-    total_value = 0
-
-    if len(transactions) != 0:
-        for transaction in transactions:
-            total_value += transaction.value
-    Session.categories[category_id].total_value_label.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10]+str(round(total_value, 2)))
+    Session.categories[category_id].total_value_label.setText(
+        LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10] +
+        str(round(Session.db.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
 
 
 def activate_categories():

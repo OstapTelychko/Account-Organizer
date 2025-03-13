@@ -17,7 +17,13 @@ ALIGN_H_CENTER = ALIGNMENT.AlignHCenter
 ALIGN_V_CENTER = ALIGNMENT.AlignVCenter
 
 ICON_SIZE = QSize(30, 30)
-APP_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App icon.ico")
+
+if platform == "linux":
+    APP_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App icon.png")
+else:
+    APP_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App icon.ico")
+app.setWindowIcon(APP_ICON)
+
 APP_UPGRADE_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App upgrade icon.svg").pixmap(64, 64)
 NO_INTERNET_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/no internet connection.png").pixmap(64, 64)
 

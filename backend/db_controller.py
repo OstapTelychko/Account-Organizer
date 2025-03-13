@@ -1,6 +1,6 @@
 import logging
 from sqlite3 import connect as sql_connect
-from sqlalchemy import create_engine, desc, and_, event, text, Engine
+from sqlalchemy import create_engine, desc, and_, event, text, Engine, func as sql_func
 from sqlalchemy.orm import sessionmaker
 
 from alembic.config import Config
@@ -250,3 +250,23 @@ class DBController():
         finally:
             conn.close()
             backup_conn.close()
+    
+
+    #Statistics
+    def get_monthly_transactions_sum(self, category_id:int, year:int, month:int) -> float:
+        total = self.session.query(sql_func.sum(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+        return float(total) if total else 0
+    
+
+    def get_monthly_transactions_min_value(self, category_id:int, year:int, month:int) -> float:
+        min_value = self.session.query(sql_func.min(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+        return float(min_value) if min_value else 0
+    
+
+    def get_monthly_transactions_max_value(self, category_id:int, year:int, month:int) -> float:
+        max_value = self.session.query(sql_func.max(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+        return float(max_value) if max_value else 0
+    
+
+    def get_monthly_transactions_by_value(self, category_id:int, year:int, month:int, value:float|int) -> list[Transaction]:
+        return self.session.query(Transaction).filter_by(category_id=category_id, year=year, month=month, value=value).all()

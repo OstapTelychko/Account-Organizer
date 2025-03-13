@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QTableWidget, QApplication, QTableWidgetItem
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QKeyEvent
+from PySide6.QtGui import QKeyEvent, QWheelEvent
 
 
 class CustomTableWidget(QTableWidget):
@@ -26,6 +26,19 @@ class CustomTableWidget(QTableWidget):
                     copy_text += '\t'
                     
             QApplication.clipboard().setText(copy_text)
+    
+
+    def wheelEvent(self, event:QWheelEvent):
+        "Prevents scrolling when TableWidget run out of rows and is neseted into a ScrollArea"
+
+        verticall_scrollbar = self.verticalScrollBar()
+        if verticall_scrollbar.isVisible() and verticall_scrollbar.minimum() < verticall_scrollbar.maximum():
+            super().wheelEvent(event)
+            event.accept()
+        else:
+            event.ignore()
+            
+
 
 
 
