@@ -53,7 +53,7 @@ def create_backup():
     else:
         backup_name = os.path.join(BACKUPS_DIRECTORY, f"Accounts_{timestamp}_{app_version}.sqlite")
 
-    Session.db.create_backup(backup_name)
+    Session.db.backup_query.create_backup(backup_name)
     backup = Backup(backup_name, timestamp, app_version)
     Session.backups[str(id(backup))] = backup
 
@@ -127,7 +127,7 @@ def load_backup():
         shutil.copy(backup.db_file_path, DB_FILE_PATH)
     Session.db = DBController()
     
-    backup_accounts = Session.db.get_all_accounts()
+    backup_accounts = Session.db.account_query.get_all_accounts()
     if Session.account_name not in [account.name for account in backup_accounts]:
         Session.account_name = backup_accounts[0].name
 

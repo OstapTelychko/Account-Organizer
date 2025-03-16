@@ -90,7 +90,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
     category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Windows"]["Main"]["Transactions"][0], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][1], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][2]))
 
-    transactions = db.get_transactions_by_month(category_id, year, month)
+    transactions = db.transaction_query.get_transactions_by_month(category_id, year, month)
     
     if len(transactions) > 0: #Check if transactions are in db
         category_data.setRowCount(len(transactions))
@@ -116,7 +116,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
             category_data.setItem(index, 2, transaction_value)
             category_data.setItem(index, 3, transaction_id)
             
-    category_total_value.setText(LANGUAGES[Language]["Windows"]["Main"]["Categories"][10]+str(round(db.get_monthly_transactions_sum(category_id, year, month), 2)))
+    category_total_value.setText(LANGUAGES[Language]["Windows"]["Main"]["Categories"][10]+str(round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)))
     category_data.setSortingEnabled(True)
 
     add_transaction = create_button(LANGUAGES[Language]["General management"][1],(185,40))

@@ -36,14 +36,14 @@ class DBTestCase(TestCase):
     def set_up_decorator(func):
         @wraps(func)
         def wrapper(self:DBTestCase):
-            Session.db.create_category("Test income category", "Incomes", 0)
-            Session.db.create_category("Test expenses category", "Expenses", 0)
+            Session.db.category_query.create_category("Test income category", "Incomes", 0)
+            Session.db.category_query.create_category("Test expenses category", "Expenses", 0)
             
-            self.income_category = Session.db.get_category("Test income category", "Incomes")
-            self.expenses_category = Session.db.get_category("Test expenses category", "Expenses")
+            self.income_category = Session.db.category_query.get_category("Test income category", "Incomes")
+            self.expenses_category = Session.db.category_query.get_category("Test expenses category", "Expenses")
 
-            Session.db.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1000, "Test income transaction")
-            Session.db.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1000, "Test expenses transaction")
+            Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1000, "Test income transaction")
+            Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1000, "Test expenses transaction")
 
             Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.language)
             Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.language)

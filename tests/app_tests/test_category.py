@@ -22,12 +22,12 @@ class TestCategory(DBTestCase):
 
         QTimer.singleShot(100, lambda: add_category("Test incomes creation category"))
         MainWindow.add_incomes_category.click()
-        self.assertTrue(Session.db.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
+        self.assertTrue(Session.db.category_query.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
 
         QTimer.singleShot(100, lambda: add_category("Test expenses creation category"))
         MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         MainWindow.add_expenses_category.click()
-        self.assertTrue(Session.db.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
+        self.assertTrue(Session.db.category_query.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
         
         qsleep(500)
     
@@ -46,8 +46,8 @@ class TestCategory(DBTestCase):
             QTimer.singleShot(100, delete_category)
             category.settings.click()
 
-        self.assertFalse(Session.db.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
-        self.assertFalse(Session.db.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
+        self.assertFalse(Session.db.category_query.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
+        self.assertFalse(Session.db.category_query.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
 
         qsleep(500)
     
@@ -78,8 +78,8 @@ class TestCategory(DBTestCase):
     
 
     def test_4_category_position_change(self):
-        Session.db.create_category("Second "+self.income_category.name, "Incomes", 1)
-        Session.db.create_category("Second "+self.expenses_category.name, "Expenses", 1)
+        Session.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
+        Session.db.category_query.create_category("Second "+self.expenses_category.name, "Expenses", 1)
 
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
@@ -95,10 +95,10 @@ class TestCategory(DBTestCase):
             QTimer.singleShot(100, open_settings)
             category.settings.click()
 
-        self.assertEqual(Session.db.get_category(self.income_category.name, "Incomes").position, 1, "Income category hasn't changed position to 1")
-        self.assertEqual(Session.db.get_category("Second "+self.income_category.name, "Incomes").position, 0, "Income category hasn't changed position to 0")
-        self.assertEqual(Session.db.get_category(self.expenses_category.name, "Expenses").position, 1, "Expenses category hasn't changed position to 1")
-        self.assertEqual(Session.db.get_category("Second "+self.expenses_category.name, "Expenses").position, 0, "Expenses category hasn't changed position to 1")
+        self.assertEqual(Session.db.category_query.get_category(self.income_category.name, "Incomes").position, 1, "Income category hasn't changed position to 1")
+        self.assertEqual(Session.db.category_query.get_category("Second "+self.income_category.name, "Incomes").position, 0, "Income category hasn't changed position to 0")
+        self.assertEqual(Session.db.category_query.get_category(self.expenses_category.name, "Expenses").position, 1, "Expenses category hasn't changed position to 1")
+        self.assertEqual(Session.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses").position, 0, "Expenses category hasn't changed position to 1")
 
         qsleep(500)
     

@@ -42,7 +42,7 @@ def change_language():
     SettingsWindow.total_income.setText(Windows["Statistics"][4]+str(Incomes))
     Expenses = SettingsWindow.total_expense.text().split(":")[1].replace(" ","")
     SettingsWindow.total_expense.setText(Windows["Statistics"][6]+str(Expenses))
-    SettingsWindow.account_created_date.setText(Windows["Settings"][1] + str(Session.db.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
+    SettingsWindow.account_created_date.setText(Windows["Settings"][1] + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
     SettingsWindow.backup_management.setText(Windows["Settings"]["Backup management"][0])
     
     SettingsWindow.app_version.setText(Windows["Settings"][2] + Session.app_version)

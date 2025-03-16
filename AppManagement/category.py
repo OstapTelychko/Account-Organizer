@@ -39,7 +39,7 @@ def load_categories_data():
                 category_data.removeRow(row)
         category_data.setRowCount(0)
 
-        transactions = Session.db.get_transactions_by_month(category, Session.current_year, Session.current_month)
+        transactions = Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, Session.current_month)
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
@@ -71,13 +71,13 @@ def create_category():
     if category_name == "":
         return Messages.no_category_name.exec()
     
-    if Session.db.category_exists(category_name, category_type):
+    if Session.db.category_query.category_exists(category_name, category_type):
         return Messages.category_exists.exec()
     
-    position = Session.db.get_available_position(category_type) 
+    position = Session.db.category_query.get_available_position(category_type) 
 
-    Session.db.create_category(category_name, category_type, position)
-    category_id = Session.db.get_category(category_name, category_type).id 
+    Session.db.category_query.create_category(category_name, category_type, position)
+    category_id = Session.db.category_query.get_category(category_name, category_type).id 
     Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month, Session.language)
 
     #Activate Category
@@ -93,14 +93,14 @@ def create_category():
 
 
 def load_categories():
-    for category in Session.db.get_all_categories():
+    for category in Session.db.category_query.get_all_categories():
         Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.language)
         logger.debug(f"Category {category.name} loaded")
         
 
 
 def show_category_settings(category_name:str):
-    if Session.db.category_exists(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
+    if Session.db.category_query.category_exists(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
         CategorySettingsWindow.window.setWindowTitle(category_name)
         CategorySettingsWindow.window.exec()
 
@@ -110,8 +110,8 @@ def remove_category():
 
     Messages.delete_category_confirmation.exec()
     if Messages.delete_category_confirmation.clickedButton() == Messages.delete_category_confirmation.ok_button:
-        category_id = Session.db.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
-        Session.db.delete_category(category_id)
+        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
+        Session.db.category_query.delete_category(category_id)
         CategorySettingsWindow.window.setWindowTitle(" ")
         CategorySettingsWindow.window.hide()
 
@@ -132,10 +132,10 @@ def rename_category():
     current_name = RenameCategoryWindow.window.windowTitle()
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
 
-    if Session.db.category_exists(new_category_name, category_type):
+    if Session.db.category_query.category_exists(new_category_name, category_type):
         return Messages.category_exists.exec()
 
-    category = Session.categories[Session.db.get_category(current_name, category_type).id]
+    category = Session.categories[Session.db.category_query.get_category(current_name, category_type).id]
 
     category.name = new_category_name
 
@@ -150,7 +150,7 @@ def rename_category():
     category.name_label.setText(new_category_name)
     logger.debug(f"Category {current_name} renamed to {new_category_name}")
 
-    Session.db.rename_category(category.id, new_category_name)
+    Session.db.category_query.rename_category(category.id, new_category_name)
     RenameCategoryWindow.window.hide()
     CategorySettingsWindow.window.hide()
     RenameCategoryWindow.new_category_name.setText("")
@@ -159,7 +159,7 @@ def rename_category():
 
 def show_change_category_position(category_name:str):
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
-    selected_category = Session.db.get_category(category_name, category_type)
+    selected_category = Session.db.category_query.get_category(category_name, category_type)
 
     ChangeCategoryPositionWindow.preview_category_name.setText(selected_category.name)
     ChangeCategoryPositionWindow.window.setWindowTitle(selected_category.name)
@@ -172,7 +172,7 @@ def show_change_category_position(category_name:str):
             widget.setParent(None)
     
 
-    for category in Session.db.get_all_categories():
+    for category in Session.db.category_query.get_all_categories():
         if category is not selected_category and category.category_type == selected_category.category_type:
             add_category_to_position_list(category)
     
@@ -182,11 +182,11 @@ def show_change_category_position(category_name:str):
 def change_category_position():
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
     category_name = ChangeCategoryPositionWindow.preview_category_name.text()
-    category = Session.db.get_category(category_name, category_type)
+    category = Session.db.category_query.get_category(category_name, category_type)
 
     new_position = ChangeCategoryPositionWindow.new_position.text()
     old_position = category.position
-    max_position = Session.db.get_available_position(category_type)-1
+    max_position = Session.db.category_query.get_available_position(category_type)-1
 
     if new_position == "":
         return Messages.empty_fields.exec()
@@ -202,7 +202,7 @@ def change_category_position():
     if new_position == old_position:
         return Messages.same_position.exec()
 
-    Session.db.change_category_position(new_position, old_position, category.id, category_type)
+    Session.db.category_query.change_category_position(new_position, old_position, category.id, category_type)
     logger.debug(f"Category {category_name} position ({old_position}) changed to {new_position}")
     
     remove_categories_from_list()
@@ -215,7 +215,7 @@ def change_category_position():
 def update_category_total_value(category_id:int):
     Session.categories[category_id].total_value_label.setText(
         LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10] +
-        str(round(Session.db.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
+        str(round(Session.db.statistics_query.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
 
 
 def activate_categories():

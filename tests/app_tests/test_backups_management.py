@@ -149,8 +149,8 @@ class TestBackupsManagement(DBTestCase):
                             )
 
                             self.assertEqual(
-                            2, len(Session.db.get_all_categories()),
-                            f"Expected categories amount after backup load is 2 returned {len(Session.db.get_all_categories())}"
+                            2, len(Session.db.category_query.get_all_categories()),
+                            f"Expected categories amount after backup load is 2 returned {len(Session.db.category_query.get_all_categories())}"
                             )
 
                             def load_newest_backup():
@@ -169,8 +169,8 @@ class TestBackupsManagement(DBTestCase):
                                     )
 
                                     self.assertEqual(
-                                    3, len(Session.db.get_all_categories()),
-                                    f"Expected categories amount after backup load is 3 returned {len(Session.db.get_all_categories())}"
+                                    3, len(Session.db.category_query.get_all_categories()),
+                                    f"Expected categories amount after backup load is 3 returned {len(Session.db.category_query.get_all_categories())}"
                                     )
 
                                     self.assertEqual(BackupManagementWindow.window.isVisible(), False, "Backup management window hasn't been closed")

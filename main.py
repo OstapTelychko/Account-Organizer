@@ -160,7 +160,7 @@ def main():
     if not Session.test_mode:
         Session.db = DBController()
         
-    if not Session.db.account_exists(Session.account_name):
+    if not Session.db.account_query.account_exists(Session.account_name):
         logger.info("Account doesn't exist. Showing add account window")
         show_add_user_window()
         if not Session.db.account_id:
@@ -198,7 +198,7 @@ def main():
 
     #Load categories if they exists
     logger.info("Loading categories")
-    if len(Session.db.get_all_categories()) > 0:
+    if len(Session.db.category_query.get_all_categories()) > 0:
         load_categories()
     activate_categories()
     logger.info(f"{len(Session.categories)} categories loaded")

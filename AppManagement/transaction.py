@@ -40,7 +40,7 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
 
 
 def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget):
-    Session.db.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
+    Session.db.transaction_query.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
                 
     for row in range(category_data.rowCount()):
         if int(category_data.item(row, 3).text()) == transaction_id:
@@ -78,7 +78,7 @@ def show_add_transaction_window(category_name:str):
 
 
 def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget, category_id:int):
-    transaction = Session.db.add_transaction(category_id, Session.current_year, Session.current_month, transaction_day, transaction_value, transaction_name)
+    transaction = Session.db.transaction_query.add_transaction(category_id, Session.current_year, Session.current_month, transaction_day, transaction_value, transaction_name)
 
     if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
         Session.current_total_income = round(Session.current_total_income + transaction_value, 2)
@@ -116,7 +116,7 @@ def transaction_data_handler():
     transaction_day = TransactionManagementWindow.transaction_day.text()
     transaction_value = TransactionManagementWindow.transaction_value.text()
     transaction_id = TransactionManagementWindow.transaction_id
-    category_id = Session.db.get_category(TransactionManagementWindow.window.windowTitle(), CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
+    category_id = Session.db.category_query.get_category(TransactionManagementWindow.window.windowTitle(), CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
     category_data = Session.categories[category_id].table_data
 
     max_month_day = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
@@ -172,7 +172,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int):
     Messages.delete_transaction_confirmation.exec()
     if Messages.delete_transaction_confirmation.clickedButton() == Messages.delete_transaction_confirmation.ok_button:
         transaction_value = float(selected_row[2].text())
-        Session.db.delete_transaction(transaction_id)
+        Session.db.transaction_query.delete_transaction(transaction_id)
 
         category_data.removeRow(selected_row[0].row())
 

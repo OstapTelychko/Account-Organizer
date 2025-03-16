@@ -74,8 +74,8 @@ class TestStatistics(DBTestCase):
 
         for month in range(1, 13):
             if month not in (Session.current_month, month_without_transactions):
-                Session.db.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
-                Session.db.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+                Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
+                Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
         def open_quarterly_statistics_window():
             def check_quarterly_statistics():
@@ -153,8 +153,8 @@ class TestStatistics(DBTestCase):
 
         for month in range(1, 13):
             if month not in (Session.current_month, month_without_transactions):
-                Session.db.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
-                Session.db.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+                Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
+                Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
         def open_yearly_statistics_window():
             def check_yearly_statistics():
@@ -225,8 +225,8 @@ class TestStatistics(DBTestCase):
     def test_4_show_custom_range_statistics(self):
         for month in range(1, 7):
             if month != Session.current_month:
-                Session.db.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
-                Session.db.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+                Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
+                Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
         def open_custom_range_statistics_window():
 

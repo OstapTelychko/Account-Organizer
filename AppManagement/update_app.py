@@ -203,7 +203,7 @@ def prepare_update():
     logger.info("Creating and migrating backups")
     def _create_single_backup(backup:Backup):
         updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
-        Session.db.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
+        Session.db.backup_query.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
         logger.debug(f"Created backup: {updated_backup_file_path}")
         return updated_backup_file_path
     

@@ -32,9 +32,9 @@ def copy_monthly_transactions():
     if CategorySettingsWindow.copy_transactions.isEnabled():
         CategorySettingsWindow.copy_transactions.setEnabled(False)
         category_name = CategorySettingsWindow.window.windowTitle()
-        category_id = Session.db.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
+        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
         
-        transactions = Session.db.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
+        transactions = Session.db.transaction_query.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
         if len(transactions):
             result = ""
             column_names = LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]

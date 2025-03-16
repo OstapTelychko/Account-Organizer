@@ -29,7 +29,7 @@ def add_acccount():
     if account_name == "":
         return Messages.empty_fields.exec()
         
-    if Session.db.account_exists(account_name):
+    if Session.db.account_query.account_exists(account_name):
         Messages.account_alredy_exists.setText(LANGUAGES[Session.language]["Messages"][1])
         return Messages.account_alredy_exists.exec()
 
@@ -74,7 +74,7 @@ def load_account_data(name:str):
 
     Session.account_name = name
     Session.db.set_account_id(Session.account_name)
-    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + str(Session.db.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
+    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
     
     Session.update_user_config()
     load_categories()
@@ -84,7 +84,7 @@ def load_account_data(name:str):
 
 
 def load_accounts():
-    Session.accounts_list = Session.db.get_all_accounts()
+    Session.accounts_list = Session.db.account_query.get_all_accounts()
 
     for account in Session.accounts_list:
         account_switch_widget = SwitchAccountWindow.AccountSwitchWidget()
@@ -129,7 +129,7 @@ def remove_account():
 
     Messages.delete_account_warning.exec()
     if Messages.delete_account_warning.clickedButton() == Messages.delete_account_warning.ok_button:
-        Session.db.delete_account()
+        Session.db.account_query.delete_account()
         clear_accounts_layout()
         load_accounts()
 
@@ -158,10 +158,10 @@ def rename_account():
     if new_account_name == "":
         return Messages.empty_fields.exec()
 
-    if Session.db.account_exists(new_account_name):
+    if Session.db.account_query.account_exists(new_account_name):
         return Messages.account_alredy_exists.exec()
 
-    Session.db.rename_account(new_account_name)
+    Session.db.account_query.rename_account(new_account_name)
 
     Session.account_name = new_account_name
     Session.update_user_config()

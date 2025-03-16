@@ -24,9 +24,9 @@ class TestTransaction(DBTestCase):
             QTimer.singleShot(100, add_transaction)
             category.add_transaction.click()
 
-        self.assertEqual(len(Session.db.get_all_transactions(self.income_category.id)), 2, "Income transaction hasn't been added")
-        self.assertEqual(len(Session.db.get_all_transactions(self.expenses_category.id)), 2, "Expense transaction hasn't been added")
-        self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+        self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 2, "Income transaction hasn't been added")
+        self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.expenses_category.id)), 2, "Expense transaction hasn't been added")
+        self.assertEqual(Session.db.account_query.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
         qsleep(500)
     
@@ -45,9 +45,9 @@ class TestTransaction(DBTestCase):
             QTimer.singleShot(100, update_transaction)
             category.edit_transaction.click()
 
-        self.assertEqual(Session.db.get_all_transactions(self.income_category.id)[0].name, "Updated transaction name", "Income transaction hasn't been updated")
-        self.assertEqual(Session.db.get_all_transactions(self.expenses_category.id)[0].name, "Updated transaction name", "Expense transaction hasn't been updated")
-        self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+        self.assertEqual(Session.db.transaction_query.get_all_transactions(self.income_category.id)[0].name, "Updated transaction name", "Income transaction hasn't been updated")
+        self.assertEqual(Session.db.transaction_query.get_all_transactions(self.expenses_category.id)[0].name, "Updated transaction name", "Expense transaction hasn't been updated")
+        self.assertEqual(Session.db.account_query.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
         qsleep(500)
     
@@ -63,9 +63,9 @@ class TestTransaction(DBTestCase):
             QTimer.singleShot(100, confirm_deletion)
             category.delete_transaction.click()
 
-        self.assertEqual(len(Session.db.get_all_transactions(self.income_category.id)), 0, "Income transaction hasn't been deleted")
-        self.assertEqual(len(Session.db.get_all_transactions(self.expenses_category.id)), 0, "Expense transaction hasn't been deleted")
-        self.assertEqual(Session.db.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+        self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 0, "Income transaction hasn't been deleted")
+        self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.expenses_category.id)), 0, "Expense transaction hasn't been deleted")
+        self.assertEqual(Session.db.account_query.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
 
         qsleep(500)
             
