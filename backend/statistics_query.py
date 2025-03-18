@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session as sql_Session
 from sqlalchemy.sql import func as sql_func
+from sqlalchemy import and_
 
 from backend.models import Transaction
 
@@ -29,3 +30,11 @@ class StatisticsQuery:
 
     def get_monthly_transactions_by_value(self, category_id:int, year:int, month:int, value:float|int) -> list[Transaction]:
         return self.session.query(Transaction).filter_by(category_id=category_id, year=year, month=month, value=value).all()
+    
+
+    def get_transaction_by_range(self, category_id:int, from_date:int, to_date:int) -> list[Transaction]:
+        return self.session.query(Transaction).filter(and_(
+            Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
+            Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,
+            Transaction.category_id == category_id
+        )).all()

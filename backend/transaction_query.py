@@ -39,11 +39,4 @@ class TransactionQuery:
     def get_all_transactions(self, category_id:int) -> list[Transaction]:
         return self.session.query(Transaction).filter_by(category_id=category_id).all()
     
-
-    def get_transaction_by_range(self, category_id:int, from_date:int, to_date:int) -> list[Transaction]:
-        return self.session.query(Transaction).filter(and_(
-            Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
-            Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,
-            Transaction.category_id == category_id
-        )).all()
  

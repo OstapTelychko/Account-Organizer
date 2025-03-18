@@ -328,7 +328,6 @@ def show_yearly_statistics():
     YearlyStatistics.window.exec()
         
 
-
 def show_custom_range_statistics_window():
     #Remove previous categories
     while CustomRangeStatistics.categories_list_layout.count():
@@ -437,14 +436,14 @@ def show_custom_range_statistics_view():
     Expenses_categories_transactions = {}
 
     for income_cateogry in Incomes_categories:
-        transactions = Session.db.transaction_query.get_transaction_by_range(income_cateogry.id, from_date, to_date)
+        transactions = Session.db.statistics_query.get_transaction_by_range(income_cateogry.id, from_date, to_date)
         total_value = round(sum([transaction.value for transaction in transactions]), 2)
 
         Incomes_categories_transactions[income_cateogry] = sorted(transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
         Incomes_categories_total_values[income_cateogry.id] = total_value
         
     for expense_category in Expenses_categories:
-        transactions = Session.db.transaction_query.get_transaction_by_range(expense_category.id, from_date, to_date)
+        transactions = Session.db.statistics_query.get_transaction_by_range(expense_category.id, from_date, to_date)
         total_value = round(sum([transaction.value for transaction in transactions]), 2)
 
         Expenses_categories_transactions[expense_category] = sorted(transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
