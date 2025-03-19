@@ -32,9 +32,9 @@ class StatisticsQuery:
         return self.session.query(Transaction).filter_by(category_id=category_id, year=year, month=month, value=value).all()
     
 
-    def get_transaction_by_range(self, category_id:int, from_date:int, to_date:int) -> list[Transaction]:
+    def get_transactions_by_range(self, category_ids:list[int], from_date:int, to_date:int) -> list[Transaction]:
         return self.session.query(Transaction).filter(and_(
+            Transaction.category_id.in_(category_ids),
             Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
             Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,
-            Transaction.category_id == category_id
         )).all()

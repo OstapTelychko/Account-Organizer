@@ -1,15 +1,19 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from functools import partial
 from datetime import date
+from collections import defaultdict
 from PySide6.QtWidgets import QListWidget, QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
 
+if TYPE_CHECKING:
+    from backend.models import Transaction
+    from AppObjects.category import Category
 
-from backend.models import Transaction
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 from DesktopQtToolkit.create_button import create_button
 
 from AppObjects.session import Session
-from AppObjects.category import Category
 from AppObjects.logger import get_logger
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
@@ -378,7 +382,7 @@ def add_category_to_statistics_list(category:Category, category_type_translate:s
     #Reset selected categories
     CustomRangeStatistics.selected_categories_list.clear()
 
-    CustomRangeStatistics.selected_categories_data[category.id] = [category, category_type_translate]
+    CustomRangeStatistics.selected_categories_data[category.id] = (category, category_type_translate)
 
     selected_categories = CustomRangeStatistics.selected_categories_data
 
@@ -429,24 +433,29 @@ def show_custom_range_statistics_view():
     Incomes_categories = [category[0] for category in CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
     Expenses_categories = [category[0] for category in CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
 
+    all_transactions = Session.db.statistics_query.get_transactions_by_range(map(lambda category: category.id, Incomes_categories+Expenses_categories), from_date, to_date)
+    categorized_transactions:defaultdict[int, list[Transaction]] = defaultdict(list)
+    for transaction in all_transactions:
+        categorized_transactions[transaction.category_id].append(transaction)
+
     Incomes_categories_total_values = {}
     Expenses_categories_total_values = {}
 
-    Incomes_categories_transactions = {}
-    Expenses_categories_transactions = {}
+    Incomes_categories_transactions:dict[Category, list[Transaction]] = {}
+    Expenses_categories_transactions:dict[Category, list[Transaction]] = {}
 
     for income_cateogry in Incomes_categories:
-        transactions = Session.db.statistics_query.get_transaction_by_range(income_cateogry.id, from_date, to_date)
-        total_value = round(sum([transaction.value for transaction in transactions]), 2)
+        category_transactions = categorized_transactions[income_cateogry.id]
+        total_value = round(sum([transaction.value for transaction in category_transactions]), 2)
 
-        Incomes_categories_transactions[income_cateogry] = sorted(transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
+        Incomes_categories_transactions[income_cateogry] = sorted(category_transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
         Incomes_categories_total_values[income_cateogry.id] = total_value
         
     for expense_category in Expenses_categories:
-        transactions = Session.db.statistics_query.get_transaction_by_range(expense_category.id, from_date, to_date)
-        total_value = round(sum([transaction.value for transaction in transactions]), 2)
+        category_transactions = categorized_transactions[expense_category.id]
+        total_value = round(sum([transaction.value for transaction in category_transactions]), 2)
 
-        Expenses_categories_transactions[expense_category] = sorted(transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
+        Expenses_categories_transactions[expense_category] = sorted(category_transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
         Expenses_categories_total_values[expense_category.id] = total_value
     
     total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
@@ -475,10 +484,10 @@ def show_custom_range_statistics_view():
 
     if len(Incomes_categories_transactions):
         CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Windows"]["Main"][1]+"\n\n")
-        for category, transactions in Incomes_categories_transactions.items():
+        for category, category_transactions in Incomes_categories_transactions.items():
             CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
-            for transaction in transactions:
+            for transaction in category_transactions:
                 day = transaction.day
                 if day < 10:
                     day = f"0{day}"
@@ -491,10 +500,10 @@ def show_custom_range_statistics_view():
     
     if len(Expenses_categories_transactions):
         CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LANGUAGES[Session.language]["Windows"]["Main"][2]+"\n\n")
-        for category, transactions in Expenses_categories_transactions.items():
+        for category, category_transactions in Expenses_categories_transactions.items():
             CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
-            for transaction in transactions:
+            for transaction in category_transactions:
                 day = transaction.day
                 if day < 10:
                     day = f"0{day}"

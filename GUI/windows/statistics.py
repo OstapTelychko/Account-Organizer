@@ -1,6 +1,10 @@
-from typing import NamedTuple
+from __future__ import annotations
+from typing import NamedTuple, TYPE_CHECKING
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
 from PySide6.QtCore import Qt, QDate
+
+if TYPE_CHECKING:
+    from AppObjects.category import Category
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
@@ -248,7 +252,7 @@ class YearlyStatistics():
 class CustomRangeStatistics():
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
-    selected_categories_data = {}
+    selected_categories_data:dict[int, tuple[Category, str]] = {}
 
     selected_categories_list = QListWidget()
     selected_categories_list.setFont(BASIC_FONT)
