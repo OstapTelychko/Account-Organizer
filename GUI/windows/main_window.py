@@ -1,3 +1,4 @@
+from __future__ import annotations
 """MIT License with Non-Monetization Clause
 
 Copyright (c) 2024 - present Ostap Telychko
@@ -26,22 +27,23 @@ SOFTWARE.
 """
 
 
+from typing import TYPE_CHECKING
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton,QSizePolicy, QGraphicsDropShadowEffect
 
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
-                               QLabel, QScrollArea, QTabWidget, QToolButton,
-                               QSizePolicy, QGraphicsDropShadowEffect)
-
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QFont
 
 from project_configuration import GENERAL_ICONS_DIRECTORY
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
 
 from DesktopQtToolkit.sub_window import SubWindow
-from DesktopQtToolkit.message_window import MessageWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
+if TYPE_CHECKING:
+    from PySide6.QtCore import QEvent
+    from PySide6.QtWidgets import QWidget
+    from DesktopQtToolkit.message_window import MessageWindow
 
 
 class MainWindow():

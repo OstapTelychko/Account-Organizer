@@ -1,7 +1,12 @@
-from sqlalchemy.orm import Session as sql_Session
-from sqlalchemy.sql import text
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
+from sqlalchemy.sql import text
 from backend.models import Account
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session as sql_Session
+
 
 
 class AccountQuery:

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout, QHBoxLayout, QSizePolicy
+from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout, QHBoxLayout
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY

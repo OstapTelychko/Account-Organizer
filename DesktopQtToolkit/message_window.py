@@ -1,5 +1,7 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QMessageBox, QWidget
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QTimer
 
 from sys import platform
@@ -9,6 +11,8 @@ if platform == "win32":
 from GUI.gui_constants import DWMWA_USE_IMMERSIVE_DARK_MODE
 from AppObjects.session import Session
 
+if TYPE_CHECKING:
+    from PySide6.QtGui import QIcon
 
 
 class MessageWindow(QMessageBox):

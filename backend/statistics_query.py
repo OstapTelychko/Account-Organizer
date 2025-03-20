@@ -1,9 +1,12 @@
-from sqlalchemy.orm import Session as sql_Session
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from sqlalchemy.sql import func as sql_func
 from sqlalchemy import and_
 
 from backend.models import Transaction
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session as sql_Session
 
 
 

@@ -1,8 +1,12 @@
-from sqlalchemy.orm import Session as sql_Session
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from sqlalchemy.sql import text
 from sqlalchemy import desc, and_
 
 from backend.models import Category
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session as sql_Session
 
 
 

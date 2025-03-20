@@ -1,8 +1,12 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import datetime
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DATETIME, SmallInteger
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Mapped
 
 Base = declarative_base()
 
@@ -18,7 +22,7 @@ class Account(Base):
     start_balance = Column(Float)
     created_date = Column(DATETIME(timezone=True), default=datetime.datetime.now)
 
-    categories:Mapped[list['Category']] = relationship("Category", back_populates="account", cascade="all, delete, delete-orphan")
+    categories:Mapped[list[Category]] = relationship("Category", back_populates="account", cascade="all, delete, delete-orphan")
 
 
     def __init__(self, name:str, start_balance:float):
@@ -41,7 +45,7 @@ class Category(Base):
 
     account_id = Column(Integer, ForeignKey("accounts.id"))
     account:Mapped[Account] = relationship("Account", back_populates="categories")
-    transactions:Mapped[list['Transaction']] = relationship("Transaction", back_populates="category", cascade="all, delete, delete-orphan")
+    transactions:Mapped[list[Transaction]] = relationship("Transaction", back_populates="category", cascade="all, delete, delete-orphan")
 
 
     def __init__(self, name:str, category_type:str, position:int, account:int):

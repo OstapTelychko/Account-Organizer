@@ -1,7 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import os
 import shutil
 from datetime import datetime
-from PySide6.QtWidgets import QHeaderView, QCheckBox
+from PySide6.QtWidgets import QHeaderView
 from PySide6.QtCore import QTimer, Qt
 
 from languages import LANGUAGES
@@ -19,7 +21,8 @@ from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWind
 from GUI.windows.messages import Messages
 from GUI.windows.settings import SettingsWindow
 
-
+if TYPE_CHECKING:
+    from PySide6.QtWidgets import QCheckBox
 
 logger = get_logger(__name__)
 
@@ -186,7 +189,7 @@ def open_auto_backup_window():
     AutoBackupWindow.window.exec()
 
 
-def prevent_same_auto_backup_status(status_checkbox: QCheckBox, state: int):
+def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
     if state == 2:#Checked
         if status_checkbox is AutoBackupWindow.monthly:
             AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)

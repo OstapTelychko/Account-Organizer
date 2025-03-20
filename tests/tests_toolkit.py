@@ -1,13 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from unittest import TestCase
 from functools import wraps
 
-from PySide6.QtWidgets import QMessageBox
-from PySide6.QtCore import Qt, QEventLoop, QTimer
+from PySide6.QtCore import QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
 
 from AppObjects.session import Session
-from AppObjects.category import Category as GUICategory
 
 from GUI.category import load_category
 from GUI.windows.main_window import MainWindow
@@ -15,6 +15,9 @@ from GUI.windows.main_window import MainWindow
 from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
 
+if TYPE_CHECKING:
+    from AppObjects.category import Category as GUICategory
+    
     
 
 def qsleep(miliseconds:int):

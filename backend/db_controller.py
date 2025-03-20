@@ -1,6 +1,7 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import logging
-from sqlite3 import connect as sql_connect
-from sqlalchemy import create_engine, desc, and_, event, text, Engine, func as sql_func
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 
 from alembic.config import Config
@@ -12,14 +13,15 @@ from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
 from AppObjects.logger import get_logger
 from AppObjects.session import Session
 
-from backend.models import Account, Category, Transaction
+from backend.models import Account
 from backend.account_query import AccountQuery
 from backend.category_query import CategoryQuery
 from backend.transaction_query import TransactionQuery
 from backend.backup_query import BackupQuery
 from backend.statistics_query import StatisticsQuery
 
-
+if TYPE_CHECKING:
+    from sqlalchemy import Engine
 
 logger = get_logger(__name__)
 

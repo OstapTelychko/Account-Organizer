@@ -1,9 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject
 from PySide6.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
-from PySide6.QtWidgets import QWidget
 
 from AppObjects.logger import get_logger
 from project_configuration import APP_HOST, APP_PORT
+
+if TYPE_CHECKING:
+    from PySide6.QtWidgets import QWidget
+
 
 
 logger = get_logger(__name__)

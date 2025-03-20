@@ -1,8 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from sys import platform
 if platform == "win32":
     import ctypes
 
-from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QIcon
 from qdarktheme._style_loader import load_stylesheet
 
@@ -14,6 +15,8 @@ from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
 
+if TYPE_CHECKING:
+    from PySide6.QtWidgets import QWidget
 
 logger = get_logger(__name__)
 
@@ -203,7 +206,7 @@ def load_theme():
 
 
 if platform == "win32":
-    def set_theme_mode_on_window(window:QWidget, value: ctypes.c_uint):
+    def set_theme_mode_on_window(window:QWidget, value:ctypes.c_uint):
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
             window.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
         )

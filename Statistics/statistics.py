@@ -3,11 +3,7 @@ from typing import TYPE_CHECKING
 from functools import partial
 from datetime import date
 from collections import defaultdict
-from PySide6.QtWidgets import QListWidget, QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
-
-if TYPE_CHECKING:
-    from backend.models import Transaction
-    from AppObjects.category import Category
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect
 
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
@@ -19,6 +15,11 @@ from AppObjects.logger import get_logger
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.messages import Messages
+
+if TYPE_CHECKING:
+    from PySide6.QtWidgets import QListWidget, QPushButton
+    from backend.models import Transaction
+    from AppObjects.category import Category
 
 
 

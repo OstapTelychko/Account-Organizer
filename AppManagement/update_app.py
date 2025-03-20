@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import os
 import shutil
 import concurrent.futures
@@ -17,9 +19,9 @@ from alembic.config import Config
 from PySide6.QtCore import QTimer
 
 from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP,\
-GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, APP_DIRECTORY,\
-MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME,\
-DEVELOPMENT_MODE, DB_FILE_PATH
+GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, DEVELOPMENT_MODE,\
+MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
+
 from languages import LANGUAGES
 
 from GUI.windows.messages import Messages
@@ -27,13 +29,15 @@ from GUI.windows.update_progress import UpdateProgressWindow
 from GUI.windows.main_window import MainWindow
 
 from AppObjects.session import Session
-from AppObjects.backup import Backup
 from AppObjects.logger import get_logger
 
 try:
     from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
 except ImportError:
     UPDATE_API_TOKEN = None
+
+if TYPE_CHECKING:
+    from AppObjects.backup import Backup
 
 
 logger = get_logger(__name__)

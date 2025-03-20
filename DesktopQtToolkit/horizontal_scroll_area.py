@@ -1,7 +1,10 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QScrollArea
 from PySide6.QtCore import Qt, QPropertyAnimation
-from PySide6.QtGui import QWheelEvent
 
+if TYPE_CHECKING:
+    from PySide6.QtGui import QWheelEvent
 
 
 
@@ -17,7 +20,7 @@ class HorizontalScrollArea(QScrollArea):
         self.animation.setDuration(self.default_duration)
 
 
-    def wheelEvent(self, event: QWheelEvent):
+    def wheelEvent(self, event:QWheelEvent):
         if event.angleDelta().x() == 0:
             delta = event.angleDelta().y()
 

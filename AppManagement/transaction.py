@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QHeaderView
 from PySide6.QtCore import Qt
 
@@ -8,10 +10,14 @@ from GUI.windows.transaction import TransactionManagementWindow
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
-from DesktopQtToolkit.table_widget import CustomTableWidgetItem, CustomTableWidget
+from DesktopQtToolkit.table_widget import CustomTableWidgetItem
+
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 from AppManagement.balance import update_account_balance
+
+if TYPE_CHECKING:
+    from DesktopQtToolkit.table_widget import CustomTableWidget
 
 
 

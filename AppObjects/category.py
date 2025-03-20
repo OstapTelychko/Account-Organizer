@@ -1,5 +1,9 @@
-from PySide6.QtWidgets import QLabel, QPushButton, QToolButton, QWidget
-from DesktopQtToolkit.table_widget import CustomTableWidget
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PySide6.QtWidgets import QLabel, QPushButton, QToolButton, QWidget
+    from DesktopQtToolkit.table_widget import CustomTableWidget
 
 
 class Category:

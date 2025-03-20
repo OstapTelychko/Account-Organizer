@@ -1,7 +1,10 @@
-from sqlalchemy.orm import Session as sql_Session
-from sqlalchemy import Engine
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from sqlite3 import connect as sql_connect
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session as sql_Session
+    from sqlalchemy import Engine
 
 
 

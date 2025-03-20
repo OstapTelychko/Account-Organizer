@@ -1,6 +1,7 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import os
 import shutil
-from types import FunctionType
 from unittest import  TestSuite, TestLoader, TextTestRunner
 
 from alembic.config import Config
@@ -17,7 +18,8 @@ from tests.app_tests.test_transaction import TestTransaction
 from tests.app_tests.test_statistics import TestStatistics
 from tests.app_tests.test_backups_management import TestBackupsManagement
 
-
+if TYPE_CHECKING:
+    from types import FunctionType
 
 
 def test_main(app_main:FunctionType):

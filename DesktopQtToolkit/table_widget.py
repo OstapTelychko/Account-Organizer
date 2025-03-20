@@ -1,6 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QTableWidget, QApplication, QTableWidgetItem
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QKeyEvent, QWheelEvent
+
+if TYPE_CHECKING:
+    from PySide6.QtGui import QKeyEvent, QWheelEvent
+
 
 
 class CustomTableWidget(QTableWidget):

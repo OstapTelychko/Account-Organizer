@@ -164,7 +164,7 @@ def change_language():
     UpdateProgressWindow.backups_upgrade_label.setText(Windows["Update"][3])
 
 
-def change_language_during_add_account(language: int | str):
+def change_language_during_add_account(language:int | str):
     if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
         Session.language = language

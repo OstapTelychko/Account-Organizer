@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
@@ -5,7 +7,6 @@ from PySide6.QtGui import QIcon
 from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY
 from languages import LANGUAGES
 from AppObjects.category import Category
-from backend.db_controller import DBController
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
@@ -14,6 +15,8 @@ from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SI
 from GUI.windows.main_window import MainWindow
 from GUI.windows.category import ChangeCategoryPositionWindow
 
+if TYPE_CHECKING:
+    from backend.db_controller import DBController
 
 ADD_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/add transaction.png")
 REMOVE_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/remove transaction.png")

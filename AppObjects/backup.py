@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import Path
 
 
@@ -10,7 +11,7 @@ class Backup:
     
 
     @staticmethod
-    def parse_db_file_path(db_file_path:str) -> 'Backup':
+    def parse_db_file_path(db_file_path:str) -> Backup:
         db_name = Path(db_file_path).name
         db_name_parts = db_name.split("_")
         timestamp = db_name_parts[1]+"_"+db_name_parts[2]

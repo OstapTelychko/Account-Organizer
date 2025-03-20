@@ -3,14 +3,14 @@ from typing import NamedTuple, TYPE_CHECKING
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
 from PySide6.QtCore import Qt, QDate
 
-if TYPE_CHECKING:
-    from AppObjects.category import Category
-
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
 from GUI.windows.main_window import MainWindow
+
+if TYPE_CHECKING:
+    from AppObjects.category import Category
 
 
 

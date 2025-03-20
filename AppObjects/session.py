@@ -3,22 +3,25 @@ import toml
 import os
 import sys
 from typing import TYPE_CHECKING
-from types import TracebackType
 from datetime import datetime
-from alembic.config import Config
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
 from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE, ERROR_LOG_FILE
-from backend.models import Account
-if TYPE_CHECKING:
-    from backend.db_controller import DBController
-    from GUI.windows.account import SwitchAccountWindow
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
-from AppObjects.category import Category
 from AppObjects.backup import Backup
 from AppObjects.logger import get_logger
+
+if TYPE_CHECKING:
+    from alembic.config import Config
+    from types import TracebackType
+    
+    from backend.models import Account
+    from backend.db_controller import DBController
+    from GUI.windows.account import SwitchAccountWindow
+    from AppObjects.category import Category
+
 
 
 logger = get_logger(__name__)
