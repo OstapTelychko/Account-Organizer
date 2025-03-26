@@ -231,14 +231,8 @@ class TestStatistics(DBTestCase):
         def open_custom_range_statistics_window():
 
             def select_custom_range():
-                for category in range(CustomRangeStatistics.categories_list_layout.count()):
-                    category_wrapper = CustomRangeStatistics.categories_list_layout.itemAt(category).widget()
-
-                    for category_layout_item in range(3):
-                        category_layout_item = category_wrapper.layout().itemAt(category_layout_item).widget()
-
-                        if category_layout_item.text() == LANGUAGES[Session.language]["General management"][1]:
-                            category_layout_item.click()#Add category button
+                CustomRangeStatistics.add_all_incomes_categories.click()
+                CustomRangeStatistics.add_all_expenses_categories.click()
                 
                 CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
                 CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))

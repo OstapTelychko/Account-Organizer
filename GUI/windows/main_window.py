@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton,QSizePolicy, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton,QSizePolicy, QGraphicsDropShadowEffect
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QFont
@@ -42,7 +42,6 @@ from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
 if TYPE_CHECKING:
     from PySide6.QtCore import QEvent
-    from PySide6.QtWidgets import QWidget
     from DesktopQtToolkit.message_window import MessageWindow
 
 

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from functools import partial
 from datetime import date
 from collections import defaultdict
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
 
 from languages import LANGUAGES
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
@@ -17,7 +17,7 @@ from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, Quarterl
 from GUI.windows.messages import Messages
 
 if TYPE_CHECKING:
-    from PySide6.QtWidgets import QListWidget, QPushButton
+    from PySide6.QtWidgets import QListWidget
     from backend.models import Transaction
     from AppObjects.category import Category
 
@@ -335,10 +335,12 @@ def show_yearly_statistics():
 
 def show_custom_range_statistics_window():
     #Remove previous categories
-    while CustomRangeStatistics.categories_list_layout.count():
-        widget = CustomRangeStatistics.categories_list_layout.takeAt(0).widget()
-        if widget:
-            widget.setParent(None)
+    while CustomRangeStatistics.incomes_categories_list_layout.count():
+        CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)
+
+    while CustomRangeStatistics.expenses_categories_list_layout.count():
+        CustomRangeStatistics.expenses_categories_list_layout.takeAt(0).widget().setParent(None)
+
     CustomRangeStatistics.selected_categories_list.clear()
     CustomRangeStatistics.selected_categories_data.clear()
 
@@ -355,14 +357,6 @@ def show_custom_range_statistics_window():
         add_category_statistics_list = create_button("Add", (100, 40))
         add_category_statistics_list.setText(LANGUAGES[Session.language]["General management"][1])
 
-        if category.type == CATEGORY_TYPE[0]:#Income
-            category_type_translate = LANGUAGES[Session.language]["Windows"]["Main"][1]
-        else:
-            category_type_translate = LANGUAGES[Session.language]["Windows"]["Main"][2]
-
-        remove_category_statistics_list.clicked.connect(partial(remove_category_from_statistics_list, category, add_category_statistics_list, remove_category_statistics_list))
-        add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
-
         category_layout = QHBoxLayout()
         category_layout.addWidget(category_name, alignment=ALIGN_H_CENTER)
         category_layout.addWidget(add_category_statistics_list, alignment=ALIGNMENT.AlignRight)
@@ -373,7 +367,15 @@ def show_custom_range_statistics_window():
         category_wrapper.setProperty("class", "category_list_item")
         category_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(category_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
-        CustomRangeStatistics.categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+        if category.type == CATEGORY_TYPE[0]:#Income
+            category_type_translate = LANGUAGES[Session.language]["Windows"]["Main"][1]
+            CustomRangeStatistics.incomes_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+        else:
+            category_type_translate = LANGUAGES[Session.language]["Windows"]["Main"][2]
+            CustomRangeStatistics.expenses_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+
+        remove_category_statistics_list.clicked.connect(partial(remove_category_from_statistics_list, category, add_category_statistics_list, remove_category_statistics_list))
+        add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
     
     StatisticsWindow.window.done(1)
     CustomRangeStatistics.window.exec()
@@ -395,6 +397,24 @@ def add_category_to_statistics_list(category:Category, category_type_translate:s
     add_button.setDisabled(True)
 
 
+def add_all_categories_to_statistics_list(sender_button:QPushButton):
+    if sender_button is CustomRangeStatistics.add_all_incomes_categories:
+        for category_wrapper_index in range(CustomRangeStatistics.incomes_categories_list_layout.count()):
+            category_wrapper = CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
+
+            for widget in category_wrapper.children():
+                if isinstance(widget, QPushButton) and widget.text() == LANGUAGES[Session.language]["General management"][1]:
+                    widget.click()
+
+    elif sender_button is CustomRangeStatistics.add_all_expenses_categories:
+        for category_wrapper_index in range(CustomRangeStatistics.expenses_categories_list_layout.count()):
+            category_wrapper = CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
+
+            for widget in category_wrapper.children():
+                if isinstance(widget, QPushButton) and widget.text() == LANGUAGES[Session.language]["General management"][1]:
+                    widget.click()
+
+
 def remove_category_from_statistics_list(category:Category, add_button:QPushButton, remove_button:QPushButton):
     #Reset selected categories
     CustomRangeStatistics.selected_categories_list.clear()
@@ -409,6 +429,24 @@ def remove_category_from_statistics_list(category:Category, add_button:QPushButt
         )
     remove_button.setDisabled(True)
     add_button.setDisabled(False)
+
+
+def remove_all_categories_from_statistics_list(sender_button:QPushButton):
+    if sender_button is CustomRangeStatistics.remove_all_incomes_categories:
+        for category_wrapper_index in range(CustomRangeStatistics.incomes_categories_list_layout.count()):
+            category_wrapper = CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
+
+            for widget in category_wrapper.children():
+                if isinstance(widget, QPushButton) and widget.text() == LANGUAGES[Session.language]["General management"][0]:
+                    widget.click()
+    
+    elif sender_button is CustomRangeStatistics.remove_all_expenses_categories:
+        for category_wrapper_index in range(CustomRangeStatistics.expenses_categories_list_layout.count()):
+            category_wrapper = CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
+
+            for widget in category_wrapper.children():
+                if isinstance(widget, QPushButton) and widget.text() == LANGUAGES[Session.language]["General management"][0]:
+                    widget.click()
 
 
 def show_custom_range_statistics_view():

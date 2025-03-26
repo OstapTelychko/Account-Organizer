@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMessageBox, QWidget, QPushButton
+from PySide6.QtWidgets import QMessageBox
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
@@ -103,6 +103,10 @@ def change_language():
     
     CustomRangeStatistics.window.setWindowTitle(Windows["Statistics"][34])
     CustomRangeStatistics.show_statistics.setText(Windows["Statistics"][0])
+    CustomRangeStatistics.add_all_incomes_categories.setText(Language["General management"][9])
+    CustomRangeStatistics.add_all_expenses_categories.setText(Language["General management"][9])
+    CustomRangeStatistics.remove_all_incomes_categories.setText(Language["General management"][10])
+    CustomRangeStatistics.remove_all_expenses_categories.setText(Language["General management"][10])
     CustomRangeStatisticsView.window.setWindowTitle(Windows["Statistics"][34])
     CustomRangeStatisticsView.copy_statistics.setText(Windows["Statistics"][35])
     CustomRangeStatisticsView.copy_transactions.setText(Windows["Statistics"][37])

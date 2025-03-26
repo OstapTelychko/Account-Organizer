@@ -48,7 +48,7 @@ from GUI.windows.transaction import TransactionManagementWindow
 from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
 from GUI.theme import swith_theme, load_theme
 
-from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view
+from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list, remove_all_categories_from_statistics_list
 from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
 from AppManagement.language import load_language, change_language_during_add_account
@@ -127,6 +127,10 @@ def main():
     QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
     CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
+    CustomRangeStatistics.add_all_incomes_categories.clicked.connect(partial(add_all_categories_to_statistics_list, CustomRangeStatistics.add_all_incomes_categories))
+    CustomRangeStatistics.add_all_expenses_categories.clicked.connect(partial(add_all_categories_to_statistics_list, CustomRangeStatistics.add_all_expenses_categories))
+    CustomRangeStatistics.remove_all_incomes_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, CustomRangeStatistics.remove_all_incomes_categories))
+    CustomRangeStatistics.remove_all_expenses_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, CustomRangeStatistics.remove_all_expenses_categories))
     CustomRangeStatisticsView.copy_statistics.clicked.connect(copy_custom_range_statistics)
     CustomRangeStatisticsView.copy_transactions.clicked.connect(copy_custom_range_transactions)
     

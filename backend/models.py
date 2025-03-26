@@ -2,11 +2,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import datetime
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DATETIME, SmallInteger
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Mapped
 
 Base = declarative_base()
 

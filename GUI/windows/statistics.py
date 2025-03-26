@@ -6,6 +6,8 @@ from PySide6.QtCore import Qt, QDate
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 
+from project_configuration import QCALENDAR_DATE_FORMAT
+
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
 from GUI.windows.main_window import MainWindow
 
@@ -257,35 +259,79 @@ class CustomRangeStatistics():
     selected_categories_list = QListWidget()
     selected_categories_list.setFont(BASIC_FONT)
     selected_categories_list.setMinimumWidth(400)
+    selected_categories_list.setMinimumHeight(225)
     selected_categories_list.setGraphicsEffect(QGraphicsDropShadowEffect(selected_categories_list, **SHADOW_EFFECT_ARGUMENTS))
     selected_categories_list.setWordWrap(True)
 
-    categories_list_layout = QVBoxLayout()
-    categories_list_layout.setSpacing(20)
-    categories_list_layout.setContentsMargins(10, 10, 20, 10)
+    add_all_incomes_categories = create_button("Add all", (150, 40))
+    remove_all_incomes_categories = create_button("Remove all", (150, 40))
 
-    categories_list_window = QWidget()
-    categories_list_window.setLayout(categories_list_layout)
+    incomes_buttons_layout = QHBoxLayout()
+    incomes_buttons_layout.addWidget(add_all_incomes_categories, alignment=ALIGN_H_CENTER)
+    incomes_buttons_layout.addWidget(remove_all_incomes_categories, alignment=ALIGN_H_CENTER)
 
-    categories_list_scroll = QScrollArea()
-    categories_list_scroll.setWidget(categories_list_window)
-    categories_list_scroll.setWidgetResizable(True)
-    categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    categories_list_scroll.setMinimumHeight(350)
-    categories_list_scroll.setMaximumHeight(350)
-    categories_list_scroll.setMinimumWidth(430)
-    categories_list_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-    categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
-    categories_list_scroll.setProperty("class", "wrapper")
-    categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+    incomes_categories_list_layout = QVBoxLayout()
+    incomes_categories_list_layout.setSpacing(20)
+    incomes_categories_list_layout.setContentsMargins(10, 10, 20, 10)
+
+    incomes_categories_layout = QVBoxLayout()
+    incomes_categories_layout.addLayout(incomes_buttons_layout)
+    incomes_categories_layout.addLayout(incomes_categories_list_layout)
+
+    incomes_categories_list_window = QWidget()
+    incomes_categories_list_window.setLayout(incomes_categories_layout)
+
+    incomes_categories_list_scroll = QScrollArea()
+    incomes_categories_list_scroll.setWidget(incomes_categories_list_window)
+    incomes_categories_list_scroll.setWidgetResizable(True)
+    incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    incomes_categories_list_scroll.setMinimumHeight(350)
+    incomes_categories_list_scroll.setMaximumHeight(350)
+    incomes_categories_list_scroll.setMinimumWidth(430)
+    incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
+    incomes_categories_list_scroll.setProperty("class", "wrapper")
+    incomes_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+
+    add_all_expenses_categories = create_button("Add all", (150, 40))
+    remove_all_expenses_categories = create_button("Remove all", (150, 40))
+
+    expenses_buttons_layout = QHBoxLayout()
+    expenses_buttons_layout.addWidget(add_all_expenses_categories, alignment=ALIGN_H_CENTER)
+    expenses_buttons_layout.addWidget(remove_all_expenses_categories, alignment=ALIGN_H_CENTER)
+
+    expenses_categories_list_layout = QVBoxLayout()
+    expenses_categories_list_layout.setSpacing(20)
+    expenses_categories_list_layout.setContentsMargins(10, 10, 20, 10)
+
+    expenses_categories_layout = QVBoxLayout()
+    expenses_categories_layout.addLayout(expenses_buttons_layout)
+    expenses_categories_layout.addLayout(expenses_categories_list_layout)
+
+    expenses_categories_list_window = QWidget()
+    expenses_categories_list_window.setLayout(expenses_categories_layout)
+    
+    expenses_categories_list_scroll = QScrollArea()
+    expenses_categories_list_scroll.setWidget(expenses_categories_list_window)
+    expenses_categories_list_scroll.setWidgetResizable(True)
+    expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    expenses_categories_list_scroll.setMinimumHeight(350)
+    expenses_categories_list_scroll.setMaximumHeight(350)
+    expenses_categories_list_scroll.setMinimumWidth(430)
+    expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
+    expenses_categories_list_scroll.setProperty("class", "wrapper")
+    expenses_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+
+    categoriels_lists_layout = QHBoxLayout()
+    categoriels_lists_layout.addWidget(incomes_categories_list_scroll)
+    categoriels_lists_layout.addWidget(expenses_categories_list_scroll)
 
     from_date = QDateEdit()
-    from_date.setDisplayFormat("dd/MM/yyyy")
+    from_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
     from_date.setCalendarPopup(True)
     from_date.setDate(QDate.currentDate())
 
     to_date = QDateEdit()
-    to_date.setDisplayFormat("dd/MM/yyyy")
+    to_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
     to_date.setCalendarPopup(True)
     to_date.setDate(QDate.currentDate())
 
@@ -300,10 +346,10 @@ class CustomRangeStatistics():
     show_statistics.setDefault(True)
 
     main_layout = QVBoxLayout()
-    main_layout.setSpacing(10)
+    main_layout.setSpacing(30)
     main_layout.addLayout(window.window_menu_layout)
     main_layout.addWidget(selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    main_layout.addWidget(categories_list_scroll, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+    main_layout.addLayout(categoriels_lists_layout)
     main_layout.addLayout(date_inputs_layout)
     main_layout.addWidget(show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
     main_layout.setContentsMargins(30, 10, 30, 20)
