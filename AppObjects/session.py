@@ -4,6 +4,7 @@ import os
 import sys
 from typing import TYPE_CHECKING
 from datetime import datetime
+
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
@@ -34,6 +35,11 @@ class Session:
         DAILY = "daily"
         NO_AUTO_BACKUP = "no auto backup"
     
+
+    class ShortcutId:
+        CLOSE_CURRENT_WINDOW = "Close_current_window"
+
+    
     app_version:str = None
 
     current_month = 4
@@ -61,6 +67,10 @@ class Session:
     instance_guard:SingleInstanceGuard = None
     test_mode = False
     test_alembic_config:Config = None
+
+    shortcuts = {
+        ShortcutId.CLOSE_CURRENT_WINDOW:"x",
+    }
 
 
     def start_session():
@@ -108,26 +118,47 @@ class Session:
 
     def load_user_config():
         with open(USER_CONF_PATH) as file:
-            User_conf = toml.load(USER_CONF_PATH)
+            User_conf = toml.load(file)
 
-            Session.theme = User_conf.get("Theme", "Dark")
-            Session.language = User_conf.get("Language", "English")
-            Session.account_name = User_conf.get("Account_name", "")
-            Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
-            Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
-            Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
-            Session.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", True)
+            if "General" in User_conf: 
+                Session.theme = User_conf["General"].get("Theme", "Dark")
+                Session.language = User_conf["General"].get("Language", "English")
+                Session.account_name = User_conf["General"].get("Account_name", "")
+
+                Session.auto_backup_status = User_conf["Backup"].get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+                Session.max_backups = User_conf["Backup"].get("Max_backups", MAX_RECOMMENDED_BACKUPS)
+                Session.max_legacy_backups = User_conf["Backup"].get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
+                Session.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", True)
+
+                Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW] = User_conf["Shortcuts"].get("Close_current_window", Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW])
+
+            else:
+            # If the file is not in the new format, load it as a legacy configuration
+                Session.theme = User_conf.get("Theme", "Dark")
+                Session.language = User_conf.get("Language", "English")
+                Session.account_name = User_conf.get("Account_name", "")
+                Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+                Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
+                Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
+                Session.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", True)
 
 
     def create_user_config():
         default_user_configuration = {
-            "Theme":"Dark",
-            "Language":"English",
-            "Account_name":"",
-            "Auto_backup_status":Session.AutoBackupStatus.MONTHLY,
-            "Max_backups":MAX_RECOMMENDED_BACKUPS,
-            "Max_legacy_backups":MAX_RECOMMENDED_LEGACY_BACKUPS,
-            "Auto_backup_removal_enabled":True
+            "General":{
+                "Theme":"Dark",
+                "Language":"English",
+                "Account_name":"",
+            },
+            "Backup":{
+                "Auto_backup_status":Session.AutoBackupStatus.MONTHLY,
+                "Max_backups":MAX_RECOMMENDED_BACKUPS,
+                "Max_legacy_backups":MAX_RECOMMENDED_LEGACY_BACKUPS,
+                "Auto_backup_removal_enabled":True
+            },
+            "Shortcuts":{
+                "Close_current_window":Session.shortcuts["Close_current_window"],
+            }
         }
 
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
@@ -137,13 +168,20 @@ class Session:
     def update_user_config():
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
             toml.dump({
-                "Theme":Session.theme,
-                "Language":Session.language,
-                "Account_name":Session.account_name,
-                "Auto_backup_status":Session.auto_backup_status,
-                "Max_backups":Session.max_backups,
-                "Max_legacy_backups":Session.max_legacy_backups,
-                "Auto_backup_removal_enabled":Session.auto_backup_removal_enabled
+                "General":{
+                    "Theme":Session.theme,
+                    "Language":Session.language,
+                    "Account_name":Session.account_name
+                },
+                "Backup":{
+                    "Auto_backup_status":Session.auto_backup_status,
+                    "Max_backups":Session.max_backups,
+                    "Max_legacy_backups":Session.max_legacy_backups,
+                    "Auto_backup_removal_enabled":Session.auto_backup_removal_enabled
+                },
+                "Shortcuts":{
+                    **Session.shortcuts
+                }
             }, file)
     
 
