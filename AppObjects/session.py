@@ -38,6 +38,14 @@ class Session:
 
     class ShortcutId:
         CLOSE_CURRENT_WINDOW = "Close_current_window"
+        OPEN_SETTINGS = "Open_settings"
+        OPEN_STATISTICS = "Open_statistics"
+        SWITCH_ACCOUNT = "Switch_account"
+        SWITCH_TO_INCOME = "Switch_to_income"
+        SWITCH_TO_EXPENSE = "Switch_to_expense"
+        LOAD_PREVIOUS_MONTH = "Load_previous_month"
+        LOAD_NEXT_MONTH = "Load_next_month"
+
 
     
     app_version:str = None
@@ -50,6 +58,7 @@ class Session:
 
     accounts_list:list[Account] = []
     categories:dict[int, Category] = {}
+    focused_category:Category = None
 
     account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
 
@@ -70,6 +79,13 @@ class Session:
 
     shortcuts = {
         ShortcutId.CLOSE_CURRENT_WINDOW:"x",
+        ShortcutId.OPEN_SETTINGS:"s",
+        ShortcutId.OPEN_STATISTICS:"a",
+        ShortcutId.SWITCH_ACCOUNT:"shift+s",
+        ShortcutId.SWITCH_TO_INCOME:"q",
+        ShortcutId.SWITCH_TO_EXPENSE:"w",
+        ShortcutId.LOAD_PREVIOUS_MONTH:"shift+q",
+        ShortcutId.LOAD_NEXT_MONTH:"shift+w",
     }
 
 
@@ -131,9 +147,14 @@ class Session:
                 Session.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", True)
 
                 Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW] = User_conf["Shortcuts"].get("Close_current_window", Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW])
+                Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS] = User_conf["Shortcuts"].get("Open_settings", Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS])
+                Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS] = User_conf["Shortcuts"].get("Open_statistics", Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS])
+                Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT] = User_conf["Shortcuts"].get("Switch_account", Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT])
+                Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME] = User_conf["Shortcuts"].get("Switch_to_income", Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME])
+                Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE] = User_conf["Shortcuts"].get("Switch_to_expense", Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE])
 
             else:
-            # If the file is not in the new format, load it as a legacy configuration
+            # If the file is not in the new format, load it as a legacy configuration (1.1.1)
                 Session.theme = User_conf.get("Theme", "Dark")
                 Session.language = User_conf.get("Language", "English")
                 Session.account_name = User_conf.get("Account_name", "")
