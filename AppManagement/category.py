@@ -96,8 +96,8 @@ def load_categories():
     for category in Session.db.category_query.get_all_categories():
         Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.language)
         logger.debug(f"Category {category.name} loaded")
+    reset_focused_category()
         
-
 
 def show_category_settings(category_name:str):
     if Session.db.category_query.category_exists(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
@@ -124,6 +124,7 @@ def remove_category():
         logger.debug(f"Category {category_name} removed")
 
         calculate_current_balance()
+        reset_focused_category()
         show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][7])
 
 
@@ -225,3 +226,18 @@ def activate_categories():
         category.edit_transaction.clicked.connect(partial(show_edit_transaction_window, category.name, category.table_data))
         category.delete_transaction.clicked.connect(partial(remove_transaction, category.table_data, category_id))
         logger.debug(f"Category {category.name} activated")
+
+
+def reset_focused_category():
+    income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
+    expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
+
+    if len(income_categories) != 0:
+        Session.focused_income_category = income_categories[0]
+    else:
+        Session.focused_income_category = None
+    
+    if len(expense_categories) != 0:
+        Session.focused_expense_category = expense_categories[0]
+    else:
+        Session.focused_expense_category = None

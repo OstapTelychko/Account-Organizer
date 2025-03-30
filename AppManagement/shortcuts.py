@@ -1,5 +1,4 @@
-from PySide6.QtWidgets import QApplication, QDialog
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGraphicsDropShadowEffect
 from PySide6.QtGui import QShortcut, QKeySequence
 from functools import partial
 
@@ -10,13 +9,58 @@ from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
 from GUI.windows.statistics import StatisticsWindow
 from GUI.windows.account import SwitchAccountWindow
+from GUI.gui_constants import FOCUSED_SHADOW_EFFECT_ARGUMENTS
 
 
 
 def move_to_next_category():
+    income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
+    expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
+
     if MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        categories = iter([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
-        next()
+        if len(income_categories) > 1:
+            current_index = income_categories.index(Session.focused_income_category)
+            next_index = (current_index + 1) % len(income_categories)
+
+            Session.focused_income_category.table_data.setGraphicsEffect(None)
+            Session.focused_income_category = income_categories[next_index]
+            Session.focused_income_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_income_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+            MainWindow.Incomes_scroll.ensureWidgetVisible(Session.focused_income_category.table_data, 300)
+    
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if len(expense_categories) > 1:
+            current_index = expense_categories.index(Session.focused_expense_category)
+            next_index = (current_index + 1) % len(expense_categories)
+
+            Session.focused_expense_category.table_data.setGraphicsEffect(None)
+            Session.focused_expense_category = expense_categories[next_index]
+            Session.focused_expense_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_expense_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+            MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)
+
+
+def move_to_previous_category():
+    income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
+    expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
+
+    if MainWindow.Incomes_and_expenses.currentIndex() == 0:
+        if len(income_categories) > 1:
+            current_index = income_categories.index(Session.focused_income_category)
+            previous_index = (current_index - 1) % len(income_categories)
+
+            Session.focused_income_category.table_data.setGraphicsEffect(None)
+            Session.focused_income_category = income_categories[previous_index]
+            Session.focused_income_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_income_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+            MainWindow.Incomes_scroll.ensureWidgetVisible(Session.focused_income_category.table_data, 300)
+    
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if len(expense_categories) > 1:
+            current_index = expense_categories.index(Session.focused_expense_category)
+            previous_index = (current_index - 1) % len(expense_categories)
+
+            Session.focused_expense_category.table_data.setGraphicsEffect(None)
+            Session.focused_expense_category = expense_categories[previous_index]
+            Session.focused_expense_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_expense_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+            MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)
 
 
 def assign_shortcuts():
@@ -64,3 +108,13 @@ def assign_shortcuts():
         QKeySequence(Session.shortcuts[Session.ShortcutId.LOAD_NEXT_MONTH]),
         MainWindow.window)
     load_next_month_shortcut.activated.connect(MainWindow.next_month_button.click)
+
+    move_to_next_category_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_NEXT_CATEGORY]),
+        MainWindow.window)
+    move_to_next_category_shortcut.activated.connect(move_to_next_category)
+
+    move_to_previous_category_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]),
+        MainWindow.window)
+    move_to_previous_category_shortcut.activated.connect(move_to_previous_category)

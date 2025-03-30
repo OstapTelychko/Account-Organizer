@@ -45,6 +45,8 @@ class Session:
         SWITCH_TO_EXPENSE = "Switch_to_expense"
         LOAD_PREVIOUS_MONTH = "Load_previous_month"
         LOAD_NEXT_MONTH = "Load_next_month"
+        FOCUS_ON_NEXT_CATEGORY = "Focus_on_next_category"
+        FOCUS_ON_PREVIOUS_CATEGORY = "Focus_on_previous_category"
 
 
     
@@ -58,7 +60,8 @@ class Session:
 
     accounts_list:list[Account] = []
     categories:dict[int, Category] = {}
-    focused_category:Category = None
+    focused_income_category:Category = None
+    focused_expense_category:Category = None
 
     account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
 
@@ -86,6 +89,8 @@ class Session:
         ShortcutId.SWITCH_TO_EXPENSE:"w",
         ShortcutId.LOAD_PREVIOUS_MONTH:"shift+q",
         ShortcutId.LOAD_NEXT_MONTH:"shift+w",
+        ShortcutId.FOCUS_ON_NEXT_CATEGORY:"ctrl+right",
+        ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY:"ctrl+left",
     }
 
 
