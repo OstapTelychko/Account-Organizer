@@ -47,6 +47,7 @@ class Session:
         LOAD_NEXT_MONTH = "Load_next_month"
         FOCUS_ON_NEXT_CATEGORY = "Focus_on_next_category"
         FOCUS_ON_PREVIOUS_CATEGORY = "Focus_on_previous_category"
+        ADD_TRANSACTION_TO_FOCUSED_CATEGORY = "Add_transaction_to_focused_category"
 
 
     
@@ -91,6 +92,7 @@ class Session:
         ShortcutId.LOAD_NEXT_MONTH:"shift+w",
         ShortcutId.FOCUS_ON_NEXT_CATEGORY:"ctrl+right",
         ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY:"ctrl+left",
+        ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY:"e"
     }
 
 

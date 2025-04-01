@@ -63,6 +63,19 @@ def move_to_previous_category():
             MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)
 
 
+def add_transaction_to_focused_category():
+    """
+    Adds a transaction to the focused category.
+    """
+    if MainWindow.Incomes_and_expenses.currentIndex() == 0:
+        if Session.focused_income_category is not None:
+            Session.focused_income_category.add_transaction.click()
+
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if Session.focused_expense_category is not None:
+            Session.focused_expense_category.add_transaction.click()
+
+
 def assign_shortcuts():
     """
     Assign shortcuts to the application.
@@ -118,3 +131,8 @@ def assign_shortcuts():
         QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]),
         MainWindow.window)
     move_to_previous_category_shortcut.activated.connect(move_to_previous_category)
+
+    add_transaction_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]),
+        MainWindow.window)
+    add_transaction_shortcut.activated.connect(add_transaction_to_focused_category)
