@@ -76,6 +76,66 @@ def add_transaction_to_focused_category():
             Session.focused_expense_category.add_transaction.click()
 
 
+def select_previous_transaction():
+    """
+    Selects the previous transaction in the focused category.
+    """
+    if MainWindow.Incomes_and_expenses.currentIndex() == 0:
+        if Session.focused_income_category is not None:
+            current_index = Session.focused_income_category.table_data.currentRow()
+            if current_index > 0:
+                Session.focused_income_category.table_data.selectRow(current_index - 1)
+
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if Session.focused_expense_category is not None:
+            current_index = Session.focused_expense_category.table_data.currentRow()
+            if current_index > 0:
+                Session.focused_expense_category.table_data.selectRow(current_index - 1)
+
+
+def select_next_transaction():
+    """
+    Selects the next transaction in the focused category.
+    """
+    if MainWindow.Incomes_and_expenses.currentIndex() == 0:
+        if Session.focused_income_category is not None:
+            current_index = Session.focused_income_category.table_data.currentRow()
+            if current_index < Session.focused_income_category.table_data.rowCount() - 1:
+                Session.focused_income_category.table_data.selectRow(current_index + 1)
+
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if Session.focused_expense_category is not None:
+            current_index = Session.focused_expense_category.table_data.currentRow()
+            if current_index < Session.focused_expense_category.table_data.rowCount() - 1:
+                Session.focused_expense_category.table_data.selectRow(current_index + 1)
+
+
+def delete_transaction():
+    """
+    Deletes the selected transaction in the focused category.
+    """
+    if MainWindow.Incomes_and_expenses.currentIndex() == 0:
+        if Session.focused_income_category is not None:
+            Session.focused_income_category.delete_transaction.click()
+
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if Session.focused_expense_category is not None:
+            Session.focused_expense_category.delete_transaction.click()
+
+
+def edit_transaction():
+    """
+    Edits the selected transaction in the focused category.
+    """
+    if MainWindow.Incomes_and_expenses.currentIndex() == 0:
+        if Session.focused_income_category is not None:
+            Session.focused_income_category.edit_transaction.click()
+
+    elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
+        if Session.focused_expense_category is not None:
+            Session.focused_expense_category.edit_transaction.click()
+
+
 def assign_shortcuts():
     """
     Assign shortcuts to the application.
@@ -136,3 +196,23 @@ def assign_shortcuts():
         QKeySequence(Session.shortcuts[Session.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]),
         MainWindow.window)
     add_transaction_shortcut.activated.connect(add_transaction_to_focused_category)
+
+    select_previous_transaction_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION]),
+        MainWindow.window)
+    select_previous_transaction_shortcut.activated.connect(select_previous_transaction)
+
+    select_next_transaction_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]),
+        MainWindow.window)
+    select_next_transaction_shortcut.activated.connect(select_next_transaction)
+
+    delete_transaction_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.DELETE_TRANSACTION]),
+        MainWindow.window)
+    delete_transaction_shortcut.activated.connect(delete_transaction)
+
+    edit_transaction_shortcut = QShortcut(
+        QKeySequence(Session.shortcuts[Session.ShortcutId.EDIT_TRANSACTION]),
+        MainWindow.window)
+    edit_transaction_shortcut.activated.connect(edit_transaction)

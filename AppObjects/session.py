@@ -48,6 +48,10 @@ class Session:
         FOCUS_ON_NEXT_CATEGORY = "Focus_on_next_category"
         FOCUS_ON_PREVIOUS_CATEGORY = "Focus_on_previous_category"
         ADD_TRANSACTION_TO_FOCUSED_CATEGORY = "Add_transaction_to_focused_category"
+        SELECT_PREVIOUS_TRANSACTION = "Select_previous_transaction"
+        SELECT_NEXT_TRANSACTION = "Select_next_transaction"
+        DELETE_TRANSACTION = "Delete_transaction"
+        EDIT_TRANSACTION = "Edit_transaction"
 
 
     
@@ -92,7 +96,11 @@ class Session:
         ShortcutId.LOAD_NEXT_MONTH:"shift+w",
         ShortcutId.FOCUS_ON_NEXT_CATEGORY:"ctrl+right",
         ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY:"ctrl+left",
-        ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY:"e"
+        ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY:"e",
+        ShortcutId.SELECT_PREVIOUS_TRANSACTION:"up",
+        ShortcutId.SELECT_NEXT_TRANSACTION:"down",
+        ShortcutId.DELETE_TRANSACTION:"d",
+        ShortcutId.EDIT_TRANSACTION:"c"
     }
 
 
@@ -159,6 +167,8 @@ class Session:
                 Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT] = User_conf["Shortcuts"].get("Switch_account", Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT])
                 Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME] = User_conf["Shortcuts"].get("Switch_to_income", Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME])
                 Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE] = User_conf["Shortcuts"].get("Switch_to_expense", Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE])
+                Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION] = User_conf["Shortcuts"].get("Select_previous_transaction", Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION])
+                Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION] = User_conf["Shortcuts"].get("Select_next_transaction", Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION])
 
             else:
             # If the file is not in the new format, load it as a legacy configuration (1.1.1)
