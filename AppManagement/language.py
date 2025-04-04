@@ -19,6 +19,8 @@ from GUI.windows.update_progress import UpdateProgressWindow
 logger = get_logger(__name__)
 
 def change_language():
+    """Change language of the application. It changes the text of all widgets in the application."""
+
     Language = LANGUAGES[Session.language]
     Windows = Language["Windows"]
 
@@ -169,6 +171,8 @@ def change_language():
 
 
 def change_language_during_add_account(language:int | str):
+    """Change language during adding account. In case db have no account, not all windows are loaded."""
+
     if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
         Session.language = language
@@ -188,6 +192,14 @@ def change_language_during_add_account(language:int | str):
 
 
 def load_language(language):
+    """Load language. It loads language from user config or by user choice.
+
+        Arguments
+        ---------
+        `language` : str | int - Language to load. It can be a string or an index of the language in AVAILABLE_LANGUAGES.
+            If the language is a string, it will be converted to an index.
+    """
+
     logger.info("Loading language")
     if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]

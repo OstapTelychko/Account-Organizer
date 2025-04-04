@@ -16,6 +16,8 @@ if TYPE_CHECKING:
 
 
 class MessageWindow(QMessageBox):
+    """This class is used to create a message window that can be used to display messages to the user.
+    It inherits from QMessageBox and adds some additional functionality."""
     
     def __init__(self, main_window:QWidget, message_windows_container:dict, type_confirm:bool, message_icon:QMessageBox.Icon | QPixmap, title:str, window_icon:QIcon, ) -> None:
         super().__init__(main_window)
@@ -40,6 +42,9 @@ class MessageWindow(QMessageBox):
     
 
     def exec(self):
+        """This method is used to show the message window and center it on the main window.
+        It also sets the theme of the message window to match the main window theme on windows OS."""
+
         if platform == "win32":
             if Session.theme == "Dark":
                 value = ctypes.c_int(2)
@@ -51,6 +56,8 @@ class MessageWindow(QMessageBox):
             )
 
         def center_message():
+            """This method is used to center the message window on the main window."""
+
             main_window_center = self.main_window.geometry().center()
             message_window_geometry = self.geometry()
 

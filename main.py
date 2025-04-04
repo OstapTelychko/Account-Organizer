@@ -56,7 +56,7 @@ from AppManagement.balance import load_account_balance
 from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
-from AppManagement.account import show_add_user_window, add_acccount, switch_account, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
+from AppManagement.account import show_add_user_window, add_acccount, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 from AppManagement.shortcuts import assign_shortcuts
 from AppManagement.update_app import check_for_updates
@@ -69,6 +69,8 @@ logger = get_logger(__name__)
 
 
 def calculate_expression():
+    """Calculate the expression from the mini calculator input field"""
+
     expression = MainWindow.mini_calculator_text.text()
 
     if expression != "":
@@ -92,6 +94,8 @@ def calculate_expression():
 
 
 def main():
+    """Main function to start the application"""
+
     Session.start_session()
 
     #Set main window for instance guard

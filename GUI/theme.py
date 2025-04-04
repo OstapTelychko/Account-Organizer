@@ -165,6 +165,8 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
 
 
 def swith_theme():
+    """Switch theme between dark and light. If current theme is dark, switch to light and vice versa."""
+
     if Session.theme == "Dark":
         app.setStyleSheet(LIGHT_THEME)
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
@@ -187,6 +189,8 @@ def swith_theme():
 
 
 def load_theme():
+    """Load theme from user config."""
+
     logger.info("Loading theme")
     if Session.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
@@ -207,6 +211,8 @@ def load_theme():
 
 if platform == "win32":
     def set_theme_mode_on_window(window:QWidget, value:ctypes.c_uint):
+        """Set theme mode on window. This is used to set the theme mode on windows OS."""
+
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
             window.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
         )

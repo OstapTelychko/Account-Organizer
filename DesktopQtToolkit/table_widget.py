@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 
 class CustomTableWidget(QTableWidget):
+    """This class is used to create a custom table widget that allows for copying multiple cells to the clipboard and prevents scrolling out of widget when the table widget runs out of rows."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,7 +35,7 @@ class CustomTableWidget(QTableWidget):
     
 
     def wheelEvent(self, event:QWheelEvent):
-        "Prevents scrolling when TableWidget run out of rows and is neseted into a ScrollArea"
+        "Prevents scrolling out of widget when TableWidget run out of rows and is neseted into a ScrollArea"
 
         verticall_scrollbar = self.verticalScrollBar()
         if verticall_scrollbar.isVisible() and verticall_scrollbar.minimum() < verticall_scrollbar.maximum():

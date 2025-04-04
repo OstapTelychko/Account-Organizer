@@ -19,11 +19,15 @@ from AppManagement.language import change_language_during_add_account, change_la
 logger = get_logger(__name__)
 
 def show_add_user_window():
+    """Show add user window. First window if db doesn't contain any account."""
+
     change_language_during_add_account(Session.language)
     AddAccountWindow.window.exec()
 
 
 def add_acccount():
+    """Add account to database. If account already exists, show warning message."""
+
     account_name = AddAccountWindow.account_name.text().strip()
 
     if account_name == "":
@@ -35,7 +39,9 @@ def add_acccount():
 
     balance = AddAccountWindow.current_balance.text()
 
-    def complete_adding_account():
+    def _complete_adding_account():
+        """Complete adding account. Close add account window, update user config, load accounts and load account data. Created to avoid code duplication."""
+
         AddAccountWindow.window.hide()
 
         Session.account_name = account_name
@@ -58,17 +64,19 @@ def add_acccount():
                 balance = int(balance)
 
             Session.db.create_account(account_name, balance)
-            complete_adding_account()    
+            _complete_adding_account()    
     else:
         Messages.zero_current_balance.setText(LANGUAGES[Session.language]["Messages"][2])
 
         Messages.zero_current_balance.exec()
         if Messages.zero_current_balance.clickedButton() == Messages.zero_current_balance.ok_button:
             Session.db.create_account(account_name, 0)
-            complete_adding_account()
+            _complete_adding_account()
 
 
 def load_account_data(name:str):
+    """Load account data. Load categories, set account name and balance."""
+
     #Remove loaded categories
     remove_categories_from_list()
 
@@ -84,6 +92,8 @@ def load_account_data(name:str):
 
 
 def load_accounts():
+    """Load accounts from database. Clear account switch widgets and load all accounts."""
+
     Session.accounts_list = Session.db.account_query.get_all_accounts()
 
     for account in Session.accounts_list:
@@ -102,6 +112,8 @@ def load_accounts():
  
 
 def clear_accounts_layout():
+    """Clear account switch widgets. Remove all widgets from layout and clear account switch widgets list."""
+
     Session.account_switch_widgets.clear()
     while SwitchAccountWindow.accounts_layout.count() > 0:
         widget = SwitchAccountWindow.accounts_layout.itemAt(0).widget()
@@ -110,6 +122,12 @@ def clear_accounts_layout():
 
 
 def switch_account(name:str):
+    """Switch account. Show warning message and load account data. Disable switch button for current account and enable for other accounts.
+
+        Arguments
+        ---------
+            `name` : (str) - Account name to switch to.
+    """
     Messages.load_account_question.setText(LANGUAGES[Session.language]["Messages"][10].replace("account", name))
 
     Messages.load_account_question.exec()
@@ -125,6 +143,8 @@ def switch_account(name:str):
 
 
 def remove_account():
+    """Remove account. Show warning message and remove account from database. If last account is removed, close app."""
+
     Messages.delete_account_warning.setText(LANGUAGES[Session.language]["Messages"][11].replace("account", Session.account_name))
 
     Messages.delete_account_warning.exec()
@@ -148,11 +168,15 @@ def remove_account():
 
 
 def show_rename_account_window():
+    """Show rename account window. Set current account name to line edit."""
+
     RenameAccountWindow.new_account_name.setText(Session.account_name)
     RenameAccountWindow.window.exec()
 
 
 def rename_account():
+    """Rename account. Show warning message and rename account in database. If account already exists, show warning message."""
+    
     new_account_name = RenameAccountWindow.new_account_name.text().strip()
 
     if new_account_name == "":

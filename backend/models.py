@@ -11,6 +11,8 @@ Base = declarative_base()
 
 
 class Account(Base):
+    """Represents an account in the application."""
+
     __tablename__ = "accounts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -35,6 +37,8 @@ class Account(Base):
 
 
 class Category(Base):
+    """Represents a category in the application."""
+
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -61,6 +65,8 @@ class Category(Base):
 
 
 class Transaction(Base):
+    """Represents a transaction in the application."""
+
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

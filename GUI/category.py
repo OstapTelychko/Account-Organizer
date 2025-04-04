@@ -171,6 +171,13 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
 
 def add_category_to_position_list(category:Category):
+    """Add category to categories positions list
+
+        Arguments
+        -------
+            `category` (Category): Category object to add to the list
+    """
+
     category_position = QLabel()
     category_position.setProperty("class", "category_list_item")
     category_position.setText(str(category.position))

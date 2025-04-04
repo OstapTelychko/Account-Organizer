@@ -105,6 +105,8 @@ class Session:
 
 
     def start_session():
+        """Start session. It loads user configuration, app version, and backups. It also sets the current date and creates the backups directory if it doesn't exist."""
+
         logger.info("__BREAK_LINE__")
         logger.info("__BREAK_LINE__")
         logger.info("Starting session")
@@ -143,11 +145,15 @@ class Session:
     
 
     def load_app_version():
+        """Load app version from file. It reads the version from the file and sets it to the app_version variable."""
+
         with open(f"{APP_DIRECTORY}/app version.txt") as file:
             Session.app_version = file.read().strip()
 
 
     def load_user_config():
+        """Load user configuration. It reads the configuration from the file and sets it to the session variables."""
+
         with open(USER_CONF_PATH) as file:
             User_conf = toml.load(file)
 
@@ -182,6 +188,8 @@ class Session:
 
 
     def create_user_config():
+        """Create user configuration file. It creates a new file with default values if the file doesn't exist."""
+
         default_user_configuration = {
             "General":{
                 "Theme":"Dark",
@@ -195,7 +203,7 @@ class Session:
                 "Auto_backup_removal_enabled":True
             },
             "Shortcuts":{
-                "Close_current_window":Session.shortcuts["Close_current_window"],
+                **Session.shortcuts,
             }
         }
 
@@ -204,6 +212,8 @@ class Session:
 
         
     def update_user_config():
+        """Update user configuration file. It updates the file with the current values of the session variables."""
+
         with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
             toml.dump({
                 "General":{
@@ -224,6 +234,8 @@ class Session:
     
 
     def load_backups():
+        """Load backups from the backups directory. It loads all backups and adds them to the session."""
+
         for backup in os.listdir(BACKUPS_DIRECTORY) if not Session.test_mode else os.listdir(TEST_BACKUPS_DIRECTORY):
             if Session.test_mode:
                 backup = Backup.parse_db_file_path(os.path.join(TEST_BACKUPS_DIRECTORY, backup))
@@ -234,18 +246,24 @@ class Session:
 
 
     def end_session():
+        """End session. It closes the database connection, removes the instance guard, and closes all sockets."""
+
         Session.instance_guard.close_sockets()
         Session.db.close_connection()
         logger.info("Ending session")
     
 
     def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType):
+        """Custom excepthook. It logs the exception to Error log."""
+
         logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
         logger.info(f"Ending session with critical error (see {ERROR_LOG_FILE})\n\n")
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
 
     def restart_app():
+        """Restart the app. It closes the current session and starts a new one."""
+
         Session.end_session()
         if DEVELOPMENT_MODE:
             QProcess.startDetached(sys.executable, sys.argv)#First argument using IDE is the path to the script that have to be run 

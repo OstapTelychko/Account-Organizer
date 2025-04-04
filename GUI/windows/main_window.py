@@ -187,6 +187,8 @@ class MainWindow():
     sub_windows:dict[int, SubWindow] = dict()
     message_windows:dict[int, MessageWindow] = dict()
     def move_event(event:QEvent):
+        """This method is used to move all sub windows and message windows when the main window is moved."""
+
         for sub_window in MainWindow.sub_windows.values():
             main_window_center = MainWindow.window.geometry().center()
             sub_window_geometry = sub_window.geometry()

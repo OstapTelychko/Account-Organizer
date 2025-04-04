@@ -22,6 +22,8 @@ from AppManagement.transaction import show_add_transaction_window, show_edit_tra
 logger = get_logger(__name__)
 
 def remove_categories_from_list():
+    """Remove all categories from Session.categories. It's used in case you need to update or load all categories."""
+
     for category in Session.categories.copy():
         Session.categories[category].window.deleteLater()
         Session.categories[category].settings.deleteLater()
@@ -32,6 +34,8 @@ def remove_categories_from_list():
 
 
 def load_categories_data():
+    """Load all categories data from database. It loads all monthly transactions for each category """
+
     for category in Session.categories:
         category_data = Session.categories[category].table_data
         if category_data.rowCount() != 0:#Remove current category transactions if it exist
@@ -65,6 +69,8 @@ def load_categories_data():
 
 
 def create_category():
+    """Create category. It creates a new category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
+
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
     category_name = AddCategoryWindow.category_name.text().strip()
 
@@ -93,6 +99,8 @@ def create_category():
 
 
 def load_categories():
+    """Load all categories from database for current account."""
+
     for category in Session.db.category_query.get_all_categories():
         Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.language)
         logger.debug(f"Category {category.name} loaded")
@@ -100,12 +108,21 @@ def load_categories():
         
 
 def show_category_settings(category_name:str):
+    """Show category settings.
+
+        Arguments
+        ---------
+        `category_name` : (str) Name of the category to show settings for.
+    """
+
     if Session.db.category_query.category_exists(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
         CategorySettingsWindow.window.setWindowTitle(category_name)
         CategorySettingsWindow.window.exec()
 
 
 def remove_category():
+    """Remove category. It removes the category from the database and from the GUI. It also shows a confirmation message before removing the category."""
+
     category_name = CategorySettingsWindow.window.windowTitle()
 
     Messages.delete_category_confirmation.exec()
@@ -129,6 +146,8 @@ def remove_category():
 
 
 def rename_category():
+    """Rename category. It renames the category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
+
     new_category_name = RenameCategoryWindow.new_category_name.text().strip()
     current_name = RenameCategoryWindow.window.windowTitle()
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
@@ -159,6 +178,8 @@ def rename_category():
 
 
 def show_change_category_position(category_name:str):
+    """Show change category position window. It shows the current category position and all other categories in the same type."""
+
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
     selected_category = Session.db.category_query.get_category(category_name, category_type)
 
@@ -181,6 +202,8 @@ def show_change_category_position(category_name:str):
 
 
 def change_category_position():
+    """Change category position. It changes the category position in the database and in the GUI. It also checks if the new position is valid"""
+
     category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
     category_name = ChangeCategoryPositionWindow.preview_category_name.text()
     category = Session.db.category_query.get_category(category_name, category_type)
@@ -214,12 +237,16 @@ def change_category_position():
 
 
 def update_category_total_value(category_id:int):
+    """Update category total value. It updates the total value label for the category in the GUI."""
+
     Session.categories[category_id].total_value_label.setText(
         LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10] +
         str(round(Session.db.statistics_query.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
 
 
 def activate_categories():
+    """Activate all categories. It connects all category buttons to their respective functions."""
+
     for category_id, category in Session.categories.items():
         category.settings.clicked.connect(partial(show_category_settings, category.name))
         category.add_transaction.clicked.connect(partial(show_add_transaction_window, category.name))
@@ -229,6 +256,8 @@ def activate_categories():
 
 
 def reset_focused_category():
+    """Reset focused category. It sets the focused income and expense categories to the first category of their type."""
+
     income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
     expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
 

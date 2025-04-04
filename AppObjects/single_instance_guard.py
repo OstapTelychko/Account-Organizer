@@ -14,6 +14,9 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 class SingleInstanceGuard(QObject):
+    """This class is used to ensure that only one instance of the application is running at a time.
+    It uses a TCP server to listen for incoming connections from other instances of the application.
+    If another instance is started, it will send a message to the existing instance to raise its window."""
 
     def __init__(self) -> None:
         super(SingleInstanceGuard, self).__init__()
@@ -40,15 +43,21 @@ class SingleInstanceGuard(QObject):
     
 
     def start_server(self):
+        """Start the server to listen for incoming connections from other instances of the application."""
+
         self.server_socket.listen(QHostAddress.SpecialAddress.LocalHost, APP_PORT)
 
 
     def handle_new_connection(self):
+        """Handle new incoming connection from another instance of the application."""
+
         client_connection = self.server_socket.nextPendingConnection()
         client_connection.readyRead.connect(self.read_client)
     
 
     def read_client(self):
+        """Read data from the client connection. If the data is "RAISE_WINDOW", raise the main window."""
+
         client_connection:QTcpSocket = self.sender()
         
         while client_connection.bytesAvailable() > 0:
@@ -61,6 +70,8 @@ class SingleInstanceGuard(QObject):
     
 
     def close_sockets(self):
+        """Close the server and client sockets."""
+        
         if self.server_socket.isListening():
             self.server_socket.close()
         self.client_socket.close()

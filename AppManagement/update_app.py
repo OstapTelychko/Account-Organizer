@@ -44,6 +44,17 @@ logger = get_logger(__name__)
 
 
 def requests_retry_session(retries:int = 3, backoff_factor:int = 0.3, status_forcelist:tuple = (429, 500, 502, 503, 504)):
+    """Create a requests session with retry logic.
+
+        Arguments
+        ---------
+        `retries`: (int) - The number of retries to attempt.
+
+        `backoff_factor`: (int) - The backoff factor to apply between attempts (delay).
+
+        `status_forcelist`: (tuple) - A set of HTTP status codes that we should force a retry on.
+    """
+
     request_session = req.Session()
     retry = Retry(total=retries, read=retries, connect=retries, backoff_factor=backoff_factor, status_forcelist=status_forcelist)
     adapter = HTTPAdapter(max_retries=retry)
@@ -53,6 +64,13 @@ def requests_retry_session(retries:int = 3, backoff_factor:int = 0.3, status_for
 
 
 def check_internet_connection() -> bool:
+    """Check if internet connection is available by sending a HEAD request to google.com.
+
+        Returns
+        -------
+        `bool`: True if internet connection is available, False otherwise.
+    """
+
     try:
         response = req.head("https://www.google.com/", timeout=5)
         response.raise_for_status()
@@ -74,7 +92,13 @@ def check_internet_connection() -> bool:
         return False
 
 
-def get_latest_version():
+def get_latest_version() -> str:
+    """Get the latest version of the app from GitHub releases.
+        Returns
+        -------
+        `str`: The latest version of the app.
+    """
+
     logger.info("Checking for internet connection")
     if not check_internet_connection():
         return
@@ -95,6 +119,13 @@ def get_latest_version():
 
 
 def download_latest_update() -> bool:
+    """Download the latest update from GitHub releases.
+
+        Returns
+        -------
+        `bool`: True if the download was successful, False otherwise.
+    """
+
     try:
         request_session = requests_retry_session()
         if UPDATE_API_TOKEN:
@@ -163,6 +194,8 @@ def download_latest_update() -> bool:
 
 
 def prepare_update():
+    """Prepare the update by copying the GUI library and creating backups of the database files."""
+
     logger.info("Preparing update")
 
     if os.path.exists(PREVIOUS_VERSION_COPY_DIRECTORY):
@@ -206,6 +239,8 @@ def prepare_update():
 
     logger.info("Creating and migrating backups")
     def _create_single_backup(backup:Backup):
+        """Create a copy of the backup and upgrade it version but doesn't upgrade the database schema."""
+
         updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
         Session.db.backup_query.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
         logger.debug(f"Created backup: {updated_backup_file_path}")
@@ -216,6 +251,8 @@ def prepare_update():
         updated_backups_paths = [future.result() for future in futures]
 
     def _migrate_single_backup(backup_path:str):
+        """Upgrade the copied backup database schema to the latest version."""
+
         nonlocal upgraded_backups
 
         alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
@@ -252,6 +289,8 @@ def prepare_update():
         
         
 def apply_update():
+    """Apply the update by moving files and."""
+
     logger.info("Applying update")
     Session.db.close_connection()
 
@@ -319,6 +358,8 @@ def apply_update():
 
 
 def check_for_updates():
+    """Check for updates and ask to download them if available."""
+
     logger.info("__BREAK_LINE__")
     logger.info("Checking for updates")
     latest_version = get_latest_version()

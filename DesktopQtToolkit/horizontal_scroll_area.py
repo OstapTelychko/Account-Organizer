@@ -10,6 +10,8 @@ if TYPE_CHECKING:
 
 
 class HorizontalScrollArea(QScrollArea):
+    """This class is used to create a horizontal scroll area that can be scrolled using the mouse wheel."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -21,6 +23,13 @@ class HorizontalScrollArea(QScrollArea):
 
 
     def wheelEvent(self, event:QWheelEvent):
+        """Override the wheel event to scroll horizontally instead of vertically.
+
+            Arguments
+            ---------
+                `event` : (QWheelEvent) - The wheel event.
+        """
+
         if event.angleDelta().x() == 0:
             delta = event.angleDelta().y()
 

@@ -8,6 +8,7 @@ from DesktopQtToolkit.create_button import create_button
 
 
 class SubWindow(QDialog):
+    """This class is used to create a sub window that can be used to display sub windows."""
 
     def __init__(self, main_window:QWidget, sub_window_container:dict) -> None:
         super().__init__(main_window)
@@ -57,6 +58,7 @@ class SubWindow(QDialog):
 
 
     def exec(self):
+        """This method is used to show the sub window and center it on the main window."""
         def show_window():
             main_window_center = self.main_window.geometry().center()
             sub_window_geometry = self.geometry()
@@ -91,6 +93,8 @@ class SubWindow(QDialog):
     
 
     def done(self, return_code:int):
+        """This method is used to close the sub window and hide it."""
+
         def hide_window():
             QDialog.done(self, return_code)
             self.window_container.setGeometry(self.size_animation.endValue())
@@ -104,5 +108,7 @@ class SubWindow(QDialog):
 
 
     def setWindowTitle(self, text:str):
+        """This method is used to set the window title of the sub window."""
+        
         self.sub_window_title.setText(text)
         super().setWindowTitle(text)

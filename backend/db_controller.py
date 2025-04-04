@@ -26,6 +26,8 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 class DBController():
+    """This class is used to manage the database connection and queries.
+    It handles the creation of the database engine, session, and queries for accounts, categories, transactions, backups, and statistics."""
 
     def __init__(self):
         # Init db connection 
@@ -44,6 +46,8 @@ class DBController():
 
         @event.listens_for(self.engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):
+            """Set SQLite PRAGMA settings for the connection."""
+
             cursor = dbapi_connection.cursor()
             # cursor.execute("PRAGMA journal_mode=WAL")
             cursor.execute("PRAGMA synchronous=OFF")
@@ -67,6 +71,8 @@ class DBController():
 
 
     def close_connection(self):
+        """Close the database connection and commit the session."""
+
         logger.info("Closing db connection")
         try:
             self.session.commit()
@@ -83,6 +89,17 @@ class DBController():
 
     @staticmethod
     def db_up_to_date(alembic_config:Config, engine:Engine) -> bool:
+        """Check if the database is up to date with the latest migrations.
+
+            Arguments
+            ---------
+                `alembic_config` : (Config) - Alembic configuration object.
+                `engine` : (Engine) - SQLAlchemy engine object.
+            Returns
+            -------
+                `bool` - True if the database is up to date, False otherwise.
+        """
+
         directory = ScriptDirectory.from_config(alembic_config)
 
         with engine.begin() as connection:
@@ -93,6 +110,13 @@ class DBController():
 
 
     def set_account_id(self, account_name:str):
+        """Set the account ID based on the account name.
+
+            Arguments
+            ---------
+                `account_name` : (str) - Name of the account to set.
+        """
+
         self.account_id = self.session.query(Account).filter(Account.name == account_name).first().id
         self.account_query.account_id = self.account_id
         self.category_query.account_id = self.account_id
@@ -102,5 +126,13 @@ class DBController():
     
 
     def create_account(self, account_name:str, balance:float|int=0):
+        """Create a new account in the database.
+
+            Arguments
+            ---------
+                `account_name` : (str) - Name of the account to create.
+                `balance` : (float|int) - Initial balance of the account. Default is 0.
+        """
+
         self.account_query.create_account(account_name, balance)
         self.set_account_id(account_name)

@@ -24,6 +24,15 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget):
+    """Show edit transaction window. It allows to edit transaction data.
+
+        Arguments
+        ---------
+
+        `category_name` : (str) - Name of the category. It will be shown in the window title.
+        `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to get selected row data.
+    """
+
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
@@ -46,6 +55,18 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
 
 
 def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget):
+    """Update transaction data. It updates transaction data in database and GUI.
+
+        Arguments
+        ---------
+
+        `transaction_id` : (int) - Transaction id. It will be used to find transaction to update.
+        `transaction_name` : (str) - Transaction name.
+        `transaction_day` : (int) - Transaction day.
+        `transaction_value` : (int|float) - Transaction value.
+        `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to update selected row data.
+    """
+
     Session.db.transaction_query.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
                 
     for row in range(category_data.rowCount()):
@@ -71,6 +92,13 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
 
 
 def show_add_transaction_window(category_name:str):
+    """Show add transaction window. It allows to add transaction data.
+        Arguments
+        ---------
+
+        `category_name` : (str) - Name of the category. It will be shown in the window title.
+    """
+
     TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][1])
     TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]["Messages"][1])
 
@@ -84,6 +112,17 @@ def show_add_transaction_window(category_name:str):
 
 
 def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget, category_id:int):
+    """Add transaction data. It adds transaction data to database and GUI.
+        Arguments
+        ---------
+
+        `transaction_name` : (str) - Transaction name.
+        `transaction_day` : (int) - Transaction day.
+        `transaction_value` : (int|float) - Transaction value.
+        `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to update selected row data.
+        `category_id` : (int) - Category id. It will be used to find category which transaction should be added to.
+    """
+
     transaction = Session.db.transaction_query.add_transaction(category_id, Session.current_year, Session.current_month, transaction_day, transaction_value, transaction_name)
 
     if CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
@@ -118,6 +157,8 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
 
 
 def transaction_data_handler():
+    """Handle transaction data. It checks if transaction data is valid and adds or updates transaction data."""
+
     transaction_name = TransactionManagementWindow.transaction_name.text().strip()
     transaction_day = TransactionManagementWindow.transaction_day.text()
     transaction_value = TransactionManagementWindow.transaction_value.text()
@@ -165,6 +206,15 @@ def transaction_data_handler():
 
 
 def remove_transaction(category_data:CustomTableWidget, category_id:int):
+    """Remove transaction. It removes transaction from database and GUI.
+
+        Arguments
+        ---------
+
+        `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to delete selected row data.
+        `category_id` : (int) - Category id. It will be used to find category which transaction should be removed from.
+    """
+
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:

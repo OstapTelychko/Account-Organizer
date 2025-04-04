@@ -3,6 +3,11 @@ from PySide6.QtGui import QDoubleValidator, QValidator
 
 
 class StrictDoubleValidator(QDoubleValidator):
+    """A custom QDoubleValidator that validates double values with strict bounds.
+    
+        This validator ensures that the input is a valid double and falls within the specified range.
+    """
+
     def validate(self, input_str:str, pos:int) -> tuple[QValidator.State, str, int]:
         state, input_str, pos = super().validate(input_str, pos)
 

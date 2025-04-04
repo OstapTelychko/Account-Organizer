@@ -14,6 +14,8 @@ from GUI.gui_constants import FOCUSED_SHADOW_EFFECT_ARGUMENTS
 
 
 def move_to_next_category():
+    """Move focus to the next category in the list of categories."""
+
     income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
     expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
 
@@ -39,6 +41,8 @@ def move_to_next_category():
 
 
 def move_to_previous_category():
+    """Move focus to the previous category in the list of categories."""
+
     income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
     expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
 

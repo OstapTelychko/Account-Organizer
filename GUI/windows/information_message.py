@@ -34,6 +34,8 @@ class InformationMessage:
 
 
     def run():
+        """This method is used to show the information message window and center it on the main window."""
+
         opacity = 0
         InformationMessage.window.setWindowOpacity(0)
         InformationMessage.window.show()

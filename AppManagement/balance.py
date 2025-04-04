@@ -9,6 +9,8 @@ from GUI.windows.settings import SettingsWindow
 logger = get_logger(__name__)
 
 def calculate_current_balance():
+    """Calculate current balance. It sums up all incomes and expenses and updates the account balance."""
+
     Session.current_total_income = 0
     Session.current_total_expenses = 0
 
@@ -34,6 +36,8 @@ def calculate_current_balance():
 
 
 def load_account_balance():
+    """Load account balance from database. If total income and expenses are 0, recalculate the balance."""
+
     logger.info("Loading account balance")
     account = Session.db.account_query.get_account()
     Session.current_balance = account.current_balance
@@ -51,6 +55,8 @@ def load_account_balance():
 
 
 def update_account_balance():
+    """Update account balance. It updates balance in database and GUI."""
+
     Session.db.account_query.update_account_balance(Session.current_balance, Session.current_total_income, Session.current_total_expenses)
 
     MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Windows"]["Main"][0]+str(Session.current_balance))

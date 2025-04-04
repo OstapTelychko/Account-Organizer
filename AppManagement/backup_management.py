@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 def load_backups():
+    """Load backups from database and display them in the table."""
+
     BackupManagementWindow.backups_table.setRowCount(0)
     BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
     
@@ -48,6 +50,8 @@ def load_backups():
 
 
 def create_backup():
+    """Create a backup of the database. The backup is created in the BACKUPS_DIRECTORY folder."""
+    
     app_version = Session.app_version
     timestamp = datetime.now().strftime(BACKUPS_DATE_FORMAT)
 
@@ -60,16 +64,18 @@ def create_backup():
     backup = Backup(backup_name, timestamp, app_version)
     Session.backups[str(id(backup))] = backup
 
-    def enable_button():
+    def _enable_button():
         BackupManagementWindow.create_backup.setEnabled(True)
     BackupManagementWindow.create_backup.setEnabled(False)
 
     load_backups()
     logger.info(f"Backup {timestamp} created")
-    QTimer.singleShot(1000, enable_button)
+    QTimer.singleShot(1000, _enable_button)
 
 
 def remove_backup():
+    """Remove a backup from the table and delete the backup file."""
+
     selected_items = BackupManagementWindow.backups_table.selectedItems()
 
     if len(selected_items) == 0 or len(selected_items) < 2:
@@ -102,6 +108,8 @@ def remove_backup():
 
 
 def load_backup():
+    """Load a selected backup from the table. The backup is replaced with the current database. Current database is saved in the BACKUPS_DIRECTORY folder."""
+
     selected_items = BackupManagementWindow.backups_table.selectedItems()
 
     if len(selected_items) == 0 or len(selected_items) < 2:
@@ -145,6 +153,8 @@ def load_backup():
 
 
 def auto_backup():
+    """Check if the auto backup is enabled and create a backup if necessary."""
+
     if len(Session.backups) == 0:
         create_backup()
         return
@@ -167,6 +177,8 @@ def auto_backup():
 
 
 def open_auto_backup_window():
+    """Open the auto backup window and set the current status of the auto backup."""
+
     AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
     AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
     AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
@@ -190,6 +202,14 @@ def open_auto_backup_window():
 
 
 def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
+    """Prevent the same auto backup status from being selected. If one is selected, the others are unchecked.
+
+        Arguments
+        ---------
+            `status_checkbox` : (QCheckBox) - The checkbox that was clicked.
+            `state` : (int) - The state of the checkbox.
+    """
+
     if state == 2:#Checked
         if status_checkbox is AutoBackupWindow.monthly:
             AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
@@ -213,6 +233,8 @@ def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
 
 
 def save_auto_backup_settings():
+    """Save the auto backup settings. Check if the auto backup is enabled and set the status. If the auto backup is disabled, show a warning message."""
+
     if AutoBackupWindow.monthly.isChecked():
         Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
 
@@ -303,6 +325,8 @@ def save_auto_backup_settings():
 
 
 def auto_remove_backups():
+    """Remove backups if the auto backup removal is enabled. The backups are removed if the number of backups is greater than the maximum number of backups."""
+
     sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT))
     backups = [backup for backup in sorted_backups if backup[1].app_version == Session.app_version]
     legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != Session.app_version]

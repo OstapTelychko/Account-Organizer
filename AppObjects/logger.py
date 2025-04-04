@@ -1,22 +1,23 @@
 import os
-import sys
 import logging
 from logging.handlers import RotatingFileHandler
-from datetime import datetime
-from project_configuration import ROOT_DIRECTORY, APP_LOG_FILE, ERROR_LOG_FILE, MAX_LOG_SIZE, MAX_LOG_BACKUPS, APP_LOG_FORMAT, ERROR_LOG_FORMAT, LOG_DATE_FORMAT, LOGS_DIRECTORY, MAX_ERROR_LOG_SIZE
+from project_configuration import APP_LOG_FILE, ERROR_LOG_FILE, MAX_LOG_SIZE, MAX_LOG_BACKUPS, APP_LOG_FORMAT, ERROR_LOG_FORMAT, LOG_DATE_FORMAT, LOGS_DIRECTORY, MAX_ERROR_LOG_SIZE
 
 
 os.makedirs(LOGS_DIRECTORY, exist_ok=True)
 
 
 class InfoFilter(logging.Filter):
+    """This class is used to filter out logs with level INFO and below"""
+
     def filter(self, record):
         return record.levelno <= logging.INFO
 
 
 
 class BreakLineFormatter(logging.Formatter):
-    #This class is used to add break lines to the log file
+    """This class is used to format the logs. It replaces the message "__BREAK_LINE__" with an break line
+    (string is empty but logger always add \\n to the end of the message)"""
 
     def format(self, record):
         if record.getMessage() == "__BREAK_LINE__":
@@ -46,5 +47,15 @@ logger.addHandler(console_handler)
 
 
 def get_logger(name) -> logging.Logger:
+    """Get a logger with the specified name. If the logger already exists, return it.
+
+        Arguments
+        ---------
+            `name` : (str) - Name of the logger to get.
+        Returns
+        -------
+            `logging.Logger` object with the specified name.
+    """
+
     return logging.getLogger(name)
 
