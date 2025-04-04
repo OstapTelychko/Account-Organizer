@@ -23,6 +23,12 @@ if TYPE_CHECKING:
 
 
 def test_main(app_main:FunctionType):
+    """This function is used to run the tests in the test suite.
+        Arguments
+        ---------
+            `app_main` : (FunctionType) - Main function of the application.
+    """
+
     if os.path.exists(TEST_DB_FILE_PATH):#Why not remove test db at the end? Because of windows file locking system (lock db even if all connections are closed)
         os.remove(TEST_DB_FILE_PATH)
 

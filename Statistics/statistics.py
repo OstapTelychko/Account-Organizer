@@ -27,6 +27,20 @@ logger = get_logger(__name__)
 
 
 def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
+    """Get categories with highest and lowest values based on transactions in month
+
+        Arguments
+        -------
+            `unsorted_categories` (list): categories to sort
+            `month` (int): month to get transactions
+        Returns
+        -------
+            `tuple`:
+                `Categories_with_highest_total_value` (dict) - all categories with highest value, if more then one category have the same top value\n
+                `Categories_with_lowest_total_value` (dict) - all categories with lowest value, if more then one category have the same bottom value returns 0 categories if only 1 category exists\n
+                `Categories_total_values` (dict) - all categories with their total value 
+    """
+
     Categories_total_values = {}
 
     for category in unsorted_categories:
@@ -36,6 +50,20 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
 
 
     def _get_min_and_max_transactions(category:int, year:int, month:int) -> tuple:
+        """Get transactions with highest and lowest value in category
+
+            Arguments
+            ---------
+                `category` (int): category to get transactions
+                `year` (int): year to get transactions
+                `month` (int): month to get transactions
+            Returns
+            -------
+                `tuple`:
+                    `transactions_with_highest_value` (dict) - transactions with highest value in category\n
+                    `transactions_with_lowest_value` (dict) - transactions with lowest value in category
+        """
+
         #Highest transactions
         highest_transaction_value = Session.db.statistics_query.get_monthly_transactions_max_value(category, year, month)
         transactions_with_highest_value = Session.db.statistics_query.get_monthly_transactions_by_value(category, year, month, highest_transaction_value)
@@ -85,8 +113,24 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
 
 
 def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
+    """Add statistic to the list
+
+        Arguments
+        ---------
+            `statistic_list` (QListWidget): list to add statistic
+            `statistic_data` (dict): statistic data to add
+            `words` (list): language specific words to add statistic
+    """
 
     def add_highest_and_lowest_transactions(category:int, statistic:dict):
+        """Add highest and lowest transactions to the list
+
+            Arguments
+            ---------
+                `category` (int): category to add transactions
+                `statistic` (dict): statistic data to add transactions
+        """
+
         #Highest transactions
         statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[4]])
         for transaction_name, transaction_value in statistic[category][0].items():
@@ -136,6 +180,16 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
 
 
 def add_total_statistics(statistic:dict, words:list, total_statistics_list:QListWidget, Statistic_words:dict):
+    """Add total statistics to the list
+
+        Arguments
+        ---------
+            `statistic` (dict): statistic data to add
+            `words` (list): language specific words to add statistic
+            `total_statistics_list` (QListWidget): list to add statistic
+            `Statistic_words` (dict): language specific words to add statistic
+    """        
+
     max_total_value  = max(total_value for total_value in statistic.values())
     min_total_value = min(total_value for total_value in statistic.values())
 
@@ -153,6 +207,17 @@ def add_total_statistics(statistic:dict, words:list, total_statistics_list:QList
 
 
 def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Statistic_words:dict, month_statistics:QListWidget, current_month:int):
+    """Add month statistics to the list
+
+        Arguments
+        ---------
+            `Incomes_categories` (dict): income categories to add statistics
+            `Expenses_categories` (dict): expense categories to add statistics
+            `Statistic_words` (dict): language specific words to add statistic
+            `month_statistics` (QListWidget): list to add statistic
+            `current_month` (int): month to add statistics
+    """
+
     Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)
     Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)
 
@@ -175,6 +240,8 @@ def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, Stat
 
 
 def show_monthly_statistics():
+    """This method is used to show the monthly statistics window."""
+
     MonthlyStatistics.window.setWindowTitle(LANGUAGES[Session.language]["Months"][Session.current_month])
     MonthlyStatistics.statistics.clear()
 
@@ -198,6 +265,8 @@ def show_monthly_statistics():
 
 
 def show_quarterly_statistics():
+    """This method is used to show the quarterly statistics window."""
+
     #Clear quarters statistics
     for quarter in QuarterlyStatistics.statistics.quarters:
         quarter.total_quarter_statistics.data.clear()
@@ -267,6 +336,8 @@ def show_quarterly_statistics():
 
 
 def show_yearly_statistics():
+    """This method is used to show the yearly statistics window."""
+
     #Clear yearly statistics
     YearlyStatistics.statistics.total_year_statistics.data.clear()
     for month in YearlyStatistics.statistics.months:
@@ -334,6 +405,8 @@ def show_yearly_statistics():
         
 
 def show_custom_range_statistics_window():
+    """This method is used to show the custom range statistics window. Where parameters like from and to date are set."""
+
     #Remove previous categories
     while CustomRangeStatistics.incomes_categories_list_layout.count():
         CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)
@@ -382,6 +455,16 @@ def show_custom_range_statistics_window():
 
 
 def add_category_to_statistics_list(category:Category, category_type_translate:str, remove_button:QPushButton, add_button:QPushButton):
+    """Add category to the custom range statistics list
+
+        Arguments
+        ---------
+            `category` (Category): category to add to selected categories
+            `category_type_translate` (str): translated category type
+            `remove_button` (QPushButton): enable button to remove category
+            `add_button` (QPushButton): disable button to add category
+    """
+
     #Reset selected categories
     CustomRangeStatistics.selected_categories_list.clear()
 
@@ -398,6 +481,13 @@ def add_category_to_statistics_list(category:Category, category_type_translate:s
 
 
 def add_all_categories_to_statistics_list(sender_button:QPushButton):
+    """Add all categories to the custom range statistics list
+
+        Arguments
+        ---------
+            `sender_button` (QPushButton): button that was clicked
+    """
+
     if sender_button is CustomRangeStatistics.add_all_incomes_categories:
         for category_wrapper_index in range(CustomRangeStatistics.incomes_categories_list_layout.count()):
             category_wrapper = CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
@@ -416,6 +506,15 @@ def add_all_categories_to_statistics_list(sender_button:QPushButton):
 
 
 def remove_category_from_statistics_list(category:Category, add_button:QPushButton, remove_button:QPushButton):
+    """Remove category from the custom range statistics list
+
+        Arguments
+        ---------
+            `category` (Category): category to remove from selected categories
+            `add_button` (QPushButton): enable button to add category
+            `remove_button` (QPushButton): disable button to remove category
+    """
+
     #Reset selected categories
     CustomRangeStatistics.selected_categories_list.clear()
 
@@ -432,6 +531,13 @@ def remove_category_from_statistics_list(category:Category, add_button:QPushButt
 
 
 def remove_all_categories_from_statistics_list(sender_button:QPushButton):
+    """Remove all categories from the custom range statistics list
+
+        Arguments
+        ---------
+            `sender_button` (QPushButton): button that was clicked
+    """
+
     if sender_button is CustomRangeStatistics.remove_all_incomes_categories:
         for category_wrapper_index in range(CustomRangeStatistics.incomes_categories_list_layout.count()):
             category_wrapper = CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
@@ -450,6 +556,8 @@ def remove_all_categories_from_statistics_list(sender_button:QPushButton):
 
 
 def show_custom_range_statistics_view():
+    """This method is used to show the actual custom range statistics."""
+
     #Reset statistics and transactions list
     CustomRangeStatisticsView.statistics_list.clear()
     CustomRangeStatisticsView.transactions_list.clear()

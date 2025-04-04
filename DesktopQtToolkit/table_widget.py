@@ -49,6 +49,9 @@ class CustomTableWidget(QTableWidget):
 
 
 class CustomTableWidgetItem(QTableWidgetItem):
+    """This class is used to create a custom table widget item that allows for sorting by string or float values.
+    It overrides the less than operator to compare the values of the items.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

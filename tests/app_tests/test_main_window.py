@@ -21,22 +21,28 @@ from GUI.windows.category import AddCategoryWindow
 class TestMainWindow(TestCase):
 
     def test_1_windows_opening(self:TestCase):
+        """Test opening windows from main window."""
+
         test_windows_open = {SettingsWindow:MainWindow.settings, StatisticsWindow:MainWindow.statistics, AddCategoryWindow:MainWindow.add_incomes_category}
 
         for window, open_window_button in test_windows_open.items():
             window_object = getattr(window, "window")
 
-            def check_window_appearance():
+            def _check_window_appearance():
+                """Check if window is visible after clicking button."""
+
                 self.assertTrue(window_object.isVisible(), f"Window {window.__name__} hasn't showed after click on button {open_window_button.text()}")
                 window_object.done(1)
 
-            QTimer.singleShot(100, check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
+            QTimer.singleShot(100, _check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
             open_window_button.click()
         
         qsleep(500)
 
 
     def test_2_date_change(self):
+        """Test changing date in the application."""
+
         months_list = LANGUAGES[Session.language]["Months"]
         current_month = datetime.now().month
         translated_current_month = months_list[current_month]
@@ -68,6 +74,8 @@ class TestMainWindow(TestCase):
     
 
     def test_3_mini_calculator(self):
+        """Test mini calculator in the application."""
+
         MainWindow.mini_calculator_text.setText("2*2")
         MainWindow.calculate.click()
         result = MainWindow.mini_calculator_text.text()
@@ -91,34 +99,42 @@ class TestMainWindow(TestCase):
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for division by zero {result} instead of {translated_warning}")
 
         MainWindow.mini_calculator_text.setText("")
-        def check_empty_expression_error():
+        def _check_empty_expression_error():
+            """Check if empty expression error is shown."""
+
             result = MainWindow.mini_calculator_text.text()
             translated_message = LANGUAGES[Session.language]["Messages"][12]
             self.assertTrue(Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             Messages.empty_expression.done(1)
 
-        QTimer.singleShot(100, check_empty_expression_error)
+        QTimer.singleShot(100, _check_empty_expression_error)
         MainWindow.calculate.click()
 
         MainWindow.mini_calculator_text.setText("quit()")
-        def check_forbidden_expression():
+        def _check_forbidden_expression():
+            """Check if forbidden expression error is shown."""
+
             result = MainWindow.mini_calculator_text.text()
             translated_message = LANGUAGES[Session.language]["Messages"][13]
             self.assertTrue(Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             Messages.forbidden_calculator_word.done(1)
 
-        QTimer.singleShot(100, check_forbidden_expression)
+        QTimer.singleShot(100, _check_forbidden_expression)
         MainWindow.calculate.click()
         qsleep(500)
 
 
     def test_4_language_change(self):
+        """Test changing language in the application."""
+
         all_languages = AVAILABLE_LANGUAGES.copy()
         all_languages.remove(Session.language)
         previous_language = Session.language
         language_to_change = all_languages[0]
 
-        def open_settings():
+        def _open_settings():
+            """Change language in the application."""
+
             SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
             expected_translation = LANGUAGES[language_to_change]["Windows"]["Settings"][0]
             result = SettingsWindow.window.windowTitle()
@@ -127,13 +143,17 @@ class TestMainWindow(TestCase):
             SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(previous_language))
             SettingsWindow.window.done(1)
 
-        QTimer.singleShot(100, open_settings)
+        QTimer.singleShot(100, _open_settings)
         MainWindow.settings.click()
         qsleep(500)
     
 
     def test_5_theme_change(self):
-        def open_settings():
+        """Test changing theme in the application."""
+
+        def _open_settings():
+            """Change theme in the application."""
+
             current_theme = Session.theme
             current_style_sheet = app.styleSheet()
             current_theme_icon = SettingsWindow.switch_themes_button.icon()
@@ -147,6 +167,6 @@ class TestMainWindow(TestCase):
             SettingsWindow.switch_themes_button.click()
             SettingsWindow.window.done(1)
         
-        QTimer.singleShot(100, open_settings)
+        QTimer.singleShot(100, _open_settings)
         MainWindow.settings.click()
         qsleep(500)

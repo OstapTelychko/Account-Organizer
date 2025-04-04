@@ -22,11 +22,15 @@ from GUI.windows.category import AddCategoryWindow
 class TestBackupsManagement(DBTestCase):
 
     def setUp(self):
+        """Create test backups directory"""
+
         os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
         return super().setUp()
 
 
     def tearDown(self):
+        """Remove test backups directory and clear backups list and table"""
+
         BackupManagementWindow.backups_table.setRowCount(0)
         Session.backups.clear()
         shutil.rmtree(TEST_BACKUPS_DIRECTORY)
@@ -34,19 +38,32 @@ class TestBackupsManagement(DBTestCase):
 
 
     def open_backup_management_window(self, func):
-        def open_backup_management():
+        """Open backup management window and call function after some delay.
+
+            Arguments
+            ---------
+                `func` : (function) - Function to call after opening backup management window.
+        """
+
+        def _open_backup_management():
             QTimer.singleShot(100, func)
             SettingsWindow.backup_management.click()
 
-        QTimer.singleShot(100, open_backup_management)
+        QTimer.singleShot(100, _open_backup_management)
         MainWindow.settings.click()
 
 
     def test_1_create_backup(self):
-        def create_backup():
+        """Test creating backup in the application."""
+
+        def _create_backup():
+            """Click create backup button"""
+
             BackupManagementWindow.create_backup.click()
 
-            def check_backup_appearance():
+            def _check_backup_appearance():
+                """Check if backup is created and added to the table"""
+
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
                 f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
@@ -68,33 +85,43 @@ class TestBackupsManagement(DBTestCase):
                 SettingsWindow.window.done(0)
 
             self.assertEqual(BackupManagementWindow.create_backup.isEnabled(), False, "Create backup button hasn't been disabled")
-            QTimer.singleShot(1200, check_backup_appearance)
+            QTimer.singleShot(1200, _check_backup_appearance)
 
-        self.open_backup_management_window(create_backup)
+        self.open_backup_management_window(_create_backup)
 
         qsleep(2000)
     
 
     def test_2_remove_backup(self):
-        def remove_backup():
+        """Test removing backup in the application."""
+
+        def _remove_backup():
+            """Create example backup and remove it"""
+
             BackupManagementWindow.create_backup.click()
 
-            def check_no_selection():
+            def _check_no_selection():
+                """Check if no backup is selected"""
+                
                 self.assertEqual(Messages.unselected_row.isVisible(), True, "Unselected row message hasn't been shown")
                 Messages.unselected_row.ok_button.click()
-            QTimer.singleShot(100, check_no_selection)
+            QTimer.singleShot(100, _check_no_selection)
             BackupManagementWindow.delete_backup.click()
 
             qsleep(5000)
 
             BackupManagementWindow.backups_table.selectRow(0)
-            def check_below_min_backups():
+            def _check_below_min_backups():
+                """Check if below min backups message is shown"""
+
                 self.assertEqual(Messages.below_recommended_min_backups.isVisible(), True, "Below min backups message hasn't been shown")
                 Messages.below_recommended_min_backups.ok_button.click()
-            QTimer.singleShot(200, check_below_min_backups)
+            QTimer.singleShot(200, _check_below_min_backups)
             BackupManagementWindow.delete_backup.click()
 
-            def check_backup_deletion():
+            def _check_backup_deletion():
+                """Check if backup is deleted from the table and session"""
+
                 self.assertEqual(
                 0, BackupManagementWindow.backups_table.rowCount(),
                 f"Backup hasn't been removed from the table or more then 0 backups are left {BackupManagementWindow.backups_table.rowCount()}"
@@ -113,36 +140,50 @@ class TestBackupsManagement(DBTestCase):
                 BackupManagementWindow.window.done(0)
                 SettingsWindow.window.done(0)
             
-            QTimer.singleShot(500, check_backup_deletion)
+            QTimer.singleShot(500, _check_backup_deletion)
     
-        self.open_backup_management_window(remove_backup)
+        self.open_backup_management_window(_remove_backup)
 
         qsleep(3000)
         
 
     def test_3_load_backup(self):
-        def prepare_load_backup():
+        """Test loading backup in the application."""
+
+        def _prepare_load_backup():
+            """Create new backup that doesn't have new income category and load it"""
+
             BackupManagementWindow.create_backup.click()
             BackupManagementWindow.window.done(0)
             SettingsWindow.window.done(0)
 
-            def add_category():
+            def _add_category():
+                """Add new income category to the session"""
+
                 AddCategoryWindow.category_name.setText("Test backup category name")
-                def load_backup():
-                    def check_no_selection():
+                def _load_backup():
+                    """Load backup that doesn't have new income category"""
+
+                    def _check_no_selection():
+                        """Check if no backup is selected"""
+
                         self.assertEqual(Messages.unselected_row.isVisible(), True, "Unselected row message hasn't been shown")
                         Messages.unselected_row.ok_button.click()
-                    QTimer.singleShot(100, check_no_selection)
+                    QTimer.singleShot(100, _check_no_selection)
                     BackupManagementWindow.load_backup.click()
 
                     qsleep(1000)
 
                     BackupManagementWindow.backups_table.selectRow(0)
 
-                    def check_load_confirmation():
+                    def _check_load_confirmation():
+                        """Check if load backup confirmation message is shown"""
+
                         self.assertEqual(Messages.load_backup_confirmation.isVisible(), True, "Load backup confirmation message hasn't been shown")
 
-                        def check_backup_load():
+                        def _check_backup_load():
+                            """Check if backup is loaded and if new income category doesn't appears"""
+
                             self.assertEqual(
                             2, len(Session.categories),
                             f"Expected categories amount after backup load is 2 returned {len(Session.categories)}"
@@ -153,16 +194,22 @@ class TestBackupsManagement(DBTestCase):
                             f"Expected categories amount after backup load is 2 returned {len(Session.db.category_query.get_all_categories())}"
                             )
 
-                            def load_newest_backup():
+                            def _load_newest_backup():
+                                """Load automatically created backup that has new income category"""
+
                                 BackupManagementWindow.backups_table.selectRow(0)
 
-                                def check_load_confirmation():
+                                def _check_load_confirmation():
+                                    """Check if load backup confirmation message is shown"""
+
                                     self.assertEqual(Messages.load_backup_confirmation.isVisible(), True, "Load backup confirmation message hasn't been shown")
                                     Messages.load_backup_confirmation.ok_button.click()
-                                QTimer.singleShot(100, check_load_confirmation)
+                                QTimer.singleShot(100, _check_load_confirmation)
                                 BackupManagementWindow.load_backup.click()
 
-                                def check_backup_load():
+                                def _check_backup_load():
+                                    """Check if backup is loaded and if new income category appears"""
+
                                     self.assertEqual(
                                     3, len(Session.categories),
                                     f"Expected categories amount after backup load is 3 returned {len(Session.categories)}"
@@ -175,29 +222,35 @@ class TestBackupsManagement(DBTestCase):
 
                                     self.assertEqual(BackupManagementWindow.window.isVisible(), False, "Backup management window hasn't been closed")
                                     self.assertEqual(SettingsWindow.window.isVisible(), False, "Settings window hasn't been closed")
-                                QTimer.singleShot(200, check_backup_load)
+                                QTimer.singleShot(200, _check_backup_load)
 
-                            QTimer.singleShot(1000, partial(self.open_backup_management_window, load_newest_backup))
+                            QTimer.singleShot(1000, partial(self.open_backup_management_window, _load_newest_backup))
 
-                        QTimer.singleShot(1000, check_backup_load)
+                        QTimer.singleShot(1000, _check_backup_load)
                         Messages.load_backup_confirmation.ok_button.click()
 
-                    QTimer.singleShot(100, check_load_confirmation)
+                    QTimer.singleShot(100, _check_load_confirmation)
                     BackupManagementWindow.load_backup.click()
 
-                QTimer.singleShot(200, partial(self.open_backup_management_window, load_backup))
+                QTimer.singleShot(200, partial(self.open_backup_management_window, _load_backup))
                 AddCategoryWindow.button.click()
             
-            QTimer.singleShot(100, add_category)
+            QTimer.singleShot(100, _add_category)
             MainWindow.add_incomes_category.click()
 
-        self.open_backup_management_window(prepare_load_backup)
+        self.open_backup_management_window(_prepare_load_backup)
         qsleep(5000)
     
 
     def test_4_auto_backup_status_change(self):
-        def set_daily_status():
-            def choose_daily_auto_backup():
+        """Test changing auto backup status in the application."""
+
+        def _set_daily_status():
+            """Open auto backup window to set daily status"""
+
+            def _choose_daily_auto_backup():
+                """Set daily auto backup status and check if it is set correctly"""
+                
                 self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
 
                 AutoBackupWindow.daily.click()
@@ -219,15 +272,18 @@ class TestBackupsManagement(DBTestCase):
                 BackupManagementWindow.window.done(0)
                 SettingsWindow.window.done(0)
 
-            QTimer.singleShot(100, choose_daily_auto_backup)
+            QTimer.singleShot(100, _choose_daily_auto_backup)
             BackupManagementWindow.auto_backup.click()
 
-        self.open_backup_management_window(set_daily_status)
-
+        self.open_backup_management_window(_set_daily_status)
         qsleep(500)
 
-        def set_weekly_status():
-            def choose_weekly_auto_backup():
+        def _set_weekly_status():
+            """Open auto backup window to set weekly status"""
+
+            def _choose_weekly_auto_backup():
+                """Set weekly auto backup status and check if it is set correctly"""
+
                 self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
 
                 AutoBackupWindow.weekly.click()
@@ -249,15 +305,18 @@ class TestBackupsManagement(DBTestCase):
                 BackupManagementWindow.window.done(0)
                 SettingsWindow.window.done(0)
 
-            QTimer.singleShot(100, choose_weekly_auto_backup)
+            QTimer.singleShot(100, _choose_weekly_auto_backup)
             BackupManagementWindow.auto_backup.click()
 
-        self.open_backup_management_window(set_weekly_status)
-
+        self.open_backup_management_window(_set_weekly_status)
         qsleep(500)
 
-        def set_monthly_status():
-            def choose_monthly_auto_backup():
+        def _set_monthly_status():
+            """Open auto backup window to set monthly status"""
+
+            def _choose_monthly_auto_backup():
+                """Set monthly auto backup status and check if it is set correctly"""
+
                 self.assertEqual(AutoBackupWindow.window.isVisible(), True, "Auto backup window hasn't been opened")
 
                 AutoBackupWindow.monthly.click()
@@ -279,21 +338,26 @@ class TestBackupsManagement(DBTestCase):
                 BackupManagementWindow.window.done(0)
                 SettingsWindow.window.done(0)
 
-            QTimer.singleShot(100, choose_monthly_auto_backup)
+            QTimer.singleShot(100, _choose_monthly_auto_backup)
             BackupManagementWindow.auto_backup.click()
 
-        self.open_backup_management_window(set_monthly_status)
-
+        self.open_backup_management_window(_set_monthly_status)
         qsleep(500)
 
 
     def test_5_auto_daily_backup(self):
+        """Test daily auto backup in the application."""
+
         Session.auto_backup_status = Session.AutoBackupStatus.DAILY
         date_now = datetime.now()
         date_minus_1_day = date_now - timedelta(days=1)
 
-        def prepare_auto_daily_backup():
-            def check_backup_appearance():
+        def _prepare_auto_daily_backup():
+            """Create fresh backup with current date"""
+
+            def _check_backup_appearance():
+                """Check if backup is created and added to the table"""
+
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
                 f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
@@ -309,7 +373,9 @@ class TestBackupsManagement(DBTestCase):
                 f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                 )
 
-                def check_no_new_backup():
+                def _check_no_new_backup():
+                    """Check if no new backup is created since last backup is new"""
+
                     self.assertEqual(
                     1, BackupManagementWindow.backups_table.rowCount(),
                     f"Backup have been added even though less then 1 day has passed {BackupManagementWindow.backups_table.rowCount()}"
@@ -325,14 +391,16 @@ class TestBackupsManagement(DBTestCase):
                     f"Backup file have been created even though less then 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                     )
 
-                QTimer.singleShot(200, check_no_new_backup)
+                QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
-                def check_second_backup_appearance():
+                def _check_second_backup_appearance():
+                    """After mocking backup timestamp check if second backup is created"""
+
                     self.assertEqual(
                     2, BackupManagementWindow.backups_table.rowCount(),
                     f"Backup during daily auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
@@ -351,24 +419,30 @@ class TestBackupsManagement(DBTestCase):
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
 
-                QTimer.singleShot(1000, check_second_backup_appearance)
+                QTimer.singleShot(1000, _check_second_backup_appearance)
                 auto_backup()
                 
             qsleep(1000)
-            QTimer.singleShot(1000, check_backup_appearance)
+            QTimer.singleShot(1000, _check_backup_appearance)
             BackupManagementWindow.create_backup.click()
         
-        QTimer.singleShot(200, prepare_auto_daily_backup)
+        QTimer.singleShot(200, _prepare_auto_daily_backup)
         qsleep(5000)
 
 
     def test_6_auto_weekly_backup(self):
+        """Test weekly auto backup in the application."""
+
         Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY
         date_now = datetime.now()
         date_minus_7_days = date_now - timedelta(days=7)
 
-        def prepare_auto_weekly_backup():
-            def check_backup_appearance():
+        def _prepare_auto_weekly_backup():
+            """Create fresh backup with current date"""
+
+            def _check_backup_appearance():
+                """Check if backup is created and added to the table"""
+
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
                 f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
@@ -384,7 +458,9 @@ class TestBackupsManagement(DBTestCase):
                 f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                 )
 
-                def check_no_new_backup():
+                def _check_no_new_backup():
+                    """Check if no new backup is created since last backup is new"""
+
                     self.assertEqual(
                     1, BackupManagementWindow.backups_table.rowCount(),
                     f"Backup have been added even though less then 7 days has passed {BackupManagementWindow.backups_table.rowCount()}"
@@ -400,14 +476,16 @@ class TestBackupsManagement(DBTestCase):
                     f"Backup file have been created even though less then 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                     )
 
-                QTimer.singleShot(200, check_no_new_backup)
+                QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
-                def check_second_backup_appearance():
+                def _check_second_backup_appearance():
+                    """After mocking backup timestamp check if second backup is created"""
+
                     self.assertEqual(
                     2, BackupManagementWindow.backups_table.rowCount(),
                     f"Backup during weekly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
@@ -426,23 +504,29 @@ class TestBackupsManagement(DBTestCase):
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
 
-                QTimer.singleShot(1000, check_second_backup_appearance)
+                QTimer.singleShot(1000, _check_second_backup_appearance)
                 auto_backup()
 
-            QTimer.singleShot(1200, check_backup_appearance)
+            QTimer.singleShot(1200, _check_backup_appearance)
             BackupManagementWindow.create_backup.click()
 
-        QTimer.singleShot(100, prepare_auto_weekly_backup)
+        QTimer.singleShot(100, _prepare_auto_weekly_backup)
         qsleep(5000)
     
 
     def test_7_auto_monthly_backup(self):
+        """Test monthly auto backup in the application."""
+
         Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
         date_now = datetime.now()
         date_minus_30_days = date_now - timedelta(days=30)
 
-        def prepare_auto_monthly_backup():
-            def check_backup_appearance():
+        def _prepare_auto_monthly_backup():
+            """Create fresh backup with current date"""
+
+            def _check_backup_appearance():
+                """Check if backup is created and added to the table"""
+
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
                 f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
@@ -458,7 +542,9 @@ class TestBackupsManagement(DBTestCase):
                 f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                 )
 
-                def check_no_new_backup():
+                def _check_no_new_backup():
+                    """Check if no new backup is created since last backup is new"""
+
                     self.assertEqual(
                     1, BackupManagementWindow.backups_table.rowCount(),
                     f"Backup have been added even though less then 30 days has passed {BackupManagementWindow.backups_table.rowCount()}"
@@ -474,14 +560,16 @@ class TestBackupsManagement(DBTestCase):
                     f"Backup file have been created even though less then 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
                     )
 
-                QTimer.singleShot(200, check_no_new_backup)
+                QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
                 qsleep(500)
                 
                 backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
                 backup.timestamp = date_minus_30_days.strftime(BACKUPS_DATE_FORMAT)
 
-                def check_second_backup_appearance():
+                def _check_second_backup_appearance():
+                    """After mocking backup timestamp check if second backup is created"""
+
                     self.assertEqual(
                     2, BackupManagementWindow.backups_table.rowCount(),
                     f"Backup during monthly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
@@ -500,22 +588,30 @@ class TestBackupsManagement(DBTestCase):
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
 
-                QTimer.singleShot(1000, check_second_backup_appearance)
+                QTimer.singleShot(1000, _check_second_backup_appearance)
                 auto_backup()
 
-            QTimer.singleShot(1000, check_backup_appearance)
+            QTimer.singleShot(1000, _check_backup_appearance)
             BackupManagementWindow.create_backup.click()
 
-        QTimer.singleShot(100, prepare_auto_monthly_backup)
+        QTimer.singleShot(100, _prepare_auto_monthly_backup)
         qsleep(5000)
 
 
     def test_8_check_max_backups_change(self):
+        """Test changing max backups amount in the application."""
+
         init_max_backups = Session.max_backups
 
-        def open_auto_backup_settings():
-            def set_new_max_backups():
-                def check_no_change():
+        def _open_auto_backup_settings():
+            """Open auto backup window to set new max backups amount"""
+
+            def _set_new_max_backups():
+                """Set new max backups amount and check if it is set correctly"""
+
+                def _check_no_change():
+                    """Check if no change is made to max backups amount after clicking save without changing anything"""
+
                     self.assertEqual(
                     init_max_backups, Session.max_backups,
                     f"Expected max backups amount in session is {init_max_backups} returned {Session.max_backups}"
@@ -532,29 +628,35 @@ class TestBackupsManagement(DBTestCase):
                     f"Expected max backups amount in label is {init_max_backups} returned {AutoBackupWindow.max_backups_label.text()}"
                     )
 
-                QTimer.singleShot(100, check_no_change)
+                QTimer.singleShot(100, _check_no_change)
                 AutoBackupWindow.save.click()
 
-                def check_below_min_backups():
+                def _check_below_min_backups():
+                    """Check if below min backups message is shown"""
+
                     self.assertEqual(Messages.below_recommended_min_backups.isVisible(), True, "Below min backups message hasn't been shown")
                     Messages.below_recommended_min_backups.ok_button.click()
                 
                 if MIN_RECOMMENDED_BACKUPS > 1:
-                    QTimer.singleShot(200, check_below_min_backups)
+                    QTimer.singleShot(200, _check_below_min_backups)
                     AutoBackupWindow.max_backups.setText(str(MIN_RECOMMENDED_BACKUPS - 1))
                     AutoBackupWindow.save.click()
                     qsleep(500)
                 
-                def check_above_max_backups():
+                def _check_above_max_backups():
+                    """Check if above max backups message is shown"""
+
                     self.assertEqual(Messages.above_recommended_max_backups.isVisible(), True, "Above max backups message hasn't been shown")
                     Messages.above_recommended_max_backups.ok_button.click()
                 
-                QTimer.singleShot(200, check_above_max_backups)
+                QTimer.singleShot(200, _check_above_max_backups)
                 AutoBackupWindow.max_backups.setText(str(MAX_RECOMMENDED_BACKUPS + 1))
                 AutoBackupWindow.save.click()
                 qsleep(500)
 
-                def check_max_backups_change():
+                def _check_max_backups_change():
+                    """Check if max backups amount is changed correctly"""
+
                     self.assertEqual(
                     3, Session.max_backups,
                     f"Expected max backups amount in session is 3 returned {Session.max_backups}"
@@ -575,14 +677,14 @@ class TestBackupsManagement(DBTestCase):
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
 
-                QTimer.singleShot(200, check_max_backups_change)
+                QTimer.singleShot(200, _check_max_backups_change)
                 AutoBackupWindow.max_backups.setText("3")
                 AutoBackupWindow.save.click()
 
-            QTimer.singleShot(100, set_new_max_backups)
+            QTimer.singleShot(100, _set_new_max_backups)
             BackupManagementWindow.auto_backup.click()
             
-        self.open_backup_management_window(open_auto_backup_settings)
+        self.open_backup_management_window(_open_auto_backup_settings)
         qsleep(1000)
 
                     

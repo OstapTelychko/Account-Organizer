@@ -16,6 +16,13 @@ from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, Yearl
 logger = get_logger(__name__)
 
 def show_information_message(text:str):
+    """This method is used to show the information message window and center it on the main window.
+
+        Arguments
+        -------
+            `text` (str): message to show
+    """
+
     InformationMessage.message_text.setText(text)
     screen_center = MainWindow.window.frameGeometry().center()
     InformationMessage.window.move(screen_center)
@@ -29,6 +36,8 @@ def show_information_message(text:str):
 
 
 def copy_monthly_transactions():
+    """This method is used to copy the transactions of the selected category to the clipboard."""
+
     if CategorySettingsWindow.copy_transactions.isEnabled():
         CategorySettingsWindow.copy_transactions.setEnabled(False)
         category_name = CategorySettingsWindow.window.windowTitle()
@@ -52,6 +61,8 @@ def copy_monthly_transactions():
 
 
 def copy_monthly_statistics():
+    """This method is used to copy the monthly statistics to the clipboard."""
+
     if MonthlyStatistics.copy_statistics.isEnabled():
         MonthlyStatistics.copy_statistics.setEnabled(False)
         statistics = MonthlyStatistics.statistics
@@ -66,6 +77,8 @@ def copy_monthly_statistics():
 
 
 def copy_quarterly_statistics():
+    """This method is used to copy the quarterly statistics to the clipboard."""
+
     if QuarterlyStatistics.copy_statistics.isEnabled():
         QuarterlyStatistics.copy_statistics.setEnabled(False)
         statistics = QuarterlyStatistics.statistics
@@ -93,6 +106,8 @@ def copy_quarterly_statistics():
 
 
 def copy_yearly_statistics():
+    """This method is used to copy the yearly statistics to the clipboard."""
+
     if YearlyStatistics.copy_statistics.isEnabled():
         YearlyStatistics.copy_statistics.setEnabled(False)
         statistics = YearlyStatistics.statistics
@@ -116,6 +131,8 @@ def copy_yearly_statistics():
 
 
 def copy_custom_range_statistics():
+    """This method is used to copy the custom range statistics to the clipboard."""
+
     if CustomRangeStatisticsView.copy_statistics.isEnabled():
         CustomRangeStatisticsView.copy_statistics.setEnabled(False)
         statistics = CustomRangeStatisticsView.statistics_list
@@ -129,6 +146,8 @@ def copy_custom_range_statistics():
 
 
 def copy_custom_range_transactions():
+    """This method is used to copy the custom range transactions to the clipboard."""
+
     if CustomRangeStatisticsView.copy_transactions.isEnabled():
         CustomRangeStatisticsView.copy_transactions.setEnabled(False)
         transactions = CustomRangeStatisticsView.transactions_list

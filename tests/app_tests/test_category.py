@@ -15,16 +15,19 @@ from GUI.windows.category import AddCategoryWindow, CategorySettingsWindow, Rena
 class TestCategory(DBTestCase):
 
     def test_1_category_creation(self):
+        """Test adding category to the application."""
 
-        def add_category(name:str):
+        def _add_category(name:str):
+            """Set category name and click add button."""
+
             AddCategoryWindow.category_name.setText(name)
             AddCategoryWindow.button.click()
 
-        QTimer.singleShot(100, lambda: add_category("Test incomes creation category"))
+        QTimer.singleShot(100, lambda: _add_category("Test incomes creation category"))
         MainWindow.add_incomes_category.click()
         self.assertTrue(Session.db.category_query.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
 
-        QTimer.singleShot(100, lambda: add_category("Test expenses creation category"))
+        QTimer.singleShot(100, lambda: _add_category("Test expenses creation category"))
         MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         MainWindow.add_expenses_category.click()
         self.assertTrue(Session.db.category_query.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
@@ -33,17 +36,21 @@ class TestCategory(DBTestCase):
     
 
     def test_2_category_deletion(self):
+        """Test deleting category from the application."""
+
         income_category_name = self.income_category.name
         expenses_category_name = self.expenses_category.name
 
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
 
-            def delete_category():
+            def _delete_category():
+                """Click delete button and confirm deletion."""
+
                 QTimer.singleShot(100, lambda: Messages.delete_category_confirmation.ok_button.click())
                 CategorySettingsWindow.delete_category.click()
 
-            QTimer.singleShot(100, delete_category)
+            QTimer.singleShot(100, _delete_category)
             category.settings.click()
 
         self.assertFalse(Session.db.category_query.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
@@ -53,22 +60,27 @@ class TestCategory(DBTestCase):
     
 
     def test_3_category_rename(self):
+        """Test renaming category in the application."""
+
         income_category_name = self.income_category.name
         expenses_category_name = self.expenses_category.name
 
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
 
-            def open_settings():
+            def _open_settings():
+                """Click button that show rename category window."""
 
-                def rename_category():
+                def _rename_category():
+                    """Set new category name and click rename button."""
+
                     RenameCategoryWindow.new_category_name.setText(f"{category.name} rename test")
                     RenameCategoryWindow.button.click()
 
-                QTimer.singleShot(100, rename_category)
+                QTimer.singleShot(100, _rename_category)
                 CategorySettingsWindow.rename_category.click()
 
-            QTimer.singleShot(100, open_settings)
+            QTimer.singleShot(100, _open_settings)
             category.settings.click()
 
         self.assertTrue(Session.db.session.query(Category).filter_by(name=income_category_name+" rename test").first(), "Income category hasn't been renamed")
@@ -78,21 +90,27 @@ class TestCategory(DBTestCase):
     
 
     def test_4_category_position_change(self):
+        """Test changing category position in the application."""
+
         Session.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
         Session.db.category_query.create_category("Second "+self.expenses_category.name, "Expenses", 1)
 
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
 
-            def open_settings():
-                def change_position():
+            def _open_settings():
+                """Click button that show change category position window."""
+
+                def _change_position():
+                    """Set new category position and click change button."""
+
                     ChangeCategoryPositionWindow.new_position.setText("1")
                     ChangeCategoryPositionWindow.enter_new_position.click()
 
-                QTimer.singleShot(100, change_position)
+                QTimer.singleShot(100, _change_position)
                 CategorySettingsWindow.change_category_position.click()
 
-            QTimer.singleShot(100, open_settings)
+            QTimer.singleShot(100, _open_settings)
             category.settings.click()
 
         self.assertEqual(Session.db.category_query.get_category(self.income_category.name, "Incomes").position, 1, "Income category hasn't changed position to 1")
@@ -104,9 +122,15 @@ class TestCategory(DBTestCase):
     
 
     def test_5_copy_month_transactions(self):
+        """Test copying monthly transactions to the clipboard."""
+
         for category in Session.categories.values():
-            def copy_transactions():
-                def check_copied_transactions():
+            def _copy_transactions():
+                """Click copy transactions button and check if transactions are copied to the clipboard."""
+
+                def _check_copied_transactions():
+                    """Check if transactions are copied to the clipboard."""
+
                     if category.type == "Incomes":
                         transaction_type = "income"
                     else:
@@ -119,10 +143,10 @@ class TestCategory(DBTestCase):
                     self.assertEqual(expected_transactions, app.clipboard().text(), f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}")
                     CategorySettingsWindow.window.done(1)
 
-                QTimer.singleShot(100, check_copied_transactions)
+                QTimer.singleShot(100, _check_copied_transactions)
                 CategorySettingsWindow.copy_transactions.click()
 
-            QTimer.singleShot(100, copy_transactions)
+            QTimer.singleShot(100, _copy_transactions)
             category.settings.click()
         
         qsleep(500)

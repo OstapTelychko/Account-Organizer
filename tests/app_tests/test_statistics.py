@@ -14,17 +14,31 @@ from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, Quarterl
 class TestStatistics(DBTestCase):
 
     def setUp(self):
+        """Set up the test case. It creates translations so you don't have to create them in every test case."""
+
         self.statistics_words = LANGUAGES[Session.language]["Windows"]["Statistics"]
         self.translated_incomes = LANGUAGES[Session.language]["Windows"]["Main"][1]
         self.translated_expenses = LANGUAGES[Session.language]["Windows"]["Main"][2]
 
 
     def open_statistics_window(self, func):
+        """Open statistics window and call function after some delay."""
+
         QTimer.singleShot(100, func)
         MainWindow.statistics.click()
     
 
     def create_monthly_statistics(self, days_amount:int) -> list[str]:
+        """Create monthly statistics for the current month.
+
+            Arguments
+            ---------
+                `days_amount` : (int) - Number of days in the current month.
+            Returns
+            -------
+                `list` - List of strings with the monthly statistics.
+        """
+
         return [
             f"{self.statistics_words[4]}1000.0",
             f"{self.statistics_words[5]}{round(1000/days_amount, 2)}\n",
@@ -43,10 +57,16 @@ class TestStatistics(DBTestCase):
 
 
     def test_1_show_monthly_statistics(self):
+        """Test showing monthly statistics."""
+
         days_amount = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)
 
-        def open_monthly_statics_window():
-            def check_monthly_statistics():
+        def _open_monthly_statics_window():
+            """Click button that show monthly statistics window."""
+
+            def _check_monthly_statistics():
+                """Check if monthly statistics are correct."""
+
                 expected_monthly_statistics = self.create_monthly_statistics(days_amount)
 
                 self.assertEqual(
@@ -62,13 +82,15 @@ class TestStatistics(DBTestCase):
                     
                 MonthlyStatistics.window.done(1)
             
-            QTimer.singleShot(100, check_monthly_statistics)
+            QTimer.singleShot(100, _check_monthly_statistics)
             StatisticsWindow.monthly_statistics.click()
-        self.open_statistics_window(open_monthly_statics_window)
+        self.open_statistics_window(_open_monthly_statics_window)
         qsleep(500)
     
 
     def test_2_show_quarterly_statistics(self):
+        """Test showing quarterly statistics."""
+
         month_without_transactions = 12 if Session.current_month != 12 else 1
         quarter_without_transaction = 4 if Session.current_month != 12 else 1
 
@@ -77,8 +99,12 @@ class TestStatistics(DBTestCase):
                 Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
                 Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
-        def open_quarterly_statistics_window():
-            def check_quarterly_statistics():
+        def _open_quarterly_statistics_window():
+            """Click button that show quarterly statistics window."""
+
+            def _check_quarterly_statistics():
+                """Check if quarterly statistics are correct."""
+
                 for quarter in QuarterlyStatistics.statistics.quarters:
                     quarter_number = quarter.quarter_number
                     days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
@@ -141,14 +167,16 @@ class TestStatistics(DBTestCase):
 
                 QuarterlyStatistics.window.done(1)
             
-            QTimer.singleShot(100, check_quarterly_statistics)
+            QTimer.singleShot(100, _check_quarterly_statistics)
             StatisticsWindow.quarterly_statistics.click()
         
-        self.open_statistics_window(open_quarterly_statistics_window)
+        self.open_statistics_window(_open_quarterly_statistics_window)
         qsleep(2000)
                         
 
     def test_3_show_yearly_statistics(self):
+        """Test showing yearly statistics."""
+
         month_without_transactions = 12 if Session.current_month != 12 else 1
 
         for month in range(1, 13):
@@ -156,8 +184,12 @@ class TestStatistics(DBTestCase):
                 Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
                 Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
-        def open_yearly_statistics_window():
-            def check_yearly_statistics():
+        def _open_yearly_statistics_window():
+            """Click button that show yearly statistics window."""
+
+            def _check_yearly_statistics():
+                """Check if yearly statistics are correct."""
+
                 days_amount = 365 if Session.current_year % 4 != 0 else 366
 
                 total_income = 11000.0
@@ -215,29 +247,36 @@ class TestStatistics(DBTestCase):
 
                 YearlyStatistics.window.done(1)
             
-            QTimer.singleShot(100, check_yearly_statistics)
+            QTimer.singleShot(100, _check_yearly_statistics)
             StatisticsWindow.yearly_statistics.click()
         
-        self.open_statistics_window(open_yearly_statistics_window)
+        self.open_statistics_window(_open_yearly_statistics_window)
         qsleep(2000)
     
 
     def test_4_show_custom_range_statistics(self):
+        """Test showing custom range statistics."""
+
         for month in range(1, 7):
             if month != Session.current_month:
                 Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
                 Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
-        def open_custom_range_statistics_window():
+        def _open_custom_range_statistics_window():
+            """Click button that show custom range statistics window."""
 
-            def select_custom_range():
+            def _select_custom_range():
+                """Select custom range and click show statistics button."""
+
                 CustomRangeStatistics.add_all_incomes_categories.click()
                 CustomRangeStatistics.add_all_expenses_categories.click()
                 
                 CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
                 CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))
 
-                def check_custom_range_statistics():
+                def _check_custom_range_statistics():
+                    """Check if custom range statistics are correct."""
+
                     total_income = 6000.0
                     total_expense = 6000.0
                     date_difference = date(Session.current_year, 6, 1) - date(Session.current_year, 1, 1)
@@ -303,13 +342,13 @@ class TestStatistics(DBTestCase):
                     CustomRangeStatisticsView.window.done(1)
                     CustomRangeStatistics.window.done(1)
 
-                QTimer.singleShot(100, check_custom_range_statistics)
+                QTimer.singleShot(100, _check_custom_range_statistics)
                 CustomRangeStatistics.show_statistics.click()
 
-            QTimer.singleShot(100, select_custom_range)
+            QTimer.singleShot(100, _select_custom_range)
             StatisticsWindow.custom_range_statistics.click()
 
-        self.open_statistics_window(open_custom_range_statistics_window)
+        self.open_statistics_window(_open_custom_range_statistics_window)
         qsleep(500)
 
 

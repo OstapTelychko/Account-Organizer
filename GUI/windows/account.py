@@ -99,6 +99,8 @@ class SwitchAccountWindow():
     accounts_layout.setSpacing(50)
 
     class AccountSwitchWidget():
+        """This class is used to create a widget that displays the account name, balance, and creation date and a button to switch to that account."""
+
         def __init__(self):
             self.account_name_label = QLabel()
             self.account_name_label.setFont(BASIC_FONT)

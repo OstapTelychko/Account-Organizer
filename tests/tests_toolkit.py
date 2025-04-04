@@ -21,12 +21,21 @@ if TYPE_CHECKING:
     
 
 def qsleep(miliseconds:int):
+    """Sleep for a given number of milliseconds. time.sleep() is not used because it blocks the main event loop.
+
+        Arguments
+        ---------
+            `miliseconds` : (int) - Number of milliseconds to sleep.
+    """
+
     loop = QEventLoop()
     QTimer.singleShot(miliseconds, loop.quit)
     loop.exec()
 
 
 class DBTestCase(TestCase):
+    """This class is used to create a test case that uses a database.
+        It creates a test database and removes it after the test is finished."""
 
     def __init_subclass__(cls) -> None:
         if "setUp" in cls.__dict__:
@@ -37,6 +46,16 @@ class DBTestCase(TestCase):
     
 
     def set_up_decorator(func):
+        """This decorator is used to set up the test case. It creates first objects so you don't have to create them in every test case.
+
+            Arguments
+            ---------
+                `func` : (function) - Function to decorate.
+            Returns
+            -------
+                `function` - Decorated function.
+        """
+
         @wraps(func)
         def wrapper(self:DBTestCase):
             Session.db.category_query.create_category("Test income category", "Incomes", 0)
@@ -58,16 +77,32 @@ class DBTestCase(TestCase):
     
 
     def select_correct_tab(self, category:GUICategory):
+        """This method is used to select the correct tab in the main window.
+
+            Arguments
+            ---------
+                `category` : (GUICategory) - Category to select tab.
+        """
+
         MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
 
 
     @classmethod
     def setUpClass(cls):
+        """This method is used to set up the test case. It just tells IDE that class have those variables (they are created dynamically in decorator).
+
+            Arguments
+            ---------
+                `cls` : (DBTestCase) - Test case class.
+        """
+
         cls.income_category:Category
         cls.expenses_category:Category
     
 
     def tearDown(self) -> None:
+        """This method is used to remove the test database after the test is finished."""
+
         remove_categories_from_list()
 
         Session.db.session.expunge_all()
