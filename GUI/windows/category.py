@@ -16,11 +16,8 @@ class CategorySettingsWindow():
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     rename_category = create_button("Rename category",(255,40))
-
     delete_category = create_button("Delete category",(255,40))
-
     change_category_position = create_button("Change position", (255, 40))
-
     copy_transactions = create_button("Copy transactions",(275,40))
 
     main_layout = QVBoxLayout()

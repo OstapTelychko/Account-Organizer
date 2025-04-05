@@ -41,8 +41,7 @@ class TransactionQuery:
         self.session.query(Transaction).filter_by(id=transaction_id).update({
             Transaction.name:transaction_name,
             Transaction.day:transaction_day,
-            Transaction.value:transaction_value
-        }, False)
+            Transaction.value:transaction_value}, False)
         self.session.commit()
 
 

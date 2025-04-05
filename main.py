@@ -80,13 +80,16 @@ def calculate_expression():
             except ZeroDivisionError:
                 result = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][1]
                 logger.debug(f"Zero division error (mini calculator) expression: {expression}")
+
             except SyntaxError:
                 result = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][2]
                 logger.debug(f"Syntax error (mini calculator) expression: {expression}")
+                
             except Exception as ex:
                 result = str(ex)
                 logger.debug(f"Error (mini calculator) expression: {expression}")
             MainWindow.mini_calculator_text.setText(result)
+
         else:
             Messages.forbidden_calculator_word.exec()
     else:

@@ -84,7 +84,6 @@ class SettingsWindow():
     account_info_wrapper.setLayout(account_info_wrapper_layout)
     account_info_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(account_info_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
-
     gui_settings_and_account_management = QHBoxLayout()
     gui_settings_and_account_management.addStretch(1)
     gui_settings_and_account_management.addWidget(gui_settings_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)

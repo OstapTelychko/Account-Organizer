@@ -104,12 +104,14 @@ def select_next_transaction():
     if MainWindow.Incomes_and_expenses.currentIndex() == 0:
         if Session.focused_income_category is not None:
             current_index = Session.focused_income_category.table_data.currentRow()
+
             if current_index < Session.focused_income_category.table_data.rowCount() - 1:
                 Session.focused_income_category.table_data.selectRow(current_index + 1)
 
     elif MainWindow.Incomes_and_expenses.currentIndex() == 1:
         if Session.focused_expense_category is not None:
             current_index = Session.focused_expense_category.table_data.currentRow()
+            
             if current_index < Session.focused_expense_category.table_data.rowCount() - 1:
                 Session.focused_expense_category.table_data.selectRow(current_index + 1)
 

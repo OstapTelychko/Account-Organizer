@@ -48,7 +48,6 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
 
     highest_total_value = max(Categories_total_values.values())
 
-
     def _get_min_and_max_transactions(category:int, year:int, month:int) -> tuple:
         """Get transactions with highest and lowest value in category
 
@@ -86,7 +85,6 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
 
         return (transactions_with_highest_value, transactions_with_lowest_value)
 
-
     #Highest categories
     Categories_with_highest_total_value = {}
     for category in Categories_total_values:
@@ -122,7 +120,7 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
             `words` (list): language specific words to add statistic
     """
 
-    def add_highest_and_lowest_transactions(category:int, statistic:dict):
+    def _add_highest_and_lowest_transactions(category:int, statistic:dict):
         """Add highest and lowest transactions to the list
 
             Arguments
@@ -135,6 +133,7 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
         statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[4]])
         for transaction_name, transaction_value in statistic[category][0].items():
             if transaction_name != "Highest value":
+
                 if transaction_name == "":
                     transaction_name = LANGUAGES[Session.language]["Windows"]["Statistics"][12]
                 statistic_list.addItem(f"{transaction_name} - {statistic[category][0]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][0]['Highest value']}")
@@ -143,6 +142,7 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
         if statistic[category][1]["Lowest value"] != statistic[category][0]["Highest value"]:
             statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[5]])
             for transaction_name,transaction_value in statistic[category][1].items():
+
                 if transaction_name != "Lowest value":
                     if transaction_name == "":
                         transaction_name = LANGUAGES[Session.language]["Windows"]["Statistics"][12]
@@ -152,7 +152,7 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
     if len(statistic_data[0]) == 2:
         most_category = [*statistic_data[0].keys()][0]
         statistic_list.addItem(LANGUAGES[Session.language]["Windows"]["Statistics"][words[0]] + Session.categories[most_category].name+f"  ({statistic_data[0]['Highest total value']})")
-        add_highest_and_lowest_transactions(most_category,statistic_data[0])
+        _add_highest_and_lowest_transactions(most_category,statistic_data[0])
 
     elif len(statistic_data[0]) > 2:#Highest categories
         highest_categories = [category for category in statistic_data[0] if category != "Highest total value"]
@@ -161,13 +161,13 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
 
         for category in highest_categories:
             statistic_list.addItem(f"\n{LANGUAGES[Session.language]['Windows']['Statistics'][16]} {Session.categories[category].name}")
-            add_highest_and_lowest_transactions(category, statistic_data[0])
+            _add_highest_and_lowest_transactions(category, statistic_data[0])
 
     #Lowest category
     if len(statistic_data[1]) == 2:
         least_category = [*statistic_data[1].keys()][0] 
         statistic_list.addItem("\n"+LANGUAGES[Session.language]["Windows"]["Statistics"][words[2]]+Session.categories[least_category].name+f" ({statistic_data[1]['Lowest total value']})")
-        add_highest_and_lowest_transactions(least_category, statistic_data[1])
+        _add_highest_and_lowest_transactions(least_category, statistic_data[1])
 
     elif len(statistic_data[1]) > 2:#Lowest categories
         lowest_categories = [category for category in statistic_data[1] if category != "Lowest total value"]
@@ -176,7 +176,7 @@ def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
 
         for category in lowest_categories:
             statistic_list.addItem(f"\n{LANGUAGES[Session.language]['Windows']['Statistics'][16]} {Session.categories[category].name}")
-            add_highest_and_lowest_transactions(category, statistic_data[1])
+            _add_highest_and_lowest_transactions(category, statistic_data[1])
 
 
 def add_total_statistics(statistic:dict, words:list, total_statistics_list:QListWidget, Statistic_words:dict):
@@ -280,8 +280,8 @@ def show_quarterly_statistics():
         return Messages.no_category.exec()
     
     for quarter in QuarterlyStatistics.statistics.quarters:
-        Incomes_categories_total_values = {}
-        Expenses_categories_total_values = {}
+        Incomes_categories_total_values:dict[int, list] = {}
+        Expenses_categories_total_values:dict[int, list] = {}
 
         for income_category in Incomes_categories:
             Incomes_categories_total_values[income_category] = []
@@ -349,8 +349,8 @@ def show_yearly_statistics():
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
         return Messages.no_category.exec()
     
-    Incomes_categories_total_values = {}
-    Expenses_categories_total_values = {}
+    Incomes_categories_total_values:dict[int, list] = {}
+    Expenses_categories_total_values:dict[int, list] = {}
 
     for income_category in Incomes_categories:
         Incomes_categories_total_values[income_category] = []
@@ -517,7 +517,6 @@ def remove_category_from_statistics_list(category:Category, add_button:QPushButt
 
     #Reset selected categories
     CustomRangeStatistics.selected_categories_list.clear()
-
     del CustomRangeStatistics.selected_categories_data[category.id]
 
     selected_categories = CustomRangeStatistics.selected_categories_data
@@ -628,7 +627,6 @@ def show_custom_range_statistics_view():
         add_total_statistics(Expenses_categories_total_values, [17,20], CustomRangeStatisticsView.statistics_list, Statistic_words)
     
     #Transactions list
-
     if len(Incomes_categories_transactions):
         CustomRangeStatisticsView.transactions_list.addItem(LANGUAGES[Session.language]["Windows"]["Main"][1]+"\n\n")
         for category, category_transactions in Incomes_categories_transactions.items():

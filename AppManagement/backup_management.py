@@ -24,6 +24,7 @@ from GUI.windows.settings import SettingsWindow
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QCheckBox
 
+
 logger = get_logger(__name__)
 
 def load_backups():

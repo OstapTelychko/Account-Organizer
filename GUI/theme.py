@@ -162,8 +162,6 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
 """
 
 
-
-
 def swith_theme():
     """Switch theme between dark and light. If current theme is dark, switch to light and vice versa."""
 

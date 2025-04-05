@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QScrollArea, QWidget, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 

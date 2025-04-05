@@ -23,6 +23,8 @@ from backend.statistics_query import StatisticsQuery
 if TYPE_CHECKING:
     from sqlalchemy import Engine
 
+
+
 logger = get_logger(__name__)
 
 class DBController():
@@ -77,9 +79,11 @@ class DBController():
         try:
             self.session.commit()
             logger.info("Db session commited")
+
         except:
             self.session.rollback()
             logger.error("Rollback")
+
         finally:
             self.session.expire_all()
             self.session.close()
@@ -106,6 +110,7 @@ class DBController():
             logging.getLogger("alembic.runtime.migration").setLevel(logging.WARN)
             context = migration.MigrationContext.configure(connection)
             logging.getLogger("alembic.runtime.migration").setLevel(logging.INFO)
+            
             return set(context.get_current_heads()) == set(directory.get_heads())
 
 

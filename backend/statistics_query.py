@@ -102,5 +102,4 @@ class StatisticsQuery:
         return self.session.query(Transaction).filter(and_(
             Transaction.category_id.in_(category_ids),
             Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
-            Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,
-        )).all()
+            Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,)).all()

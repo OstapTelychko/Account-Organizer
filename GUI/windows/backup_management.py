@@ -9,6 +9,8 @@ from DesktopQtToolkit.table_widget import CustomTableWidget
 from GUI.windows.main_window import MainWindow
 from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENTS, ALIGNMENT, ALIGN_V_CENTER
 
+from project_configuration import MAX_BACKUPS_VALIDATOR_REGEX, MAX_LEGACY_BACKUPS_VALIDATOR_REGEX
+
 
 
 class BackupManagementWindow():
@@ -120,7 +122,7 @@ class AutoBackupWindow():
 
     max_backups = QLineEdit()
     max_backups.setMinimumWidth(220)
-    max_backups_validator = QRegularExpressionValidator(QRegularExpression("^[1-9][0-9]{0,2}|1000$"))
+    max_backups_validator = QRegularExpressionValidator(QRegularExpression(MAX_BACKUPS_VALIDATOR_REGEX))
     max_backups.setValidator(max_backups_validator)
 
     max_backups_label = QLabel("Max backups")
@@ -131,7 +133,7 @@ class AutoBackupWindow():
 
     max_legacy_backups = QLineEdit()
     max_legacy_backups.setMinimumWidth(250)
-    max_legacy_backups_validator = QRegularExpressionValidator(QRegularExpression("^(?:[1-9]|[1-9]\\d|100)$"))
+    max_legacy_backups_validator = QRegularExpressionValidator(QRegularExpression(MAX_LEGACY_BACKUPS_VALIDATOR_REGEX))
     max_legacy_backups.setValidator(max_legacy_backups_validator)
 
     max_legacy_backups_label = QLabel("Max legacy backups")

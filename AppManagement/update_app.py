@@ -351,12 +351,6 @@ def apply_update():
     Session.restart_app()
 
 
-    
-
-
-
-
-
 def check_for_updates():
     """Check for updates and ask to download them if available."""
 
@@ -373,12 +367,14 @@ def check_for_updates():
         logger.info(f"Latest version: {latest_version} | Current version: {Session.app_version}")
         Messages.update_available.exec()
         if Messages.update_available.clickedButton() == Messages.update_available.ok_button:
+            
             def _run_update():
                 logger.info("Running update")
                 if download_latest_update():
                     logger.info("Downloaded latest update")
                     prepare_update()
                     apply_update()
+
             QTimer.singleShot(150, _run_update)
             UpdateProgressWindow.window.exec()
     else:

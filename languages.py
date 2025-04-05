@@ -1,6 +1,7 @@
 import json
 from project_configuration import APP_DIRECTORY
 
+
 with open(f"{APP_DIRECTORY}/languages.json", encoding="utf-8") as file:
     languages_data = json.load(file)
 

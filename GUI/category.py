@@ -113,7 +113,6 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
             transaction_name = CustomTableWidgetItem(transaction.name)
             transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-
             category_data.setItem(index, 0, transaction_name)
             category_data.setItem(index, 1, transaction_day)
             category_data.setItem(index, 2, transaction_value)

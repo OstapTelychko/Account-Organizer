@@ -61,8 +61,7 @@ def test_main(app_main:FunctionType):
         loader.loadTestsFromTestCase(TestAccount),
         loader.loadTestsFromTestCase(TestTransaction),
         loader.loadTestsFromTestCase(TestStatistics),
-        loader.loadTestsFromTestCase(TestBackupsManagement)
-        ))
+        loader.loadTestsFromTestCase(TestBackupsManagement)))
         print(f"Tests found: {suite.countTestCases()}")
 
         TextTestRunner().run(suite)

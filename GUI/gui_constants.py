@@ -30,7 +30,6 @@ NO_INTERNET_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/no internet connection.png"
 SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
 FOCUSED_SHADOW_EFFECT_ARGUMENTS = {"blurRadius":20, "xOffset":0, "yOffset":0, "color":QColor(70, 120, 255)}
 
-
 if platform == "linux":
     BASIC_FONT = QFont("C059 [urw]", pointSize=12)
 else:#Windows

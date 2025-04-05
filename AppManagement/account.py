@@ -42,7 +42,7 @@ def add_acccount():
     def _complete_adding_account():
         """Complete adding account. Close add account window, update user config, load accounts and load account data. Created to avoid code duplication."""
 
-        AddAccountWindow.window.hide()
+        AddAccountWindow.window.done(1)
 
         Session.account_name = account_name
         Session.update_user_config()
@@ -128,9 +128,10 @@ def switch_account(name:str):
         ---------
             `name` : (str) - Account name to switch to.
     """
-    Messages.load_account_question.setText(LANGUAGES[Session.language]["Messages"][10].replace("account", name))
 
+    Messages.load_account_question.setText(LANGUAGES[Session.language]["Messages"][10].replace("account", name))
     Messages.load_account_question.exec()
+
     if Messages.load_account_question.clickedButton() == Messages.load_account_question.ok_button:
         for widget in Session.account_switch_widgets:
             if widget.account_name_label.text() == name:
@@ -146,8 +147,8 @@ def remove_account():
     """Remove account. Show warning message and remove account from database. If last account is removed, close app."""
 
     Messages.delete_account_warning.setText(LANGUAGES[Session.language]["Messages"][11].replace("account", Session.account_name))
-
     Messages.delete_account_warning.exec()
+
     if Messages.delete_account_warning.clickedButton() == Messages.delete_account_warning.ok_button:
         Session.db.account_query.delete_account()
         clear_accounts_layout()
@@ -192,5 +193,5 @@ def rename_account():
     clear_accounts_layout()
     load_accounts()
 
-    RenameAccountWindow.window.hide()
+    RenameAccountWindow.window.done(1)
     logger.info(f"Account renamed to {new_account_name}")

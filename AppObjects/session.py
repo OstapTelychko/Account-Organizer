@@ -54,7 +54,6 @@ class Session:
         EDIT_TRANSACTION = "Edit_transaction"
 
 
-    
     app_version:str = None
 
     current_month = 4

@@ -15,11 +15,12 @@ if TYPE_CHECKING:
     from PySide6.QtGui import QIcon
 
 
+
 class MessageWindow(QMessageBox):
     """This class is used to create a message window that can be used to display messages to the user.
     It inherits from QMessageBox and adds some additional functionality."""
     
-    def __init__(self, main_window:QWidget, message_windows_container:dict, type_confirm:bool, message_icon:QMessageBox.Icon | QPixmap, title:str, window_icon:QIcon, ) -> None:
+    def __init__(self, main_window:QWidget, message_windows_container:dict, type_confirm:bool, message_icon:QMessageBox.Icon | QPixmap, title:str, window_icon:QIcon):
         super().__init__(main_window)
         self.main_window = main_window
         message_windows_container[id(self)] = self
@@ -52,8 +53,7 @@ class MessageWindow(QMessageBox):
                 value = ctypes.c_int(0)
 
             ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                self.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
-            )
+                self.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value))
 
         def center_message():
             """This method is used to center the message window on the main window."""

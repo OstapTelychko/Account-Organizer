@@ -46,7 +46,9 @@ class InformationMessage:
             InformationMessage.window.update()
             QApplication.processEvents()
             sleep(0.05)
+
         sleep(0.6)
+        
         for _ in range(5):
             opacity -= 0.2
             InformationMessage.window.setWindowOpacity(opacity)

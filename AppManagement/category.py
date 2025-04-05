@@ -156,7 +156,6 @@ def rename_category():
         return Messages.category_exists.exec()
 
     category = Session.categories[Session.db.category_query.get_category(current_name, category_type).id]
-
     category.name = new_category_name
 
     #Update connections

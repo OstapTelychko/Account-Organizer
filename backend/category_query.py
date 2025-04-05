@@ -79,12 +79,10 @@ class CategoryQuery:
 
         if new_position < old_position:
             self.session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
-                {Category.position: Category.position + 1}, synchronize_session=False
-            )
+                {Category.position: Category.position + 1}, synchronize_session=False)
         else:
             self.session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
-                {Category.position: Category.position - 1}, synchronize_session=False
-            )
+                {Category.position: Category.position - 1}, synchronize_session=False)
         self.session.query(Category).filter_by(id=category_id).update({Category.position: new_position}, synchronize_session=False)
         self.session.commit()
 
@@ -99,8 +97,7 @@ class CategoryQuery:
 
         position = self.session.query(Category).filter_by(id=category_id).first().position
         self.session.query(Category).filter(Category.position > position).update(
-            {Category.position: Category.position - 1}, synchronize_session=False
-        )
+            {Category.position: Category.position - 1}, synchronize_session=False)
         self.session.commit()
 
 

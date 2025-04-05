@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel
-from PySide6.QtGui import QDoubleValidator, QRegularExpressionValidator
+from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtCore import QRegularExpression
 
 from project_configuration import MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE
@@ -10,6 +10,8 @@ from DesktopQtToolkit.create_button import create_button
 
 from GUI.gui_constants import ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT
 from GUI.windows.main_window import MainWindow
+
+from project_configuration import TRANSACTION_DAY_REGEX
 
 
 
@@ -23,7 +25,7 @@ class TransactionManagementWindow():
     transaction_name = QLineEdit()
 
     transaction_day = QLineEdit()
-    day_regularexpression = QRegularExpression("^([1-9]|[12][0-9]|3[01])$")
+    day_regularexpression = QRegularExpression(TRANSACTION_DAY_REGEX)
     transaction_day_validator = QRegularExpressionValidator(day_regularexpression)
     transaction_day.setValidator(transaction_day_validator)
 

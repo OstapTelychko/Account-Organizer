@@ -48,6 +48,7 @@ def copy_monthly_transactions():
             result = ""
             column_names = LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]
             result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
+            
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction.value}\t\t{transaction.day}\t{transaction.name}\n"
             

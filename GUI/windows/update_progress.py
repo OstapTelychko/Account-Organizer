@@ -1,10 +1,11 @@
-from PySide6.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QWidget, QHBoxLayout, QScrollArea, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QWidget, QScrollArea, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt
 
 from DesktopQtToolkit.sub_window import SubWindow
 
 from GUI.windows.main_window import MainWindow
 from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS
+
 
 
 class UpdateProgressWindow():

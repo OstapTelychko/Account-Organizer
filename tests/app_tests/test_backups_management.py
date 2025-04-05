@@ -66,18 +66,15 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
-                )
+                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}"
-                )
+                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                )
+                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 self.assertEqual(BackupManagementWindow.create_backup.isEnabled(), True, "Create backup button hasn't been enabled")
                 
@@ -124,18 +121,15 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 0, BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been removed from the table or more then 0 backups are left {BackupManagementWindow.backups_table.rowCount()}"
-                )
+                f"Backup hasn't been removed from the table or more then 0 backups are left {BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 0, len(Session.backups),
-                f"Backup hasn't been removed from the session or more then 0 backups are left {len(Session.backups)}"
-                )
+                f"Backup hasn't been removed from the session or more then 0 backups are left {len(Session.backups)}")
 
                 self.assertEqual(
                 0, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been removed or more then 0 backups are left {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                )
+                f"Backup file hasn't been removed or more then 0 backups are left {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
                 
                 BackupManagementWindow.window.done(0)
                 SettingsWindow.window.done(0)
@@ -186,13 +180,11 @@ class TestBackupsManagement(DBTestCase):
 
                             self.assertEqual(
                             2, len(Session.categories),
-                            f"Expected categories amount after backup load is 2 returned {len(Session.categories)}"
-                            )
+                            f"Expected categories amount after backup load is 2 returned {len(Session.categories)}")
 
                             self.assertEqual(
                             2, len(Session.db.category_query.get_all_categories()),
-                            f"Expected categories amount after backup load is 2 returned {len(Session.db.category_query.get_all_categories())}"
-                            )
+                            f"Expected categories amount after backup load is 2 returned {len(Session.db.category_query.get_all_categories())}")
 
                             def _load_newest_backup():
                                 """Load automatically created backup that has new income category"""
@@ -212,13 +204,11 @@ class TestBackupsManagement(DBTestCase):
 
                                     self.assertEqual(
                                     3, len(Session.categories),
-                                    f"Expected categories amount after backup load is 3 returned {len(Session.categories)}"
-                                    )
+                                    f"Expected categories amount after backup load is 3 returned {len(Session.categories)}")
 
                                     self.assertEqual(
                                     3, len(Session.db.category_query.get_all_categories()),
-                                    f"Expected categories amount after backup load is 3 returned {len(Session.db.category_query.get_all_categories())}"
-                                    )
+                                    f"Expected categories amount after backup load is 3 returned {len(Session.db.category_query.get_all_categories())}")
 
                                     self.assertEqual(BackupManagementWindow.window.isVisible(), False, "Backup management window hasn't been closed")
                                     self.assertEqual(SettingsWindow.window.isVisible(), False, "Settings window hasn't been closed")
@@ -360,36 +350,30 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
-                )
+                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}"
-                )
+                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                )
+                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 def _check_no_new_backup():
                     """Check if no new backup is created since last backup is new"""
 
                     self.assertEqual(
                     1, BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup have been added even though less then 1 day has passed {BackupManagementWindow.backups_table.rowCount()}"
-                    )
+                    f"Backup have been added even though less then 1 day has passed {BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     1, len(Session.backups),
-                    f"Backup have been added even though less then 1 day has passed {len(Session.backups)}"
-                    )
+                    f"Backup have been added even though less then 1 day has passed {len(Session.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file have been created even though less then 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                    )
+                    f"Backup file have been created even though less then 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
@@ -403,18 +387,15 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     2, BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup during daily auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
-                    )
+                    f"Backup during daily auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     2, len(Session.backups),
-                    f"Backup during daily auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}"
-                    )
+                    f"Backup during daily auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file during daily auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                    )
+                    f"Backup file during daily auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
@@ -445,36 +426,30 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
-                )
+                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}"
-                )
+                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                )
+                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 def _check_no_new_backup():
                     """Check if no new backup is created since last backup is new"""
 
                     self.assertEqual(
                     1, BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup have been added even though less then 7 days has passed {BackupManagementWindow.backups_table.rowCount()}"
-                    )
+                    f"Backup have been added even though less then 7 days has passed {BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     1, len(Session.backups),
-                    f"Backup have been added even though less then 7 days has passed {len(Session.backups)}"
-                    )
+                    f"Backup have been added even though less then 7 days has passed {len(Session.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file have been created even though less then 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                    )
+                    f"Backup file have been created even though less then 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
@@ -488,18 +463,15 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     2, BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup during weekly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
-                    )
+                    f"Backup during weekly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     2, len(Session.backups),
-                    f"Backup during weekly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}"
-                    )
+                    f"Backup during weekly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file during weekly auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                    )
+                    f"Backup file during weekly auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
@@ -529,36 +501,30 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}"
-                )
+                f"Backup hasn't been added to the table or more then 1 backup is added {BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}"
-                )
+                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                )
+                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 def _check_no_new_backup():
                     """Check if no new backup is created since last backup is new"""
 
                     self.assertEqual(
                     1, BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup have been added even though less then 30 days has passed {BackupManagementWindow.backups_table.rowCount()}"
-                    )
+                    f"Backup have been added even though less then 30 days has passed {BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     1, len(Session.backups),
-                    f"Backup have been added even though less then 30 days has passed {len(Session.backups)}"
-                    )
+                    f"Backup have been added even though less then 30 days has passed {len(Session.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file have been created even though less then 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                    )
+                    f"Backup file have been created even though less then 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
@@ -572,18 +538,15 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     2, BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup during monthly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}"
-                    )
+                    f"Backup during monthly auto backup hasn't been added to the table or more then 2 backups are added {BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     2, len(Session.backups),
-                    f"Backup during monthly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}"
-                    )
+                    f"Backup during monthly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file during monthly auto backup hasn't been created or more than 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}"
-                    )
+                    f"Backup file during monthly auto backup hasn't been created or more than 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                     BackupManagementWindow.window.done(0)
                     SettingsWindow.window.done(0)
@@ -614,19 +577,16 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     init_max_backups, Session.max_backups,
-                    f"Expected max backups amount in session is {init_max_backups} returned {Session.max_backups}"
-                    )
+                    f"Expected max backups amount in session is {init_max_backups} returned {Session.max_backups}")
 
                     Session.load_user_config()
                     self.assertEqual(
                     init_max_backups, Session.max_backups,
-                    f"Expected max backups amount in user config is {init_max_backups} returned {Session.max_backups}"
-                    )
+                    f"Expected max backups amount in user config is {init_max_backups} returned {Session.max_backups}")
 
                     self.assertNotEqual(
                     -1, AutoBackupWindow.max_backups_label.text().find(str(init_max_backups)),
-                    f"Expected max backups amount in label is {init_max_backups} returned {AutoBackupWindow.max_backups_label.text()}"
-                    )
+                    f"Expected max backups amount in label is {init_max_backups} returned {AutoBackupWindow.max_backups_label.text()}")
 
                 QTimer.singleShot(100, _check_no_change)
                 AutoBackupWindow.save.click()
@@ -659,19 +619,16 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     3, Session.max_backups,
-                    f"Expected max backups amount in session is 3 returned {Session.max_backups}"
-                    )
+                    f"Expected max backups amount in session is 3 returned {Session.max_backups}")
 
                     Session.load_user_config()
                     self.assertEqual(
                     3, Session.max_backups,
-                    f"Expected max backups amount in user config is 3 returned {Session.max_backups}"
-                    )
+                    f"Expected max backups amount in user config is 3 returned {Session.max_backups}")
                     
                     self.assertNotEqual(
                     -1, AutoBackupWindow.max_backups_label.text().find("3"),
-                    f"Expected max backups amount in label is 3 returned {AutoBackupWindow.max_backups_label.text()}"
-                    )
+                    f"Expected max backups amount in label is 3 returned {AutoBackupWindow.max_backups_label.text()}")
 
                     AutoBackupWindow.window.done(0)
                     BackupManagementWindow.window.done(0)

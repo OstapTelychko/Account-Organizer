@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import NamedTuple, TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit
 from PySide6.QtCore import Qt, QDate
 
 from DesktopQtToolkit.sub_window import SubWindow
@@ -20,9 +20,7 @@ class StatisticsWindow():
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     monthly_statistics = create_button("Monthly", (150,40))
-
     quarterly_statistics = create_button("Quarterly", (150,40))
-
     yearly_statistics = create_button("Yearly", (150,40))
 
     statistics_wrapper_layout = QVBoxLayout()
@@ -47,7 +45,6 @@ class StatisticsWindow():
     custom_statistics_wrapper.setLayout(custom_statistics_wrapper_layout)
     custom_statistics_wrapper.setProperty("class", "wrapper")
     custom_statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-
 
     main_layout = QVBoxLayout()
     main_layout.setSpacing(20)
@@ -232,7 +229,6 @@ class YearlyStatistics():
     copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
 
     statistics_window_layout.addLayout(copy_statistics_layout)
-
     statistics_window.setLayout(statistics_window_layout)
 
     statistics_scroll = QScrollArea()
