@@ -13,6 +13,8 @@ from GUI.windows.main_window import MainWindow
 
 
 class CategorySettingsWindow():
+    """Represents Category settings window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     rename_category = create_button("Rename category",(255,40))
@@ -34,6 +36,8 @@ class CategorySettingsWindow():
 
 
 class AddCategoryWindow():
+    """Represents Add category window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     category_name = QLineEdit()
@@ -54,6 +58,8 @@ class AddCategoryWindow():
 
 
 class ChangeCategoryPositionWindow():
+    """Represents Change category position window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     preview_category_position = QLabel()
@@ -113,6 +119,8 @@ class ChangeCategoryPositionWindow():
 
 
 class RenameCategoryWindow():
+    """Represents Rename category window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     new_category_name = QLineEdit()

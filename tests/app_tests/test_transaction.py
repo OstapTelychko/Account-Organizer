@@ -10,6 +10,8 @@ from GUI.windows.transaction import TransactionManagementWindow
 
 
 class TestTransaction(DBTestCase):
+    """Test transaction management in the application."""
+
 
     def test_1_add_transaction(self):
         """Test adding transaction to the application."""

@@ -16,6 +16,15 @@ from project_configuration import TRANSACTION_DAY_REGEX
 
 
 class TransactionManagementWindow():
+    """Represents Transaction management window structure.
+
+        Warning
+        -------
+        This class contains non-GUI related objects like `transaction_id`\n
+        `transaction_id` - is a variable that stores the ID of the transaction for editing or deleting.
+    """
+        
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     message = QLabel()

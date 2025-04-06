@@ -10,6 +10,8 @@ from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, Yearl
 
 
 class InformationMessage:
+    """Represents information message window structure."""
+
     window = QWidget()
     window.setWindowFlags( Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
     window.resize(250,50)

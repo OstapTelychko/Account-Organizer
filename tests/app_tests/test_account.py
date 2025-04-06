@@ -14,6 +14,7 @@ from GUI.windows.messages import Messages
 
 
 class TestAccount(DBTestCase):
+    """Test account management in the application."""
 
     def open_settings(self, func):
         """Open settings window and call function after some delay.

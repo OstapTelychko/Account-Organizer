@@ -1,7 +1,8 @@
 ☐ add tests for shortcuts
-☐ add docs to all classes
+☐ make tests create and use a test user configuration instead of the user one. This will allow to run the tests without having to worry about the user configuration.
 
 Archive:
+  ✔ add docs to all classes @done(25-04-06 20:08)
   ✔ remove excessive lines, break lines in the code @done(25-04-05 18:08)
   ✔ add docs to all functions @started(25-04-04 01:35) @done(25-04-04 23:52) @lasted(22h17m41s)
   ✔ add option to moved category focus using shortcut ( This will simplify adding shortcut to add transaction ) @done(25-03-30 19:25)

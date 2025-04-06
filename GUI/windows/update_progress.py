@@ -9,6 +9,8 @@ from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS
 
 
 class UpdateProgressWindow():
+    """Represents Update progress window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     update_progress_title = QLabel("Update progress")

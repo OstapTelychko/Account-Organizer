@@ -9,6 +9,8 @@ from GUI.windows.main_window import MainWindow
 
 
 class Messages():
+    """Represents all application messages."""
+
     incorrect_data_type = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     account_alredy_exists  = MessageWindow(MainWindow.window, MainWindow.message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
     zero_current_balance = MessageWindow(MainWindow.window, MainWindow.message_windows, True, QMessageBox.Icon.Question, APP_NAME, APP_ICON)

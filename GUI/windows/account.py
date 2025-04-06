@@ -14,6 +14,8 @@ from GUI.windows.main_window import MainWindow
 
 
 class AddAccountWindow():
+    """Represents Add account window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     languages = QComboBox()
@@ -64,6 +66,8 @@ class AddAccountWindow():
 
 
 class RenameAccountWindow():
+    """Represents Rename account window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     
     message = QLabel()
@@ -93,6 +97,8 @@ class RenameAccountWindow():
 
 
 class SwitchAccountWindow():
+    """Represents Switch account window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     accounts_layout = QHBoxLayout()

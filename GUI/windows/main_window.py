@@ -45,7 +45,19 @@ if TYPE_CHECKING:
     from DesktopQtToolkit.message_window import MessageWindow
 
 
+
 class MainWindow():
+    """Represents main window structure.
+
+        Warning
+        -------
+        This class contains non-GUI related objects like `sub_windows` and `message_windows`.
+        
+        `sub_windows` - is a dictionary that contains all sub windows.
+
+        `message_windows` - is a dictionary that contains all message windows.
+    """
+
     window = QWidget()
     window.resize(1500, 770)
     window.setMinimumHeight(770)

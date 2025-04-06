@@ -20,6 +20,7 @@ from GUI.windows.category import AddCategoryWindow
 
 
 class TestBackupsManagement(DBTestCase):
+    """Test backup management in the application."""
 
     def setUp(self):
         """Create test backups directory"""

@@ -19,6 +19,7 @@ from GUI.windows.category import AddCategoryWindow
 
 
 class TestMainWindow(TestCase):
+    """Test main window of the application."""
 
     def test_1_windows_opening(self:TestCase):
         """Test opening windows from main window."""

@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 
 class StatisticsWindow():
+    """Represents Statistics window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     monthly_statistics = create_button("Monthly", (150,40))
@@ -60,6 +62,8 @@ class StatisticsWindow():
 
 
 class MonthlyStatistics():
+    """Represents Monthly statistics window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet(""" 
     QListWidget::item:hover,
@@ -88,6 +92,17 @@ class MonthlyStatistics():
 
 
 class QuarterlyStatistics():
+    """Represents Quarterly statistics window structure.
+
+        Warning
+        -------
+        This class contains non-GUI related objects, like NamedTuple variables.\n
+        `TotalQuarterStatisticsView` - is a NamedTuple that contains the label and data for the total quarter statistics.\n
+        `MonthlyStatisticsView` - is a NamedTuple that contains the month number, label and data for the monthly statistics in quarter.\n
+        `QuarterStatisticsView` - is a NamedTuple that contains the quarter number, label, total quarter statistics and monthly statistics.\n
+        `StatisticsView` - is a NamedTuple that contains all quarters statistics.
+    """
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet(""" 
     QListWidget::item:hover,
@@ -180,6 +195,16 @@ class QuarterlyStatistics():
 
 
 class YearlyStatistics():
+    """Represents Yearly statistics window structure.
+
+        Warning
+        -------
+        This class contains non-GUI related objects, like NamedTuple variables.\n
+        `TotalYearStatisticsView` - is a NamedTuple that contains the label and data for the total year statistics.\n
+        `MonthlyStatisticsView` - is a NamedTuple that contains the month number, label and data for the monthly statistics in year.\n
+        `StatisticsView` - is a NamedTuple that contains the total year statistics and monthly statistics.\n
+    """
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet(""" 
     QListWidget::item:hover,
@@ -248,6 +273,14 @@ class YearlyStatistics():
 
 
 class CustomRangeStatistics():
+    """Represents Custom range statistics window structure.
+
+        Warning
+        -------
+        This class contains non-GUI related objects, like `selected_categories_data`.\n
+        `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
+    """
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     selected_categories_data:dict[int, tuple[Category, str]] = {}
@@ -355,6 +388,8 @@ class CustomRangeStatistics():
 
 
 class CustomRangeStatisticsView:
+    """Represents Custom range statistics view structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_())
 

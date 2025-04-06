@@ -12,6 +12,7 @@ from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, Quarterl
 
 
 class TestStatistics(DBTestCase):
+    """Test statistics of the application."""
 
     def setUp(self):
         """Set up the test case. It creates translations so you don't have to create them in every test case."""

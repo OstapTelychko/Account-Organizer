@@ -13,6 +13,7 @@ from GUI.windows.category import AddCategoryWindow, CategorySettingsWindow, Rena
 
 
 class TestCategory(DBTestCase):
+    """Test category management in the application."""
 
     def test_1_category_creation(self):
         """Test adding category to the application."""

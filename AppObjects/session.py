@@ -28,8 +28,12 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 class Session:
+    """Session class main app support object. It stores all session variables and methods. Used to load user configuration, app version, and backups."""
+
 
     class AutoBackupStatus:
+        """Auto backup status class. It stores all auto backup statuses."""
+
         MONTHLY = "monthly"
         WEEKLY = "weekly"
         DAILY = "daily"
@@ -37,6 +41,8 @@ class Session:
     
 
     class ShortcutId:
+        """Shortcut ID class. It stores all shortcut names, that are used in the app."""
+
         CLOSE_CURRENT_WINDOW = "Close_current_window"
         OPEN_SETTINGS = "Open_settings"
         OPEN_STATISTICS = "Open_statistics"

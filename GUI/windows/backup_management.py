@@ -14,6 +14,8 @@ from project_configuration import MAX_BACKUPS_VALIDATOR_REGEX, MAX_LEGACY_BACKUP
 
 
 class BackupManagementWindow():
+    """Represents Backup management window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     backups_table = CustomTableWidget()
@@ -74,6 +76,8 @@ class BackupManagementWindow():
 
 
 class AutoBackupWindow():
+    """Represents Auto backup window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
 
     current_status = QLabel("Status: monthly")

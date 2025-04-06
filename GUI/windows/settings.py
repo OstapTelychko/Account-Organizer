@@ -12,6 +12,8 @@ from GUI.windows.main_window import MainWindow
 
 
 class SettingsWindow():
+    """Represents Settings window structure."""
+
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
     window.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")
 
