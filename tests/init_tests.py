@@ -9,7 +9,7 @@ from alembic import command
 
 from AppObjects.session import Session
 from backend.db_controller import DBController
-from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY
+from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY, TEST_USER_CONF_PATH
 
 from tests.app_tests.test_main_window import TestMainWindow
 from tests.app_tests.test_category import TestCategory
@@ -41,8 +41,9 @@ def test_main(app_main:FunctionType):
     command.upgrade(Session.test_alembic_config, "head")
 
     Session.test_mode = True
+    Session.create_user_config()
     Session.load_user_config()
-    previous_name = Session.account_name
+    # previous_name = Session.account_name
     user_name = "Test user"
     Session.account_name = user_name
     Session.update_user_config()
@@ -70,9 +71,11 @@ def test_main(app_main:FunctionType):
         print(ex)
 
     finally:
-        Session.account_name = previous_name
-        Session.update_user_config()
+        # Session.account_name = previous_name
+        # Session.update_user_config()
         Session.db.close_connection()
+
+        os.remove(TEST_USER_CONF_PATH)
 
         if os.path.exists(TEST_BACKUPS_DIRECTORY):
             shutil.rmtree(TEST_BACKUPS_DIRECTORY)

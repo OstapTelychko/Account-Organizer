@@ -23,6 +23,7 @@ THEME_DIRECTORY = f"{IMAGES_DIRECTORY}Theme/"
 GENERAL_ICONS_DIRECTORY = f"{IMAGES_DIRECTORY}General Icons/"
     
 USER_CONF_PATH = f"{APP_DIRECTORY}/User_configuration.toml"
+TEST_USER_CONF_PATH = f"{APP_DIRECTORY}/test_User_configuration.toml"
 DB_PATH = f"sqlite:///{APP_DIRECTORY}Accounts.sqlite"
 DB_FILE_PATH = DB_PATH.replace("sqlite:///","")
 TEST_DB_PATH = f"sqlite:///{APP_DIRECTORY}test_Accounts.sqlite"

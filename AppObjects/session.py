@@ -8,7 +8,7 @@ from datetime import datetime
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE, ERROR_LOG_FILE
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE, ERROR_LOG_FILE, TEST_USER_CONF_PATH
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.backup import Backup
@@ -159,37 +159,41 @@ class Session:
     def load_user_config():
         """Load user configuration. It reads the configuration from the file and sets it to the session variables."""
 
-        with open(USER_CONF_PATH) as file:
-            User_conf = toml.load(file)
+        if Session.test_mode:
+            with open(TEST_USER_CONF_PATH) as file:
+                User_conf = toml.load(file)
+        else:
+            with open(USER_CONF_PATH) as file:
+                User_conf = toml.load(file)
 
-            if "General" in User_conf: 
-                Session.theme = User_conf["General"].get("Theme", "Dark")
-                Session.language = User_conf["General"].get("Language", "English")
-                Session.account_name = User_conf["General"].get("Account_name", "")
+        if "General" in User_conf: 
+            Session.theme = User_conf["General"].get("Theme", "Dark")
+            Session.language = User_conf["General"].get("Language", "English")
+            Session.account_name = User_conf["General"].get("Account_name", "")
 
-                Session.auto_backup_status = User_conf["Backup"].get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
-                Session.max_backups = User_conf["Backup"].get("Max_backups", MAX_RECOMMENDED_BACKUPS)
-                Session.max_legacy_backups = User_conf["Backup"].get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
-                Session.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", True)
+            Session.auto_backup_status = User_conf["Backup"].get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+            Session.max_backups = User_conf["Backup"].get("Max_backups", MAX_RECOMMENDED_BACKUPS)
+            Session.max_legacy_backups = User_conf["Backup"].get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
+            Session.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", True)
 
-                Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW] = User_conf["Shortcuts"].get("Close_current_window", Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW])
-                Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS] = User_conf["Shortcuts"].get("Open_settings", Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS])
-                Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS] = User_conf["Shortcuts"].get("Open_statistics", Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS])
-                Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT] = User_conf["Shortcuts"].get("Switch_account", Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT])
-                Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME] = User_conf["Shortcuts"].get("Switch_to_income", Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME])
-                Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE] = User_conf["Shortcuts"].get("Switch_to_expense", Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE])
-                Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION] = User_conf["Shortcuts"].get("Select_previous_transaction", Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION])
-                Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION] = User_conf["Shortcuts"].get("Select_next_transaction", Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION])
+            Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW] = User_conf["Shortcuts"].get("Close_current_window", Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW])
+            Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS] = User_conf["Shortcuts"].get("Open_settings", Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS])
+            Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS] = User_conf["Shortcuts"].get("Open_statistics", Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS])
+            Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT] = User_conf["Shortcuts"].get("Switch_account", Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT])
+            Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME] = User_conf["Shortcuts"].get("Switch_to_income", Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME])
+            Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE] = User_conf["Shortcuts"].get("Switch_to_expense", Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE])
+            Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION] = User_conf["Shortcuts"].get("Select_previous_transaction", Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION])
+            Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION] = User_conf["Shortcuts"].get("Select_next_transaction", Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION])
 
-            else:
-            # If the file is not in the new format, load it as a legacy configuration (1.1.1)
-                Session.theme = User_conf.get("Theme", "Dark")
-                Session.language = User_conf.get("Language", "English")
-                Session.account_name = User_conf.get("Account_name", "")
-                Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
-                Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
-                Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
-                Session.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", True)
+        else:
+        # If the file is not in the new format, load it as a legacy configuration (1.1.1)
+            Session.theme = User_conf.get("Theme", "Dark")
+            Session.language = User_conf.get("Language", "English")
+            Session.account_name = User_conf.get("Account_name", "")
+            Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+            Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
+            Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
+            Session.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", True)
 
 
     def create_user_config():
@@ -212,30 +216,40 @@ class Session:
             }
         }
 
-        with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
-            toml.dump(default_user_configuration, file)
+        if Session.test_mode:
+            with open(TEST_USER_CONF_PATH, "w", encoding="utf-8") as file:
+                toml.dump(default_user_configuration, file)
+        else:   
+            with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
+                toml.dump(default_user_configuration, file)
 
         
     def update_user_config():
         """Update user configuration file. It updates the file with the current values of the session variables."""
 
-        with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
-            toml.dump({
-                "General":{
-                    "Theme":Session.theme,
-                    "Language":Session.language,
-                    "Account_name":Session.account_name
-                },
-                "Backup":{
-                    "Auto_backup_status":Session.auto_backup_status,
-                    "Max_backups":Session.max_backups,
-                    "Max_legacy_backups":Session.max_legacy_backups,
-                    "Auto_backup_removal_enabled":Session.auto_backup_removal_enabled
-                },
-                "Shortcuts":{
-                    **Session.shortcuts
-                }
-            }, file)
+        user_config = {
+            "General":{
+                "Theme":Session.theme,
+                "Language":Session.language,
+                "Account_name":Session.account_name
+            },
+            "Backup":{
+                "Auto_backup_status":Session.auto_backup_status,
+                "Max_backups":Session.max_backups,
+                "Max_legacy_backups":Session.max_legacy_backups,
+                "Auto_backup_removal_enabled":Session.auto_backup_removal_enabled
+            },
+            "Shortcuts":{
+                **Session.shortcuts
+            }
+        }
+
+        if Session.test_mode:
+            with open(TEST_USER_CONF_PATH, "w", encoding="utf-8") as file:
+                toml.dump(user_config, file)
+        else:
+            with open(USER_CONF_PATH, "w", encoding="utf-8") as file:
+                toml.dump(user_config, file)
     
 
     def load_backups():
