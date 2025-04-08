@@ -17,9 +17,12 @@ from tests.app_tests.test_account import TestAccount
 from tests.app_tests.test_transaction import TestTransaction
 from tests.app_tests.test_statistics import TestStatistics
 from tests.app_tests.test_backups_management import TestBackupsManagement
+from tests.app_tests.test_shortcuts import TestShortcuts
 
 if TYPE_CHECKING:
     from types import FunctionType
+
+
 
 
 def test_main(app_main:FunctionType):
@@ -43,7 +46,6 @@ def test_main(app_main:FunctionType):
     Session.test_mode = True
     Session.create_user_config()
     Session.load_user_config()
-    # previous_name = Session.account_name
     user_name = "Test user"
     Session.account_name = user_name
     Session.update_user_config()
@@ -62,7 +64,10 @@ def test_main(app_main:FunctionType):
         loader.loadTestsFromTestCase(TestAccount),
         loader.loadTestsFromTestCase(TestTransaction),
         loader.loadTestsFromTestCase(TestStatistics),
-        loader.loadTestsFromTestCase(TestBackupsManagement)))
+        loader.loadTestsFromTestCase(TestBackupsManagement),
+        loader.loadTestsFromTestCase(TestShortcuts),
+        ))
+        
         print(f"Tests found: {suite.countTestCases()}")
 
         TextTestRunner().run(suite)
@@ -71,8 +76,6 @@ def test_main(app_main:FunctionType):
         print(ex)
 
     finally:
-        # Session.account_name = previous_name
-        # Session.update_user_config()
         Session.db.close_connection()
 
         os.remove(TEST_USER_CONF_PATH)
