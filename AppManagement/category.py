@@ -96,6 +96,7 @@ def create_category():
     AddCategoryWindow.category_name.setText("")
     AddCategoryWindow.window.hide()
     show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][8])
+    reset_focused_category()
 
 
 def load_categories():

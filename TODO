@@ -1,6 +1,9 @@
-✔ add tests for shortcuts @started(25-04-08 17:52) @done(25-04-08 22:13) @lasted(4h21m53s)
+
+
 
 Archive:
+  ✔ improve tests console output @started(25-04-09 21:24) @done(25-04-10 00:50) @lasted(3h26m6s)
+  ✔ add tests for shortcuts @started(25-04-08 17:52) @done(25-04-08 22:13) @lasted(4h21m53s)
   ✔ make tests create and use a test user configuration instead of the user one. This will allow to run the tests without having to worry about the user configuration. @started(25-04-07 23:49) @done(25-04-08 00:18) @lasted(29m51s)
   ✔ add docs to all classes @done(25-04-06 20:08)
   ✔ remove excessive lines, break lines in the code @done(25-04-05 18:08)
