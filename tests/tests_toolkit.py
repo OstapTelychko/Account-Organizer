@@ -30,6 +30,16 @@ LEXER = get_lexer_by_name("py3tb")
 FORMATTER = TerminalFormatter()
 colorama_init(autoreset=True)
 
+ERROR = "ERROR"
+ERROR_COLOR = Fore.YELLOW
+FAIL = "FAIL"
+FAIL_COLOR = Fore.RED
+SUCCESS = "SUCCESS"
+SUCCESS_COLOR = Fore.GREEN
+
+SEPARATOR1 = "=" 
+SEPARATOR2 = "-"
+
 def qsleep(miliseconds:int):
     """Sleep for a given number of milliseconds. time.sleep() is not used because it blocks the main event loop.
 
@@ -125,22 +135,22 @@ class DBTestCase(TestCase):
 
 
 
-class CustomTextTestResult(TextTestResult):
+class ColoredTextTestResult(TextTestResult):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
-    def _print_separator(self):
+    def _print_separator(self, separator: str = SEPARATOR1):
         """Print a separator line with dynamic length (based on console width)."""
         width = shutil.get_terminal_size().columns-1
-        print("\n"+"=" * width)
+        self.stream.writeln("\n"+separator * width)
 
 
     def startTest(self, test):
         """Override startTest to print separators and the test name."""
         self._print_separator()
-        print(f"Running test: {test}")
+        self.stream.writeln(f"Running test: {test}")
 
         super().startTest(test)
 
@@ -152,13 +162,13 @@ class CustomTextTestResult(TextTestResult):
 
     def addSuccess(self, test):
         """Override to print success message in green."""
-        print(Fore.GREEN + f"SUCCESS: {test}", end=" ")
+        self.stream.write(SUCCESS_COLOR + f"{SUCCESS}: {test}")
         super().addSuccess(test)
 
 
     def addFailure(self, test, err):
         """Override to print failure message in red."""
-        print(Fore.RED + f"FAILURE: {test}")
+        self.stream.write(FAIL_COLOR + f"{FAIL}: {test}")
 
         exception_type, exception_value, traceback_obj = err
         formatted_exception = "".join(format_exception(exception_type, exception_value, traceback_obj))
@@ -171,7 +181,7 @@ class CustomTextTestResult(TextTestResult):
 
     def addError(self, test, err):
         """Override to print error message in yellow."""
-        print(Fore.YELLOW + f"ERROR: {test}")
+        self.stream.write(ERROR_COLOR + f"{ERROR}: {test}")
 
         exception_type, exception_value, traceback_obj = err
         formatted_exception = "".join(format_exception(exception_type, exception_value, traceback_obj))
@@ -180,4 +190,18 @@ class CustomTextTestResult(TextTestResult):
         self.errors.append((test, colored_exception))
         self._mirrorOutput = True
         #I don't use super method because it will print extra traceback message
-        
+    
+
+    def printErrorList(self, flavour, errors):
+        """Override to print errors in colored format."""
+        for test, err in errors:
+            self._print_separator()
+
+            if flavour == ERROR:
+                self.stream.write(f"{ERROR_COLOR}{flavour}: {self.getDescription(test)}")
+            elif flavour == FAIL:
+                self.stream.write(f"{FAIL_COLOR}{flavour}: {self.getDescription(test)}")
+
+            self._print_separator(SEPARATOR2)
+            self.stream.writeln(err)
+            self.stream.flush()
