@@ -48,6 +48,10 @@ APP_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 ERROR_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(pathname)s:%(lineno)d - %(message)s"
 LOG_DATE_FORMAT = "%d-%m-%Y %H:%M:%S"
 
+ERROR_LOG_START_MESSAGE = "Starting session. I hope you won't see any messages below this line."
+TERMINAL_IGNORE_LOG_MESSAGES = {ERROR_LOG_START_MESSAGE}
+REPLACE_LOG_MESSAGES = {"__BREAK_LINE__":"",} 
+
 BACKUPS_DIRECTORY_NAME = "DB Backups"
 BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}{BACKUPS_DIRECTORY_NAME}"
 TEST_BACKUPS_DIRECTORY = f"{ROOT_DIRECTORY}Test DB Backups"
