@@ -31,7 +31,7 @@ class HorizontalScrollArea(QScrollArea):
         """
 
         if event.angleDelta().x() == 0:
-            delta = event.angleDelta().y()
+            delta = float(event.angleDelta().y())
 
             if delta < 0:
                 speed_factor = max(1, -(delta / 100))

@@ -21,7 +21,7 @@ class InfoFilter(logging.Filter):
 class IgnoreFilter(logging.Filter):
     """This class is used to filter out logs that are in the ignored_messages set"""
 
-    def __init__(self, ignored_messages:Set=None):
+    def __init__(self, ignored_messages:Set|None=None):
         super().__init__()
 
         if ignored_messages is None:
@@ -45,7 +45,7 @@ class IgnoreFilter(logging.Filter):
 
 class ReplaceMessageFormatter(logging.Formatter):
 
-    def __init__(self, fmt = None, datefmt = None, style = "%", validate = True, *, replace_messages:Mapping[str, str]=None, defaults = None):
+    def __init__(self, fmt = None, datefmt = None, style = "%", validate = True, *, replace_messages:Mapping[str, str]|None=None, defaults = None):
         """This formatter is used to replace messages in the log with the values in the replace_messages dict.
 
             Arguments

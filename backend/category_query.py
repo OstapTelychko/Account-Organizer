@@ -4,18 +4,21 @@ from sqlalchemy.sql import text
 from sqlalchemy import desc, and_
 
 from backend.models import Category
+from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session as sql_Session
 
 
 
+logger = get_logger(__name__)
+
 class CategoryQuery:
     """This class is used to manage categories and related data in the database."""
 
     def __init__(self, session:sql_Session):
         self.session = session
-        self.account_id:int = None
+        self.account_id:int
     
 
     def category_exists(self, name:str, category_type:str) -> bool:
@@ -44,7 +47,7 @@ class CategoryQuery:
                 `position` : (int) - Position of the category for sorting.
         """
 
-        self.session.add(Category(name, category_type, position, self.account_id))
+        self.session.add(Category(name=name, category_type=category_type, position=position, account_id=self.account_id))
         self.session.commit()
 
 
@@ -95,13 +98,17 @@ class CategoryQuery:
                 `category_id` : (int) - ID of the category to remove.
         """
 
-        position = self.session.query(Category).filter_by(id=category_id).first().position
-        self.session.query(Category).filter(Category.position > position).update(
-            {Category.position: Category.position - 1}, synchronize_session=False)
-        self.session.commit()
+        category = self.session.query(Category).filter_by(id=category_id).first()
+
+        if category:
+            self.session.query(Category).filter(Category.position > category.position).update(
+                {Category.position: Category.position - 1}, synchronize_session=False)
+            self.session.commit()
+        else:
+            logger.error(f"Category with ID {category_id} not found.")
 
 
-    def get_category(self, name:str, category_type:str) -> Category:
+    def get_category(self, name:str, category_type:str) -> Category|None:
         """Get a category by its name and type.
 
             Arguments
@@ -114,7 +121,13 @@ class CategoryQuery:
         """
 
         category = self.session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
-        return category
+
+        if category:
+            return category
+        else:
+            logger.error(f"Category with name {name} and type {category_type} not found.")
+            return None
+            
     
 
     def get_all_categories(self) -> list[Category]:

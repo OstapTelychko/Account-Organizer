@@ -1,9 +1,8 @@
-☐ fix empty rows in error log @started(25-04-13 22:39)
 ☐ update settings window to make it more scalable for further additional settings
 ☐ add shortcut change option to settings window
 
-
 Archive:
+  ✔ fix empty rows in error log @started(25-04-13 22:39) @done(25-04-16 22:54) @lasted(3d15m8s)
   ✔ improve tests console output @started(25-04-09 21:24) @done(25-04-10 00:50) @lasted(3h26m6s)
   ✔ add tests for shortcuts @started(25-04-08 17:52) @done(25-04-08 22:13) @lasted(4h21m53s)
   ✔ make tests create and use a test user configuration instead of the user one. This will allow to run the tests without having to worry about the user configuration. @started(25-04-07 23:49) @done(25-04-08 00:18) @lasted(29m51s)

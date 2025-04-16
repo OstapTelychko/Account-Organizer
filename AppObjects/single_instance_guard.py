@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from PySide6.QtCore import QObject
 from PySide6.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
 
@@ -26,7 +26,7 @@ class SingleInstanceGuard(QObject):
         self.server_socket.newConnection.connect(self.handle_new_connection)
 
         self.client_socket = QTcpSocket(self)
-        self.main_window:QWidget = None
+        self.main_window:QWidget
 
         # Attempt to connect to the server (to existing instance)
         self.client_socket.connectToHost(APP_HOST, APP_PORT)
@@ -58,7 +58,7 @@ class SingleInstanceGuard(QObject):
     def read_client(self):
         """Read data from the client connection. If the data is "RAISE_WINDOW", raise the main window."""
 
-        client_connection:QTcpSocket = self.sender()
+        client_connection:QTcpSocket = cast(QTcpSocket, self.sender())
         
         while client_connection.bytesAvailable() > 0:
             line = client_connection.readLine().data().decode()

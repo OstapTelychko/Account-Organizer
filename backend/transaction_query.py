@@ -12,7 +12,7 @@ class TransactionQuery:
 
     def __init__(self, session:sql_Session):
         self.session = session
-        self.account_id:int = None
+        self.account_id:int
     
 
     def delete_transaction(self, transaction_id:int):
@@ -58,7 +58,7 @@ class TransactionQuery:
                 `name` : (str) - Name of the transaction.
         """
 
-        transaction = Transaction(year, month, day, value, name, category_id)
+        transaction = Transaction(year=year, month=month, day=day, value=value, name=name, category_id=category_id)
         self.session.add(transaction)
         self.session.commit()
         return transaction

@@ -61,7 +61,7 @@ class Session:
         EDIT_TRANSACTION = "Edit_transaction"
 
 
-    app_version:str = None
+    app_version:str
 
     current_month = 4
     current_year = 2023
@@ -71,8 +71,8 @@ class Session:
 
     accounts_list:list[Account] = []
     categories:dict[int, Category] = {}
-    focused_income_category:Category = None
-    focused_expense_category:Category = None
+    focused_income_category:Category
+    focused_expense_category:Category
 
     account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
 
@@ -80,7 +80,7 @@ class Session:
     theme = "Dark"
     account_name = ""
 
-    db:DBController = None
+    db:DBController
     backups:dict[str, Backup] = {}
     auto_backup_status:AutoBackupStatus = AutoBackupStatus.MONTHLY
     auto_backup_removal_enabled:bool = True

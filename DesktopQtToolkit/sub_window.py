@@ -63,8 +63,8 @@ class SubWindow(QDialog):
             main_window_center = self.main_window.geometry().center()
             sub_window_geometry = self.geometry()
 
-            main_window_center.setX(main_window_center.x()-sub_window_geometry.width()/2)
-            main_window_center.setY(main_window_center.y()-sub_window_geometry.height()/2)
+            main_window_center.setX(int(main_window_center.x()-sub_window_geometry.width()/2))
+            main_window_center.setY(int(main_window_center.y()-sub_window_geometry.height()/2))
 
             self.move(main_window_center)
 
@@ -77,8 +77,8 @@ class SubWindow(QDialog):
                 start_height = window_height*0.8
                 
                 smaller_size = QRect(initial_size)
-                smaller_size.setWidth(start_width)
-                smaller_size.setHeight(start_height)
+                smaller_size.setWidth(int(start_width))
+                smaller_size.setHeight(int(start_height))
                 
                 self.size_animation.setStartValue(smaller_size)
                 self.size_animation.setEndValue(initial_size)

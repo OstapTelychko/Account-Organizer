@@ -1,12 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from sqlite3 import connect as sql_connect
+from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session as sql_Session
     from sqlalchemy import Engine
 
 
+logger = get_logger(__name__)
 
 class BackupQuery:
     """This class is used to manage the backup logic of the database.
@@ -15,7 +17,7 @@ class BackupQuery:
     def __init__(self, session:sql_Session, engine:Engine):
         self.session = session
         self.engine = engine
-        self.account_id:int = None
+        self.account_id:int
     
 
     def create_backup(self, backup_file_path:str ):
@@ -26,16 +28,20 @@ class BackupQuery:
                 `backup_file_path` : (str) - Path to the backup file.
         """
 
-        db_file_path = self.engine.url.database.replace("sqlite:///", "")
-        try:
-            with sql_connect(db_file_path) as conn:
-                conn.execute("PRAGMA VACUUM")
+        if self.engine.url.database is not None:
+            db_file_path = self.engine.url.database.replace("sqlite:///", "")
+            try:
+                with sql_connect(db_file_path) as conn:
+                    conn.execute("PRAGMA VACUUM")
 
-                with sql_connect(backup_file_path) as backup_conn:
-                    conn.backup(backup_conn)
-        finally:
-            conn.close()
-            backup_conn.close()
+                    with sql_connect(backup_file_path) as backup_conn:
+                        conn.backup(backup_conn)
+            finally:
+                conn.close()
+                backup_conn.close()
+
+        else:
+            logger.error("Database file path is None. Cannot create backup.")
 
 
     def create_backup_based_on_external_db(self, external_db_path:str, backup_file_path:str):

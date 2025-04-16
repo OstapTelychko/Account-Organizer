@@ -15,7 +15,7 @@ class StatisticsQuery:
 
     def __init__(self, session:sql_Session):
         self.session = session
-        self.account_id:int = None
+        self.account_id:int
     
 
     def get_monthly_transactions_sum(self, category_id:int, year:int, month:int) -> float:

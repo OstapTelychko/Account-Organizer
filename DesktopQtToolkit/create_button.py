@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QPushButton
 from GUI.gui_constants import BASIC_FONT
 
 
-def create_button(button_text:str, size:tuple[int], css_class:str="button") -> QPushButton:
+def create_button(button_text:str, size:tuple[int, int], css_class:str="button") -> QPushButton:
     """Create a button with the specified text, size, and CSS class.
     
         Arguments

@@ -3,18 +3,21 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.sql import text
 from backend.models import Account
+from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session as sql_Session
 
 
 
+logger = get_logger(__name__)
+
 class AccountQuery:
     """This class is used to manage accounts and related to accounts data in the database."""
 
     def __init__(self, session:sql_Session):
         self.session = session
-        self.account_id:int = None
+        self.account_id:int
     
 
     def account_exists(self, name:str) -> bool:
@@ -57,7 +60,7 @@ class AccountQuery:
         self.session.commit()
 
 
-    def get_account(self) -> Account:
+    def get_account(self) -> Account|None:
         """Get the account object from the database.
 
             Returns
@@ -65,7 +68,12 @@ class AccountQuery:
                 `Account` - The account object.
         """
 
-        return self.session.query(Account).filter_by(id=self.account_id).first()
+        account = self.session.query(Account).filter_by(id=self.account_id).first()
+        if account:
+            return account
+        else:
+            logger.error(f"Account with ID {self.account_id} not found.")
+            return None
 
 
     def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float):
@@ -95,8 +103,12 @@ class AccountQuery:
         """
 
         account = self.session.query(Account).filter_by(id=self.account_id).first()
-        account.name = new_account_name
-        self.session.commit()
+
+        if account:
+            account.name = new_account_name
+            self.session.commit()
+        else:
+            logger.error(f"Account with ID {self.account_id} not found.")
     
 
     def delete_account(self):
