@@ -139,19 +139,19 @@ def change_language():
     BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
 
     AutoBackupWindow.window.setWindowTitle(Windows["Settings"]["Backup management"][4])
-    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY:
+    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY.value:
         AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
         BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][5])
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY:
+    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY.value:
         AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][6])
         BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][6])
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY:
+    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY.value:
         AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][7])
         BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][7])
     
-    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
         AutoBackupWindow.current_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][20])
         BackupManagementWindow.auto_backup_status.setText(Windows["Settings"]["Backup management"][8]+" "+Windows["Settings"]["Backup management"][20])
     AutoBackupWindow.monthly.setText(Windows["Settings"]["Backup management"][9])

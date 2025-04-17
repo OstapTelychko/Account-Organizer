@@ -90,7 +90,7 @@ class AutoBackupWindow():
     status_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(status_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
     status_wrapper.setLayout(QVBoxLayout())
-    status_wrapper.layout().addWidget(current_status, alignment=ALIGN_H_CENTER)
+    status_wrapper.layout().addWidget(current_status)
     status_wrapper.layout().setContentsMargins(20, 20, 20, 20)
 
     monthly = QCheckBox("Monthly")

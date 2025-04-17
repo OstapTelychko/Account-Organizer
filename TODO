@@ -1,5 +1,8 @@
 ☐ update settings window to make it more scalable for further additional settings
 ☐ add shortcut change option to settings window
+☐ fix all mypy errors @started(25-04-17 19:08)
+☐ migrate gui structure to use a class instances for each window instead of using references to class template
+☐ rewrite language usage in project to use LanguageStructure class @started(25-04-17 23:29)
 
 Archive:
   ✔ fix empty rows in error log @started(25-04-13 22:39) @done(25-04-16 22:54) @lasted(3d15m8s)

@@ -121,8 +121,13 @@ class DBController():
             ---------
                 `account_name` : (str) - Name of the account to set.
         """
-
-        self.account_id = self.session.query(Account).filter(Account.name == account_name).first().id
+        
+        account = self.session.query(Account).filter(Account.name == account_name).first()
+        if not account:
+            logger.error(f"Account with name {account_name} not found.")
+            raise ValueError(f"Account with name '{account_name}' not found.")
+        
+        self.account_id = account.id
         self.account_query.account_id = self.account_id
         self.category_query.account_id = self.account_id
         self.transaction_query.account_id = self.account_id

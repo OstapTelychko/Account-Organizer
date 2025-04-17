@@ -255,7 +255,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.DAILY, "Auto backup status hasn't been changed to daily")
+                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.DAILY.value, "Auto backup status hasn't been changed to daily")
 
                 translated_daily_status = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"][7]
                 self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
@@ -288,7 +288,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.WEEKLY, "Auto backup status hasn't been changed to weekly")
+                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.WEEKLY.value, "Auto backup status hasn't been changed to weekly")
 
                 translated_weekly_status = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"][6]
                 self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
@@ -321,7 +321,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.MONTHLY, "Auto backup status hasn't been changed to monthly")
+                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.MONTHLY.value, "Auto backup status hasn't been changed to monthly")
 
                 translated_monthly_status = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"][5]
                 self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
@@ -339,7 +339,7 @@ class TestBackupsManagement(DBTestCase):
     def test_5_auto_daily_backup(self):
         """Test daily auto backup in the application."""
 
-        Session.auto_backup_status = Session.AutoBackupStatus.DAILY
+        Session.auto_backup_status = Session.AutoBackupStatus.DAILY.value
         date_now = datetime.now()
         date_minus_1_day = date_now - timedelta(days=1)
 
@@ -415,7 +415,7 @@ class TestBackupsManagement(DBTestCase):
     def test_6_auto_weekly_backup(self):
         """Test weekly auto backup in the application."""
 
-        Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY
+        Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY.value
         date_now = datetime.now()
         date_minus_7_days = date_now - timedelta(days=7)
 
@@ -490,7 +490,7 @@ class TestBackupsManagement(DBTestCase):
     def test_7_auto_monthly_backup(self):
         """Test monthly auto backup in the application."""
 
-        Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY
+        Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY.value
         date_now = datetime.now()
         date_minus_30_days = date_now - timedelta(days=30)
 

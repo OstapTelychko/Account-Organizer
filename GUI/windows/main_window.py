@@ -46,6 +46,32 @@ if TYPE_CHECKING:
 
 
 
+
+def main_window_move_event(event:QEvent):
+    """This method is used to move all sub windows and message windows when the main window is moved."""
+
+    for sub_window in MainWindow.sub_windows.values():
+        main_window_center = MainWindow.window.geometry().center()
+        sub_window_geometry = sub_window.geometry()
+
+        main_window_center.setX(int(main_window_center.x()-sub_window_geometry.width()/2))
+        main_window_center.setY(int(main_window_center.y()-sub_window_geometry.height()/2))
+
+        sub_window.move(main_window_center)
+    
+    for message_window in MainWindow.message_windows.values():
+        main_window_center = MainWindow.window.geometry().center()
+        message_window_geometry = message_window.geometry()
+
+        main_window_center.setX(int(main_window_center.x()-message_window_geometry.width()/2))
+        main_window_center.setY(int(main_window_center.y()-message_window_geometry.height()/2))
+
+        message_window.move(main_window_center)
+
+    event.accept()
+
+
+
 class MainWindow():
     """Represents main window structure.
 
@@ -198,30 +224,9 @@ class MainWindow():
 
     sub_windows:dict[int, SubWindow] = dict()
     message_windows:dict[int, MessageWindow] = dict()
-    def move_event(event:QEvent):
-        """This method is used to move all sub windows and message windows when the main window is moved."""
 
-        for sub_window in MainWindow.sub_windows.values():
-            main_window_center = MainWindow.window.geometry().center()
-            sub_window_geometry = sub_window.geometry()
 
-            main_window_center.setX(main_window_center.x()-sub_window_geometry.width()/2)
-            main_window_center.setY(main_window_center.y()-sub_window_geometry.height()/2)
-
-            sub_window.move(main_window_center)
-        
-        for message_window in MainWindow.message_windows.values():
-            main_window_center = MainWindow.window.geometry().center()
-            message_window_geometry = message_window.geometry()
-
-            main_window_center.setX(main_window_center.x()-message_window_geometry.width()/2)
-            main_window_center.setY(main_window_center.y()-message_window_geometry.height()/2)
-
-            message_window.move(main_window_center)
-
-        event.accept()
-
-    window.moveEvent = move_event
+    window.moveEvent = main_window_move_event #type: ignore[assignment]  #this will be replaced by proper new class that will override the method
 
 
 

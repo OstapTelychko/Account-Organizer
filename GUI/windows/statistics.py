@@ -131,7 +131,8 @@ class QuarterlyStatistics():
         quarter_layout = QHBoxLayout()
         quarter_layout.setSpacing(30)
 
-        quarter_statistics_parts_list = []
+
+        quarter_months_statistics_list:list[MonthlyStatisticsView] = []
         for statistic_list in range(4):              
             statistic_label = QLabel()
             statistic_label.setFont(BASIC_FONT)
@@ -151,13 +152,12 @@ class QuarterlyStatistics():
             quarter_layout.addLayout(statistic_layout)
 
             if statistic_list == 0:
-                quarter_statistics_part = TotalQuarterStatisticsView(statistic_label, statistic_data)
+                total_quarter_statistics = TotalQuarterStatisticsView(statistic_label, statistic_data)
             else:
                 quarter_statistics_part = MonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
-
-            quarter_statistics_parts_list.append(quarter_statistics_part)
+                quarter_months_statistics_list.append(quarter_statistics_part)
         
-        quarter_statistics = QuarterStatisticsView(quarter, quarter_label, quarter_statistics_parts_list[0], quarter_statistics_parts_list[1:4])
+        quarter_statistics = QuarterStatisticsView(quarter, quarter_label, total_quarter_statistics, quarter_months_statistics_list)
         quarters_statistics_list.append(quarter_statistics)
 
         quarter_window.setLayout(quarter_layout)
@@ -220,7 +220,7 @@ class YearlyStatistics():
     statistics_window = QWidget()
     statistics_window_layout = QVBoxLayout()
 
-    yearly_statistics_parts_list = []
+    yearly_statistics_parts_list:list[MonthlyStatisticsView] = []
     for statistics_list in range(13):
         statistics_label = QLabel()
         statistics_label.setFont(BASIC_FONT)
@@ -241,12 +241,12 @@ class YearlyStatistics():
         statistics_window_layout.addLayout(statistics_layout)
 
         if statistics_list == 0:
-            yearly_statistics_part = TotalYearStatisticsView(statistics_label, statistics_data)
+            total_year_statistics = TotalYearStatisticsView(statistics_label, statistics_data)
         else:
             yearly_statistics_part = MonthlyStatisticsView(statistics_list, statistics_label, statistics_data)
-        yearly_statistics_parts_list.append(yearly_statistics_part)
+            yearly_statistics_parts_list.append(yearly_statistics_part)
 
-    statistics = StatisticsView(yearly_statistics_parts_list[0], yearly_statistics_parts_list[1:13])
+    statistics = StatisticsView(total_year_statistics, yearly_statistics_parts_list)
 
     
     copy_statistics = create_button("Copy yearly statistics", (275,40))
@@ -391,7 +391,7 @@ class CustomRangeStatisticsView:
     """Represents Custom range statistics view structure."""
 
     window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-    window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_())
+    window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_()) #type: ignore[method-assign, assignment, func-returns-value]  #This will be solved in the future when class will be written properly
 
     statistics_list = QListWidget()
     statistics_list.setFont(BASIC_FONT)

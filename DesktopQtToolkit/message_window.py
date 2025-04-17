@@ -34,7 +34,7 @@ class MessageWindow(QMessageBox):
             self.addButton(QMessageBox.StandardButton.Cancel)  
             self.setDefaultButton(QMessageBox.StandardButton.Cancel)
 
-        if type(message_icon) is QPixmap:
+        if isinstance(message_icon, QPixmap):
             self.setIconPixmap(message_icon)
         else:
             self.setIcon(message_icon)
@@ -52,7 +52,7 @@ class MessageWindow(QMessageBox):
             else:
                 value = ctypes.c_int(0)
 
-            ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            ctypes.windll.dwmapi.DwmSetWindowAttribute( # type: ignore[attr-defined]  #Mypy doesn't understand that this attribute exists only on windows
                 self.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value))
 
         def center_message():
@@ -61,8 +61,8 @@ class MessageWindow(QMessageBox):
             main_window_center = self.main_window.geometry().center()
             message_window_geometry = self.geometry()
 
-            main_window_center.setX(main_window_center.x()-message_window_geometry.width()/2)
-            main_window_center.setY(main_window_center.y()-message_window_geometry.height()/2)
+            main_window_center.setX(int(main_window_center.x()-message_window_geometry.width()/2))
+            main_window_center.setY(int(main_window_center.y()-message_window_geometry.height()/2))
 
             self.move(main_window_center)
             self.activateWindow()

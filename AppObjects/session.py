@@ -4,6 +4,7 @@ import os
 import sys
 from typing import TYPE_CHECKING
 from datetime import datetime
+from enum import Enum
 
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
@@ -32,7 +33,7 @@ class Session:
     """Session class main app support object. It stores all session variables and methods. Used to load user configuration, app version, and backups."""
 
 
-    class AutoBackupStatus:
+    class AutoBackupStatus(Enum):
         """Auto backup status class. It stores all auto backup statuses."""
 
         MONTHLY = "monthly"
@@ -87,9 +88,9 @@ class Session:
     max_backups = MAX_RECOMMENDED_BACKUPS
     max_legacy_backups = MAX_RECOMMENDED_LEGACY_BACKUPS
 
-    instance_guard:SingleInstanceGuard = None
+    instance_guard:SingleInstanceGuard
     test_mode = False
-    test_alembic_config:Config = None
+    test_alembic_config:Config
 
     shortcuts = {
         ShortcutId.CLOSE_CURRENT_WINDOW:"x",
@@ -110,6 +111,7 @@ class Session:
     }
 
 
+    @staticmethod
     def start_session():
         """Start session. It loads user configuration, app version, and backups. It also sets the current date and creates the backups directory if it doesn't exist."""
 
@@ -151,6 +153,7 @@ class Session:
         logger.info("__BREAK_LINE__")
     
 
+    @staticmethod
     def load_app_version():
         """Load app version from file. It reads the version from the file and sets it to the app_version variable."""
 
@@ -158,6 +161,7 @@ class Session:
             Session.app_version = file.read().strip()
 
 
+    @staticmethod
     def load_user_config():
         """Load user configuration. It reads the configuration from the file and sets it to the session variables."""
 
@@ -173,7 +177,7 @@ class Session:
             Session.language = User_conf["General"].get("Language", "English")
             Session.account_name = User_conf["General"].get("Account_name", "")
 
-            Session.auto_backup_status = User_conf["Backup"].get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+            Session.auto_backup_status = User_conf["Backup"].get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY.value)
             Session.max_backups = User_conf["Backup"].get("Max_backups", MAX_RECOMMENDED_BACKUPS)
             Session.max_legacy_backups = User_conf["Backup"].get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
             Session.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", True)
@@ -192,12 +196,13 @@ class Session:
             Session.theme = User_conf.get("Theme", "Dark")
             Session.language = User_conf.get("Language", "English")
             Session.account_name = User_conf.get("Account_name", "")
-            Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY)
+            Session.auto_backup_status = User_conf.get("Auto_backup_status", Session.AutoBackupStatus.MONTHLY.value)
             Session.max_backups = User_conf.get("Max_backups", MAX_RECOMMENDED_BACKUPS)
             Session.max_legacy_backups = User_conf.get("Max_legacy_backups", MAX_RECOMMENDED_LEGACY_BACKUPS)
             Session.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", True)
 
 
+    @staticmethod
     def create_user_config():
         """Create user configuration file. It creates a new file with default values if the file doesn't exist."""
 
@@ -208,7 +213,7 @@ class Session:
                 "Account_name":"",
             },
             "Backup":{
-                "Auto_backup_status":Session.AutoBackupStatus.MONTHLY,
+                "Auto_backup_status":Session.AutoBackupStatus.MONTHLY.value,
                 "Max_backups":MAX_RECOMMENDED_BACKUPS,
                 "Max_legacy_backups":MAX_RECOMMENDED_LEGACY_BACKUPS,
                 "Auto_backup_removal_enabled":True
@@ -226,6 +231,7 @@ class Session:
                 toml.dump(default_user_configuration, file)
 
         
+    @staticmethod    
     def update_user_config():
         """Update user configuration file. It updates the file with the current values of the session variables."""
 
@@ -254,18 +260,20 @@ class Session:
                 toml.dump(user_config, file)
     
 
+    @staticmethod
     def load_backups():
         """Load backups from the backups directory. It loads all backups and adds them to the session."""
 
-        for backup in os.listdir(BACKUPS_DIRECTORY) if not Session.test_mode else os.listdir(TEST_BACKUPS_DIRECTORY):
+        for backup_path in os.listdir(BACKUPS_DIRECTORY) if not Session.test_mode else os.listdir(TEST_BACKUPS_DIRECTORY):
             if Session.test_mode:
-                backup = Backup.parse_db_file_path(os.path.join(TEST_BACKUPS_DIRECTORY, backup))
+                backup = Backup.parse_db_file_path(os.path.join(TEST_BACKUPS_DIRECTORY, backup_path))
             else:
-                backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup))
+                backup = Backup.parse_db_file_path(os.path.join(BACKUPS_DIRECTORY, backup_path))
             Session.backups[str(id(backup))] = backup
             logger.debug(f"Backup loaded: {backup.db_file_path}")
 
 
+    @staticmethod
     def end_session():
         """End session. It closes the database connection, removes the instance guard, and closes all sockets."""
 
@@ -274,7 +282,8 @@ class Session:
         logger.info("Ending session")
     
 
-    def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType):
+    @staticmethod
+    def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType | None):
         """Custom excepthook. It logs the exception to Error log."""
 
         logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -282,6 +291,7 @@ class Session:
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
 
+    @staticmethod
     def restart_app():
         """Restart the app. It closes the current session and starts a new one."""
 

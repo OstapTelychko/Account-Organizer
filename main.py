@@ -187,7 +187,7 @@ def main():
     logger.info("Loading backups")
     load_backups()
 
-    if not Session.test_mode and not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP:
+    if not Session.test_mode and not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
         logger.info("Auto backup enabled")
         auto_backup()
     
