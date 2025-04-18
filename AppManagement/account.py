@@ -3,7 +3,7 @@ from functools import partial
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
-from languages import LANGUAGES
+from languages import LanguageStructure
 
 from GUI.gui_constants import ALIGN_V_CENTER
 from GUI.windows.settings import SettingsWindow
@@ -34,7 +34,7 @@ def add_acccount():
         return Messages.empty_fields.exec()
         
     if Session.db.account_query.account_exists(account_name):
-        Messages.account_alredy_exists.setText(LANGUAGES[Session.language]["Messages"][1])
+        Messages.account_alredy_exists.setText(LanguageStructure.Messages.get_translation(1))
         return Messages.account_alredy_exists.exec()
 
     balance = AddAccountWindow.current_balance.text()
@@ -66,7 +66,7 @@ def add_acccount():
             Session.db.create_account(account_name, balance)
             _complete_adding_account()    
     else:
-        Messages.zero_current_balance.setText(LANGUAGES[Session.language]["Messages"][2])
+        Messages.zero_current_balance.setText(LanguageStructure.Messages.get_translation(2))
 
         Messages.zero_current_balance.exec()
         if Messages.zero_current_balance.clickedButton() == Messages.zero_current_balance.ok_button:
@@ -82,7 +82,7 @@ def load_account_data(name:str):
 
     Session.account_name = name
     Session.db.set_account_id(Session.account_name)
-    SettingsWindow.account_created_date.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
+    SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
     
     Session.update_user_config()
     load_categories()
@@ -99,11 +99,11 @@ def load_accounts():
     for account in Session.accounts_list:
         account_switch_widget = SwitchAccountWindow.AccountSwitchWidget()
         account_switch_widget.account_name_label.setText(account.name)
-        account_switch_widget.account_balance_label.setText(LANGUAGES[Session.language]["Windows"]["Main"][0] + str(account.current_balance))
-        account_switch_widget.account_creation_date_label.setText(LANGUAGES[Session.language]["Windows"]["Settings"][1] + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
+        account_switch_widget.account_balance_label.setText(LanguageStructure.MainWindow.get_translation(0) + str(account.current_balance))
+        account_switch_widget.account_creation_date_label.setText(LanguageStructure.Settings.get_translation(1) + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
 
         account_switch_widget.switch_button.clicked.connect(partial(switch_account, account.name))
-        account_switch_widget.switch_button.setText(LANGUAGES[Session.language]["General management"][8])
+        account_switch_widget.switch_button.setText(LanguageStructure.GeneralManagement.get_translation(8))
         if account.name == Session.account_name:
             account_switch_widget.switch_button.setDisabled(True)
 
@@ -129,7 +129,7 @@ def switch_account(name:str):
             `name` : (str) - Account name to switch to.
     """
 
-    Messages.load_account_question.setText(LANGUAGES[Session.language]["Messages"][10].replace("account", name))
+    Messages.load_account_question.setText(LanguageStructure.Messages.get_translation(10).replace("account", name))
     Messages.load_account_question.exec()
 
     if Messages.load_account_question.clickedButton() == Messages.load_account_question.ok_button:
@@ -146,7 +146,7 @@ def switch_account(name:str):
 def remove_account():
     """Remove account. Show warning message and remove account from database. If last account is removed, close app."""
 
-    Messages.delete_account_warning.setText(LANGUAGES[Session.language]["Messages"][11].replace("account", Session.account_name))
+    Messages.delete_account_warning.setText(LanguageStructure.Messages.get_translation(11).replace("account", Session.account_name))
     Messages.delete_account_warning.exec()
 
     if Messages.delete_account_warning.clickedButton() == Messages.delete_account_warning.ok_button:

@@ -12,7 +12,7 @@ from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 
-from languages import LANGUAGES
+from languages import LanguageStructure
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
 from AppManagement.balance import update_account_balance
 
@@ -41,8 +41,8 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     if len(selected_row) > 3 or selected_row[0].row() != selected_row[1].row() or selected_row[0].row() != selected_row[2].row():
         return Messages.only_one_row.exec()
     
-    TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][5])
-    TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]["Messages"][0])
+    TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(5))
+    TransactionManagementWindow.message.setText(LanguageStructure.TransactionsMessages.get_translation(0))
     TransactionManagementWindow.window.setWindowTitle(category_name)
 
     TransactionManagementWindow.transaction_name.setText(selected_row[0].text())
@@ -99,8 +99,8 @@ def show_add_transaction_window(category_name:str):
         `category_name` : (str) - Name of the category. It will be shown in the window title.
     """
 
-    TransactionManagementWindow.button.setText(LANGUAGES[Session.language]["General management"][1])
-    TransactionManagementWindow.message.setText(LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]["Messages"][1])
+    TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
+    TransactionManagementWindow.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
 
     TransactionManagementWindow.transaction_name.setText("")
     TransactionManagementWindow.transaction_name.setFocus()
@@ -177,7 +177,7 @@ def transaction_data_handler():
         return Messages.incorrect_data_type.exec()
 
     if not 0 < transaction_day <= max_month_day:
-        Messages.day_out_range.setText(LANGUAGES[Session.language]["Messages"][8]+f"1-{max_month_day}")
+        Messages.day_out_range.setText(LanguageStructure.Messages.get_translation(8)+f"1-{max_month_day}")
         return Messages.day_out_range.exec()
 
     if transaction_value.find(","):#if transaction_value contains "," for example: 4,5 will be 4.5 
@@ -187,7 +187,7 @@ def transaction_data_handler():
     else:
         transaction_value = int(transaction_value)
 
-    if TransactionManagementWindow.button.text() == LANGUAGES[Session.language]["General management"][5]: #Update 
+    if TransactionManagementWindow.button.text() == LanguageStructure.GeneralManagement.get_translation(5): #Update 
         update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
         logger.debug(f"Transaction updated: {transaction_name} | {transaction_day} | {transaction_value} | Transaction id: {transaction_id} | Category id: {category_id}")
     else: #Add

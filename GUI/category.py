@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
 from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY
-from languages import LANGUAGES
+from languages import LanguageStructure
 from AppObjects.category import Category
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
@@ -91,7 +91,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     column = category_data.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-    category_data.setHorizontalHeaderLabels((LANGUAGES[Language]["Windows"]["Main"]["Transactions"][0], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][1], LANGUAGES[Language]["Windows"]["Main"]["Transactions"][2]))
+    category_data.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(0), LanguageStructure.Transactions.get_translation(1), LanguageStructure.Transactions.get_translation(2)))
 
     transactions = db.transaction_query.get_transactions_by_month(category_id, year, month)
     
@@ -118,18 +118,18 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
             category_data.setItem(index, 2, transaction_value)
             category_data.setItem(index, 3, transaction_id)
             
-    category_total_value.setText(LANGUAGES[Language]["Windows"]["Main"]["Categories"][10]+str(round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)))
+    category_total_value.setText(LanguageStructure.Categories.get_translation(10)+str(round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)))
     category_data.setSortingEnabled(True)
 
-    add_transaction = create_button(LANGUAGES[Language]["General management"][1],(185,40))
+    add_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(1),(185,40))
     add_transaction.setIcon(ADD_TRANSACTION_ICON)
     add_transaction.setIconSize(ICON_SIZE)
 
-    delete_transaction = create_button(LANGUAGES[Language]["General management"][0],(185,40))
+    delete_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(0),(185,40))
     delete_transaction.setIcon(REMOVE_TRANSACTION_ICON)
     delete_transaction.setIconSize(ICON_SIZE)
 
-    edit_transaction = create_button(LANGUAGES[Language]["General management"][7],(210,40))
+    edit_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(7),(210,40))
     edit_transaction.setIcon(EDIT_TRANSACTION_ICON)
     edit_transaction.setIconSize(ICON_SIZE)
     

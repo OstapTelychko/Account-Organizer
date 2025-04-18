@@ -1,7 +1,7 @@
 from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, qsleep
 
-from languages import LANGUAGES
+from languages import LanguageStructure
 from backend.models import Category
 from AppObjects.session import Session
 
@@ -137,8 +137,7 @@ class TestCategory(DBTestCase):
                     else:
                         transaction_type = "expenses"
 
-                    column_names = LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]
-                    expected_transactions = f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
+                    expected_transactions = f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(Session.current_month)}\t{Session.current_year}\n"
                     expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
 
                     self.assertEqual(expected_transactions, app.clipboard().text(), f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}")

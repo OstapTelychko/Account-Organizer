@@ -1,6 +1,6 @@
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
-from languages import LANGUAGES
+from languages import LanguageStructure
 
 from GUI.windows.main_window import MainWindow
 from GUI.windows.settings import SettingsWindow
@@ -30,9 +30,9 @@ def calculate_current_balance():
     Session.current_balance = Session.db.account_query.get_account().start_balance + round(Session.current_total_income - Session.current_total_expenses, 2)
 
     Session.db.account_query.update_account_balance(Session.current_balance, Session.current_total_income, Session.current_total_expenses)
-    MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Windows"]["Main"][0]+str(Session.current_balance))
-    SettingsWindow.total_income.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][4]+str(Session.current_total_income))
-    SettingsWindow.total_expense.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][6]+str(Session.current_total_expenses))
+    MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(Session.current_balance))
+    SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(Session.current_total_income))
+    SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Session.current_total_expenses))
 
 
 def load_account_balance():
@@ -48,9 +48,9 @@ def load_account_balance():
         logger.info("Recalculating account balance")
         calculate_current_balance()
     
-    MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Windows"]["Main"][0]+str(Session.current_balance))
-    SettingsWindow.total_income.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][4]+str(Session.current_total_income))
-    SettingsWindow.total_expense.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][6]+str(Session.current_total_expenses))
+    MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(Session.current_balance))
+    SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(Session.current_total_income))
+    SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Session.current_total_expenses))
     logger.info(f"Current balance: {Session.current_balance} | Total income: {Session.current_total_income} | Total expenses: {Session.current_total_expenses}")
 
 
@@ -59,6 +59,6 @@ def update_account_balance():
 
     Session.db.account_query.update_account_balance(Session.current_balance, Session.current_total_income, Session.current_total_expenses)
 
-    MainWindow.account_current_balance.setText(LANGUAGES[Session.language]["Windows"]["Main"][0]+str(Session.current_balance))
-    SettingsWindow.total_income.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][4]+str(Session.current_total_income))
-    SettingsWindow.total_expense.setText(LANGUAGES[Session.language]["Windows"]["Statistics"][6]+str(Session.current_total_expenses))
+    MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(Session.current_balance))
+    SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(Session.current_total_income))
+    SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Session.current_total_expenses))

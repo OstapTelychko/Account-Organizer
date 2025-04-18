@@ -32,7 +32,7 @@ from functools import partial
 from PySide6.QtCore import QTimer
 
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
-from languages import LANGUAGES
+from languages import LanguageStructure
 from backend.db_controller import DBController
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
@@ -78,11 +78,11 @@ def calculate_expression():
             try:
                 result = str(eval(expression))
             except ZeroDivisionError:
-                result = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][1]
+                result = LanguageStructure.MiniCalculator.get_translation(1)
                 logger.debug(f"Zero division error (mini calculator) expression: {expression}")
 
             except SyntaxError:
-                result = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][2]
+                result = LanguageStructure.MiniCalculator.get_translation(2)
                 logger.debug(f"Syntax error (mini calculator) expression: {expression}")
                 
             except Exception as ex:
@@ -110,7 +110,7 @@ def main():
 
     #Set current month and year
     MainWindow.current_year.setText(str(Session.current_year))
-    MainWindow.current_month.setText(LANGUAGES[Session.language]["Months"][Session.current_month])
+    MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
 
     #Connect buttons to functions
     #Settings

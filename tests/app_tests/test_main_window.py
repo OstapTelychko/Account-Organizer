@@ -3,7 +3,7 @@ from datetime import datetime
 
 from PySide6.QtCore import QTimer
 
-from languages import LANGUAGES
+from languages import LanguageStructure
 from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.session import Session
 from tests.tests_toolkit import qsleep
@@ -44,19 +44,18 @@ class TestMainWindow(TestCase):
     def test_2_date_change(self):
         """Test changing date in the application."""
 
-        months_list = LANGUAGES[Session.language]["Months"]
         current_month = datetime.now().month
-        translated_current_month = months_list[current_month]
+        translated_current_month = LanguageStructure.Months.get_translation(current_month)
 
         current_showed_month = MainWindow.current_month.text()
         self.assertEqual(translated_current_month, current_showed_month, f"Wrong current month has been showed {current_showed_month} instead of {translated_current_month}")
 
-        translated_next_month = months_list[current_month+1] if current_month != 12 else months_list[1]
+        translated_next_month = LanguageStructure.Months.get_translation(current_month+1) if current_month != 12 else LanguageStructure.Months.get_translation(1)
         MainWindow.next_month_button.click()
         current_showed_month = MainWindow.current_month.text()
         self.assertEqual(translated_next_month, current_showed_month, f"Wrong next month has been showed {current_showed_month} instead of {translated_next_month}")
         
-        translated_previous_month = months_list[current_month]
+        translated_previous_month = LanguageStructure.Months.get_translation(current_month)
         MainWindow.previous_month_button.click()
         current_showed_month = MainWindow.current_month.text()
         self.assertEqual(translated_previous_month, current_showed_month, f"Wrong previous month has been showed {current_showed_month} instead of {translated_previous_month}")
@@ -90,13 +89,13 @@ class TestMainWindow(TestCase):
         MainWindow.mini_calculator_text.setText("1000Money+friends")
         MainWindow.calculate.click()
         result = MainWindow.mini_calculator_text.text()
-        translated_warning = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][2]
+        translated_warning = LanguageStructure.MiniCalculator.get_translation(2)
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for incorrect expression {result} instead of {translated_warning}")
 
         MainWindow.mini_calculator_text.setText("5/0")
         MainWindow.calculate.click()
         result = MainWindow.mini_calculator_text.text()
-        translated_warning = LANGUAGES[Session.language]["Windows"]["Main"]["Mini calculator"][1]
+        translated_warning = LanguageStructure.MiniCalculator.get_translation(1)
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for division by zero {result} instead of {translated_warning}")
 
         MainWindow.mini_calculator_text.setText("")
@@ -104,7 +103,7 @@ class TestMainWindow(TestCase):
             """Check if empty expression error is shown."""
 
             result = MainWindow.mini_calculator_text.text()
-            translated_message = LANGUAGES[Session.language]["Messages"][12]
+            translated_message = LanguageStructure.Messages.get_translation(12)
             self.assertTrue(Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             Messages.empty_expression.done(1)
 
@@ -116,7 +115,7 @@ class TestMainWindow(TestCase):
             """Check if forbidden expression error is shown."""
 
             result = MainWindow.mini_calculator_text.text()
-            translated_message = LANGUAGES[Session.language]["Messages"][13]
+            translated_message = LanguageStructure.Messages.get_translation(13)
             self.assertTrue(Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             Messages.forbidden_calculator_word.done(1)
 
@@ -137,7 +136,7 @@ class TestMainWindow(TestCase):
             """Change language in the application."""
 
             SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
-            expected_translation = LANGUAGES[language_to_change]["Windows"]["Settings"][0]
+            expected_translation = LanguageStructure.Settings.get_translation(0)
             result = SettingsWindow.window.windowTitle()
 
             self.assertEqual(result, expected_translation, f"Language has't been changed. Expected translation {expected_translation} not {result}")

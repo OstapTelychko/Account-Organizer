@@ -3,7 +3,7 @@ from threading import Thread
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from project_configuration import CATEGORY_TYPE
-from languages import LANGUAGES
+from languages import LanguageStructure
 
 from GUI.gui_constants import app
 from GUI.windows.main_window import MainWindow
@@ -46,8 +46,7 @@ def copy_monthly_transactions():
         transactions = Session.db.transaction_query.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
         if len(transactions):
             result = ""
-            column_names = LANGUAGES[Session.language]["Windows"]["Main"]["Transactions"]
-            result += f"\t{column_names[2]}\t{column_names[1]}\t{column_names[0]}\t\t{LANGUAGES[Session.language]['Months'][Session.current_month]}\t{Session.current_year}\n"
+            result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(Session.current_month)}\t{Session.current_year}\n"
             
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction.value}\t\t{transaction.day}\t{transaction.name}\n"
@@ -58,7 +57,7 @@ def copy_monthly_transactions():
             app.clipboard().setText("")
         
         logger.info(f"Transactions for {category_name} copied | {Session.current_year}-{Session.current_month}")
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][5])
+        show_information_message(LanguageStructure.Categories.get_translation(5))
 
 
 def copy_monthly_statistics():
@@ -74,7 +73,7 @@ def copy_monthly_statistics():
         
         app.clipboard().setText(result)
         logger.info(f"Monthly statistics copied | {Session.current_year}-{Session.current_month}")
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][29])
+        show_information_message(LanguageStructure.Statistics.get_translation(29))
 
 
 def copy_quarterly_statistics():
@@ -103,7 +102,7 @@ def copy_quarterly_statistics():
         
         app.clipboard().setText(result)
         logger.info(f"Quarterly statistics copied | {Session.current_year}")
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][31])
+        show_information_message(LanguageStructure.Statistics.get_translation(31))
 
 
 def copy_yearly_statistics():
@@ -128,7 +127,7 @@ def copy_yearly_statistics():
 
         app.clipboard().setText(result)
         logger.info(f"Yearly statistics copied | {Session.current_year}")
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][33])
+        show_information_message(LanguageStructure.Statistics.get_translation(33))
 
 
 def copy_custom_range_statistics():
@@ -143,7 +142,7 @@ def copy_custom_range_statistics():
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][36])
+        show_information_message(LanguageStructure.Statistics.get_translation(36))
 
 
 def copy_custom_range_transactions():
@@ -160,4 +159,4 @@ def copy_custom_range_transactions():
         
         app.clipboard().setText(result)
         logger.info(f"Transactions for custom range copied")
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Statistics"][38])
+        show_information_message(LanguageStructure.Statistics.get_translation(38))

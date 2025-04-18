@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from project_configuration import CATEGORY_TYPE
-from languages import LANGUAGES
+from languages import LanguageStructure
 
 from GUI.gui_constants import ALIGNMENT
 from GUI.windows.main_window import MainWindow
@@ -95,7 +95,7 @@ def create_category():
 
     AddCategoryWindow.category_name.setText("")
     AddCategoryWindow.window.hide()
-    show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][8])
+    show_information_message(LanguageStructure.Categories.get_translation(8))
     reset_focused_category()
 
 
@@ -143,7 +143,7 @@ def remove_category():
 
         calculate_current_balance()
         reset_focused_category()
-        show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][7])
+        show_information_message(LanguageStructure.Categories.get_translation(7))
 
 
 def rename_category():
@@ -174,7 +174,7 @@ def rename_category():
     RenameCategoryWindow.window.hide()
     CategorySettingsWindow.window.hide()
     RenameCategoryWindow.new_category_name.setText("")
-    show_information_message(LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][6])
+    show_information_message(LanguageStructure.Categories.get_translation(6))
 
 
 def show_change_category_position(category_name:str):
@@ -220,7 +220,7 @@ def change_category_position():
     new_position = int(new_position)
 
     if not 0 <= new_position <= max_position:
-        Messages.position_out_range.setText(LANGUAGES[Session.language]["Messages"][17].replace("max_position", str(max_position)))
+        Messages.position_out_range.setText(LanguageStructure.Messages.get_translation(17).replace("max_position", str(max_position)))
         return Messages.position_out_range.exec()
     
     if new_position == old_position:
@@ -240,7 +240,7 @@ def update_category_total_value(category_id:int):
     """Update category total value. It updates the total value label for the category in the GUI."""
 
     Session.categories[category_id].total_value_label.setText(
-        LANGUAGES[Session.language]["Windows"]["Main"]["Categories"][10] +
+        LanguageStructure.Categories.get_translation(10) +
         str(round(Session.db.statistics_query.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
 
 

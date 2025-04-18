@@ -22,7 +22,7 @@ from project_configuration import LATEST_RELEASE_URL, UPDATE_DIRECTORY, LINUX_UP
 GUI_LIBRARY, PREVIOUS_VERSION_COPY_DIRECTORY, ROOT_DIRECTORY, DEVELOPMENT_MODE,\
 MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_NAME
 
-from languages import LANGUAGES
+from languages import LanguageStructure
 
 from GUI.windows.messages import Messages
 from GUI.windows.update_progress import UpdateProgressWindow
@@ -151,7 +151,7 @@ def download_latest_update() -> bool:
                     logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
 
-        UpdateProgressWindow.download_label.setText(LANGUAGES[Session.language]["Windows"]["Update"][2].replace("update_size", str(round(total_size/1024/1024, 2))))
+        UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(total_size/1024/1024, 2))))
         
         download_response = req.get(download_url, stream=True, timeout=15)
         download_response.raise_for_status()

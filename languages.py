@@ -61,6 +61,7 @@ class LanguageCategory:
         return translation
 
 
+
 class LanguageStructure():
     """This class is used to create a structure for the language categories. And simplify categories names maintenance.
 

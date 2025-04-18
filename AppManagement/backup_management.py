@@ -6,7 +6,7 @@ from datetime import datetime
 from PySide6.QtWidgets import QHeaderView
 from PySide6.QtCore import QTimer, Qt
 
-from languages import LANGUAGES
+from languages import LanguageStructure
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, BACKUPS_DATE_FORMAT
 from backend.db_controller import DBController
@@ -125,7 +125,7 @@ def load_backup():
     if backup.app_version != Session.app_version:
         return Messages.different_app_version.exec()
     
-    Messages.load_backup_confirmation.setText(LANGUAGES[Session.language]["Messages"][24].replace("timestamp", backup.timestamp))
+    Messages.load_backup_confirmation.setText(LanguageStructure.Messages.get_translation(24).replace("timestamp", backup.timestamp))
     Messages.load_backup_confirmation.exec()
     if Messages.load_backup_confirmation.clickedButton() != Messages.load_backup_confirmation.ok_button:
         return
@@ -251,22 +251,21 @@ def save_auto_backup_settings():
             return
         Session.auto_backup_status = Session.AutoBackupStatus.NO_AUTO_BACKUP.value
 
-    Backup_management = LANGUAGES[Session.language]["Windows"]["Settings"]["Backup management"]
     if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY.value:
-        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[5])
-        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[5])
+        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY.value:
-        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[6])
-        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[6])
+        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
     elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY.value:
-        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[7])
-        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[7])
+        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
+        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
     elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
-        AutoBackupWindow.current_status.setText(Backup_management[8]+" "+Backup_management[20])
-        BackupManagementWindow.auto_backup_status.setText(Backup_management[8]+" "+Backup_management[20])
+        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
 
     if AutoBackupWindow.no_auto_removal.isChecked():
         if Session.auto_backup_removal_enabled:
@@ -292,8 +291,7 @@ def save_auto_backup_settings():
                     return
             
             Session.max_backups = new_max_backups
-            Windows = LANGUAGES[Session.language]["Windows"]
-            AutoBackupWindow.max_backups_label.setText(Windows["Settings"]["Backup management"][12].replace("max_backups", str(Session.max_backups)+"\n"+Windows["Settings"]["Backup management"][13]))
+            AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
         else:
             Messages.auto_removal_disabled.exec()
 
@@ -313,8 +311,7 @@ def save_auto_backup_settings():
                     return
             
             Session.max_legacy_backups = new_max_legacy_backups
-            Windows = LANGUAGES[Session.language]["Windows"]
-            AutoBackupWindow.max_legacy_backups_label.setText(Windows["Settings"]["Backup management"][17].replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+Windows["Settings"]["Backup management"][18]))
+            AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
         else:
             Messages.auto_removal_disabled.exec()
 

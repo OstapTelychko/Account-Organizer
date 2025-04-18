@@ -2,7 +2,7 @@ from datetime import date
 from PySide6.QtCore import QTimer, QDate
 from tests.tests_toolkit import DBTestCase, qsleep
 
-from languages import LANGUAGES
+from languages import LanguageStructure
 from project_configuration import MONTHS_DAYS
 from AppObjects.session import Session
 
@@ -17,9 +17,8 @@ class TestStatistics(DBTestCase):
     def setUp(self):
         """Set up the test case. It creates translations so you don't have to create them in every test case."""
 
-        self.statistics_words = LANGUAGES[Session.language]["Windows"]["Statistics"]
-        self.translated_incomes = LANGUAGES[Session.language]["Windows"]["Main"][1]
-        self.translated_expenses = LANGUAGES[Session.language]["Windows"]["Main"][2]
+        self.translated_incomes = LanguageStructure.MainWindow.get_translation(1)
+        self.translated_expenses = LanguageStructure.MainWindow.get_translation(2)
 
 
     def open_statistics_window(self, func):
@@ -41,18 +40,18 @@ class TestStatistics(DBTestCase):
         """
 
         return [
-            f"{self.statistics_words[4]}1000.0",
-            f"{self.statistics_words[5]}{round(1000/days_amount, 2)}\n",
-            f"{self.statistics_words[6]}1000.0",
-            f"{self.statistics_words[7]}{round(1000/days_amount, 2)}\n",
-            f"{self.statistics_words[8]}0.0",
+            f"{LanguageStructure.Statistics.get_translation(4)}1000.0",
+            f"{LanguageStructure.Statistics.get_translation(5)}{round(1000/days_amount, 2)}\n",
+            f"{LanguageStructure.Statistics.get_translation(6)}1000.0",
+            f"{LanguageStructure.Statistics.get_translation(7)}{round(1000/days_amount, 2)}\n",
+            f"{LanguageStructure.Statistics.get_translation(8)}0.0",
             f"\n\n{self.translated_incomes}",
-            f"{self.statistics_words[9]}{self.income_category.name}  (1000.0)",
-            f"\n{self.statistics_words[11]}",
+            f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name}  (1000.0)",
+            f"\n{LanguageStructure.Statistics.get_translation(11)}",
             f"Test income transaction - 1000.0",
             f"\n\n{self.translated_expenses}",
-            f"{self.statistics_words[17]}{self.expenses_category.name}  (1000.0)",
-            f"\n{self.statistics_words[19]}",
+            f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name}  (1000.0)",
+            f"\n{LanguageStructure.Statistics.get_translation(19)}",
             f"Test expenses transaction - 1000.0",]
 
 
@@ -115,16 +114,16 @@ class TestStatistics(DBTestCase):
                         total_expense = 2000.0
 
                     expected_total_quarterly_statistics = [
-                        f"{self.statistics_words[4]}{total_income}",
-                        f"{self.statistics_words[5]}{round(total_income/days_amount, 2)}\n",
-                        f"{self.statistics_words[6]}{total_expense}",
-                        f"{self.statistics_words[7]}{round(total_expense/days_amount, 2)}\n",
-                        f"{self.statistics_words[8]}0.0",
+                        f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
+                        f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                        f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                         f"\n\n{self.translated_incomes}",
-                        f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
+                        f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) \n",
                         f"{self.income_category.name} - {total_income}",
                         f"\n\n{self.translated_expenses}",
-                        f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
+                        f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
                         f"{self.expenses_category.name} - {total_expense}",]
 
                     statistics_data = quarter.total_quarter_statistics.data
@@ -189,18 +188,18 @@ class TestStatistics(DBTestCase):
                 total_expense = 11000.0
 
                 expected_yearly_statistics = [
-                    f"{self.statistics_words[4]}{total_income}",
-                    f"{self.statistics_words[25]}{round(total_income/12, 2)}",
-                    f"{self.statistics_words[24]}{round(total_income/days_amount, 2)}\n",
-                    f"{self.statistics_words[6]}{total_expense}",
-                    f"{self.statistics_words[27]}{round(total_expense/12, 2)}",
-                    f"{self.statistics_words[26]}{round(total_expense/days_amount, 2)}\n",
-                    f"{self.statistics_words[8]}0.0",
+                    f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
+                    f"{LanguageStructure.Statistics.get_translation(25)}{round(total_income/12, 2)}",
+                    f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}\n",
+                    f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                    f"{LanguageStructure.Statistics.get_translation(27)}{round(total_expense/12, 2)}",
+                    f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}\n",
+                    f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                     f"\n\n{self.translated_incomes}",
-                    f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
+                    f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) \n",
                     f"{self.income_category.name} - {total_income}",
                     f"\n\n{self.translated_expenses}",
-                    f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
+                    f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
                     f"{self.expenses_category.name} - {total_expense}"]
 
                 statistics_data = YearlyStatistics.statistics.total_year_statistics.data
@@ -271,16 +270,16 @@ class TestStatistics(DBTestCase):
                     days_amount = date_difference.days
 
                     expected_custom_range_statistics = [
-                        f"{self.statistics_words[4]}{total_income}",
-                        f"{self.statistics_words[24]}{round(total_income/days_amount, 2)}\n",
-                        f"{self.statistics_words[6]}{total_expense}",
-                        f"{self.statistics_words[26]}{round(total_expense/days_amount, 2)}\n",
-                        f"{self.statistics_words[8]}0.0",
+                        f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
+                        f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                        f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                         f"\n\n{self.translated_incomes}",
-                        f"{self.statistics_words[9]}{self.income_category.name} ({total_income}) \n",
+                        f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) \n",
                         f"{self.income_category.name} - {total_income}",
                         f"\n\n{self.translated_expenses}",
-                        f"{self.statistics_words[17]}{self.expenses_category.name} ({total_expense}) \n",
+                        f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
                         f"{self.expenses_category.name} - {total_expense}"]
 
                     statistics_data = CustomRangeStatisticsView.statistics_list
