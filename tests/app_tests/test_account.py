@@ -95,12 +95,12 @@ class TestAccount(DBTestCase):
     def test_3_account_deletion(self):
         """Test deleting account."""
 
-        Session.account_name = "Second test user"
-        Session.db.create_account(Session.account_name, 100)
+        Session.config.account_name = "Second test user"
+        Session.db.create_account(Session.config.account_name, 100)
 
         clear_accounts_layout()
         load_accounts()
-        load_account_data(Session.account_name)
+        load_account_data(Session.config.account_name)
 
         def _delete_account():
             """Click button that show delete account window."""
@@ -113,7 +113,7 @@ class TestAccount(DBTestCase):
                     """Check if account has been deleted."""
 
                     self.assertFalse(Session.db.account_query.account_exists("Second test user"), "Account hasn't been removed")
-                    self.assertEqual(Session.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
+                    self.assertEqual(Session.config.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
                     SettingsWindow.window.done(0)
                 QTimer.singleShot(200, _check_deletion)
 

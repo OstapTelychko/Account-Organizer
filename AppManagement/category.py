@@ -84,7 +84,7 @@ def create_category():
 
     Session.db.category_query.create_category(category_name, category_type, position)
     category_id = Session.db.category_query.get_category(category_name, category_type).id 
-    Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month, Session.language)
+    Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month, Session.config.language)
 
     #Activate Category
     Session.categories[category_id].settings.clicked.connect(partial(show_category_settings, Session.categories[category_id].name))
@@ -103,7 +103,7 @@ def load_categories():
     """Load all categories from database for current account."""
 
     for category in Session.db.category_query.get_all_categories():
-        Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.language)
+        Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.config.language)
         logger.debug(f"Category {category.name} loaded")
     reset_focused_category()
         

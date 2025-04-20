@@ -47,7 +47,7 @@ class MessageWindow(QMessageBox):
         It also sets the theme of the message window to match the main window theme on windows OS."""
 
         if platform == "win32":
-            if Session.theme == "Dark":
+            if Session.config.theme == "Dark":
                 value = ctypes.c_int(2)
             else:
                 value = ctypes.c_int(0)

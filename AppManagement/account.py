@@ -21,11 +21,11 @@ logger = get_logger(__name__)
 def show_add_user_window():
     """Show add user window. First window if db doesn't contain any account."""
 
-    change_language_during_add_account(Session.language)
+    change_language_during_add_account(Session.config.language)
     AddAccountWindow.window.exec()
 
 
-def add_acccount():
+def add_account():
     """Add account to database. If account already exists, show warning message."""
 
     account_name = AddAccountWindow.account_name.text().strip()
@@ -34,8 +34,8 @@ def add_acccount():
         return Messages.empty_fields.exec()
         
     if Session.db.account_query.account_exists(account_name):
-        Messages.account_alredy_exists.setText(LanguageStructure.Messages.get_translation(1))
-        return Messages.account_alredy_exists.exec()
+        Messages.account_already_exists.setText(LanguageStructure.Messages.get_translation(1))
+        return Messages.account_already_exists.exec()
 
     balance = AddAccountWindow.current_balance.text()
 
@@ -44,12 +44,12 @@ def add_acccount():
 
         AddAccountWindow.window.done(1)
 
-        Session.account_name = account_name
-        Session.update_user_config()
+        Session.config.account_name = account_name
+        Session.config.update_user_config()
         clear_accounts_layout()
 
         load_accounts()
-        load_account_data(Session.account_name)
+        load_account_data(Session.config.account_name)
         change_language()
         logger.info(f"Account {account_name} added")  
 
@@ -80,11 +80,11 @@ def load_account_data(name:str):
     #Remove loaded categories
     remove_categories_from_list()
 
-    Session.account_name = name
-    Session.db.set_account_id(Session.account_name)
+    Session.config.account_name = name
+    Session.db.set_account_id(Session.config.account_name)
     SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
     
-    Session.update_user_config()
+    Session.config.update_user_config()
     load_categories()
     activate_categories()
     load_account_balance()
@@ -104,7 +104,7 @@ def load_accounts():
 
         account_switch_widget.switch_button.clicked.connect(partial(switch_account, account.name))
         account_switch_widget.switch_button.setText(LanguageStructure.GeneralManagement.get_translation(8))
-        if account.name == Session.account_name:
+        if account.name == Session.config.account_name:
             account_switch_widget.switch_button.setDisabled(True)
 
         SwitchAccountWindow.accounts_layout.addWidget(account_switch_widget.account_widget, alignment=ALIGN_V_CENTER)
@@ -146,7 +146,7 @@ def switch_account(name:str):
 def remove_account():
     """Remove account. Show warning message and remove account from database. If last account is removed, close app."""
 
-    Messages.delete_account_warning.setText(LanguageStructure.Messages.get_translation(11).replace("account", Session.account_name))
+    Messages.delete_account_warning.setText(LanguageStructure.Messages.get_translation(11).replace("account", Session.config.account_name))
     Messages.delete_account_warning.exec()
 
     if Messages.delete_account_warning.clickedButton() == Messages.delete_account_warning.ok_button:
@@ -161,9 +161,9 @@ def remove_account():
                     widget.switch_button.setDisabled(True)
 
             load_account_data(next_name)
-            logger.info(f"Account {Session.account_name} removed")
+            logger.info(f"Account {Session.config.account_name} removed")
         else:#Close app if db is empty
-            Session.update_user_config()
+            Session.config.update_user_config()
             logger.info("Last account removed. Closing app")
             exit()
 
@@ -171,7 +171,7 @@ def remove_account():
 def show_rename_account_window():
     """Show rename account window. Set current account name to line edit."""
 
-    RenameAccountWindow.new_account_name.setText(Session.account_name)
+    RenameAccountWindow.new_account_name.setText(Session.config.account_name)
     RenameAccountWindow.window.exec()
 
 
@@ -184,12 +184,12 @@ def rename_account():
         return Messages.empty_fields.exec()
 
     if Session.db.account_query.account_exists(new_account_name):
-        return Messages.account_alredy_exists.exec()
+        return Messages.account_already_exists.exec()
 
     Session.db.account_query.rename_account(new_account_name)
 
-    Session.account_name = new_account_name
-    Session.update_user_config()
+    Session.config.account_name = new_account_name
+    Session.config.update_user_config()
     clear_accounts_layout()
     load_accounts()
 

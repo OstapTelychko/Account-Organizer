@@ -50,9 +50,9 @@ class LanguageCategory:
         """Get the translation for the category. If the translation is not found, return the name of the category."""
         
         try:
-            translations_category = reduce(getitem, self.path(), LANGUAGES[Session.language])
+            translations_category = reduce(getitem, self.path(), LANGUAGES[Session.config.language])
         except KeyError as exception:
-            logger.error(f"{exception} - path: {self.path()} - language: {Session.language}")
+            logger.error(f"{exception} - path: {self.path()} - language: {Session.config.language}")
         
         translation = translations_category.get(translation_index)
         if translation is None:

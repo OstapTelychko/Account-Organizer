@@ -128,8 +128,8 @@ class TestMainWindow(TestCase):
         """Test changing language in the application."""
 
         all_languages = AVAILABLE_LANGUAGES.copy()
-        all_languages.remove(Session.language)
-        previous_language = Session.language
+        all_languages.remove(Session.config.language)
+        previous_language = Session.config.language
         language_to_change = all_languages[0]
 
         def _open_settings():
@@ -154,13 +154,13 @@ class TestMainWindow(TestCase):
         def _open_settings():
             """Change theme in the application."""
 
-            current_theme = Session.theme
+            current_theme = Session.config.theme
             current_style_sheet = app.styleSheet()
             current_theme_icon = SettingsWindow.switch_themes_button.icon()
 
             SettingsWindow.switch_themes_button.click()
 
-            self.assertNotEqual(current_theme, Session.theme, f"Session theme hasn't changed. Theme {current_theme}")
+            self.assertNotEqual(current_theme, Session.config.theme, f"Session theme hasn't changed. Theme {current_theme}")
             self.assertNotEqual(current_style_sheet, app.styleSheet(), f"App style sheet hasn't changed.")
             self.assertNotEqual(current_theme_icon, SettingsWindow.switch_themes_button.icon(), f"Theme icon  hasn't changed.")
 

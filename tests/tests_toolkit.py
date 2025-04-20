@@ -87,8 +87,8 @@ class DBTestCase(TestCase):
             Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1000, "Test income transaction")
             Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1000, "Test expenses transaction")
 
-            Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.language)
-            Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.language)
+            Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
+            Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
             activate_categories()
 
             return func(self)
@@ -130,8 +130,8 @@ class DBTestCase(TestCase):
         Session.db.session.query(Transaction).delete()
         Session.db.session.query(Account).filter(Account.id != 1).delete()
         
-        Session.account_name = "Test user"
-        Session.db.set_account_id(Session.account_name)
+        Session.config.account_name = "Test user"
+        Session.db.set_account_id(Session.config.account_name)
 
 
 

@@ -149,76 +149,76 @@ def assign_shortcuts():
 
     for sub_window in MainWindow.sub_windows.values():
         close_current_window_shortcut = QShortcut(
-            QKeySequence(Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW]),
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.CLOSE_CURRENT_WINDOW]),
             sub_window)
         close_current_window_shortcut.activated.connect(partial(lambda sub_window: sub_window.done(1), sub_window))
     
     open_settings_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.OPEN_SETTINGS]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.OPEN_SETTINGS]),
         MainWindow.window)
     open_settings_shortcut.activated.connect(SettingsWindow.window.exec)
 
     open_statistics_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.OPEN_STATISTICS]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.OPEN_STATISTICS]),
         MainWindow.window)
     open_statistics_shortcut.activated.connect(StatisticsWindow.window.exec)
 
     switch_account_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.SWITCH_ACCOUNT]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_ACCOUNT]),
         MainWindow.window)
     switch_account_shortcut.activated.connect(SwitchAccountWindow.window.exec)
 
     switch_to_income_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_INCOME]),
         MainWindow.window)
     switch_to_income_shortcut.activated.connect(lambda: MainWindow.Incomes_and_expenses.setCurrentIndex(0))
 
     switch_to_expense_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_EXPENSE]),
         MainWindow.window)
     switch_to_expense_shortcut.activated.connect(lambda: MainWindow.Incomes_and_expenses.setCurrentIndex(1))
 
     load_previous_month_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.LOAD_PREVIOUS_MONTH]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.LOAD_PREVIOUS_MONTH]),
         MainWindow.window)
     load_previous_month_shortcut.activated.connect(MainWindow.previous_month_button.click)
 
     load_next_month_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.LOAD_NEXT_MONTH]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.LOAD_NEXT_MONTH]),
         MainWindow.window)
     load_next_month_shortcut.activated.connect(MainWindow.next_month_button.click)
 
     move_to_next_category_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_NEXT_CATEGORY]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]),
         MainWindow.window)
     move_to_next_category_shortcut.activated.connect(move_to_next_category)
 
     move_to_previous_category_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]),
         MainWindow.window)
     move_to_previous_category_shortcut.activated.connect(move_to_previous_category)
 
     add_transaction_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]),
         MainWindow.window)
     add_transaction_shortcut.activated.connect(add_transaction_to_focused_category)
 
     select_previous_transaction_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_PREVIOUS_TRANSACTION]),
         MainWindow.window)
     select_previous_transaction_shortcut.activated.connect(select_previous_transaction)
 
     select_next_transaction_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]),
         MainWindow.window)
     select_next_transaction_shortcut.activated.connect(select_next_transaction)
 
     delete_transaction_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.DELETE_TRANSACTION]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.DELETE_TRANSACTION]),
         MainWindow.window)
     delete_transaction_shortcut.activated.connect(delete_transaction)
 
     edit_transaction_shortcut = QShortcut(
-        QKeySequence(Session.shortcuts[Session.ShortcutId.EDIT_TRANSACTION]),
+        QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.EDIT_TRANSACTION]),
         MainWindow.window)
     edit_transaction_shortcut.activated.connect(edit_transaction)

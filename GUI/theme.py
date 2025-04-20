@@ -162,35 +162,35 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
 """
 
 
-def swith_theme():
+def switch_theme():
     """Switch theme between dark and light. If current theme is dark, switch to light and vice versa."""
 
-    if Session.theme == "Dark":
+    if Session.config.theme == "Dark":
         app.setStyleSheet(LIGHT_THEME)
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
-        Session.theme = "Light"
+        Session.config.theme = "Light"
 
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
         logger.info("Theme switched to Light")
 
-    elif Session.theme == "Light":
+    elif Session.config.theme == "Light":
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
-        Session.theme = "Dark"
+        Session.config.theme = "Dark"
 
         if platform == "win32":
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
         logger.info("Theme switched to Dark")
 
-    Session.update_user_config()
+    Session.config.update_user_config()
 
 
 def load_theme():
     """Load theme from user config."""
 
     logger.info("Loading theme")
-    if Session.theme == "Dark":
+    if Session.config.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
         SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
 
@@ -198,7 +198,7 @@ def load_theme():
             set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
         logger.info("Dark theme loaded")
             
-    if Session.theme == "Light":
+    if Session.config.theme == "Light":
         app.setStyleSheet(LIGHT_THEME)
         SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
 

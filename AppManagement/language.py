@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 def change_language():
     """Change language of the application. It changes the text of all widgets in the application."""
 
-    SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.language))
+    SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.config.language))
 
     MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(round(Session.current_balance, 2)))
     MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
@@ -136,28 +136,28 @@ def change_language():
     BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     AutoBackupWindow.window.setWindowTitle(LanguageStructure.BackupManagement.get_translation(4))
-    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY.value:
+    if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
-    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
     AutoBackupWindow.monthly.setText(LanguageStructure.BackupManagement.get_translation(9))
     AutoBackupWindow.weekly.setText(LanguageStructure.BackupManagement.get_translation(10))
     AutoBackupWindow.daily.setText(LanguageStructure.BackupManagement.get_translation(11))
     AutoBackupWindow.no_auto_backup.setText(LanguageStructure.BackupManagement.get_translation(15))
-    AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
+    AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
     AutoBackupWindow.max_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(14))
-    AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
+    AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
     AutoBackupWindow.max_legacy_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(19))
     AutoBackupWindow.no_auto_removal.setText(LanguageStructure.BackupManagement.get_translation(16))
     AutoBackupWindow.save.setText(LanguageStructure.GeneralManagement.get_translation(6))
@@ -172,13 +172,13 @@ def change_language_during_add_account(language:int | str):
 
     if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
-        Session.language = language
+        Session.config.language = language
     else:
-        Session.language = language
-    logger.info(f"Language {Session.language} loaded during adding account")
-    Session.update_user_config()
+        Session.config.language = language
+    logger.info(f"Language {Session.config.language} loaded during adding account")
+    Session.config.update_user_config()
 
-    AddAccountWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.language))
+    AddAccountWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.config.language))
     
     AddAccountWindow.message.setText(LanguageStructure.Messages.get_translation(0))
     AddAccountWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
@@ -199,9 +199,9 @@ def load_language(language):
     logger.info("Loading language")
     if type(language) is int:# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
-        Session.language = language
+        Session.config.language = language
     else:
-        Session.language = language
-    Session.update_user_config()
+        Session.config.language = language
+    Session.config.update_user_config()
     change_language()
-    logger.info(f"Language {Session.language} loaded")
+    logger.info(f"Language {Session.config.language} loaded")

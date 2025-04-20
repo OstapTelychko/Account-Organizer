@@ -46,7 +46,7 @@ from GUI.windows.messages import Messages
 from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
-from GUI.theme import swith_theme, load_theme
+from GUI.theme import switch_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list, remove_all_categories_from_statistics_list
 from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
@@ -56,7 +56,7 @@ from AppManagement.balance import load_account_balance
 from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
-from AppManagement.account import show_add_user_window, add_acccount, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
+from AppManagement.account import show_add_user_window, add_account, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 from AppManagement.shortcuts import assign_shortcuts
 from AppManagement.update_app import check_for_updates
@@ -115,7 +115,7 @@ def main():
     #Connect buttons to functions
     #Settings
     MainWindow.settings.clicked.connect(SettingsWindow.window.exec)
-    SettingsWindow.switch_themes_button.clicked.connect(swith_theme)
+    SettingsWindow.switch_themes_button.clicked.connect(switch_theme)
     SettingsWindow.languages.currentIndexChanged.connect(load_language)
     SettingsWindow.add_account.clicked.connect(show_add_user_window)
     SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
@@ -164,7 +164,7 @@ def main():
 
 
     #Create new account if it doesn't exist
-    AddAccountWindow.button.clicked.connect(add_acccount)
+    AddAccountWindow.button.clicked.connect(add_account)
     AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
     #Connect to db
     logger.info("__BREAK_LINE__")
@@ -172,14 +172,14 @@ def main():
     if not Session.test_mode:
         Session.db = DBController()
         
-    if not Session.db.account_query.account_exists(Session.account_name):
+    if not Session.db.account_query.account_exists(Session.config.account_name):
         logger.info("Account doesn't exist. Showing add account window")
         show_add_user_window()
         if not Session.db.account_id:
             logger.info("Account wasn't created. Exiting")
             exit() 
-    Session.db.set_account_id(Session.account_name)
-    logger.info("accont_id set")
+    Session.db.set_account_id(Session.config.account_name)
+    logger.info("account_id set")
     logger.info("Connected to database")
     logger.info("__BREAK_LINE__")
     
@@ -187,11 +187,11 @@ def main():
     logger.info("Loading backups")
     load_backups()
 
-    if not Session.test_mode and not Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    if not Session.test_mode and not Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         logger.info("Auto backup enabled")
         auto_backup()
     
-    if Session.auto_backup_removal_enabled:
+    if Session.config.auto_backup_removal_enabled:
         logger.info("Auto backup removal enabled")
         auto_remove_backups()
     logger.info("__BREAK_LINE__")
@@ -233,7 +233,7 @@ def main():
     RenameAccountWindow.button.clicked.connect(rename_account)
 
     load_account_balance()
-    load_language(Session.language)
+    load_language(Session.config.language)
 
     MainWindow.window.show()
 

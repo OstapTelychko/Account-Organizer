@@ -140,15 +140,15 @@ def load_backup():
     Session.db = DBController()
     
     backup_accounts = Session.db.account_query.get_all_accounts()
-    if Session.account_name not in [account.name for account in backup_accounts]:
-        Session.account_name = backup_accounts[0].name
+    if Session.config.account_name not in [account.name for account in backup_accounts]:
+        Session.config.account_name = backup_accounts[0].name
 
     clear_accounts_layout()
     load_accounts()
 
     logger.info(f"Backup {backup.timestamp} loaded")
     load_backups()
-    load_account_data(Session.account_name)
+    load_account_data(Session.config.account_name)
     BackupManagementWindow.window.done(0)
     SettingsWindow.window.done(0)
 
@@ -164,15 +164,15 @@ def auto_backup():
     backup_date = datetime.strptime(backup.timestamp, BACKUPS_DATE_FORMAT)
     current_date = datetime.now()
 
-    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY.value and backup_date.month != current_date.month:
+    if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value and backup_date.month != current_date.month:
         create_backup()
         logger.debug("Monthly backup created")
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY.value and current_date.isocalendar()[1] != backup_date.isocalendar()[1]:#Week number
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value and current_date.isocalendar()[1] != backup_date.isocalendar()[1]:#Week number
         create_backup()
         logger.debug("Weekly backup created")
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY.value and (current_date - backup_date).days >= 1:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value and (current_date - backup_date).days >= 1:
         create_backup()
         logger.debug("Daily backup created")
 
@@ -184,19 +184,19 @@ def open_auto_backup_window():
     AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
     AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
 
-    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY.value:
+    if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
         AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Checked)
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
         AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Checked)
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
         AutoBackupWindow.daily.setCheckState(Qt.CheckState.Checked)
     
-    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Checked)
     
-    if not Session.auto_backup_removal_enabled:
+    if not Session.config.auto_backup_removal_enabled:
         AutoBackupWindow.no_auto_removal.setCheckState(Qt.CheckState.Checked)
 
     AutoBackupWindow.window.exec()
@@ -237,47 +237,47 @@ def save_auto_backup_settings():
     """Save the auto backup settings. Check if the auto backup is enabled and set the status. If the auto backup is disabled, show a warning message."""
 
     if AutoBackupWindow.monthly.isChecked():
-        Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.MONTHLY.value
 
     elif AutoBackupWindow.weekly.isChecked():
-        Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.WEEKLY.value
 
     elif AutoBackupWindow.daily.isChecked():
-        Session.auto_backup_status = Session.AutoBackupStatus.DAILY.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.DAILY.value
     
     elif AutoBackupWindow.no_auto_backup.isChecked():
         Messages.no_auto_backup.exec()
         if Messages.no_auto_backup.clickedButton() != Messages.no_auto_backup.ok_button:
             return
-        Session.auto_backup_status = Session.AutoBackupStatus.NO_AUTO_BACKUP.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value
 
-    if Session.auto_backup_status == Session.AutoBackupStatus.MONTHLY.value:
+    if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.WEEKLY.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
-    elif Session.auto_backup_status == Session.AutoBackupStatus.DAILY.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
-    elif Session.auto_backup_status == Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
         BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
 
     if AutoBackupWindow.no_auto_removal.isChecked():
-        if Session.auto_backup_removal_enabled:
+        if Session.config.auto_backup_removal_enabled:
             Messages.no_auto_removal.exec()
             if Messages.no_auto_removal.clickedButton() == Messages.no_auto_removal.ok_button:
-                Session.auto_backup_removal_enabled = False
+                Session.config.auto_backup_removal_enabled = False
     else:
-        Session.auto_backup_removal_enabled = True
+        Session.config.auto_backup_removal_enabled = True
 
     new_max_backups = AutoBackupWindow.max_backups.text()
     if new_max_backups:
-        if Session.auto_backup_removal_enabled:
+        if Session.config.auto_backup_removal_enabled:
             new_max_backups = int(new_max_backups)
 
             if new_max_backups < MIN_RECOMMENDED_BACKUPS:
@@ -290,14 +290,14 @@ def save_auto_backup_settings():
                 if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
                     return
             
-            Session.max_backups = new_max_backups
-            AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
+            Session.config.max_backups = new_max_backups
+            AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
         else:
             Messages.auto_removal_disabled.exec()
 
     new_max_legacy_backups = AutoBackupWindow.max_legacy_backups.text()
     if new_max_legacy_backups:
-        if Session.auto_backup_removal_enabled:
+        if Session.config.auto_backup_removal_enabled:
             new_max_legacy_backups = int(new_max_legacy_backups)
 
             if new_max_legacy_backups < MIN_RECOMMENDED_LEGACY_BACKUPS:
@@ -310,14 +310,14 @@ def save_auto_backup_settings():
                 if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
                     return
             
-            Session.max_legacy_backups = new_max_legacy_backups
-            AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
+            Session.config.max_legacy_backups = new_max_legacy_backups
+            AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
         else:
             Messages.auto_removal_disabled.exec()
 
-    if Session.auto_backup_status != Session.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    if Session.config.auto_backup_status != Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         auto_backup()
-    Session.update_user_config()
+    Session.config.update_user_config()
     AutoBackupWindow.window.done(0)
     logger.info("Auto backup settings saved")
 
@@ -335,7 +335,7 @@ def auto_remove_backups():
             if backup_id == backups[0][0]:
                 supported_backups_row = row
 
-        while len(backups) > Session.max_backups:
+        while len(backups) > Session.config.max_backups:
             backup_id, backup = backups.pop(0)
             
             os.remove(backup.db_file_path)
@@ -356,7 +356,7 @@ def auto_remove_backups():
         if backup_id == legacy_backups[0][0]:
             legacy_backups_row = row
 
-    while len(legacy_backups) > Session.max_legacy_backups:
+    while len(legacy_backups) > Session.config.max_legacy_backups:
         backup_id, backup = legacy_backups.pop(0)
         
         os.remove(backup.db_file_path)

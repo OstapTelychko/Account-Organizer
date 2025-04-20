@@ -29,9 +29,9 @@ class TestShortcuts(DBTestCase):
         def _check_closure():
             QTest.keySequence(
                 AddCategoryWindow.window,
-                QKeySequence(Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW]))
+                QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.CLOSE_CURRENT_WINDOW]))
             qsleep(200)
-            self.assertFalse(AddCategoryWindow.window.isVisible(), f"Add category window should be closed after {Session.shortcuts[Session.ShortcutId.CLOSE_CURRENT_WINDOW]} shortcut.")
+            self.assertFalse(AddCategoryWindow.window.isVisible(), f"Add category window should be closed after {Session.config.shortcuts[Session.config.ShortcutId.CLOSE_CURRENT_WINDOW]} shortcut.")
 
         QTimer.singleShot(200, _check_closure)
         MainWindow.add_incomes_category.click()
@@ -42,17 +42,17 @@ class TestShortcuts(DBTestCase):
         """Test opening windows with shortcuts."""
 
         # qsleep(200)#For some reason program needs some time to start working with these shortcuts
-        open_some_window_shortcuts = {Session.ShortcutId.OPEN_SETTINGS:SettingsWindow.window, Session.ShortcutId.OPEN_STATISTICS:StatisticsWindow.window, Session.ShortcutId.SWITCH_ACCOUNT:SwitchAccountWindow.window}
+        open_some_window_shortcuts = {Session.config.ShortcutId.OPEN_SETTINGS:SettingsWindow.window, Session.config.ShortcutId.OPEN_STATISTICS:StatisticsWindow.window, Session.config.ShortcutId.SWITCH_ACCOUNT:SwitchAccountWindow.window}
         for shortcut_id, window in open_some_window_shortcuts.items():
             
             def _check_visibility():
-                self.assertTrue(window.isVisible(), f"{window.windowTitle()} should be opened after {Session.shortcuts[shortcut_id]} shortcut.")
+                self.assertTrue(window.isVisible(), f"{window.windowTitle()} should be opened after {Session.config.shortcuts[shortcut_id]} shortcut.")
                 window.done(0)
                 
             QTimer.singleShot(200, _check_visibility)
             QTest.keySequence(
                 MainWindow.window,
-                QKeySequence(Session.shortcuts[shortcut_id]))
+                QKeySequence(Session.config.shortcuts[shortcut_id]))
             qsleep(250)
             
 
@@ -60,12 +60,12 @@ class TestShortcuts(DBTestCase):
         """Test switching to expense tab with shortcut."""        
         
         def _check_switch():
-            self.assertEqual(MainWindow.Incomes_and_expenses.currentIndex(), 1, f"Tab should be switched to expense after {Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE]} shortcut.")
+            self.assertEqual(MainWindow.Incomes_and_expenses.currentIndex(), 1, f"Tab should be switched to expense after {Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut.")
             
         QTimer.singleShot(200, _check_switch)
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SWITCH_TO_EXPENSE]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_EXPENSE]))
         qsleep(200)
 
 
@@ -73,12 +73,12 @@ class TestShortcuts(DBTestCase):
         """Test switching to income tab with shortcut."""        
         
         def _check_switch():
-            self.assertEqual(MainWindow.Incomes_and_expenses.currentIndex(), 0, f"Tab should be switched to income after {Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME]} shortcut.")
+            self.assertEqual(MainWindow.Incomes_and_expenses.currentIndex(), 0, f"Tab should be switched to income after {Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_INCOME]} shortcut.")
             
         QTimer.singleShot(200, _check_switch)
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SWITCH_TO_INCOME]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_INCOME]))
         qsleep(200)
 
 
@@ -89,12 +89,12 @@ class TestShortcuts(DBTestCase):
 
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.LOAD_PREVIOUS_MONTH]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.LOAD_PREVIOUS_MONTH]))
         qsleep(100)
 
         self.assertEqual(
             Session.current_month, expected_previous_month,
-            f"Month should be switched to previous ({expected_previous_month}) after {Session.shortcuts[Session.ShortcutId.LOAD_PREVIOUS_MONTH]} shortcut not {Session.current_month} month.")
+            f"Month should be switched to previous ({expected_previous_month}) after {Session.config.shortcuts[Session.config.ShortcutId.LOAD_PREVIOUS_MONTH]} shortcut not {Session.current_month} month.")
 
 
     def test_06_load_next_month(self):
@@ -104,12 +104,12 @@ class TestShortcuts(DBTestCase):
 
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.LOAD_NEXT_MONTH]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.LOAD_NEXT_MONTH]))
         qsleep(100)
 
         self.assertEqual(
             Session.current_month, expected_next_month,
-            f"Month should be switched to next ({expected_next_month}) after {Session.shortcuts[Session.ShortcutId.LOAD_NEXT_MONTH]} shortcut not {Session.current_month} month.")
+            f"Month should be switched to next ({expected_next_month}) after {Session.config.shortcuts[Session.config.ShortcutId.LOAD_NEXT_MONTH]} shortcut not {Session.current_month} month.")
     
 
     def test_07_focus_on_next_category(self):
@@ -117,19 +117,19 @@ class TestShortcuts(DBTestCase):
 
         Session.db.category_query.create_category("Second test category", "Incomes", 1)
         new_category = Session.db.category_query.get_category("Second test category", "Incomes")
-        Session.categories[new_category.id] = expected_focused_category = load_category(new_category.category_type, new_category.name, Session.db, new_category.id, 0, Session.current_year, Session.current_month, Session.language)
+        Session.categories[new_category.id] = expected_focused_category = load_category(new_category.category_type, new_category.name, Session.db, new_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
         activate_categories()
 
         reset_focused_category()
 
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
         qsleep(100)
 
         self.assertEqual(
             Session.focused_income_category, expected_focused_category,
-            f"Focused category should be {expected_focused_category.name} after {Session.shortcuts[Session.ShortcutId.FOCUS_ON_NEXT_CATEGORY]} shortcut not {Session.focused_income_category.name}.")
+            f"Focused category should be {expected_focused_category.name} after {Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]} shortcut not {Session.focused_income_category.name}.")
     
 
     def test_08_focus_on_previous_category(self):
@@ -137,7 +137,7 @@ class TestShortcuts(DBTestCase):
 
         Session.db.category_query.create_category("Second test category", "Incomes", 1)
         new_category = Session.db.category_query.get_category("Second test category", "Incomes")
-        Session.categories[new_category.id] = load_category(new_category.category_type, new_category.name, Session.db, new_category.id, 0, Session.current_year, Session.current_month, Session.language)
+        Session.categories[new_category.id] = load_category(new_category.category_type, new_category.name, Session.db, new_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
         activate_categories()
 
         reset_focused_category()
@@ -145,17 +145,17 @@ class TestShortcuts(DBTestCase):
         # Focus on next category first to make sure that focus on previous category works
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
         qsleep(100)
 
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]))
         qsleep(100)
 
         self.assertEqual(
             Session.focused_income_category, Session.categories[self.income_category.id],
-            f"Focused category should be {self.income_category.name} after {Session.shortcuts[Session.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]} shortcut not {Session.focused_income_category.name}.")
+            f"Focused category should be {self.income_category.name} after {Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]} shortcut not {Session.focused_income_category.name}.")
         
     
     def test_09_add_transaction_to_focused_category(self):
@@ -167,12 +167,12 @@ class TestShortcuts(DBTestCase):
             TransactionManagementWindow.button.click()
             qsleep(100)
 
-            self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 2, f"Transaction should be added to {self.income_category.name} after {Session.shortcuts[Session.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut.")
+            self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 2, f"Transaction should be added to {self.income_category.name} after {Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut.")
         
         QTimer.singleShot(200, _add_transaction)
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]))
         qsleep(400)
 
 
@@ -194,27 +194,27 @@ class TestShortcuts(DBTestCase):
         qsleep(200)
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))
         
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]))#I have to use shortcut twice since for the first time it selects the first transaction due to the fact that selection by init is not set
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))#I have to use shortcut twice since for the first time it selects the first transaction due to the fact that selection by init is not set
         qsleep(100)
 
         selected_transaction = Session.categories[self.income_category.id].table_data.currentRow()
         self.assertEqual(
             selected_transaction, 1,
-            f"Next transaction should be selected after {Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]} shortcut not {selected_transaction} transaction.")
+            f"Next transaction should be selected after {Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]} shortcut not {selected_transaction} transaction.")
         
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_PREVIOUS_TRANSACTION]))
         qsleep(100)
 
         selected_transaction = Session.categories[self.income_category.id].table_data.currentRow()
         self.assertEqual(
             selected_transaction, 0,
-            f"Previous transaction should be selected after {Session.shortcuts[Session.ShortcutId.SELECT_PREVIOUS_TRANSACTION]} shortcut not {selected_transaction} transaction.")
+            f"Previous transaction should be selected after {Session.config.shortcuts[Session.config.ShortcutId.SELECT_PREVIOUS_TRANSACTION]} shortcut not {selected_transaction} transaction.")
 
         qsleep(200)
 
@@ -226,7 +226,7 @@ class TestShortcuts(DBTestCase):
         
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))
         
         def _perform_deletion():
             """Confirm and check transaction deletion."""
@@ -234,12 +234,12 @@ class TestShortcuts(DBTestCase):
             Messages.delete_transaction_confirmation.ok_button.click()
 
             QTimer.singleShot(200,
-                lambda: self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 0, f"Transaction should be deleted after {Session.shortcuts[Session.ShortcutId.DELETE_TRANSACTION]} shortcut."))
+                lambda: self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 0, f"Transaction should be deleted after {Session.config.shortcuts[Session.config.ShortcutId.DELETE_TRANSACTION]} shortcut."))
 
         QTimer.singleShot(200, _perform_deletion)
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.DELETE_TRANSACTION]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.DELETE_TRANSACTION]))
         qsleep(400)
     
 
@@ -250,7 +250,7 @@ class TestShortcuts(DBTestCase):
 
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.SELECT_NEXT_TRANSACTION]))  
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))  
         
         def _perform_edit():
             """Edit transaction and check if it was edited."""
@@ -259,11 +259,11 @@ class TestShortcuts(DBTestCase):
             TransactionManagementWindow.button.click()
             qsleep(200)
 
-            self.assertEqual(Session.db.transaction_query.get_all_transactions(self.income_category.id)[0].value, 2000, f"Transaction should be edited after {Session.shortcuts[Session.ShortcutId.EDIT_TRANSACTION]} shortcut.")
+            self.assertEqual(Session.db.transaction_query.get_all_transactions(self.income_category.id)[0].value, 2000, f"Transaction should be edited after {Session.config.shortcuts[Session.config.ShortcutId.EDIT_TRANSACTION]} shortcut.")
 
         QTimer.singleShot(200, _perform_edit)
         QTest.keySequence(
             MainWindow.window,
-            QKeySequence(Session.shortcuts[Session.ShortcutId.EDIT_TRANSACTION]))
+            QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.EDIT_TRANSACTION]))
         qsleep(200)
             

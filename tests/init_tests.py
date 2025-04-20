@@ -7,6 +7,7 @@ from unittest import  TestSuite, TestLoader, TextTestRunner
 from alembic.config import Config
 from alembic import command
 
+from AppObjects.user_config import UserConfig
 from AppObjects.session import Session
 from backend.db_controller import DBController
 from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY, TEST_USER_CONF_PATH
@@ -46,11 +47,12 @@ def test_main(app_main:FunctionType):
     command.upgrade(Session.test_alembic_config, "head")
 
     Session.test_mode = True
-    Session.create_user_config()
-    Session.load_user_config()
+    Session.config = UserConfig(Session.test_mode)
+    Session.config.create_user_config()
+    Session.config.load_user_config()
     user_name = "Test user"
-    Session.account_name = user_name
-    Session.update_user_config()
+    Session.config.account_name = user_name
+    Session.config.update_user_config()
 
     Session.db = DBController()
     Session.db.create_account(user_name, 0)

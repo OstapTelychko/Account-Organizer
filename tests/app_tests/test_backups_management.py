@@ -255,7 +255,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.DAILY.value, "Auto backup status hasn't been changed to daily")
+                self.assertEqual(Session.config.auto_backup_status, Session.config.AutoBackupStatus.DAILY.value, "Auto backup status hasn't been changed to daily")
 
                 translated_daily_status = LanguageStructure.BackupManagement.get_translation(7)
                 self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
@@ -288,7 +288,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.WEEKLY.value, "Auto backup status hasn't been changed to weekly")
+                self.assertEqual(Session.config.auto_backup_status, Session.config.AutoBackupStatus.WEEKLY.value, "Auto backup status hasn't been changed to weekly")
 
                 translated_weekly_status = LanguageStructure.BackupManagement.get_translation(6)
                 self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
@@ -321,7 +321,7 @@ class TestBackupsManagement(DBTestCase):
                 qsleep(200)
 
                 self.assertEqual(AutoBackupWindow.window.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.auto_backup_status, Session.AutoBackupStatus.MONTHLY.value, "Auto backup status hasn't been changed to monthly")
+                self.assertEqual(Session.config.auto_backup_status, Session.config.AutoBackupStatus.MONTHLY.value, "Auto backup status hasn't been changed to monthly")
 
                 translated_monthly_status = LanguageStructure.BackupManagement.get_translation(5)
                 self.assertNotEqual(AutoBackupWindow.current_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
@@ -339,7 +339,7 @@ class TestBackupsManagement(DBTestCase):
     def test_5_auto_daily_backup(self):
         """Test daily auto backup in the application."""
 
-        Session.auto_backup_status = Session.AutoBackupStatus.DAILY.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.DAILY.value
         date_now = datetime.now()
         date_minus_1_day = date_now - timedelta(days=1)
 
@@ -415,7 +415,7 @@ class TestBackupsManagement(DBTestCase):
     def test_6_auto_weekly_backup(self):
         """Test weekly auto backup in the application."""
 
-        Session.auto_backup_status = Session.AutoBackupStatus.WEEKLY.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.WEEKLY.value
         date_now = datetime.now()
         date_minus_7_days = date_now - timedelta(days=7)
 
@@ -490,7 +490,7 @@ class TestBackupsManagement(DBTestCase):
     def test_7_auto_monthly_backup(self):
         """Test monthly auto backup in the application."""
 
-        Session.auto_backup_status = Session.AutoBackupStatus.MONTHLY.value
+        Session.config.auto_backup_status = Session.config.AutoBackupStatus.MONTHLY.value
         date_now = datetime.now()
         date_minus_30_days = date_now - timedelta(days=30)
 
@@ -565,7 +565,7 @@ class TestBackupsManagement(DBTestCase):
     def test_8_check_max_backups_change(self):
         """Test changing max backups amount in the application."""
 
-        init_max_backups = Session.max_backups
+        init_max_backups = Session.config.max_backups
 
         def _open_auto_backup_settings():
             """Open auto backup window to set new max backups amount"""
@@ -577,13 +577,13 @@ class TestBackupsManagement(DBTestCase):
                     """Check if no change is made to max backups amount after clicking save without changing anything"""
 
                     self.assertEqual(
-                    init_max_backups, Session.max_backups,
-                    f"Expected max backups amount in session is {init_max_backups} returned {Session.max_backups}")
+                    init_max_backups, Session.config.max_backups,
+                    f"Expected max backups amount in session is {init_max_backups} returned {Session.config.max_backups}")
 
-                    Session.load_user_config()
+                    Session.config.load_user_config()
                     self.assertEqual(
-                    init_max_backups, Session.max_backups,
-                    f"Expected max backups amount in user config is {init_max_backups} returned {Session.max_backups}")
+                    init_max_backups, Session.config.max_backups,
+                    f"Expected max backups amount in user config is {init_max_backups} returned {Session.config.max_backups}")
 
                     self.assertNotEqual(
                     -1, AutoBackupWindow.max_backups_label.text().find(str(init_max_backups)),
@@ -619,13 +619,13 @@ class TestBackupsManagement(DBTestCase):
                     """Check if max backups amount is changed correctly"""
 
                     self.assertEqual(
-                    3, Session.max_backups,
-                    f"Expected max backups amount in session is 3 returned {Session.max_backups}")
+                    3, Session.config.max_backups,
+                    f"Expected max backups amount in session is 3 returned {Session.config.max_backups}")
 
-                    Session.load_user_config()
+                    Session.config.load_user_config()
                     self.assertEqual(
-                    3, Session.max_backups,
-                    f"Expected max backups amount in user config is 3 returned {Session.max_backups}")
+                    3, Session.config.max_backups,
+                    f"Expected max backups amount in user config is 3 returned {Session.config.max_backups}")
                     
                     self.assertNotEqual(
                     -1, AutoBackupWindow.max_backups_label.text().find("3"),

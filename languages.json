@@ -164,7 +164,7 @@
 
         "Messages":{
             "0": "You have entered invalid type of data, check entered fields again",
-            "1": "Account with this name alredy exists",
+            "1": "Account with this name already exists",
             "2": "You haven't entered a current balance, current balance will count as 0 (if that's not true value there may be discrepancy between current and actual balance)",
             "3": "This category already exists",
             "4": "Are you sure you want to delete the category? You will lose ALL transactions added to this category and your current balance will be recalculated",
