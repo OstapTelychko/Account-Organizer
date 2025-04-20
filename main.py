@@ -34,18 +34,12 @@ from PySide6.QtCore import QTimer
 from project_configuration import FORBIDDEN_CALCULATOR_WORDS
 from languages import LanguageStructure
 from backend.db_controller import DBController
+
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
+from AppObjects.windows_registry import WindowsRegistry
 
 from GUI.gui_constants import app
-from GUI.windows.main_window import MainWindow
-from GUI.windows.settings import SettingsWindow
-from GUI.windows.account import AddAccountWindow, RenameAccountWindow, SwitchAccountWindow
-from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
-from GUI.windows.messages import Messages
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
-from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
 from GUI.theme import switch_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list, remove_all_categories_from_statistics_list
@@ -71,7 +65,7 @@ logger = get_logger(__name__)
 def calculate_expression():
     """Calculate the expression from the mini calculator input field"""
 
-    expression = MainWindow.mini_calculator_text.text()
+    expression = WindowsRegistry.MainWindow.mini_calculator_text.text()
 
     if expression != "":
         if not any([word in expression for word in FORBIDDEN_CALCULATOR_WORDS]):
@@ -88,12 +82,12 @@ def calculate_expression():
             except Exception as ex:
                 result = str(ex)
                 logger.debug(f"Error (mini calculator) expression: {expression}")
-            MainWindow.mini_calculator_text.setText(result)
+            WindowsRegistry.MainWindow.mini_calculator_text.setText(result)
 
         else:
-            Messages.forbidden_calculator_word.exec()
+            WindowsRegistry.Messages.forbidden_calculator_word.exec()
     else:
-        Messages.empty_expression.exec()
+        WindowsRegistry.Messages.empty_expression.exec()
 
 
 def main():
@@ -102,70 +96,70 @@ def main():
     Session.start_session()
 
     #Set main window for instance guard
-    Session.instance_guard.main_window = MainWindow.window
+    Session.instance_guard.main_window = WindowsRegistry.MainWindow
     # Ensure the safe exit when the application exits
     app.aboutToQuit.connect(Session.end_session)
 
     load_theme()
 
     #Set current month and year
-    MainWindow.current_year.setText(str(Session.current_year))
-    MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
+    WindowsRegistry.MainWindow.current_year.setText(str(Session.current_year))
+    WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
 
     #Connect buttons to functions
     #Settings
-    MainWindow.settings.clicked.connect(SettingsWindow.window.exec)
-    SettingsWindow.switch_themes_button.clicked.connect(switch_theme)
-    SettingsWindow.languages.currentIndexChanged.connect(load_language)
-    SettingsWindow.add_account.clicked.connect(show_add_user_window)
-    SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
-    SettingsWindow.switch_account.clicked.connect(SwitchAccountWindow.window.exec)
-    SettingsWindow.backup_management.clicked.connect(BackupManagementWindow.window.exec)
+    WindowsRegistry.MainWindow.settings.clicked.connect(WindowsRegistry.SettingsWindow.exec)
+    WindowsRegistry.SettingsWindow.switch_themes_button.clicked.connect(switch_theme)
+    WindowsRegistry.SettingsWindow.languages.currentIndexChanged.connect(load_language)
+    WindowsRegistry.SettingsWindow.add_account.clicked.connect(show_add_user_window)
+    WindowsRegistry.SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
+    WindowsRegistry.SettingsWindow.switch_account.clicked.connect(WindowsRegistry.SwitchAccountWindow.exec)
+    WindowsRegistry.SettingsWindow.backup_management.clicked.connect(WindowsRegistry.BackupManagementWindow.exec)
 
     #Activate mini calculator
-    MainWindow.calculate.clicked.connect(calculate_expression)
+    WindowsRegistry.MainWindow.calculate.clicked.connect(calculate_expression)
 
     #Statistics
-    MainWindow.statistics.clicked.connect(StatisticsWindow.window.exec)
-    StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
-    StatisticsWindow.quarterly_statistics.clicked.connect(show_quarterly_statistics)
-    StatisticsWindow.yearly_statistics.clicked.connect(show_yearly_statistics)
-    StatisticsWindow.custom_range_statistics.clicked.connect(show_custom_range_statistics_window)
-    MonthlyStatistics.copy_statistics.clicked.connect(copy_monthly_statistics)
-    QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
-    YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
-    CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
-    CustomRangeStatistics.add_all_incomes_categories.clicked.connect(partial(add_all_categories_to_statistics_list, CustomRangeStatistics.add_all_incomes_categories))
-    CustomRangeStatistics.add_all_expenses_categories.clicked.connect(partial(add_all_categories_to_statistics_list, CustomRangeStatistics.add_all_expenses_categories))
-    CustomRangeStatistics.remove_all_incomes_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, CustomRangeStatistics.remove_all_incomes_categories))
-    CustomRangeStatistics.remove_all_expenses_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, CustomRangeStatistics.remove_all_expenses_categories))
-    CustomRangeStatisticsView.copy_statistics.clicked.connect(copy_custom_range_statistics)
-    CustomRangeStatisticsView.copy_transactions.clicked.connect(copy_custom_range_transactions)
+    WindowsRegistry.MainWindow.statistics.clicked.connect(WindowsRegistry.StatisticsWindow.exec)
+    WindowsRegistry.StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
+    WindowsRegistry.StatisticsWindow.quarterly_statistics.clicked.connect(show_quarterly_statistics)
+    WindowsRegistry.StatisticsWindow.yearly_statistics.clicked.connect(show_yearly_statistics)
+    WindowsRegistry.StatisticsWindow.custom_range_statistics.clicked.connect(show_custom_range_statistics_window)
+    WindowsRegistry.MonthlyStatistics.copy_statistics.clicked.connect(copy_monthly_statistics)
+    WindowsRegistry.QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
+    WindowsRegistry.YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
+    WindowsRegistry.CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
+    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.clicked.connect(partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories))
+    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.clicked.connect(partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories))
+    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories))
+    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories))
+    WindowsRegistry.CustomRangeStatisticsView.copy_statistics.clicked.connect(copy_custom_range_statistics)
+    WindowsRegistry.CustomRangeStatisticsView.copy_transactions.clicked.connect(copy_custom_range_transactions)
     
     #Category settings
-    CategorySettingsWindow.delete_category.clicked.connect(remove_category)
-    CategorySettingsWindow.rename_category.clicked.connect(lambda: (RenameCategoryWindow.window.setWindowTitle(CategorySettingsWindow.window.windowTitle()), RenameCategoryWindow.window.exec()))
-    CategorySettingsWindow.change_category_position.clicked.connect(lambda: show_change_category_position(CategorySettingsWindow.window.windowTitle()))
-    CategorySettingsWindow.copy_transactions.clicked.connect(copy_monthly_transactions)
-    RenameCategoryWindow.button.clicked.connect(rename_category)
-    ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
-    TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
+    WindowsRegistry.CategorySettingsWindow.delete_category.clicked.connect(remove_category)
+    WindowsRegistry.CategorySettingsWindow.rename_category.clicked.connect(lambda: (WindowsRegistry.RenameCategoryWindow.setWindowTitle(WindowsRegistry.CategorySettingsWindow.windowTitle()), WindowsRegistry.RenameCategoryWindow.exec()))
+    WindowsRegistry.CategorySettingsWindow.change_category_position.clicked.connect(lambda: show_change_category_position(WindowsRegistry.CategorySettingsWindow.windowTitle()))
+    WindowsRegistry.CategorySettingsWindow.copy_transactions.clicked.connect(copy_monthly_transactions)
+    WindowsRegistry.RenameCategoryWindow.button.clicked.connect(rename_category)
+    WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
+    WindowsRegistry.TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
     
     #Date management
-    MainWindow.next_month_button.clicked.connect(next_month)
-    MainWindow.previous_month_button.clicked.connect(previous_month)
-    MainWindow.next_year_button.clicked.connect(next_year)
-    MainWindow.previous_year_button.clicked.connect(previous_year)
+    WindowsRegistry.MainWindow.next_month_button.clicked.connect(next_month)
+    WindowsRegistry.MainWindow.previous_month_button.clicked.connect(previous_month)
+    WindowsRegistry.MainWindow.next_year_button.clicked.connect(next_year)
+    WindowsRegistry.MainWindow.previous_year_button.clicked.connect(previous_year)
 
     #Add category
-    MainWindow.add_incomes_category.clicked.connect(AddCategoryWindow.window.exec)
-    MainWindow.add_expenses_category.clicked.connect(AddCategoryWindow.window.exec)
-    AddCategoryWindow.button.clicked.connect(create_category)
+    WindowsRegistry.MainWindow.add_incomes_category.clicked.connect(WindowsRegistry.AddCategoryWindow.exec)
+    WindowsRegistry.MainWindow.add_expenses_category.clicked.connect(WindowsRegistry.AddCategoryWindow.exec)
+    WindowsRegistry.AddCategoryWindow.button.clicked.connect(create_category)
 
 
     #Create new account if it doesn't exist
-    AddAccountWindow.button.clicked.connect(add_account)
-    AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
+    WindowsRegistry.AddAccountWindow.button.clicked.connect(add_account)
+    WindowsRegistry.AddAccountWindow.languages.currentIndexChanged.connect(change_language_during_add_account)
     #Connect to db
     logger.info("__BREAK_LINE__")
     logger.info("Connecting to database")
@@ -197,16 +191,16 @@ def main():
     logger.info("__BREAK_LINE__")
 
     #Backup management
-    BackupManagementWindow.create_backup.clicked.connect(create_backup)
-    BackupManagementWindow.delete_backup.clicked.connect(remove_backup)
-    BackupManagementWindow.load_backup.clicked.connect(load_backup)
-    BackupManagementWindow.auto_backup.clicked.connect(open_auto_backup_window)
+    WindowsRegistry.BackupManagementWindow.create_backup.clicked.connect(create_backup)
+    WindowsRegistry.BackupManagementWindow.delete_backup.clicked.connect(remove_backup)
+    WindowsRegistry.BackupManagementWindow.load_backup.clicked.connect(load_backup)
+    WindowsRegistry.BackupManagementWindow.auto_backup.clicked.connect(open_auto_backup_window)
 
-    AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.monthly))
-    AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.weekly))
-    AutoBackupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.daily))
-    AutoBackupWindow.no_auto_backup.stateChanged.connect(partial(prevent_same_auto_backup_status, AutoBackupWindow.no_auto_backup))
-    AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
+    WindowsRegistry.AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.monthly))
+    WindowsRegistry.AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.weekly))
+    WindowsRegistry.AutoBackupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.daily))
+    WindowsRegistry.AutoBackupWindow.no_auto_backup.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.no_auto_backup))
+    WindowsRegistry.AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
     #Load categories if they exists
     logger.info("Loading categories")
@@ -229,13 +223,13 @@ def main():
     logger.info("__BREAK_LINE__")
 
     #Account management
-    SettingsWindow.delete_account.clicked.connect(remove_account)
-    RenameAccountWindow.button.clicked.connect(rename_account)
+    WindowsRegistry.SettingsWindow.delete_account.clicked.connect(remove_account)
+    WindowsRegistry.RenameAccountWindow.button.clicked.connect(rename_account)
 
     load_account_balance()
     load_language(Session.config.language)
 
-    MainWindow.window.show()
+    WindowsRegistry.MainWindow.show()
 
     if not Session.test_mode:
         QTimer.singleShot(200, check_for_updates)

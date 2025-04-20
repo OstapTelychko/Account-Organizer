@@ -1,51 +1,59 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QPushButton
 from PySide6.QtCore import Qt
 from time import sleep
 
 from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
-from GUI.windows.category import CategorySettingsWindow
-from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 
 
 
 
-class InformationMessage:
+class InformationMessage(QWidget):
     """Represents information message window structure."""
 
-    window = QWidget()
-    window.setWindowFlags( Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
-    window.resize(250,50)
-    window.setMaximumWidth(250)
-    window.setMaximumHeight(50)
-    window.setWindowIcon(APP_ICON)
-    window.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+    def __init__(self, buttons:list[QPushButton]):
+        """Initialize the information message window with buttons.
 
-    message = QWidget()
-    message.setProperty("class", "information_message")
-    message.resize(250,50)
+            Arguments
+            ---------
+            `buttons` : list[QPushButton] - list of buttons to be enabled after the message is shown.
+        """
 
-    message_text = QLabel("Statisctics has been copied")
-    message_text.setFont(BASIC_FONT)
-    message_layout = QHBoxLayout()
-    message_layout.addWidget(message_text,alignment=ALIGNMENT.AlignCenter)
-    message.setLayout(message_layout)
+        super().__init__()
+        self.buttons = buttons
 
-    main_layout=  QVBoxLayout()
-    main_layout.addWidget(message)
-    window.setLayout(main_layout)
+        self.setWindowFlags( Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
+        self.resize(250,50)
+        self.setMaximumWidth(250)
+        self.setMaximumHeight(50)
+        self.setWindowIcon(APP_ICON)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        self.message = QWidget()
+        self.message.setProperty("class", "information_message")
+        self.message.resize(250,50)
+
+        self.message_text = QLabel("Statistics has been copied")
+        self.message_text.setFont(BASIC_FONT)
+        self.message_layout = QHBoxLayout()
+        self.message_layout.addWidget(self.message_text,alignment=ALIGNMENT.AlignCenter)
+        self.message.setLayout(self.message_layout)
+
+        self.main_layout=  QVBoxLayout()
+        self.main_layout.addWidget(self.message)
+        self.setLayout(self.main_layout)
 
 
-    def run():
+    def run(self):
         """This method is used to show the information message window and center it on the main window."""
 
         opacity = 0
-        InformationMessage.window.setWindowOpacity(0)
-        InformationMessage.window.show()
+        self.setWindowOpacity(0)
+        self.show()
 
         for _ in range(5):
             opacity += 0.2
-            InformationMessage.window.setWindowOpacity(opacity)
-            InformationMessage.window.update()
+            self.setWindowOpacity(opacity)
+            self.update()
             QApplication.processEvents()
             sleep(0.05)
 
@@ -53,15 +61,14 @@ class InformationMessage:
         
         for _ in range(5):
             opacity -= 0.2
-            InformationMessage.window.setWindowOpacity(opacity)
-            InformationMessage.window.update()
+            self.setWindowOpacity(opacity)
+            self.update()
             QApplication.processEvents()
             sleep(0.05)
 
-        InformationMessage.window.hide()
-        CategorySettingsWindow.copy_transactions.setEnabled(True)
-        MonthlyStatistics.copy_statistics.setEnabled(True)
-        QuarterlyStatistics.copy_statistics.setEnabled(True)
-        YearlyStatistics.copy_statistics.setEnabled(True)
-        CustomRangeStatisticsView.copy_statistics.setEnabled(True)
-        CustomRangeStatisticsView.copy_transactions.setEnabled(True)
+        self.hide()
+        for button in self.buttons:
+            button.setEnabled(True)
+
+
+

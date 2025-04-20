@@ -13,13 +13,11 @@ from backend.db_controller import DBController
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.backup import Backup
 from AppObjects.logger import get_logger
 
 from GUI.gui_constants import ALIGNMENT
-from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
-from GUI.windows.messages import Messages
-from GUI.windows.settings import SettingsWindow
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QCheckBox
@@ -30,8 +28,8 @@ logger = get_logger(__name__)
 def load_backups():
     """Load backups from database and display them in the table."""
 
-    BackupManagementWindow.backups_table.setRowCount(0)
-    BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
+    WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(0)
+    WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(len(Session.backups))
     
     backups_sorted_by_date = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT), reverse=True)
     backups_sorted_by_app_version = sorted(backups_sorted_by_date, key=lambda backup: (*map(int, backup[1].app_version.split(".")),), reverse=True)
@@ -44,9 +42,9 @@ def load_backups():
         app_version.setFlags(~ Qt.ItemFlag.ItemIsEditable)
         app_version.setTextAlignment(ALIGNMENT.AlignCenter)
 
-        BackupManagementWindow.backups_table.setItem(row, 0, data)
-        BackupManagementWindow.backups_table.setItem(row, 1, app_version)
-        BackupManagementWindow.backups_table.setItem(row, 2, CustomTableWidgetItem(backup_id))
+        WindowsRegistry.BackupManagementWindow.backups_table.setItem(row, 0, data)
+        WindowsRegistry.BackupManagementWindow.backups_table.setItem(row, 1, app_version)
+        WindowsRegistry.BackupManagementWindow.backups_table.setItem(row, 2, CustomTableWidgetItem(backup_id))
         logger.debug(f"Backup {backup.timestamp} loaded into list")
 
 
@@ -66,8 +64,8 @@ def create_backup():
     Session.backups[str(id(backup))] = backup
 
     def _enable_button():
-        BackupManagementWindow.create_backup.setEnabled(True)
-    BackupManagementWindow.create_backup.setEnabled(False)
+        WindowsRegistry.BackupManagementWindow.create_backup.setEnabled(True)
+    WindowsRegistry.BackupManagementWindow.create_backup.setEnabled(False)
 
     load_backups()
     logger.info(f"Backup {timestamp} created")
@@ -77,57 +75,57 @@ def create_backup():
 def remove_backup():
     """Remove a backup from the table and delete the backup file."""
 
-    selected_items = BackupManagementWindow.backups_table.selectedItems()
+    selected_items = WindowsRegistry.BackupManagementWindow.backups_table.selectedItems()
 
     if len(selected_items) == 0 or len(selected_items) < 2:
-        return Messages.unselected_row.exec()
+        return WindowsRegistry.Messages.unselected_row.exec()
 
     if len(selected_items) > 2 or selected_items[0].row() != selected_items[1].row():
-        return Messages.only_one_row.exec()
+        return WindowsRegistry.Messages.only_one_row.exec()
 
     if len(Session.backups)-1 < MIN_RECOMMENDED_BACKUPS:
-        Messages.below_recommended_min_backups.exec()
-        if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
+        WindowsRegistry.Messages.below_recommended_min_backups.exec()
+        if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
             return
     
     else:
-        Messages.delete_buckup_confirmation.exec()
-        if Messages.delete_buckup_confirmation.clickedButton() != Messages.delete_buckup_confirmation.ok_button:
+        WindowsRegistry.Messages.delete_buckup_confirmation.exec()
+        if WindowsRegistry.Messages.delete_buckup_confirmation.clickedButton() != WindowsRegistry.Messages.delete_buckup_confirmation.ok_button:
             return
     
     row = selected_items[0].row()
-    backup = Session.backups[BackupManagementWindow.backups_table.item(row, 2).text()]
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()]
 
 
     del Session.backups[str(id(backup))]
-    BackupManagementWindow.backups_table.removeRow(row)
+    WindowsRegistry.BackupManagementWindow.backups_table.removeRow(row)
     os.remove(backup.db_file_path)
     logger.debug(f"Backup {backup.timestamp} removed")
     
-    columns = BackupManagementWindow.backups_table.verticalHeader()
+    columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
     columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
 
 def load_backup():
     """Load a selected backup from the table. The backup is replaced with the current database. Current database is saved in the BACKUPS_DIRECTORY folder."""
 
-    selected_items = BackupManagementWindow.backups_table.selectedItems()
+    selected_items = WindowsRegistry.BackupManagementWindow.backups_table.selectedItems()
 
     if len(selected_items) == 0 or len(selected_items) < 2:
-        return Messages.unselected_row.exec()
+        return WindowsRegistry.Messages.unselected_row.exec()
 
     if len(selected_items) > 2 or selected_items[0].row() != selected_items[1].row():
-        return Messages.only_one_row.exec()
+        return WindowsRegistry.Messages.only_one_row.exec()
 
     row = selected_items[0].row()
-    backup = Session.backups[BackupManagementWindow.backups_table.item(row, 2).text()]
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()]
 
     if backup.app_version != Session.app_version:
-        return Messages.different_app_version.exec()
+        return WindowsRegistry.Messages.different_app_version.exec()
     
-    Messages.load_backup_confirmation.setText(LanguageStructure.Messages.get_translation(24).replace("timestamp", backup.timestamp))
-    Messages.load_backup_confirmation.exec()
-    if Messages.load_backup_confirmation.clickedButton() != Messages.load_backup_confirmation.ok_button:
+    WindowsRegistry.Messages.load_backup_confirmation.setText(LanguageStructure.Messages.get_translation(24).replace("timestamp", backup.timestamp))
+    WindowsRegistry.Messages.load_backup_confirmation.exec()
+    if WindowsRegistry.Messages.load_backup_confirmation.clickedButton() != WindowsRegistry.Messages.load_backup_confirmation.ok_button:
         return
     
     create_backup()
@@ -149,8 +147,8 @@ def load_backup():
     logger.info(f"Backup {backup.timestamp} loaded")
     load_backups()
     load_account_data(Session.config.account_name)
-    BackupManagementWindow.window.done(0)
-    SettingsWindow.window.done(0)
+    WindowsRegistry.BackupManagementWindow.done(0)
+    WindowsRegistry.SettingsWindow.done(0)
 
 
 def auto_backup():
@@ -160,7 +158,7 @@ def auto_backup():
         create_backup()
         return
     
-    backup = Session.backups[BackupManagementWindow.backups_table.item(0, 2).text()]
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()]
     backup_date = datetime.strptime(backup.timestamp, BACKUPS_DATE_FORMAT)
     current_date = datetime.now()
 
@@ -180,26 +178,26 @@ def auto_backup():
 def open_auto_backup_window():
     """Open the auto backup window and set the current status of the auto backup."""
 
-    AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
-    AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
-    AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+    WindowsRegistry.AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+    WindowsRegistry.AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+    WindowsRegistry.AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
 
     if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
-        AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Checked)
+        WindowsRegistry.AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Checked)
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
-        AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Checked)
+        WindowsRegistry.AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Checked)
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
-        AutoBackupWindow.daily.setCheckState(Qt.CheckState.Checked)
+        WindowsRegistry.AutoBackupWindow.daily.setCheckState(Qt.CheckState.Checked)
     
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
-        AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Checked)
+        WindowsRegistry.AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Checked)
     
     if not Session.config.auto_backup_removal_enabled:
-        AutoBackupWindow.no_auto_removal.setCheckState(Qt.CheckState.Checked)
+        WindowsRegistry.AutoBackupWindow.no_auto_removal.setCheckState(Qt.CheckState.Checked)
 
-    AutoBackupWindow.window.exec()
+    WindowsRegistry.AutoBackupWindow.exec()
 
 
 def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
@@ -212,113 +210,113 @@ def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
     """
 
     if state == 2:#Checked
-        if status_checkbox is AutoBackupWindow.monthly:
-            AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
+        if status_checkbox is WindowsRegistry.AutoBackupWindow.monthly:
+            WindowsRegistry.AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
 
-        elif status_checkbox is AutoBackupWindow.weekly:
-            AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
+        elif status_checkbox is WindowsRegistry.AutoBackupWindow.weekly:
+            WindowsRegistry.AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
 
-        elif status_checkbox is AutoBackupWindow.daily:
-            AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
+        elif status_checkbox is WindowsRegistry.AutoBackupWindow.daily:
+            WindowsRegistry.AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.no_auto_backup.setCheckState(Qt.CheckState.Unchecked)
         
-        elif status_checkbox is AutoBackupWindow.no_auto_backup:
-            AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
-            AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
+        elif status_checkbox is WindowsRegistry.AutoBackupWindow.no_auto_backup:
+            WindowsRegistry.AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.weekly.setCheckState(Qt.CheckState.Unchecked)
+            WindowsRegistry.AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
 
 
 def save_auto_backup_settings():
     """Save the auto backup settings. Check if the auto backup is enabled and set the status. If the auto backup is disabled, show a warning message."""
 
-    if AutoBackupWindow.monthly.isChecked():
+    if WindowsRegistry.AutoBackupWindow.monthly.isChecked():
         Session.config.auto_backup_status = Session.config.AutoBackupStatus.MONTHLY.value
 
-    elif AutoBackupWindow.weekly.isChecked():
+    elif WindowsRegistry.AutoBackupWindow.weekly.isChecked():
         Session.config.auto_backup_status = Session.config.AutoBackupStatus.WEEKLY.value
 
-    elif AutoBackupWindow.daily.isChecked():
+    elif WindowsRegistry.AutoBackupWindow.daily.isChecked():
         Session.config.auto_backup_status = Session.config.AutoBackupStatus.DAILY.value
     
-    elif AutoBackupWindow.no_auto_backup.isChecked():
-        Messages.no_auto_backup.exec()
-        if Messages.no_auto_backup.clickedButton() != Messages.no_auto_backup.ok_button:
+    elif WindowsRegistry.AutoBackupWindow.no_auto_backup.isChecked():
+        WindowsRegistry.Messages.no_auto_backup.exec()
+        if WindowsRegistry.Messages.no_auto_backup.clickedButton() != WindowsRegistry.Messages.no_auto_backup.ok_button:
             return
         Session.config.auto_backup_status = Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value
 
     if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
-        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
-        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
-        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
-        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
-        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
+        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
-        AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
-        BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
 
-    if AutoBackupWindow.no_auto_removal.isChecked():
+    if WindowsRegistry.AutoBackupWindow.no_auto_removal.isChecked():
         if Session.config.auto_backup_removal_enabled:
-            Messages.no_auto_removal.exec()
-            if Messages.no_auto_removal.clickedButton() == Messages.no_auto_removal.ok_button:
+            WindowsRegistry.Messages.no_auto_removal.exec()
+            if WindowsRegistry.Messages.no_auto_removal.clickedButton() == WindowsRegistry.Messages.no_auto_removal.ok_button:
                 Session.config.auto_backup_removal_enabled = False
     else:
         Session.config.auto_backup_removal_enabled = True
 
-    new_max_backups = AutoBackupWindow.max_backups.text()
+    new_max_backups = WindowsRegistry.AutoBackupWindow.max_backups.text()
     if new_max_backups:
         if Session.config.auto_backup_removal_enabled:
             new_max_backups = int(new_max_backups)
 
             if new_max_backups < MIN_RECOMMENDED_BACKUPS:
-                Messages.below_recommended_min_backups.exec()
-                if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
+                WindowsRegistry.Messages.below_recommended_min_backups.exec()
+                if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
                     return
             
             elif new_max_backups > MAX_RECOMMENDED_BACKUPS:
-                Messages.above_recommended_max_backups.exec()
-                if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
+                WindowsRegistry.Messages.above_recommended_max_backups.exec()
+                if WindowsRegistry.Messages.above_recommended_max_backups.clickedButton() != WindowsRegistry.Messages.above_recommended_max_backups.ok_button:
                     return
             
             Session.config.max_backups = new_max_backups
-            AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
+            WindowsRegistry.AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
         else:
-            Messages.auto_removal_disabled.exec()
+            WindowsRegistry.Messages.auto_removal_disabled.exec()
 
-    new_max_legacy_backups = AutoBackupWindow.max_legacy_backups.text()
+    new_max_legacy_backups = WindowsRegistry.AutoBackupWindow.max_legacy_backups.text()
     if new_max_legacy_backups:
         if Session.config.auto_backup_removal_enabled:
             new_max_legacy_backups = int(new_max_legacy_backups)
 
             if new_max_legacy_backups < MIN_RECOMMENDED_LEGACY_BACKUPS:
-                Messages.below_recommended_min_backups.exec()
-                if Messages.below_recommended_min_backups.clickedButton() != Messages.below_recommended_min_backups.ok_button:
+                WindowsRegistry.Messages.below_recommended_min_backups.exec()
+                if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
                     return
             
             elif new_max_legacy_backups > MAX_RECOMMENDED_LEGACY_BACKUPS:
-                Messages.above_recommended_max_backups.exec()
-                if Messages.above_recommended_max_backups.clickedButton() != Messages.above_recommended_max_backups.ok_button:
+                WindowsRegistry.Messages.above_recommended_max_backups.exec()
+                if WindowsRegistry.Messages.above_recommended_max_backups.clickedButton() != WindowsRegistry.Messages.above_recommended_max_backups.ok_button:
                     return
             
             Session.config.max_legacy_backups = new_max_legacy_backups
-            AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
+            WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
         else:
-            Messages.auto_removal_disabled.exec()
+            WindowsRegistry.Messages.auto_removal_disabled.exec()
 
     if Session.config.auto_backup_status != Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         auto_backup()
     Session.config.update_user_config()
-    AutoBackupWindow.window.done(0)
+    WindowsRegistry.AutoBackupWindow.done(0)
     logger.info("Auto backup settings saved")
 
 
@@ -330,8 +328,8 @@ def auto_remove_backups():
     legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != Session.app_version]
 
     if len(backups) != 0:
-        for row in range(BackupManagementWindow.backups_table.rowCount()):
-            backup_id = BackupManagementWindow.backups_table.item(row, 2).text()
+        for row in range(WindowsRegistry.BackupManagementWindow.backups_table.rowCount()):
+            backup_id = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()
             if backup_id == backups[0][0]:
                 supported_backups_row = row
 
@@ -342,8 +340,8 @@ def auto_remove_backups():
             logger.debug(f"Backup {backup.timestamp} removed")
             del Session.backups[backup_id]
 
-            BackupManagementWindow.backups_table.removeRow(supported_backups_row)
-            columns = BackupManagementWindow.backups_table.verticalHeader()
+            WindowsRegistry.BackupManagementWindow.backups_table.removeRow(supported_backups_row)
+            columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
             columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             supported_backups_row -= 1
     
@@ -351,8 +349,8 @@ def auto_remove_backups():
     if len(legacy_backups) == 0:
         return
     
-    for row in range(BackupManagementWindow.backups_table.rowCount()):
-        backup_id = BackupManagementWindow.backups_table.item(row, 2).text()
+    for row in range(WindowsRegistry.BackupManagementWindow.backups_table.rowCount()):
+        backup_id = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()
         if backup_id == legacy_backups[0][0]:
             legacy_backups_row = row
 
@@ -363,7 +361,7 @@ def auto_remove_backups():
         logger.debug(f"Legacy backup {backup.timestamp} removed")
         del Session.backups[backup_id]
 
-        BackupManagementWindow.backups_table.removeRow(legacy_backups_row)
-        columns = BackupManagementWindow.backups_table.verticalHeader()
+        WindowsRegistry.BackupManagementWindow.backups_table.removeRow(legacy_backups_row)
+        columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
         columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         legacy_backups_row -= 1

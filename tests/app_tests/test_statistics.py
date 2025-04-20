@@ -5,10 +5,8 @@ from tests.tests_toolkit import DBTestCase, qsleep
 from languages import LanguageStructure
 from project_configuration import MONTHS_DAYS
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 
-from GUI.windows.main_window import MainWindow
-from GUI.windows.messages import Messages
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
 
 
 class TestStatistics(DBTestCase):
@@ -25,7 +23,7 @@ class TestStatistics(DBTestCase):
         """Open statistics window and call function after some delay."""
 
         QTimer.singleShot(100, func)
-        MainWindow.statistics.click()
+        WindowsRegistry.MainWindow.statistics.click()
     
 
     def create_monthly_statistics(self, days_amount:int) -> list[str]:
@@ -69,18 +67,18 @@ class TestStatistics(DBTestCase):
                 expected_monthly_statistics = self.create_monthly_statistics(days_amount)
 
                 self.assertEqual(
-                    len(expected_monthly_statistics), MonthlyStatistics.statistics.count(),
-                    f"Month statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {MonthlyStatistics.statistics.count()} rows")
+                    len(expected_monthly_statistics), WindowsRegistry.MonthlyStatistics.statistics.count(),
+                    f"Month statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {WindowsRegistry.MonthlyStatistics.statistics.count()} rows")
 
                 for index, expected_row in enumerate(expected_monthly_statistics):
                     self.assertEqual(
-                        expected_row, MonthlyStatistics.statistics.item(index).text(),
-                        f"In month statistics row {index} expected result {expected_row} not {MonthlyStatistics.statistics.item(index).text()}")
+                        expected_row, WindowsRegistry.MonthlyStatistics.statistics.item(index).text(),
+                        f"In month statistics row {index} expected result {expected_row} not {WindowsRegistry.MonthlyStatistics.statistics.item(index).text()}")
                     
-                MonthlyStatistics.window.done(1)
+                WindowsRegistry.MonthlyStatistics.done(1)
             
             QTimer.singleShot(100, _check_monthly_statistics)
-            StatisticsWindow.monthly_statistics.click()
+            WindowsRegistry.StatisticsWindow.monthly_statistics.click()
         self.open_statistics_window(_open_monthly_statics_window)
         qsleep(500)
     
@@ -102,7 +100,7 @@ class TestStatistics(DBTestCase):
             def _check_quarterly_statistics():
                 """Check if quarterly statistics are correct."""
 
-                for quarter in QuarterlyStatistics.statistics.quarters:
+                for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
                     quarter_number = quarter.quarter_number
                     days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
 
@@ -155,12 +153,12 @@ class TestStatistics(DBTestCase):
 
                         else:
                             self.assertEqual(1, statistics_data.count(), f"Month {current_month} without transactions don't have 1 row in statistics")
-                            self.assertEqual(Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                            self.assertEqual(WindowsRegistry.Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
 
-                QuarterlyStatistics.window.done(1)
+                WindowsRegistry.QuarterlyStatistics.done(1)
             
             QTimer.singleShot(100, _check_quarterly_statistics)
-            StatisticsWindow.quarterly_statistics.click()
+            WindowsRegistry.StatisticsWindow.quarterly_statistics.click()
         
         self.open_statistics_window(_open_quarterly_statistics_window)
         qsleep(2000)
@@ -202,7 +200,7 @@ class TestStatistics(DBTestCase):
                     f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
                     f"{self.expenses_category.name} - {total_expense}"]
 
-                statistics_data = YearlyStatistics.statistics.total_year_statistics.data
+                statistics_data = WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data
                 self.assertEqual(
                     len(expected_yearly_statistics), statistics_data.count(),
                     f"Yearly statistics have another amount of rows. Expected amount {len(expected_yearly_statistics)} found {statistics_data.count()} rows")
@@ -212,7 +210,7 @@ class TestStatistics(DBTestCase):
                         expected_row, statistics_data.item(index).text(),
                         f"In total year statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
 
-                for month in YearlyStatistics.statistics.months:
+                for month in WindowsRegistry.YearlyStatistics.statistics.months:
                     statistics_data = month.data
 
                     month_days_amount = MONTHS_DAYS[month.month_number-1] + (month.month_number == 2 and Session.current_year % 4 == 0)
@@ -230,12 +228,12 @@ class TestStatistics(DBTestCase):
 
                     else:
                         self.assertEqual(1, statistics_data.count(), f"Month {month.month_number} without transactions don't have 1 row in statistics")
-                        self.assertEqual(Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                        self.assertEqual(WindowsRegistry.Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
 
-                YearlyStatistics.window.done(1)
+                WindowsRegistry.YearlyStatistics.done(1)
             
             QTimer.singleShot(100, _check_yearly_statistics)
-            StatisticsWindow.yearly_statistics.click()
+            WindowsRegistry.StatisticsWindow.yearly_statistics.click()
         
         self.open_statistics_window(_open_yearly_statistics_window)
         qsleep(2000)
@@ -255,11 +253,11 @@ class TestStatistics(DBTestCase):
             def _select_custom_range():
                 """Select custom range and click show statistics button."""
 
-                CustomRangeStatistics.add_all_incomes_categories.click()
-                CustomRangeStatistics.add_all_expenses_categories.click()
+                WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.click()
+                WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.click()
                 
-                CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
-                CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))
+                WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
+                WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))
 
                 def _check_custom_range_statistics():
                     """Check if custom range statistics are correct."""
@@ -282,7 +280,7 @@ class TestStatistics(DBTestCase):
                         f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
                         f"{self.expenses_category.name} - {total_expense}"]
 
-                    statistics_data = CustomRangeStatisticsView.statistics_list
+                    statistics_data = WindowsRegistry.CustomRangeStatisticsView.statistics_list
                     self.assertEqual(
                         len(expected_custom_range_statistics), statistics_data.count(),
                         f"Custom range statistics (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) have another amount of rows. Expected amount {len(expected_custom_range_statistics)} found {statistics_data.count()} rows")
@@ -310,7 +308,7 @@ class TestStatistics(DBTestCase):
                         f"01/05/{Session.current_year}\t1000.0\tTest expenses transaction",
                         f"01/06/{Session.current_year}\t1000.0\tTest expenses transaction",]
 
-                    statistics_data = CustomRangeStatisticsView.transactions_list
+                    statistics_data = WindowsRegistry.CustomRangeStatisticsView.transactions_list
                     self.assertEqual(
                         len(expected_transactions), statistics_data.count(),
                         f"Custom range transactions list (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) have another amount of rows. Expected amount {len(expected_transactions)} found {statistics_data.count()} rows")
@@ -320,14 +318,14 @@ class TestStatistics(DBTestCase):
                             expected_row, statistics_data.item(index).text(),
                             f"In Custom range transactions list (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
                     
-                    CustomRangeStatisticsView.window.done(1)
-                    CustomRangeStatistics.window.done(1)
+                    WindowsRegistry.CustomRangeStatisticsView.done(1)
+                    WindowsRegistry.CustomRangeStatistics.done(1)
 
                 QTimer.singleShot(100, _check_custom_range_statistics)
-                CustomRangeStatistics.show_statistics.click()
+                WindowsRegistry.CustomRangeStatistics.show_statistics.click()
 
             QTimer.singleShot(100, _select_custom_range)
-            StatisticsWindow.custom_range_statistics.click()
+            WindowsRegistry.StatisticsWindow.custom_range_statistics.click()
 
         self.open_statistics_window(_open_custom_range_statistics_window)
         qsleep(500)

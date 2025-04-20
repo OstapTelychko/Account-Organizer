@@ -11,10 +11,9 @@ from DesktopQtToolkit.create_button import create_button
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
+from AppObjects.windows_registry import WindowsRegistry
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
-from GUI.windows.messages import Messages
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QListWidget
@@ -240,33 +239,33 @@ def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, mont
 def show_monthly_statistics():
     """This method is used to show the monthly statistics window."""
 
-    MonthlyStatistics.window.setWindowTitle(LanguageStructure.Months.get_translation(Session.current_month))
-    MonthlyStatistics.statistics.clear()
+    WindowsRegistry.MonthlyStatistics.setWindowTitle(LanguageStructure.Months.get_translation(Session.current_month))
+    WindowsRegistry.MonthlyStatistics.statistics.clear()
 
     Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
 
     if len(Session.categories) < 2 or len(Incomes_categories) < 1 or len(Expenses_categories) < 1:
-        return Messages.no_category.exec()
+        return WindowsRegistry.Messages.no_category.exec()
     
     Incomes_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Incomes_categories])
     Expenses_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, Session.current_month))) for category in Expenses_categories])
 
     if not (Incomes_categories_have_transactions and Expenses_categories_have_transactions):
-        return Messages.no_transactions.exec()
+        return WindowsRegistry.Messages.no_transactions.exec()
     
-    add_month_statistics(Incomes_categories, Expenses_categories, MonthlyStatistics.statistics, Session.current_month)
+    add_month_statistics(Incomes_categories, Expenses_categories, WindowsRegistry.MonthlyStatistics.statistics, Session.current_month)
     
-    StatisticsWindow.window.done(1)
+    WindowsRegistry.StatisticsWindow.done(1)
     logger.debug(f"Monthly statistics window is shown. Current month: {LanguageStructure.Months.get_translation(Session.current_month)}")
-    MonthlyStatistics.window.exec()
+    WindowsRegistry.MonthlyStatistics.exec()
 
 
 def show_quarterly_statistics():
     """This method is used to show the quarterly statistics window."""
 
     #Clear quarters statistics
-    for quarter in QuarterlyStatistics.statistics.quarters:
+    for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
         quarter.total_quarter_statistics.data.clear()
         for month in quarter.months:
             month.data.clear()
@@ -275,9 +274,9 @@ def show_quarterly_statistics():
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
 
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
-        return Messages.no_category.exec()
+        return WindowsRegistry.Messages.no_category.exec()
     
-    for quarter in QuarterlyStatistics.statistics.quarters:
+    for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
         Incomes_categories_total_values:dict[int, list] = {}
         Expenses_categories_total_values:dict[int, list] = {}
 
@@ -325,26 +324,26 @@ def show_quarterly_statistics():
             if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
                 add_month_statistics(Incomes_categories, Expenses_categories, month.data, month.month_number)
             else:
-                month.data.addItem(Messages.no_transactions.text())
+                month.data.addItem(WindowsRegistry.Messages.no_transactions.text())
 
-    StatisticsWindow.window.done(1)
+    WindowsRegistry.StatisticsWindow.done(1)
     logger.debug(f"Quarterly statistics window is shown. Current year: {Session.current_year}")
-    QuarterlyStatistics.window.exec()
+    WindowsRegistry.QuarterlyStatistics.exec()
 
 
 def show_yearly_statistics():
     """This method is used to show the yearly statistics window."""
 
     #Clear yearly statistics
-    YearlyStatistics.statistics.total_year_statistics.data.clear()
-    for month in YearlyStatistics.statistics.months:
+    WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data.clear()
+    for month in WindowsRegistry.YearlyStatistics.statistics.months:
         month.data.clear()
     
     Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
 
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
-        return Messages.no_category.exec()
+        return WindowsRegistry.Messages.no_category.exec()
     
     Incomes_categories_total_values:dict[int, list] = {}
     Expenses_categories_total_values:dict[int, list] = {}
@@ -368,7 +367,7 @@ def show_yearly_statistics():
     total_expense = round(sum(Expenses_categories_total_values.values()), 2)
     days_amount = 365 if Session.current_year % 4 != 0 else 366# 365 days if year is not leap
 
-    Total_statistic_list = YearlyStatistics.statistics.total_year_statistics.data
+    Total_statistic_list = WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data
 
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(4)+str(total_income))
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(25)+str(round(total_income/12, 2)))
@@ -386,32 +385,32 @@ def show_yearly_statistics():
     Total_statistic_list.addItem("\n\n"+LanguageStructure.MainWindow.get_translation(2))
     add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list)
 
-    for month in YearlyStatistics.statistics.months:
+    for month in WindowsRegistry.YearlyStatistics.statistics.months:
         Incomes_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Incomes_categories])
         Expenses_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Expenses_categories])
 
         if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
             add_month_statistics(Incomes_categories, Expenses_categories, month.data, month.month_number)
         else:
-            month.data.addItem(Messages.no_transactions.text())
+            month.data.addItem(WindowsRegistry.Messages.no_transactions.text())
 
-    StatisticsWindow.window.done(1)
+    WindowsRegistry.StatisticsWindow.done(1)
     logger.debug(f"Yearly statistics window is shown. Current year: {Session.current_year}")
-    YearlyStatistics.window.exec()
+    WindowsRegistry.YearlyStatistics.exec()
         
 
 def show_custom_range_statistics_window():
     """This method is used to show the custom range statistics window. Where parameters like from and to date are set."""
 
     #Remove previous categories
-    while CustomRangeStatistics.incomes_categories_list_layout.count():
-        CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)
+    while WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count():
+        WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)
 
-    while CustomRangeStatistics.expenses_categories_list_layout.count():
-        CustomRangeStatistics.expenses_categories_list_layout.takeAt(0).widget().setParent(None)
+    while WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count():
+        WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.takeAt(0).widget().setParent(None)
 
-    CustomRangeStatistics.selected_categories_list.clear()
-    CustomRangeStatistics.selected_categories_data.clear()
+    WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
+    WindowsRegistry.CustomRangeStatistics.selected_categories_data.clear()
 
     categories = sorted(Session.categories.values(), key=lambda category: category.type)
 
@@ -438,16 +437,16 @@ def show_custom_range_statistics_window():
 
         if category.type == CATEGORY_TYPE[0]:#Income
             category_type_translate = LanguageStructure.MainWindow.get_translation(1)
-            CustomRangeStatistics.incomes_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+            WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
         else:
             category_type_translate = LanguageStructure.MainWindow.get_translation(2)
-            CustomRangeStatistics.expenses_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+            WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
 
         remove_category_statistics_list.clicked.connect(partial(remove_category_from_statistics_list, category, add_category_statistics_list, remove_category_statistics_list))
         add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
     
-    StatisticsWindow.window.done(1)
-    CustomRangeStatistics.window.exec()
+    WindowsRegistry.StatisticsWindow.done(1)
+    WindowsRegistry.CustomRangeStatistics.exec()
 
 
 def add_category_to_statistics_list(category:Category, category_type_translate:str, remove_button:QPushButton, add_button:QPushButton):
@@ -462,14 +461,14 @@ def add_category_to_statistics_list(category:Category, category_type_translate:s
     """
 
     #Reset selected categories
-    CustomRangeStatistics.selected_categories_list.clear()
+    WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
 
-    CustomRangeStatistics.selected_categories_data[category.id] = (category, category_type_translate)
+    WindowsRegistry.CustomRangeStatistics.selected_categories_data[category.id] = (category, category_type_translate)
 
-    selected_categories = CustomRangeStatistics.selected_categories_data
+    selected_categories = WindowsRegistry.CustomRangeStatistics.selected_categories_data
 
     for iteration, selected_category in enumerate(selected_categories):
-        CustomRangeStatistics.selected_categories_list.addItem(
+        WindowsRegistry.CustomRangeStatistics.selected_categories_list.addItem(
             f"{iteration+1}. {selected_categories[selected_category][0].name} ({selected_categories[selected_category][1]})"
         )
     remove_button.setDisabled(False)
@@ -484,17 +483,17 @@ def add_all_categories_to_statistics_list(sender_button:QPushButton):
             `sender_button` (QPushButton): button that was clicked
     """
 
-    if sender_button is CustomRangeStatistics.add_all_incomes_categories:
-        for category_wrapper_index in range(CustomRangeStatistics.incomes_categories_list_layout.count()):
-            category_wrapper = CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
+    if sender_button is WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories:
+        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count()):
+            category_wrapper = WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
 
             for widget in category_wrapper.children():
                 if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(1):
                     widget.click()
 
-    elif sender_button is CustomRangeStatistics.add_all_expenses_categories:
-        for category_wrapper_index in range(CustomRangeStatistics.expenses_categories_list_layout.count()):
-            category_wrapper = CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
+    elif sender_button is WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories:
+        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count()):
+            category_wrapper = WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
 
             for widget in category_wrapper.children():
                 if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(1):
@@ -512,13 +511,13 @@ def remove_category_from_statistics_list(category:Category, add_button:QPushButt
     """
 
     #Reset selected categories
-    CustomRangeStatistics.selected_categories_list.clear()
-    del CustomRangeStatistics.selected_categories_data[category.id]
+    WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
+    del WindowsRegistry.CustomRangeStatistics.selected_categories_data[category.id]
 
-    selected_categories = CustomRangeStatistics.selected_categories_data
+    selected_categories = WindowsRegistry.CustomRangeStatistics.selected_categories_data
 
     for iteration, selected_category in enumerate(selected_categories):
-        CustomRangeStatistics.selected_categories_list.addItem(
+        WindowsRegistry.CustomRangeStatistics.selected_categories_list.addItem(
             f"{iteration+1}. {selected_categories[selected_category][0].name} ({selected_categories[selected_category][1]})"
         )
     remove_button.setDisabled(True)
@@ -533,17 +532,17 @@ def remove_all_categories_from_statistics_list(sender_button:QPushButton):
             `sender_button` (QPushButton): button that was clicked
     """
 
-    if sender_button is CustomRangeStatistics.remove_all_incomes_categories:
-        for category_wrapper_index in range(CustomRangeStatistics.incomes_categories_list_layout.count()):
-            category_wrapper = CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
+    if sender_button is WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories:
+        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count()):
+            category_wrapper = WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
 
             for widget in category_wrapper.children():
                 if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(0):
                     widget.click()
     
-    elif sender_button is CustomRangeStatistics.remove_all_expenses_categories:
-        for category_wrapper_index in range(CustomRangeStatistics.expenses_categories_list_layout.count()):
-            category_wrapper = CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
+    elif sender_button is WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories:
+        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count()):
+            category_wrapper = WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
 
             for widget in category_wrapper.children():
                 if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(0):
@@ -554,17 +553,17 @@ def show_custom_range_statistics_view():
     """This method is used to show the actual custom range statistics."""
 
     #Reset statistics and transactions list
-    CustomRangeStatisticsView.statistics_list.clear()
-    CustomRangeStatisticsView.transactions_list.clear()
+    WindowsRegistry.CustomRangeStatisticsView.statistics_list.clear()
+    WindowsRegistry.CustomRangeStatisticsView.transactions_list.clear()
 
-    from_date = CustomRangeStatistics.from_date.date()
-    to_date = CustomRangeStatistics.to_date.date()
+    from_date = WindowsRegistry.CustomRangeStatistics.from_date.date()
+    to_date = WindowsRegistry.CustomRangeStatistics.to_date.date()
 
     if from_date >= to_date:
-        return Messages.wrong_date.exec()
+        return WindowsRegistry.Messages.wrong_date.exec()
     
-    if len(CustomRangeStatistics.selected_categories_data) == 0:
-        return Messages.no_selected_category.exec()
+    if len(WindowsRegistry.CustomRangeStatistics.selected_categories_data) == 0:
+        return WindowsRegistry.Messages.no_selected_category.exec()
     
     date_difference = date(to_date.year(), to_date.month(), to_date.day()) - date(from_date.year(), from_date.month(), from_date.day()) 
     days_amount = date_difference.days
@@ -572,8 +571,8 @@ def show_custom_range_statistics_view():
     from_date = from_date.year()*1000 + from_date.month()*100 + from_date.day()
     to_date = to_date.year()*1000 + to_date.month()*100 + to_date.day()
 
-    Incomes_categories = [category[0] for category in CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
-    Expenses_categories = [category[0] for category in CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
+    Incomes_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
+    Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
 
     all_transactions = Session.db.statistics_query.get_transactions_by_range(map(lambda category: category.id, Incomes_categories+Expenses_categories), from_date, to_date)
     categorized_transactions:defaultdict[int, list[Transaction]] = defaultdict(list)
@@ -604,27 +603,27 @@ def show_custom_range_statistics_view():
     total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
 
     #Custom range statistics
-    CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(4)+str(total_income))
-    CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(24)+str(round(total_income/days_amount, 2))+"\n")
+    WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(4)+str(total_income))
+    WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(24)+str(round(total_income/days_amount, 2))+"\n")
 
-    CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(6)+str(total_expense))
-    CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(26)+str(round(total_expense/days_amount, 2))+"\n")
+    WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(6)+str(total_expense))
+    WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(26)+str(round(total_expense/days_amount, 2))+"\n")
 
-    CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}")
+    WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}")
 
     if len(Incomes_categories):
-        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LanguageStructure.MainWindow.get_translation(1))
-        add_total_statistics(Incomes_categories_total_values, [9,13], CustomRangeStatisticsView.statistics_list)
+        WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LanguageStructure.MainWindow.get_translation(1))
+        add_total_statistics(Incomes_categories_total_values, [9,13], WindowsRegistry.CustomRangeStatisticsView.statistics_list)
 
     if len(Expenses_categories):
-        CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LanguageStructure.MainWindow.get_translation(2))
-        add_total_statistics(Expenses_categories_total_values, [17,20], CustomRangeStatisticsView.statistics_list)
+        WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem("\n\n"+LanguageStructure.MainWindow.get_translation(2))
+        add_total_statistics(Expenses_categories_total_values, [17,20], WindowsRegistry.CustomRangeStatisticsView.statistics_list)
     
     #Transactions list
     if len(Incomes_categories_transactions):
-        CustomRangeStatisticsView.transactions_list.addItem(LanguageStructure.MainWindow.get_translation(1)+"\n\n")
+        WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(LanguageStructure.MainWindow.get_translation(1)+"\n\n")
         for category, category_transactions in Incomes_categories_transactions.items():
-            CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
+            WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
             for transaction in category_transactions:
                 day = transaction.day
@@ -635,12 +634,12 @@ def show_custom_range_statistics_view():
                 if month < 10:
                     month = f"0{month}"
 
-                CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
+                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
     
     if len(Expenses_categories_transactions):
-        CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LanguageStructure.MainWindow.get_translation(2)+"\n\n")
+        WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LanguageStructure.MainWindow.get_translation(2)+"\n\n")
         for category, category_transactions in Expenses_categories_transactions.items():
-            CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
+            WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
             for transaction in category_transactions:
                 day = transaction.day
@@ -651,7 +650,7 @@ def show_custom_range_statistics_view():
                 if month < 10:
                     month = f"0{month}"
 
-                CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
+                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
         
     logger.debug(f"Custom range statistics window is shown. From date: {from_date} To date: {to_date}")
-    CustomRangeStatisticsView.window.exec()
+    WindowsRegistry.CustomRangeStatisticsView.exec()

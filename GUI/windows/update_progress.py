@@ -1,82 +1,85 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QWidget, QScrollArea, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt
 
 from DesktopQtToolkit.sub_window import SubWindow
-
-from GUI.windows.main_window import MainWindow
 from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS
 
+if TYPE_CHECKING:
+    from GUI.windows.main_window import MainWindow
 
 
-class UpdateProgressWindow():
+class UpdateProgressWindow(SubWindow):
     """Represents Update progress window structure."""
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    update_progress_title = QLabel("Update progress")
+        self.update_progress_title = QLabel("Update progress")
 
-    download_label = QLabel("")
-    download_progress = QProgressBar()
-    download_progress.setRange(0, 100)
+        self.download_label = QLabel("")
+        self.download_progress = QProgressBar()
+        self.download_progress.setRange(0, 100)
 
-    download_layout = QVBoxLayout()
-    download_layout.addWidget(download_label)
-    download_layout.addWidget(download_progress)
+        self.download_layout = QVBoxLayout()
+        self.download_layout.addWidget(self.download_label)
+        self.download_layout.addWidget(self.download_progress)
 
-    download_wrapper = QWidget()
-    download_wrapper.setLayout(download_layout)
-    download_wrapper.setProperty("class", "wrapper")
-    download_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(download_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-    download_wrapper.setFixedWidth(300)
+        self.download_wrapper = QWidget()
+        self.download_wrapper.setLayout(self.download_layout)
+        self.download_wrapper.setProperty("class", "wrapper")
+        self.download_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.download_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.download_wrapper.setFixedWidth(300)
 
-    backups_upgrade_label = QLabel()
-    backups_upgrade_progress = QProgressBar()
-    backups_upgrade_progress.setFormat("%v/%m")
-    backups_upgrade_progress.setTextVisible(True)
+        self.backups_upgrade_label = QLabel()
+        self.backups_upgrade_progress = QProgressBar()
+        self.backups_upgrade_progress.setFormat("%v/%m")
+        self.backups_upgrade_progress.setTextVisible(True)
 
-    backups_upgrade_layout = QVBoxLayout()
-    backups_upgrade_layout.addWidget(backups_upgrade_label)
-    backups_upgrade_layout.addWidget(backups_upgrade_progress)
+        self.backups_upgrade_layout = QVBoxLayout()
+        self.backups_upgrade_layout.addWidget(self.backups_upgrade_label)
+        self.backups_upgrade_layout.addWidget(self.backups_upgrade_progress)
 
-    backups_upgrade_wrapper = QWidget()
-    backups_upgrade_wrapper.setLayout(backups_upgrade_layout)
-    backups_upgrade_wrapper.setProperty("class", "wrapper")
-    backups_upgrade_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(backups_upgrade_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-    backups_upgrade_wrapper.setFixedWidth(300)
+        self.backups_upgrade_wrapper = QWidget()
+        self.backups_upgrade_wrapper.setLayout(self.backups_upgrade_layout)
+        self.backups_upgrade_wrapper.setProperty("class", "wrapper")
+        self.backups_upgrade_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.backups_upgrade_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.backups_upgrade_wrapper.setFixedWidth(300)
 
-    apply_update_label = QLabel()
-    apply_update_progress = QProgressBar()
-    apply_update_progress.setRange(0, 4)
+        self.apply_update_label = QLabel()
+        self.apply_update_progress = QProgressBar()
+        self.apply_update_progress.setRange(0, 4)
 
-    apply_update_layout = QVBoxLayout()
-    apply_update_layout.addWidget(apply_update_label)
-    apply_update_layout.addWidget(apply_update_progress)
+        self.apply_update_layout = QVBoxLayout()
+        self.apply_update_layout.addWidget(self.apply_update_label)
+        self.apply_update_layout.addWidget(self.apply_update_progress)
 
-    apply_update_wrapper = QWidget()
-    apply_update_wrapper.setLayout(apply_update_layout)
-    apply_update_wrapper.setProperty("class", "wrapper")
-    apply_update_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(apply_update_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-    apply_update_wrapper.setFixedWidth(300)
+        self.apply_update_wrapper = QWidget()
+        self.apply_update_wrapper.setLayout(self.apply_update_layout)
+        self.apply_update_wrapper.setProperty("class", "wrapper")
+        self.apply_update_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.apply_update_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.apply_update_wrapper.setFixedWidth(300)
 
-    scroll_layout = QVBoxLayout()
-    scroll_layout.addWidget(download_wrapper)
-    scroll_layout.addWidget(backups_upgrade_wrapper)
-    scroll_layout.addWidget(apply_update_wrapper)
-    scroll_layout.setSpacing(30)
-    scroll_layout.setContentsMargins(10, 10, 30, 10)
+        self.scroll_layout = QVBoxLayout()
+        self.scroll_layout.addWidget(self.download_wrapper)
+        self.scroll_layout.addWidget(self.backups_upgrade_wrapper)
+        self.scroll_layout.addWidget(self.apply_update_wrapper)
+        self.scroll_layout.setSpacing(30)
+        self.scroll_layout.setContentsMargins(10, 10, 30, 10)
 
-    scroll_widget = QWidget()
-    scroll_widget.setLayout(scroll_layout)
+        self.scroll_widget = QWidget()
+        self.scroll_widget.setLayout(self.scroll_layout)
 
-    update_stages_scroll = QScrollArea()
-    update_stages_scroll.setWidgetResizable(True)
-    update_stages_scroll.setWidget(scroll_widget)
-    update_stages_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.update_stages_scroll = QScrollArea()
+        self.update_stages_scroll.setWidgetResizable(True)
+        self.update_stages_scroll.setWidget(self.scroll_widget)
+        self.update_stages_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-    main_layout = QVBoxLayout()
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(update_progress_title, alignment=Qt.AlignmentFlag.AlignHCenter)
-    main_layout.addWidget(update_stages_scroll)
-    main_layout.setContentsMargins(30, 10, 30, 30)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.update_progress_title, alignment=Qt.AlignmentFlag.AlignHCenter)
+        self.main_layout.addWidget(self.update_stages_scroll)
+        self.main_layout.setContentsMargins(30, 10, 30, 30)
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)

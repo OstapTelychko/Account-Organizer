@@ -3,13 +3,12 @@ from PySide6.QtCore import Qt
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
+from AppObjects.windows_registry import WindowsRegistry
+
 from project_configuration import CATEGORY_TYPE
 from languages import LanguageStructure
 
 from GUI.gui_constants import ALIGNMENT
-from GUI.windows.main_window import MainWindow
-from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
-from GUI.windows.messages import Messages
 from GUI.category import load_category, add_category_to_position_list
 
 from Statistics.copy_statistics import show_information_message
@@ -71,14 +70,14 @@ def load_categories_data():
 def create_category():
     """Create category. It creates a new category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
 
-    category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
-    category_name = AddCategoryWindow.category_name.text().strip()
+    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_name = WindowsRegistry.AddCategoryWindow.category_name.text().strip()
 
     if category_name == "":
-        return Messages.no_category_name.exec()
+        return WindowsRegistry.Messages.no_category_name.exec()
     
     if Session.db.category_query.category_exists(category_name, category_type):
-        return Messages.category_exists.exec()
+        return WindowsRegistry.Messages.category_exists.exec()
     
     position = Session.db.category_query.get_available_position(category_type) 
 
@@ -93,8 +92,8 @@ def create_category():
     Session.categories[category_id].delete_transaction.clicked.connect(partial(remove_transaction, Session.categories[category_id].table_data, category_id))
     logger.debug(f"Category {category_name} created")
 
-    AddCategoryWindow.category_name.setText("")
-    AddCategoryWindow.window.hide()
+    WindowsRegistry.AddCategoryWindow.category_name.setText("")
+    WindowsRegistry.AddCategoryWindow.hide()
     show_information_message(LanguageStructure.Categories.get_translation(8))
     reset_focused_category()
 
@@ -116,22 +115,22 @@ def show_category_settings(category_name:str):
         `category_name` : (str) Name of the category to show settings for.
     """
 
-    if Session.db.category_query.category_exists(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]):
-        CategorySettingsWindow.window.setWindowTitle(category_name)
-        CategorySettingsWindow.window.exec()
+    if Session.db.category_query.category_exists(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]):
+        WindowsRegistry.CategorySettingsWindow.setWindowTitle(category_name)
+        WindowsRegistry.CategorySettingsWindow.exec()
 
 
 def remove_category():
     """Remove category. It removes the category from the database and from the GUI. It also shows a confirmation message before removing the category."""
 
-    category_name = CategorySettingsWindow.window.windowTitle()
+    category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
 
-    Messages.delete_category_confirmation.exec()
-    if Messages.delete_category_confirmation.clickedButton() == Messages.delete_category_confirmation.ok_button:
-        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
+    WindowsRegistry.Messages.delete_category_confirmation.exec()
+    if WindowsRegistry.Messages.delete_category_confirmation.clickedButton() == WindowsRegistry.Messages.delete_category_confirmation.ok_button:
+        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]).id
         Session.db.category_query.delete_category(category_id)
-        CategorySettingsWindow.window.setWindowTitle(" ")
-        CategorySettingsWindow.window.hide()
+        WindowsRegistry.CategorySettingsWindow.setWindowTitle(" ")
+        WindowsRegistry.CategorySettingsWindow.hide()
 
         Session.categories[category_id].window.deleteLater()
         Session.categories[category_id].settings.deleteLater()
@@ -149,12 +148,12 @@ def remove_category():
 def rename_category():
     """Rename category. It renames the category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
 
-    new_category_name = RenameCategoryWindow.new_category_name.text().strip()
-    current_name = RenameCategoryWindow.window.windowTitle()
-    category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
+    new_category_name = WindowsRegistry.RenameCategoryWindow.new_category_name.text().strip()
+    current_name = WindowsRegistry.RenameCategoryWindow.windowTitle()
+    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
 
     if Session.db.category_query.category_exists(new_category_name, category_type):
-        return Messages.category_exists.exec()
+        return WindowsRegistry.Messages.category_exists.exec()
 
     category = Session.categories[Session.db.category_query.get_category(current_name, category_type).id]
     category.name = new_category_name
@@ -171,25 +170,25 @@ def rename_category():
     logger.debug(f"Category {current_name} renamed to {new_category_name}")
 
     Session.db.category_query.rename_category(category.id, new_category_name)
-    RenameCategoryWindow.window.hide()
-    CategorySettingsWindow.window.hide()
-    RenameCategoryWindow.new_category_name.setText("")
+    WindowsRegistry.RenameCategoryWindow.hide()
+    WindowsRegistry.CategorySettingsWindow.hide()
+    WindowsRegistry.RenameCategoryWindow.new_category_name.setText("")
     show_information_message(LanguageStructure.Categories.get_translation(6))
 
 
 def show_change_category_position(category_name:str):
     """Show change category position window. It shows the current category position and all other categories in the same type."""
 
-    category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
     selected_category = Session.db.category_query.get_category(category_name, category_type)
 
-    ChangeCategoryPositionWindow.preview_category_name.setText(selected_category.name)
-    ChangeCategoryPositionWindow.window.setWindowTitle(selected_category.name)
-    ChangeCategoryPositionWindow.preview_category_position.setText(str(selected_category.position))
+    WindowsRegistry.ChangeCategoryPositionWindow.preview_category_name.setText(selected_category.name)
+    WindowsRegistry.ChangeCategoryPositionWindow.setWindowTitle(selected_category.name)
+    WindowsRegistry.ChangeCategoryPositionWindow.preview_category_position.setText(str(selected_category.position))
 
     #Remove previous categories
-    while ChangeCategoryPositionWindow.categories_list_layout.count():
-        widget = ChangeCategoryPositionWindow.categories_list_layout.takeAt(0).widget()
+    while WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.count():
+        widget = WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.takeAt(0).widget()
         if widget:
             widget.setParent(None)
     
@@ -198,33 +197,33 @@ def show_change_category_position(category_name:str):
         if category is not selected_category and category.category_type == selected_category.category_type:
             add_category_to_position_list(category)
     
-    ChangeCategoryPositionWindow.window.exec()
+    WindowsRegistry.ChangeCategoryPositionWindow.exec()
 
 
 def change_category_position():
     """Change category position. It changes the category position in the database and in the GUI. It also checks if the new position is valid"""
 
-    category_type = CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]
-    category_name = ChangeCategoryPositionWindow.preview_category_name.text()
+    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_name = WindowsRegistry.ChangeCategoryPositionWindow.preview_category_name.text()
     category = Session.db.category_query.get_category(category_name, category_type)
 
-    new_position = ChangeCategoryPositionWindow.new_position.text()
+    new_position = WindowsRegistry.ChangeCategoryPositionWindow.new_position.text()
     old_position = category.position
     max_position = Session.db.category_query.get_available_position(category_type)-1
 
     if new_position == "":
-        return Messages.empty_fields.exec()
+        return WindowsRegistry.Messages.empty_fields.exec()
 
     if not new_position.isdigit():
-        return Messages.incorrect_data_type.exec()
+        return WindowsRegistry.Messages.incorrect_data_type.exec()
     new_position = int(new_position)
 
     if not 0 <= new_position <= max_position:
-        Messages.position_out_range.setText(LanguageStructure.Messages.get_translation(17).replace("max_position", str(max_position)))
-        return Messages.position_out_range.exec()
+        WindowsRegistry.Messages.position_out_range.setText(LanguageStructure.WindowsRegistry.Messages.get_translation(17).replace("max_position", str(max_position)))
+        return WindowsRegistry.Messages.position_out_range.exec()
     
     if new_position == old_position:
-        return Messages.same_position.exec()
+        return WindowsRegistry.Messages.same_position.exec()
 
     Session.db.category_query.change_category_position(new_position, old_position, category.id, category_type)
     logger.debug(f"Category {category_name} position ({old_position}) changed to {new_position}")
@@ -232,8 +231,8 @@ def change_category_position():
     remove_categories_from_list()
     load_categories()
     activate_categories()
-    ChangeCategoryPositionWindow.window.hide()
-    CategorySettingsWindow.window.hide()
+    WindowsRegistry.ChangeCategoryPositionWindow.hide()
+    WindowsRegistry.CategorySettingsWindow.hide()
 
 
 def update_category_total_value(category_id:int):

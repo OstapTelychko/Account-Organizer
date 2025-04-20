@@ -17,9 +17,9 @@ from backend.models import Category, Transaction, Account
 from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 
 from GUI.category import load_category
-from GUI.windows.main_window import MainWindow
 
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
@@ -104,7 +104,7 @@ class DBTestCase(TestCase):
                 `category` : (GUICategory) - Category to select tab.
         """
 
-        MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
 
 
     @classmethod

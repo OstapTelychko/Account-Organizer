@@ -3,10 +3,8 @@ from tests.tests_toolkit import DBTestCase, qsleep
 
 from project_configuration import CATEGORY_TYPE
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 
-from GUI.windows.main_window import MainWindow
-from GUI.windows.messages import Messages
-from GUI.windows.transaction import TransactionManagementWindow
 
 
 class TestTransaction(DBTestCase):
@@ -17,15 +15,15 @@ class TestTransaction(DBTestCase):
         """Test adding transaction to the application."""
 
         for category in Session.categories.values():
-            MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
+            WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
 
             def _add_transaction():
                 """Set transaction data and click add button."""
 
-                TransactionManagementWindow.transaction_name.setText("New test transaction")
-                TransactionManagementWindow.transaction_day.setText("1")
-                TransactionManagementWindow.transaction_value.setText("999")
-                TransactionManagementWindow.button.click()
+                WindowsRegistry.TransactionManagementWindow.transaction_name.setText("New test transaction")
+                WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
+                WindowsRegistry.TransactionManagementWindow.transaction_value.setText("999")
+                WindowsRegistry.TransactionManagementWindow.button.click()
 
             QTimer.singleShot(100, _add_transaction)
             category.add_transaction.click()
@@ -41,16 +39,16 @@ class TestTransaction(DBTestCase):
         """Test updating transaction in the application."""
 
         for category in Session.categories.values():
-            MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
+            WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
             category.table_data.selectRow(0)
 
             def _update_transaction():
                 """Set transaction data and click update button."""
 
-                TransactionManagementWindow.transaction_name.setText("Updated transaction name")
-                TransactionManagementWindow.transaction_day.setText("2")
-                TransactionManagementWindow.transaction_value.setText("1000")
-                TransactionManagementWindow.button.click()
+                WindowsRegistry.TransactionManagementWindow.transaction_name.setText("Updated transaction name")
+                WindowsRegistry.TransactionManagementWindow.transaction_day.setText("2")
+                WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
+                WindowsRegistry.TransactionManagementWindow.button.click()
 
             QTimer.singleShot(100, _update_transaction)
             category.edit_transaction.click()
@@ -70,7 +68,7 @@ class TestTransaction(DBTestCase):
             category.table_data.selectRow(0)
 
             def _confirm_deletion():
-                Messages.delete_transaction_confirmation.ok_button.click()
+                WindowsRegistry.Messages.delete_transaction_confirmation.ok_button.click()
 
             QTimer.singleShot(100, _confirm_deletion)
             category.delete_transaction.click()

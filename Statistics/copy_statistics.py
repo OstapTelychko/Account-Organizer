@@ -2,14 +2,12 @@ from threading import Thread
 
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
+from AppObjects.windows_registry import WindowsRegistry
+
 from project_configuration import CATEGORY_TYPE
 from languages import LanguageStructure
 
 from GUI.gui_constants import app
-from GUI.windows.main_window import MainWindow
-from GUI.windows.information_message import InformationMessage
-from GUI.windows.category import CategorySettingsWindow 
-from GUI.windows.statistics import MonthlyStatistics, QuarterlyStatistics, YearlyStatistics, CustomRangeStatisticsView
 
 
 
@@ -23,12 +21,12 @@ def show_information_message(text:str):
             `text` (str): message to show
     """
 
-    InformationMessage.message_text.setText(text)
-    screen_center = MainWindow.window.frameGeometry().center()
-    InformationMessage.window.move(screen_center)
+    WindowsRegistry.InformationMessage.message_text.setText(text)
+    screen_center = WindowsRegistry.MainWindow.frameGeometry().center()
+    WindowsRegistry.InformationMessage.move(screen_center)
 
     try:
-        message_worker = Thread(target=InformationMessage.run)
+        message_worker = Thread(target=WindowsRegistry.InformationMessage.run)
         message_worker.start()
     except RuntimeError:
         pass # When the program exits, this prevents a widget deletion error
@@ -38,10 +36,10 @@ def show_information_message(text:str):
 def copy_monthly_transactions():
     """This method is used to copy the transactions of the selected category to the clipboard."""
 
-    if CategorySettingsWindow.copy_transactions.isEnabled():
-        CategorySettingsWindow.copy_transactions.setEnabled(False)
-        category_name = CategorySettingsWindow.window.windowTitle()
-        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[MainWindow.Incomes_and_expenses.currentIndex()]).id
+    if WindowsRegistry.CategorySettingsWindow.copy_transactions.isEnabled():
+        WindowsRegistry.CategorySettingsWindow.copy_transactions.setEnabled(False)
+        category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
+        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]).id
         
         transactions = Session.db.transaction_query.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
         if len(transactions):
@@ -63,9 +61,9 @@ def copy_monthly_transactions():
 def copy_monthly_statistics():
     """This method is used to copy the monthly statistics to the clipboard."""
 
-    if MonthlyStatistics.copy_statistics.isEnabled():
-        MonthlyStatistics.copy_statistics.setEnabled(False)
-        statistics = MonthlyStatistics.statistics
+    if WindowsRegistry.MonthlyStatistics.copy_statistics.isEnabled():
+        WindowsRegistry.MonthlyStatistics.copy_statistics.setEnabled(False)
+        statistics = WindowsRegistry.MonthlyStatistics.statistics
         result = ""
 
         for row in range(statistics.count()):
@@ -79,9 +77,9 @@ def copy_monthly_statistics():
 def copy_quarterly_statistics():
     """This method is used to copy the quarterly statistics to the clipboard."""
 
-    if QuarterlyStatistics.copy_statistics.isEnabled():
-        QuarterlyStatistics.copy_statistics.setEnabled(False)
-        statistics = QuarterlyStatistics.statistics
+    if WindowsRegistry.QuarterlyStatistics.copy_statistics.isEnabled():
+        WindowsRegistry.QuarterlyStatistics.copy_statistics.setEnabled(False)
+        statistics = WindowsRegistry.QuarterlyStatistics.statistics
         result = ""
 
         for quarter in statistics.quarters:
@@ -108,9 +106,9 @@ def copy_quarterly_statistics():
 def copy_yearly_statistics():
     """This method is used to copy the yearly statistics to the clipboard."""
 
-    if YearlyStatistics.copy_statistics.isEnabled():
-        YearlyStatistics.copy_statistics.setEnabled(False)
-        statistics = YearlyStatistics.statistics
+    if WindowsRegistry.YearlyStatistics.copy_statistics.isEnabled():
+        WindowsRegistry.YearlyStatistics.copy_statistics.setEnabled(False)
+        statistics = WindowsRegistry.YearlyStatistics.statistics
         result = ""
 
         total_yearly_statistics = statistics.total_year_statistics
@@ -133,9 +131,9 @@ def copy_yearly_statistics():
 def copy_custom_range_statistics():
     """This method is used to copy the custom range statistics to the clipboard."""
 
-    if CustomRangeStatisticsView.copy_statistics.isEnabled():
-        CustomRangeStatisticsView.copy_statistics.setEnabled(False)
-        statistics = CustomRangeStatisticsView.statistics_list
+    if WindowsRegistry.CustomRangeStatisticsView.copy_statistics.isEnabled():
+        WindowsRegistry.CustomRangeStatisticsView.copy_statistics.setEnabled(False)
+        statistics = WindowsRegistry.CustomRangeStatisticsView.statistics_list
         result = ""
 
         for row in range(statistics.count()):
@@ -148,9 +146,9 @@ def copy_custom_range_statistics():
 def copy_custom_range_transactions():
     """This method is used to copy the custom range transactions to the clipboard."""
 
-    if CustomRangeStatisticsView.copy_transactions.isEnabled():
-        CustomRangeStatisticsView.copy_transactions.setEnabled(False)
-        transactions = CustomRangeStatisticsView.transactions_list
+    if WindowsRegistry.CustomRangeStatisticsView.copy_transactions.isEnabled():
+        WindowsRegistry.CustomRangeStatisticsView.copy_transactions.setEnabled(False)
+        transactions = WindowsRegistry.CustomRangeStatisticsView.transactions_list
 
         result = ""
 

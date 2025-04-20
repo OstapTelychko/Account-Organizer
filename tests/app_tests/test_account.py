@@ -3,12 +3,9 @@ from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, qsleep
 
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
-from GUI.windows.main_window import MainWindow
-from GUI.windows.settings import SettingsWindow
-from GUI.windows.account import AddAccountWindow, RenameAccountWindow
-from GUI.windows.messages import Messages
 
 
 
@@ -25,7 +22,7 @@ class TestAccount(DBTestCase):
         """
 
         QTimer.singleShot(100, func)
-        MainWindow.settings.click()
+        WindowsRegistry.MainWindow.settings.click()
 
 
     def test_1_account_adding(self):
@@ -37,19 +34,19 @@ class TestAccount(DBTestCase):
             def _add_account():
                 """Fill account data and click add button."""
 
-                AddAccountWindow.account_name.setText("Second test user")
-                AddAccountWindow.current_balance.setText("100")
+                WindowsRegistry.AddAccountWindow.account_name.setText("Second test user")
+                WindowsRegistry.AddAccountWindow.current_balance.setText("100")
 
                 def _check_account_existance():
                     """Check if account exists in the database."""
 
                     self.assertTrue(Session.db.account_query.account_exists("Second test user"), "Second test user hasn't been created")
-                    SettingsWindow.window.done(1)
+                    WindowsRegistry.SettingsWindow.done(1)
                 QTimer.singleShot(100, _check_account_existance)
-                AddAccountWindow.button.click()
+                WindowsRegistry.AddAccountWindow.button.click()
 
             QTimer.singleShot(100, _add_account)
-            SettingsWindow.add_account.click()
+            WindowsRegistry.SettingsWindow.add_account.click()
 
         self.open_settings(_open_add_window)
         qsleep(500)           
@@ -64,28 +61,28 @@ class TestAccount(DBTestCase):
             def _rename_account():
                 """Set new account name and click rename button."""
 
-                RenameAccountWindow.new_account_name.setText("Test user rename test")
+                WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user rename test")
 
                 def _check_account_name():
                     """Check if account name has been changed."""
 
                     self.assertEqual(Session.db.account_query.get_account().name, "Test user rename test", "Test user hasn't been renamed")
                 QTimer.singleShot(100, _check_account_name)
-                RenameAccountWindow.button.click()
+                WindowsRegistry.RenameAccountWindow.button.click()
 
                 qsleep(300)
 
-                RenameAccountWindow.new_account_name.setText("Test user")
+                WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user")
                 def _rename_back():
                     """Rename account back to original name. So it doesn't affect other tests."""
 
                     self.assertEqual(Session.db.account_query.get_account().name, "Test user", "Test user hasn't been renamed back")
-                    SettingsWindow.window.done(0)
+                    WindowsRegistry.SettingsWindow.done(0)
                 QTimer.singleShot(100, _rename_back)
-                RenameAccountWindow.button.click()
+                WindowsRegistry.RenameAccountWindow.button.click()
 
             QTimer.singleShot(100, _rename_account)
-            SettingsWindow.rename_account.click()
+            WindowsRegistry.SettingsWindow.rename_account.click()
 
         self.open_settings(_open_rename_window)
 
@@ -108,17 +105,17 @@ class TestAccount(DBTestCase):
             def _confirm_deletion():
                 """Click delete account button."""
 
-                Messages.delete_account_warning.ok_button.click()
+                WindowsRegistry.Messages.delete_account_warning.ok_button.click()
                 def _check_deletion():
                     """Check if account has been deleted."""
 
                     self.assertFalse(Session.db.account_query.account_exists("Second test user"), "Account hasn't been removed")
                     self.assertEqual(Session.config.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
-                    SettingsWindow.window.done(0)
+                    WindowsRegistry.SettingsWindow.done(0)
                 QTimer.singleShot(200, _check_deletion)
 
             QTimer.singleShot(100, _confirm_deletion)
-            SettingsWindow.delete_account.click()
+            WindowsRegistry.SettingsWindow.delete_account.click()
 
         self.open_settings(_delete_account)
         qsleep(500)

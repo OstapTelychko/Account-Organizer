@@ -1,108 +1,110 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, TypeAlias
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
-from GUI.windows.main_window import MainWindow
+
+if TYPE_CHECKING:
+    from GUI.windows.main_window import MainWindow
 
 
 
-class AddAccountWindow():
+
+class AddAccountWindow(SubWindow):
     """Represents Add account window structure."""
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    languages = QComboBox()
-    languages.setFont(BASIC_FONT)
-    languages.addItems(AVAILABLE_LANGUAGES)
+        self.languages = QComboBox()
+        self.languages.setFont(BASIC_FONT)
+        self.languages.addItems(AVAILABLE_LANGUAGES)
 
-    for language in range(len(AVAILABLE_LANGUAGES)):
-        languages.setItemIcon(language, QIcon(f"{FLAGS_DIRECTORY}/{language}-flag.png"))
+        for language in range(len(AVAILABLE_LANGUAGES)):
+            self.languages.setItemIcon(language, QIcon(f"{FLAGS_DIRECTORY}/{language}-flag.png"))
 
-    languages_layout = QHBoxLayout()
-    languages_layout.addWidget(languages, alignment=ALIGNMENT.AlignRight)
+        self.languages_layout = QHBoxLayout()
+        self.languages_layout.addWidget(self.languages, alignment=ALIGNMENT.AlignRight)
 
-    message = QLabel()
-    message.setFont(BASIC_FONT)
-    message.setWordWrap(True)
-    message.setMinimumHeight(80)
-    message.setMinimumWidth(450)
+        self.message = QLabel()
+        self.message.setFont(BASIC_FONT)
+        self.message.setWordWrap(True)
+        self.message.setMinimumHeight(80)
+        self.message.setMinimumWidth(450)
 
-    account_name = QLineEdit()
-    account_name.setPlaceholderText("Account Name")
+        self.account_name = QLineEdit()
+        self.account_name.setPlaceholderText("Account Name")
 
-    account_name_layout = QHBoxLayout()
-    account_name_layout.addWidget(account_name, alignment=ALIGNMENT.AlignCenter )
+        self.account_name_layout = QHBoxLayout()
+        self.account_name_layout.addWidget(self.account_name, alignment=ALIGNMENT.AlignCenter )
 
-    button = create_button("", (140,50))
-    button.setDefault(True)
+        self.button = create_button("", (140,50))
+        self.button.setDefault(True)
 
-    current_balance = QLineEdit()
-    current_balance.setPlaceholderText("Current balance")
+        self.current_balance = QLineEdit()
+        self.current_balance.setPlaceholderText("Current balance")
 
-    main_layout = QVBoxLayout()
-    main_layout.setSpacing(20)
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addLayout(languages_layout)
-    main_layout.addStretch(1)
-    main_layout.addWidget(message,alignment=ALIGN_H_CENTER)    
-    main_layout.addStretch(1)
-    main_layout.addLayout(account_name_layout)
-    main_layout.addStretch(1)
-    main_layout.addWidget(current_balance,alignment=ALIGN_H_CENTER)
-    main_layout.addStretch(1)
-    main_layout.addWidget(button,alignment=ALIGN_H_CENTER)
-    main_layout.addStretch(1)
-    main_layout.setContentsMargins(50, 10, 50, 30)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(20)
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addLayout(self.languages_layout)
+        self.main_layout.addStretch(1)
+        self.main_layout.addWidget(self.message,alignment=ALIGN_H_CENTER)    
+        self.main_layout.addStretch(1)
+        self.main_layout.addLayout(self.account_name_layout)
+        self.main_layout.addStretch(1)
+        self.main_layout.addWidget(self.current_balance,alignment=ALIGN_H_CENTER)
+        self.main_layout.addStretch(1)
+        self.main_layout.addWidget(self.button,alignment=ALIGN_H_CENTER)
+        self.main_layout.addStretch(1)
+        self.main_layout.setContentsMargins(50, 10, 50, 30)
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)
 
 
 
-class RenameAccountWindow():
+class RenameAccountWindow(SubWindow):
     """Represents Rename account window structure."""
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-    
-    message = QLabel()
-    message.setFont(BASIC_FONT)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
+        
+        self.message = QLabel()
+        self.message.setFont(BASIC_FONT)
 
-    new_account_name = QLineEdit()
-    account_name_layout = QHBoxLayout()
-    account_name_layout.addWidget(new_account_name,alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.new_account_name = QLineEdit()
+        self.account_name_layout = QHBoxLayout()
+        self.account_name_layout.addWidget(self.new_account_name,alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
 
-    button = create_button("Update", (160,40))
-    button.setDefault(True)
+        self.button = create_button("Update", (160,40))
+        self.button.setDefault(True)
 
-    main_layout = QVBoxLayout()
-    main_layout.setSpacing(20)
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addStretch(1)
-    main_layout.addWidget(message, alignment=ALIGN_H_CENTER)
-    main_layout.addStretch(1)
-    main_layout.addLayout(account_name_layout)
-    main_layout.addStretch(1)
-    main_layout.addWidget(button, alignment=ALIGN_H_CENTER)
-    main_layout.addStretch(1)
-    main_layout.setContentsMargins(50, 10, 50, 30)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(20)
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addStretch(1)
+        self.main_layout.addWidget(self.message, alignment=ALIGN_H_CENTER)
+        self.main_layout.addStretch(1)
+        self.main_layout.addLayout(self.account_name_layout)
+        self.main_layout.addStretch(1)
+        self.main_layout.addWidget(self.button, alignment=ALIGN_H_CENTER)
+        self.main_layout.addStretch(1)
+        self.main_layout.setContentsMargins(50, 10, 50, 30)
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)
 
 
 
-class SwitchAccountWindow():
+class SwitchAccountWindow(SubWindow):
     """Represents Switch account window structure."""
-
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-
-    accounts_layout = QHBoxLayout()
-    accounts_layout.setSpacing(50)
 
     class AccountSwitchWidget():
         """This class is used to create a widget that displays the account name, balance, and creation date and a button to switch to that account."""
@@ -139,19 +141,25 @@ class SwitchAccountWindow():
             self.account_widget.setProperty("class", "wrapper")
             self.account_widget.setGraphicsEffect(QGraphicsDropShadowEffect(self.account_widget, **SHADOW_EFFECT_ARGUMENTS))
 
-    accounts_wrapper = QWidget()
-    accounts_wrapper.setLayout(accounts_layout)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    accounts_scroll_area = HorizontalScrollArea()
-    accounts_scroll_area.setWidgetResizable(True)
-    accounts_scroll_area.setStyleSheet("QScrollArea{border:none;background-color:transparent;}")
-    accounts_scroll_area.setWidget(accounts_wrapper)
-    accounts_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    accounts_scroll_area.setMinimumSize(400, 220)
+        self.accounts_layout = QHBoxLayout()
+        self.accounts_layout.setSpacing(50)
 
-    main_layout = QVBoxLayout()
-    main_layout.setSpacing(20)
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(accounts_scroll_area)
-    
-    window.window_container.setLayout(main_layout)
+        self.accounts_wrapper = QWidget()
+        self.accounts_wrapper.setLayout(self.accounts_layout)
+
+        self.accounts_scroll_area = HorizontalScrollArea()
+        self.accounts_scroll_area.setWidgetResizable(True)
+        self.accounts_scroll_area.setStyleSheet("QScrollArea{border:none;background-color:transparent;}")
+        self.accounts_scroll_area.setWidget(self.accounts_wrapper)
+        self.accounts_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.accounts_scroll_area.setMinimumSize(400, 220)
+
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(20)
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.accounts_scroll_area)
+        
+        self.window_container.setLayout(self.main_layout)

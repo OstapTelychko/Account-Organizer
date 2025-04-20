@@ -8,12 +8,12 @@ from PySide6.QtGui import QIcon
 from qdarktheme._style_loader import load_stylesheet
 
 from project_configuration import THEME_DIRECTORY
+
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
 from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
-from GUI.windows.main_window import MainWindow
-from GUI.windows.settings import SettingsWindow
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
@@ -167,20 +167,20 @@ def switch_theme():
 
     if Session.config.theme == "Dark":
         app.setStyleSheet(LIGHT_THEME)
-        SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
+        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
         Session.config.theme = "Light"
 
         if platform == "win32":
-            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
+            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
         logger.info("Theme switched to Light")
 
     elif Session.config.theme == "Light":
         app.setStyleSheet(DARK_THEME)
-        SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
+        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
         Session.config.theme = "Dark"
 
         if platform == "win32":
-            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
+            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(2))
         logger.info("Theme switched to Dark")
 
     Session.config.update_user_config()
@@ -192,18 +192,18 @@ def load_theme():
     logger.info("Loading theme")
     if Session.config.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
-        SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
+        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
 
         if platform == "win32":
-            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(2))
+            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(2))
         logger.info("Dark theme loaded")
             
     if Session.config.theme == "Light":
         app.setStyleSheet(LIGHT_THEME)
-        SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
+        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
 
         if platform == "win32":
-            set_theme_mode_on_window(MainWindow.window, ctypes.c_uint(0))
+            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
         logger.info("Light theme loaded")
 
 

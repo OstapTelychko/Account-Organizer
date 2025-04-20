@@ -4,11 +4,9 @@ from tests.tests_toolkit import DBTestCase, qsleep
 from languages import LanguageStructure
 from backend.models import Category
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 
 from GUI.gui_constants import app
-from GUI.windows.main_window import MainWindow
-from GUI.windows.messages import Messages
-from GUI.windows.category import AddCategoryWindow, CategorySettingsWindow, RenameCategoryWindow, ChangeCategoryPositionWindow
 
 
 
@@ -21,16 +19,16 @@ class TestCategory(DBTestCase):
         def _add_category(name:str):
             """Set category name and click add button."""
 
-            AddCategoryWindow.category_name.setText(name)
-            AddCategoryWindow.button.click()
+            WindowsRegistry.AddCategoryWindow.category_name.setText(name)
+            WindowsRegistry.AddCategoryWindow.button.click()
 
         QTimer.singleShot(100, lambda: _add_category("Test incomes creation category"))
-        MainWindow.add_incomes_category.click()
+        WindowsRegistry.MainWindow.add_incomes_category.click()
         self.assertTrue(Session.db.category_query.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
 
         QTimer.singleShot(100, lambda: _add_category("Test expenses creation category"))
-        MainWindow.Incomes_and_expenses.setCurrentIndex(1)
-        MainWindow.add_expenses_category.click()
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
+        WindowsRegistry.MainWindow.add_expenses_category.click()
         self.assertTrue(Session.db.category_query.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
         
         qsleep(500)
@@ -48,8 +46,8 @@ class TestCategory(DBTestCase):
             def _delete_category():
                 """Click delete button and confirm deletion."""
 
-                QTimer.singleShot(100, lambda: Messages.delete_category_confirmation.ok_button.click())
-                CategorySettingsWindow.delete_category.click()
+                QTimer.singleShot(100, lambda: WindowsRegistry.Messages.delete_category_confirmation.ok_button.click())
+                WindowsRegistry.CategorySettingsWindow.delete_category.click()
 
             QTimer.singleShot(100, _delete_category)
             category.settings.click()
@@ -75,11 +73,11 @@ class TestCategory(DBTestCase):
                 def _rename_category():
                     """Set new category name and click rename button."""
 
-                    RenameCategoryWindow.new_category_name.setText(f"{category.name} rename test")
-                    RenameCategoryWindow.button.click()
+                    WindowsRegistry.RenameCategoryWindow.new_category_name.setText(f"{category.name} rename test")
+                    WindowsRegistry.RenameCategoryWindow.button.click()
 
                 QTimer.singleShot(100, _rename_category)
-                CategorySettingsWindow.rename_category.click()
+                WindowsRegistry.CategorySettingsWindow.rename_category.click()
 
             QTimer.singleShot(100, _open_settings)
             category.settings.click()
@@ -105,11 +103,11 @@ class TestCategory(DBTestCase):
                 def _change_position():
                     """Set new category position and click change button."""
 
-                    ChangeCategoryPositionWindow.new_position.setText("1")
-                    ChangeCategoryPositionWindow.enter_new_position.click()
+                    WindowsRegistry.ChangeCategoryPositionWindow.new_position.setText("1")
+                    WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.click()
 
                 QTimer.singleShot(100, _change_position)
-                CategorySettingsWindow.change_category_position.click()
+                WindowsRegistry.CategorySettingsWindow.change_category_position.click()
 
             QTimer.singleShot(100, _open_settings)
             category.settings.click()
@@ -141,10 +139,10 @@ class TestCategory(DBTestCase):
                     expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
 
                     self.assertEqual(expected_transactions, app.clipboard().text(), f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}")
-                    CategorySettingsWindow.window.done(1)
+                    WindowsRegistry.CategorySettingsWindow.done(1)
 
                 QTimer.singleShot(100, _check_copied_transactions)
-                CategorySettingsWindow.copy_transactions.click()
+                WindowsRegistry.CategorySettingsWindow.copy_transactions.click()
 
             QTimer.singleShot(100, _copy_transactions)
             category.settings.click()

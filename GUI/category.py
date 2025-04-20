@@ -7,13 +7,12 @@ from PySide6.QtGui import QIcon
 from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY
 from languages import LanguageStructure
 from AppObjects.category import Category
+from AppObjects.windows_registry import WindowsRegistry
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
-from GUI.windows.main_window import MainWindow
-from GUI.windows.category import ChangeCategoryPositionWindow
 
 if TYPE_CHECKING:
     from backend.db_controller import DBController
@@ -147,9 +146,9 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_window.setLayout(category_layout)
 
     if category_type == "Incomes":
-        MainWindow.Incomes_window_layout.addWidget(category_window)
+        WindowsRegistry.MainWindow.Incomes_window_layout.addWidget(category_window)
     else:
-        MainWindow.Expenses_window_layout.addWidget(category_window)
+        WindowsRegistry.MainWindow.Expenses_window_layout.addWidget(category_window)
 
 
     return Category(
@@ -197,4 +196,4 @@ def add_category_to_position_list(category:Category):
     category_container.setProperty("class", "category_list_item")
     category_container.setLayout(category_layout)
 
-    ChangeCategoryPositionWindow.categories_list_layout.addWidget(category_container)
+    WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.addWidget(category_container)

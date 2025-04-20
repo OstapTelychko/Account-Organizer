@@ -1,6 +1,7 @@
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
-from GUI.windows.main_window import MainWindow
+from AppObjects.windows_registry import WindowsRegistry
+
 from languages import LanguageStructure
 from AppManagement.category import load_categories_data
 
@@ -12,9 +13,9 @@ def next_month():
 
     if Session.current_month != 12:
         Session.current_month +=1
-        MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
+        WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
     else:
-        MainWindow.current_month.setText(LanguageStructure.Months.get_translation(1))
+        WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(1))
         Session.current_month = 1
     load_categories_data()
     logger.info(f"Next month loaded: {LanguageStructure.Months.get_translation(Session.current_month)}")
@@ -25,9 +26,9 @@ def previous_month():
 
     Session.current_month -= 1
     if Session.current_month != 0:
-        MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
+        WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
     else:
-        MainWindow.current_month.setText(LanguageStructure.Months.get_translation(12))
+        WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(12))
         Session.current_month = 12
     load_categories_data()
     logger.info(f"Previous month loaded: {LanguageStructure.Months.get_translation(Session.current_month)}")
@@ -37,7 +38,7 @@ def next_year():
     """Load next year. If current year is 2023, load 2024."""
 
     Session.current_year += 1
-    MainWindow.current_year.setText(str(Session.current_year))
+    WindowsRegistry.MainWindow.current_year.setText(str(Session.current_year))
     load_categories_data()
     logger.info(f"Next year loaded: {Session.current_year}")
 
@@ -46,6 +47,6 @@ def previous_year():
     """Load previous year. If current year is 2024, load 2023."""
     
     Session.current_year -= 1
-    MainWindow.current_year.setText(str(Session.current_year))
+    WindowsRegistry.MainWindow.current_year.setText(str(Session.current_year))
     load_categories_data()
     logger.info(f"Previous year loaded: {Session.current_year}")

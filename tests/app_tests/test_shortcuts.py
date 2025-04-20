@@ -4,15 +4,8 @@ from PySide6.QtCore import Qt, QTimer
 
 from tests.tests_toolkit import DBTestCase, qsleep
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.category import reset_focused_category, activate_categories
-
-from GUI.windows.main_window import MainWindow
-from GUI.windows.category import AddCategoryWindow
-from GUI.windows.account import SwitchAccountWindow
-from GUI.windows.settings import SettingsWindow
-from GUI.windows.statistics import StatisticsWindow
-from GUI.windows.transaction import TransactionManagementWindow
-from GUI.windows.messages import Messages
 from GUI.category import load_category
 
 
@@ -28,13 +21,13 @@ class TestShortcuts(DBTestCase):
 
         def _check_closure():
             QTest.keySequence(
-                AddCategoryWindow.window,
+                WindowsRegistry.AddCategoryWindow,
                 QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.CLOSE_CURRENT_WINDOW]))
             qsleep(200)
-            self.assertFalse(AddCategoryWindow.window.isVisible(), f"Add category window should be closed after {Session.config.shortcuts[Session.config.ShortcutId.CLOSE_CURRENT_WINDOW]} shortcut.")
+            self.assertFalse(WindowsRegistry.AddCategoryWindow.isVisible(), f"Add category window should be closed after {Session.config.shortcuts[Session.config.ShortcutId.CLOSE_CURRENT_WINDOW]} shortcut.")
 
         QTimer.singleShot(200, _check_closure)
-        MainWindow.add_incomes_category.click()
+        WindowsRegistry.MainWindow.add_incomes_category.click()
         qsleep(200)
 
     
@@ -42,7 +35,7 @@ class TestShortcuts(DBTestCase):
         """Test opening windows with shortcuts."""
 
         # qsleep(200)#For some reason program needs some time to start working with these shortcuts
-        open_some_window_shortcuts = {Session.config.ShortcutId.OPEN_SETTINGS:SettingsWindow.window, Session.config.ShortcutId.OPEN_STATISTICS:StatisticsWindow.window, Session.config.ShortcutId.SWITCH_ACCOUNT:SwitchAccountWindow.window}
+        open_some_window_shortcuts = {Session.config.ShortcutId.OPEN_SETTINGS:WindowsRegistry.SettingsWindow, Session.config.ShortcutId.OPEN_STATISTICS:WindowsRegistry.StatisticsWindow, Session.config.ShortcutId.SWITCH_ACCOUNT:WindowsRegistry.SwitchAccountWindow}
         for shortcut_id, window in open_some_window_shortcuts.items():
             
             def _check_visibility():
@@ -51,7 +44,7 @@ class TestShortcuts(DBTestCase):
                 
             QTimer.singleShot(200, _check_visibility)
             QTest.keySequence(
-                MainWindow.window,
+                WindowsRegistry.MainWindow,
                 QKeySequence(Session.config.shortcuts[shortcut_id]))
             qsleep(250)
             
@@ -60,11 +53,11 @@ class TestShortcuts(DBTestCase):
         """Test switching to expense tab with shortcut."""        
         
         def _check_switch():
-            self.assertEqual(MainWindow.Incomes_and_expenses.currentIndex(), 1, f"Tab should be switched to expense after {Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut.")
+            self.assertEqual(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(), 1, f"Tab should be switched to expense after {Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut.")
             
         QTimer.singleShot(200, _check_switch)
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_EXPENSE]))
         qsleep(200)
 
@@ -73,11 +66,11 @@ class TestShortcuts(DBTestCase):
         """Test switching to income tab with shortcut."""        
         
         def _check_switch():
-            self.assertEqual(MainWindow.Incomes_and_expenses.currentIndex(), 0, f"Tab should be switched to income after {Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_INCOME]} shortcut.")
+            self.assertEqual(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(), 0, f"Tab should be switched to income after {Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_INCOME]} shortcut.")
             
         QTimer.singleShot(200, _check_switch)
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SWITCH_TO_INCOME]))
         qsleep(200)
 
@@ -88,7 +81,7 @@ class TestShortcuts(DBTestCase):
         expected_previous_month = Session.current_month - 1 if Session.current_month > 1 else 12
 
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.LOAD_PREVIOUS_MONTH]))
         qsleep(100)
 
@@ -103,7 +96,7 @@ class TestShortcuts(DBTestCase):
         expected_next_month = Session.current_month + 1 if Session.current_month < 12 else 1
 
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.LOAD_NEXT_MONTH]))
         qsleep(100)
 
@@ -123,7 +116,7 @@ class TestShortcuts(DBTestCase):
         reset_focused_category()
 
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
         qsleep(100)
 
@@ -144,12 +137,12 @@ class TestShortcuts(DBTestCase):
 
         # Focus on next category first to make sure that focus on previous category works
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
         qsleep(100)
 
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]))
         qsleep(100)
 
@@ -162,16 +155,16 @@ class TestShortcuts(DBTestCase):
         """Test adding transaction to focused category with shortcut."""        
         
         def _add_transaction():
-            TransactionManagementWindow.transaction_day.setText("1")
-            TransactionManagementWindow.transaction_value.setText("1000")
-            TransactionManagementWindow.button.click()
+            WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
+            WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
+            WindowsRegistry.TransactionManagementWindow.button.click()
             qsleep(100)
 
             self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 2, f"Transaction should be added to {self.income_category.name} after {Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut.")
         
         QTimer.singleShot(200, _add_transaction)
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]))
         qsleep(400)
 
@@ -184,20 +177,20 @@ class TestShortcuts(DBTestCase):
         def _add_transaction():
             """Add transaction to be able to test selecting next and previous transaction."""
 
-            TransactionManagementWindow.transaction_day.setText("1")
-            TransactionManagementWindow.transaction_value.setText("1000")
-            TransactionManagementWindow.button.click()
+            WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
+            WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
+            WindowsRegistry.TransactionManagementWindow.button.click()
 
         QTimer.singleShot(200, _add_transaction)
         Session.categories[self.income_category.id].add_transaction.click()
 
         qsleep(200)
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))
         
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))#I have to use shortcut twice since for the first time it selects the first transaction due to the fact that selection by init is not set
         qsleep(100)
 
@@ -207,7 +200,7 @@ class TestShortcuts(DBTestCase):
             f"Next transaction should be selected after {Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]} shortcut not {selected_transaction} transaction.")
         
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_PREVIOUS_TRANSACTION]))
         qsleep(100)
 
@@ -225,20 +218,20 @@ class TestShortcuts(DBTestCase):
         reset_focused_category()     
         
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))
         
         def _perform_deletion():
             """Confirm and check transaction deletion."""
 
-            Messages.delete_transaction_confirmation.ok_button.click()
+            WindowsRegistry.Messages.delete_transaction_confirmation.ok_button.click()
 
             QTimer.singleShot(200,
                 lambda: self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 0, f"Transaction should be deleted after {Session.config.shortcuts[Session.config.ShortcutId.DELETE_TRANSACTION]} shortcut."))
 
         QTimer.singleShot(200, _perform_deletion)
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.DELETE_TRANSACTION]))
         qsleep(400)
     
@@ -249,21 +242,21 @@ class TestShortcuts(DBTestCase):
         reset_focused_category()
 
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.SELECT_NEXT_TRANSACTION]))  
         
         def _perform_edit():
             """Edit transaction and check if it was edited."""
             
-            TransactionManagementWindow.transaction_value.setText("2000")
-            TransactionManagementWindow.button.click()
+            WindowsRegistry.TransactionManagementWindow.transaction_value.setText("2000")
+            WindowsRegistry.TransactionManagementWindow.button.click()
             qsleep(200)
 
             self.assertEqual(Session.db.transaction_query.get_all_transactions(self.income_category.id)[0].value, 2000, f"Transaction should be edited after {Session.config.shortcuts[Session.config.ShortcutId.EDIT_TRANSACTION]} shortcut.")
 
         QTimer.singleShot(200, _perform_edit)
         QTest.keySequence(
-            MainWindow.window,
+            WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.EDIT_TRANSACTION]))
         qsleep(200)
             

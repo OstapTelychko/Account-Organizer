@@ -9,89 +9,90 @@ from DesktopQtToolkit.create_button import create_button
 from project_configuration import QCALENDAR_DATE_FORMAT
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
-from GUI.windows.main_window import MainWindow
 
 if TYPE_CHECKING:
+    from PySide6.QtCore import QEvent
     from AppObjects.category import Category
+    from GUI.windows.main_window import MainWindow
 
 
-
-class StatisticsWindow():
+class StatisticsWindow(SubWindow):
     """Represents Statistics window structure."""
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    monthly_statistics = create_button("Monthly", (150,40))
-    quarterly_statistics = create_button("Quarterly", (150,40))
-    yearly_statistics = create_button("Yearly", (150,40))
+        self.monthly_statistics = create_button("Monthly", (150,40))
+        self.quarterly_statistics = create_button("Quarterly", (150,40))
+        self.yearly_statistics = create_button("Yearly", (150,40))
 
-    statistics_wrapper_layout = QVBoxLayout()
-    statistics_wrapper_layout.setSpacing(40)
-    statistics_wrapper_layout.addWidget(monthly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    statistics_wrapper_layout.addWidget(quarterly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    statistics_wrapper_layout.addWidget(yearly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    statistics_wrapper_layout.setContentsMargins(30, 30, 30, 30)
-    
-    statistics_wrapper = QWidget()
-    statistics_wrapper.setLayout(statistics_wrapper_layout)
-    statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-    statistics_wrapper.setProperty("class", "wrapper")
+        self.statistics_wrapper_layout = QVBoxLayout()
+        self.statistics_wrapper_layout.setSpacing(40)
+        self.statistics_wrapper_layout.addWidget(self.monthly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.statistics_wrapper_layout.addWidget(self.quarterly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.statistics_wrapper_layout.addWidget(self.yearly_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.statistics_wrapper_layout.setContentsMargins(30, 30, 30, 30)
+        
+        self.statistics_wrapper = QWidget()
+        self.statistics_wrapper.setLayout(self.statistics_wrapper_layout)
+        self.statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.statistics_wrapper.setProperty("class", "wrapper")
 
-    custom_range_statistics = create_button("Custom date range", (180, 40))
+        self.custom_range_statistics = create_button("Custom date range", (180, 40))
 
-    custom_statistics_wrapper_layout = QVBoxLayout()
-    custom_statistics_wrapper_layout.addWidget(custom_range_statistics, alignment=ALIGN_V_CENTER | ALIGN_H_CENTER)
-    custom_statistics_wrapper_layout.setContentsMargins(17, 30, 17, 30)
+        self.custom_statistics_wrapper_layout = QVBoxLayout()
+        self.custom_statistics_wrapper_layout.addWidget(self.custom_range_statistics, alignment=ALIGN_V_CENTER | ALIGN_H_CENTER)
+        self.custom_statistics_wrapper_layout.setContentsMargins(17, 30, 17, 30)
 
-    custom_statistics_wrapper = QWidget()
-    custom_statistics_wrapper.setLayout(custom_statistics_wrapper_layout)
-    custom_statistics_wrapper.setProperty("class", "wrapper")
-    custom_statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.custom_statistics_wrapper = QWidget()
+        self.custom_statistics_wrapper.setLayout(self.custom_statistics_wrapper_layout)
+        self.custom_statistics_wrapper.setProperty("class", "wrapper")
+        self.custom_statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
-    main_layout = QVBoxLayout()
-    main_layout.setSpacing(20)
-    main_layout.addStretch(1)
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(statistics_wrapper, alignment=ALIGNMENT.AlignRight)
-    main_layout.addWidget(custom_statistics_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    main_layout.addStretch(1)
-    main_layout.setContentsMargins(50, 10, 50, 20)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(20)
+        self.main_layout.addStretch(1)
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.statistics_wrapper, alignment=ALIGNMENT.AlignRight)
+        self.main_layout.addWidget(self.custom_statistics_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.main_layout.addStretch(1)
+        self.main_layout.setContentsMargins(50, 10, 50, 20)
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)
 
 
-
-class MonthlyStatistics():
+class MonthlyStatistic(SubWindow):
     """Represents Monthly statistics window structure."""
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-    window.setStyleSheet(""" 
-    QListWidget::item:hover,
-    QListWidget::item:disabled:hover,
-    QListWidget::item:hover:!active,
-    QListWidget::item:focus
-    {background: transparent}""")#Disable background color change on mouseover
-    
-    statistics = QListWidget()
-    statistics.setMinimumWidth(500)
-    statistics.setMinimumHeight(450)
-    statistics.setFont(BASIC_FONT)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    copy_statistics = create_button("Copy month statistics", (275,40))
-    copy_statistics_layout = QHBoxLayout()
-    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
+        self.setStyleSheet(""" 
+        QListWidget::item:hover,
+        QListWidget::item:disabled:hover,
+        QListWidget::item:hover:!active,
+        QListWidget::item:focus
+        {background: transparent}""")#Disable background color change on mouseover
+        
+        self.statistics = QListWidget()
+        self.statistics.setMinimumWidth(500)
+        self.statistics.setMinimumHeight(450)
+        self.statistics.setFont(BASIC_FONT)
 
-    main_layout = QVBoxLayout()
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(statistics)
-    main_layout.addLayout(copy_statistics_layout)
-    main_layout.setContentsMargins(50, 10, 50, 20)
+        self.copy_statistics = create_button("Copy month statistics", (275,40))
+        self.copy_statistics_layout = QHBoxLayout()
+        self.copy_statistics_layout.addWidget(self.copy_statistics,alignment=ALIGNMENT.AlignCenter)
 
-    window.window_container.setLayout(main_layout)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.statistics)
+        self.main_layout.addLayout(self.copy_statistics_layout)
+        self.main_layout.setContentsMargins(50, 10, 50, 20)
+
+        self.window_container.setLayout(self.main_layout)
 
 
-
-class QuarterlyStatistics():
+class QuarterlyStatistics(SubWindow):
     """Represents Quarterly statistics window structure.
 
         Warning
@@ -103,98 +104,99 @@ class QuarterlyStatistics():
         `StatisticsView` - is a NamedTuple that contains all quarters statistics.
     """
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-    window.setStyleSheet(""" 
-    QListWidget::item:hover,
-    QListWidget::item:disabled:hover,
-    QListWidget::item:hover:!active,
-    QListWidget::item:focus
-    {background: transparent}""")#Disable background color change on hover
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    statistics_layout = QVBoxLayout()
-    statistics_window = QWidget()
+        self.setStyleSheet(""" 
+        QListWidget::item:hover,
+        QListWidget::item:disabled:hover,
+        QListWidget::item:hover:!active,
+        QListWidget::item:focus
+        {background: transparent}""")#Disable background color change on hover
 
-    TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", QListWidget)])
-    MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
-    QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[MonthlyStatisticsView])])
-    StatisticsView = NamedTuple("StatisticsView", [("quarters", list[QuarterStatisticsView])])
+        self.statistics_layout = QVBoxLayout()
+        self.statistics_window = QWidget()
 
-    quarters_statistics_list = []
-    for quarter in range(1,5):
+        TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", QListWidget)])
+        MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+        QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[MonthlyStatisticsView])])
+        StatisticsView = NamedTuple("StatisticsView", [("quarters", list[QuarterStatisticsView])])
 
-        quarter_label = QLabel()
-        quarter_label.setFont(BASIC_FONT)
-        quarter_label.setContentsMargins(0,50,0,0)
-        statistics_layout.addWidget(quarter_label,alignment=ALIGNMENT.AlignBottom)
+        self.quarters_statistics_list = []
+        for quarter in range(1,5):
 
-        quarter_window = QWidget()
-        quarter_layout = QHBoxLayout()
-        quarter_layout.setSpacing(30)
+            quarter_label = QLabel()
+            quarter_label.setFont(BASIC_FONT)
+            quarter_label.setContentsMargins(0,50,0,0)
+            self.statistics_layout.addWidget(quarter_label,alignment=ALIGNMENT.AlignBottom)
 
-
-        quarter_months_statistics_list:list[MonthlyStatisticsView] = []
-        for statistic_list in range(4):              
-            statistic_label = QLabel()
-            statistic_label.setFont(BASIC_FONT)
-            statistic_label_layout = QHBoxLayout()
-            statistic_label_layout.addWidget(statistic_label, alignment=ALIGN_H_CENTER)
-
-            statistic_data = QListWidget()
-            statistic_data.setFont(BASIC_FONT)
-            statistic_data.setWordWrap(True)
-            statistic_data.setMinimumHeight(250)
-            statistic_data.setMinimumWidth(500)
-
-            statistic_layout = QVBoxLayout()
-            statistic_layout.addLayout(statistic_label_layout)
-            statistic_layout.addWidget(statistic_data, alignment=ALIGN_V_CENTER)
-
-            quarter_layout.addLayout(statistic_layout)
-
-            if statistic_list == 0:
-                total_quarter_statistics = TotalQuarterStatisticsView(statistic_label, statistic_data)
-            else:
-                quarter_statistics_part = MonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
-                quarter_months_statistics_list.append(quarter_statistics_part)
-        
-        quarter_statistics = QuarterStatisticsView(quarter, quarter_label, total_quarter_statistics, quarter_months_statistics_list)
-        quarters_statistics_list.append(quarter_statistics)
-
-        quarter_window.setLayout(quarter_layout)
-
-        quarter_scroll = QScrollArea()
-        quarter_scroll.setWidget(quarter_window)
-        quarter_scroll.setWidgetResizable(True)
-        quarter_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        quarter_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        quarter_scroll.setMinimumHeight(350)
-        quarter_scroll.setStyleSheet("QScrollArea{border:none}")
-        statistics_layout.addWidget(quarter_scroll)
-
-    statistics = StatisticsView(quarters_statistics_list)
-
-    copy_statistics = create_button("Copy quarterly statistics",(300,40))
-    copy_statistics_layout = QHBoxLayout()
-    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
-    statistics_layout.addLayout(copy_statistics_layout)
-
-    statistics_window.setLayout(statistics_layout)
-    window_scroll = QScrollArea()
-    window_scroll.setWidget(statistics_window)
-    window_scroll.setWidgetResizable(True)
-    window_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    window_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-    window_scroll.setStyleSheet("QScrollArea{border:none}")
-
-    main_layout = QVBoxLayout()
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(window_scroll)
-
-    window.window_container.setLayout(main_layout)
+            self.quarter_window = QWidget()
+            quarter_layout = QHBoxLayout()
+            quarter_layout.setSpacing(30)
 
 
+            quarter_months_statistics_list:list[MonthlyStatisticsView] = []
+            for statistic_list in range(4):              
+                statistic_label = QLabel()
+                statistic_label.setFont(BASIC_FONT)
+                statistic_label_layout = QHBoxLayout()
+                statistic_label_layout.addWidget(statistic_label, alignment=ALIGN_H_CENTER)
 
-class YearlyStatistics():
+                statistic_data = QListWidget()
+                statistic_data.setFont(BASIC_FONT)
+                statistic_data.setWordWrap(True)
+                statistic_data.setMinimumHeight(250)
+                statistic_data.setMinimumWidth(500)
+
+                statistic_layout = QVBoxLayout()
+                statistic_layout.addLayout(statistic_label_layout)
+                statistic_layout.addWidget(statistic_data, alignment=ALIGN_V_CENTER)
+
+                quarter_layout.addLayout(statistic_layout)
+
+                if statistic_list == 0:
+                    total_quarter_statistics = TotalQuarterStatisticsView(statistic_label, statistic_data)
+                else:
+                    quarter_statistics_part = MonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
+                    quarter_months_statistics_list.append(quarter_statistics_part)
+            
+            quarter_statistics = QuarterStatisticsView(quarter, quarter_label, total_quarter_statistics, quarter_months_statistics_list)
+            self.quarters_statistics_list.append(quarter_statistics)
+
+            self.quarter_window.setLayout(quarter_layout)
+
+            self.quarter_scroll = QScrollArea()
+            self.quarter_scroll.setWidget(self.quarter_window)
+            self.quarter_scroll.setWidgetResizable(True)
+            self.quarter_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            self.quarter_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+            self.quarter_scroll.setMinimumHeight(350)
+            self.quarter_scroll.setStyleSheet("QScrollArea{border:none}")
+            self.statistics_layout.addWidget(self.quarter_scroll)
+
+        self.statistics = StatisticsView(self.quarters_statistics_list)
+
+        self.copy_statistics = create_button("Copy quarterly statistics",(300,40))
+        self.copy_statistics_layout = QHBoxLayout()
+        self.copy_statistics_layout.addWidget(self.copy_statistics,alignment=ALIGNMENT.AlignCenter)
+        self.statistics_layout.addLayout(self.copy_statistics_layout)
+
+        self.statistics_window.setLayout(self.statistics_layout)
+        self.window_scroll = QScrollArea()
+        self.window_scroll.setWidget(self.statistics_window)
+        self.window_scroll.setWidgetResizable(True)
+        self.window_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.window_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.window_scroll.setStyleSheet("QScrollArea{border:none}")
+
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.window_scroll)
+
+        self.window_container.setLayout(self.main_layout)
+
+
+class YearlyStatistics(SubWindow):
     """Represents Yearly statistics window structure.
 
         Warning
@@ -205,74 +207,74 @@ class YearlyStatistics():
         `StatisticsView` - is a NamedTuple that contains the total year statistics and monthly statistics.\n
     """
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-    window.setStyleSheet(""" 
-    QListWidget::item:hover,
-    QListWidget::item:disabled:hover,
-    QListWidget::item:hover:!active,
-    QListWidget::item:focus
-    {background: transparent}""")#Disable background color change on mouseover
-    
-    TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", QListWidget)])
-    MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
-    StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[MonthlyStatisticsView])])
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    statistics_window = QWidget()
-    statistics_window_layout = QVBoxLayout()
+        self.setStyleSheet(""" 
+        QListWidget::item:hover,
+        QListWidget::item:disabled:hover,
+        QListWidget::item:hover:!active,
+        QListWidget::item:focus
+        {background: transparent}""")#Disable background color change on mouseover
+        
+        TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", QListWidget)])
+        MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+        StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[MonthlyStatisticsView])])
 
-    yearly_statistics_parts_list:list[MonthlyStatisticsView] = []
-    for statistics_list in range(13):
-        statistics_label = QLabel()
-        statistics_label.setFont(BASIC_FONT)
-        statistics_label.setContentsMargins(0,50,0,0)
-        statistics_label_layout = QHBoxLayout()
-        statistics_label_layout.addWidget(statistics_label, alignment=ALIGN_H_CENTER)
+        self.statistics_window = QWidget()
+        self.statistics_window_layout = QVBoxLayout()
 
-        statistics_data = QListWidget()
-        statistics_data.setFont(BASIC_FONT)
-        statistics_data.setMinimumHeight(400)
-        statistics_data.setMinimumWidth(500)
-        statistics_data.setWordWrap(True)
+        self.yearly_statistics_parts_list:list[MonthlyStatisticsView] = []
+        for statistics_list in range(13):
+            statistics_label = QLabel()
+            statistics_label.setFont(BASIC_FONT)
+            statistics_label.setContentsMargins(0,50,0,0)
+            statistics_label_layout = QHBoxLayout()
+            statistics_label_layout.addWidget(statistics_label, alignment=ALIGN_H_CENTER)
 
-        statistics_layout = QVBoxLayout()
-        statistics_layout.addLayout(statistics_label_layout)
-        statistics_layout.addWidget(statistics_data)
+            statistics_data = QListWidget()
+            statistics_data.setFont(BASIC_FONT)
+            statistics_data.setMinimumHeight(400)
+            statistics_data.setMinimumWidth(500)
+            statistics_data.setWordWrap(True)
 
-        statistics_window_layout.addLayout(statistics_layout)
+            statistics_layout = QVBoxLayout()
+            statistics_layout.addLayout(statistics_label_layout)
+            statistics_layout.addWidget(statistics_data)
 
-        if statistics_list == 0:
-            total_year_statistics = TotalYearStatisticsView(statistics_label, statistics_data)
-        else:
-            yearly_statistics_part = MonthlyStatisticsView(statistics_list, statistics_label, statistics_data)
-            yearly_statistics_parts_list.append(yearly_statistics_part)
+            self.statistics_window_layout.addLayout(statistics_layout)
 
-    statistics = StatisticsView(total_year_statistics, yearly_statistics_parts_list)
+            if statistics_list == 0:
+                total_year_statistics = TotalYearStatisticsView(statistics_label, statistics_data)
+            else:
+                yearly_statistics_part = MonthlyStatisticsView(statistics_list, statistics_label, statistics_data)
+                self.yearly_statistics_parts_list.append(yearly_statistics_part)
 
-    
-    copy_statistics = create_button("Copy yearly statistics", (275,40))
-    copy_statistics_layout = QHBoxLayout()
-    copy_statistics_layout.addWidget(copy_statistics,alignment=ALIGNMENT.AlignCenter)
+        self.statistics = StatisticsView(total_year_statistics, self.yearly_statistics_parts_list)
+        
+        self.copy_statistics = create_button("Copy yearly statistics", (275,40))
+        self.copy_statistics_layout = QHBoxLayout()
+        self.copy_statistics_layout.addWidget(self.copy_statistics,alignment=ALIGNMENT.AlignCenter)
 
-    statistics_window_layout.addLayout(copy_statistics_layout)
-    statistics_window.setLayout(statistics_window_layout)
+        self.statistics_window_layout.addLayout(self.copy_statistics_layout)
+        self.statistics_window.setLayout(self.statistics_window_layout)
 
-    statistics_scroll = QScrollArea()
-    statistics_scroll.setWidget(statistics_window)
-    statistics_scroll.setWidgetResizable(True)
-    statistics_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-    statistics_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    statistics_scroll.setStyleSheet("QScrollArea{border:none}")
+        self.statistics_scroll = QScrollArea()
+        self.statistics_scroll.setWidget(self.statistics_window)
+        self.statistics_scroll.setWidgetResizable(True)
+        self.statistics_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.statistics_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.statistics_scroll.setStyleSheet("QScrollArea{border:none}")
 
-    main_layout = QVBoxLayout()
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(statistics_scroll)
-    main_layout.setContentsMargins(30, 10, 30, 20)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.statistics_scroll)
+        self.main_layout.setContentsMargins(30, 10, 30, 20)
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)
 
 
-
-class CustomRangeStatistics():
+class CustomRangeStatistics(SubWindow):
     """Represents Custom range statistics window structure.
 
         Warning
@@ -281,154 +283,162 @@ class CustomRangeStatistics():
         `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
     """
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+        super().__init__(main_window, sub_windows)
 
-    selected_categories_data:dict[int, tuple[Category, str]] = {}
+        self.selected_categories_data:dict[int, tuple[Category, str]] = {}
 
-    selected_categories_list = QListWidget()
-    selected_categories_list.setFont(BASIC_FONT)
-    selected_categories_list.setMinimumWidth(400)
-    selected_categories_list.setMinimumHeight(225)
-    selected_categories_list.setGraphicsEffect(QGraphicsDropShadowEffect(selected_categories_list, **SHADOW_EFFECT_ARGUMENTS))
-    selected_categories_list.setWordWrap(True)
+        self.selected_categories_list = QListWidget()
+        self.selected_categories_list.setFont(BASIC_FONT)
+        self.selected_categories_list.setMinimumWidth(400)
+        self.selected_categories_list.setMinimumHeight(225)
+        self.selected_categories_list.setGraphicsEffect(QGraphicsDropShadowEffect(self.selected_categories_list, **SHADOW_EFFECT_ARGUMENTS))
+        self.selected_categories_list.setWordWrap(True)
 
-    add_all_incomes_categories = create_button("Add all", (150, 40))
-    remove_all_incomes_categories = create_button("Remove all", (150, 40))
+        self.add_all_incomes_categories = create_button("Add all", (150, 40))
+        self.remove_all_incomes_categories = create_button("Remove all", (150, 40))
 
-    incomes_buttons_layout = QHBoxLayout()
-    incomes_buttons_layout.addWidget(add_all_incomes_categories, alignment=ALIGN_H_CENTER)
-    incomes_buttons_layout.addWidget(remove_all_incomes_categories, alignment=ALIGN_H_CENTER)
+        self.incomes_buttons_layout = QHBoxLayout()
+        self.incomes_buttons_layout.addWidget(self.add_all_incomes_categories, alignment=ALIGN_H_CENTER)
+        self.incomes_buttons_layout.addWidget(self.remove_all_incomes_categories, alignment=ALIGN_H_CENTER)
 
-    incomes_categories_list_layout = QVBoxLayout()
-    incomes_categories_list_layout.setSpacing(20)
-    incomes_categories_list_layout.setContentsMargins(10, 10, 20, 10)
+        self.incomes_categories_list_layout = QVBoxLayout()
+        self.incomes_categories_list_layout.setSpacing(20)
+        self.incomes_categories_list_layout.setContentsMargins(10, 10, 20, 10)
 
-    incomes_categories_layout = QVBoxLayout()
-    incomes_categories_layout.addLayout(incomes_buttons_layout)
-    incomes_categories_layout.addLayout(incomes_categories_list_layout)
+        self.incomes_categories_layout = QVBoxLayout()
+        self.incomes_categories_layout.addLayout(self.incomes_buttons_layout)
+        self.incomes_categories_layout.addLayout(self.incomes_categories_list_layout)
 
-    incomes_categories_list_window = QWidget()
-    incomes_categories_list_window.setLayout(incomes_categories_layout)
+        self.incomes_categories_list_window = QWidget()
+        self.incomes_categories_list_window.setLayout(self.incomes_categories_layout)
 
-    incomes_categories_list_scroll = QScrollArea()
-    incomes_categories_list_scroll.setWidget(incomes_categories_list_window)
-    incomes_categories_list_scroll.setWidgetResizable(True)
-    incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    incomes_categories_list_scroll.setMinimumHeight(350)
-    incomes_categories_list_scroll.setMaximumHeight(350)
-    incomes_categories_list_scroll.setMinimumWidth(430)
-    incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
-    incomes_categories_list_scroll.setProperty("class", "wrapper")
-    incomes_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+        self.incomes_categories_list_scroll = QScrollArea()
+        self.incomes_categories_list_scroll.setWidget(self.incomes_categories_list_window)
+        self.incomes_categories_list_scroll.setWidgetResizable(True)
+        self.incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.incomes_categories_list_scroll.setMinimumHeight(350)
+        self.incomes_categories_list_scroll.setMaximumHeight(350)
+        self.incomes_categories_list_scroll.setMinimumWidth(430)
+        self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
+        self.incomes_categories_list_scroll.setProperty("class", "wrapper")
+        self.incomes_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
 
-    add_all_expenses_categories = create_button("Add all", (150, 40))
-    remove_all_expenses_categories = create_button("Remove all", (150, 40))
+        self.add_all_expenses_categories = create_button("Add all", (150, 40))
+        self.remove_all_expenses_categories = create_button("Remove all", (150, 40))
 
-    expenses_buttons_layout = QHBoxLayout()
-    expenses_buttons_layout.addWidget(add_all_expenses_categories, alignment=ALIGN_H_CENTER)
-    expenses_buttons_layout.addWidget(remove_all_expenses_categories, alignment=ALIGN_H_CENTER)
+        self.expenses_buttons_layout = QHBoxLayout()
+        self.expenses_buttons_layout.addWidget(self.add_all_expenses_categories, alignment=ALIGN_H_CENTER)
+        self.expenses_buttons_layout.addWidget(self.remove_all_expenses_categories, alignment=ALIGN_H_CENTER)
 
-    expenses_categories_list_layout = QVBoxLayout()
-    expenses_categories_list_layout.setSpacing(20)
-    expenses_categories_list_layout.setContentsMargins(10, 10, 20, 10)
+        self.expenses_categories_list_layout = QVBoxLayout()
+        self.expenses_categories_list_layout.setSpacing(20)
+        self.expenses_categories_list_layout.setContentsMargins(10, 10, 20, 10)
 
-    expenses_categories_layout = QVBoxLayout()
-    expenses_categories_layout.addLayout(expenses_buttons_layout)
-    expenses_categories_layout.addLayout(expenses_categories_list_layout)
+        self.expenses_categories_layout = QVBoxLayout()
+        self.expenses_categories_layout.addLayout(self.expenses_buttons_layout)
+        self.expenses_categories_layout.addLayout(self.expenses_categories_list_layout)
 
-    expenses_categories_list_window = QWidget()
-    expenses_categories_list_window.setLayout(expenses_categories_layout)
-    
-    expenses_categories_list_scroll = QScrollArea()
-    expenses_categories_list_scroll.setWidget(expenses_categories_list_window)
-    expenses_categories_list_scroll.setWidgetResizable(True)
-    expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    expenses_categories_list_scroll.setMinimumHeight(350)
-    expenses_categories_list_scroll.setMaximumHeight(350)
-    expenses_categories_list_scroll.setMinimumWidth(430)
-    expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
-    expenses_categories_list_scroll.setProperty("class", "wrapper")
-    expenses_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+        self.expenses_categories_list_window = QWidget()
+        self.expenses_categories_list_window.setLayout(self.expenses_categories_layout)
+        
+        self.expenses_categories_list_scroll = QScrollArea()
+        self.expenses_categories_list_scroll.setWidget(self.expenses_categories_list_window)
+        self.expenses_categories_list_scroll.setWidgetResizable(True)
+        self.expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.expenses_categories_list_scroll.setMinimumHeight(350)
+        self.expenses_categories_list_scroll.setMaximumHeight(350)
+        self.expenses_categories_list_scroll.setMinimumWidth(430)
+        self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
+        self.expenses_categories_list_scroll.setProperty("class", "wrapper")
+        self.expenses_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
 
-    categoriels_lists_layout = QHBoxLayout()
-    categoriels_lists_layout.addWidget(incomes_categories_list_scroll)
-    categoriels_lists_layout.addWidget(expenses_categories_list_scroll)
+        self.categoriels_lists_layout = QHBoxLayout()
+        self.categoriels_lists_layout.addWidget(self.incomes_categories_list_scroll)
+        self.categoriels_lists_layout.addWidget(self.expenses_categories_list_scroll)
 
-    from_date = QDateEdit()
-    from_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
-    from_date.setCalendarPopup(True)
-    from_date.setDate(QDate.currentDate())
+        self.from_date = QDateEdit()
+        self.from_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
+        self.from_date.setCalendarPopup(True)
+        self.from_date.setDate(QDate.currentDate())
 
-    to_date = QDateEdit()
-    to_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
-    to_date.setCalendarPopup(True)
-    to_date.setDate(QDate.currentDate())
+        self.to_date = QDateEdit()
+        self.to_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
+        self.to_date.setCalendarPopup(True)
+        self.to_date.setDate(QDate.currentDate())
 
-    date_inputs_layout = QHBoxLayout()
-    date_inputs_layout.setSpacing(20)
-    date_inputs_layout.addStretch(1)
-    date_inputs_layout.addWidget(from_date, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    date_inputs_layout.addWidget(to_date, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    date_inputs_layout.addStretch(1)
-    
-    show_statistics = create_button("Statistics", (150, 40))
-    show_statistics.setDefault(True)
+        self.date_inputs_layout = QHBoxLayout()
+        self.date_inputs_layout.setSpacing(20)
+        self.date_inputs_layout.addStretch(1)
+        self.date_inputs_layout.addWidget(self.from_date, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.date_inputs_layout.addWidget(self.to_date, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.date_inputs_layout.addStretch(1)
+        
+        self.show_statistics = create_button("Statistics", (150, 40))
+        self.show_statistics.setDefault(True)
 
-    main_layout = QVBoxLayout()
-    main_layout.setSpacing(30)
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addWidget(selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    main_layout.addLayout(categoriels_lists_layout)
-    main_layout.addLayout(date_inputs_layout)
-    main_layout.addWidget(show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-    main_layout.setContentsMargins(30, 10, 30, 20)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(30)
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.main_layout.addLayout(self.categoriels_lists_layout)
+        self.main_layout.addLayout(self.date_inputs_layout)
+        self.main_layout.addWidget(self.show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.main_layout.setContentsMargins(30, 10, 30, 20)
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)
 
 
 
-class CustomRangeStatisticsView:
+class CustomRangeStatisticsView(SubWindow):
     """Represents Custom range statistics view structure."""
 
-    window = SubWindow(MainWindow.window, MainWindow.sub_windows)
-    window.closeEvent = lambda event: (event.accept(), CustomRangeStatistics.window.raise_()) #type: ignore[method-assign, assignment, func-returns-value]  #This will be solved in the future when class will be written properly
+    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow], parent_window:CustomRangeStatistics):
+        super().__init__(main_window, sub_windows)
 
-    statistics_list = QListWidget()
-    statistics_list.setFont(BASIC_FONT)
-    statistics_list.setMinimumWidth(500)
-    statistics_list.setMinimumHeight(350)
-    statistics_list.setGraphicsEffect(QGraphicsDropShadowEffect(statistics_list, **SHADOW_EFFECT_ARGUMENTS))
+        self.parent_window = parent_window
 
-    copy_statistics = create_button("Copy statistics", (200, 40))
+        self.statistics_list = QListWidget()
+        self.statistics_list.setFont(BASIC_FONT)
+        self.statistics_list.setMinimumWidth(500)
+        self.statistics_list.setMinimumHeight(350)
+        self.statistics_list.setGraphicsEffect(QGraphicsDropShadowEffect(self.statistics_list, **SHADOW_EFFECT_ARGUMENTS))
 
-    statistics_layout = QVBoxLayout()
-    statistics_layout.addWidget(statistics_list)
-    statistics_layout.addWidget(copy_statistics, alignment=ALIGN_H_CENTER)
+        self.copy_statistics = create_button("Copy statistics", (200, 40))
 
-    transactions_list = QListWidget()
-    transactions_list.setFont(BASIC_FONT)
-    transactions_list.setMinimumWidth(650)
-    transactions_list.setMinimumHeight(350)
-    transactions_list.setGraphicsEffect(QGraphicsDropShadowEffect(transactions_list, **SHADOW_EFFECT_ARGUMENTS))
+        self.statistics_layout = QVBoxLayout()
+        self.statistics_layout.addWidget(self.statistics_list)
+        self.statistics_layout.addWidget(self.copy_statistics, alignment=ALIGN_H_CENTER)
 
-    copy_transactions = create_button("Copy transactions", (200, 40))
+        self.transactions_list = QListWidget()
+        self.transactions_list.setFont(BASIC_FONT)
+        self.transactions_list.setMinimumWidth(650)
+        self.transactions_list.setMinimumHeight(350)
+        self.transactions_list.setGraphicsEffect(QGraphicsDropShadowEffect(self.transactions_list, **SHADOW_EFFECT_ARGUMENTS))
 
-    transactions_layout = QVBoxLayout()
-    transactions_layout.addWidget(transactions_list)
-    transactions_layout.addWidget(copy_transactions, alignment=ALIGN_H_CENTER)
+        self.copy_transactions = create_button("Copy transactions", (200, 40))
 
-    content_layout = QHBoxLayout()
-    content_layout.setSpacing(20)
-    content_layout.addStretch(1)
-    content_layout.addLayout(statistics_layout)
-    content_layout.addStretch(2)
-    content_layout.addLayout(transactions_layout)
-    content_layout.addStretch(1)
+        self.transactions_layout = QVBoxLayout()
+        self.transactions_layout.addWidget(self.transactions_list)
+        self.transactions_layout.addWidget(self.copy_transactions, alignment=ALIGN_H_CENTER)
 
-    main_layout = QVBoxLayout()
-    main_layout.addLayout(window.window_menu_layout)
-    main_layout.addLayout(content_layout)
-    main_layout.setContentsMargins(30, 10, 30, 20)
+        self.content_layout = QHBoxLayout()
+        self.content_layout.setSpacing(20)
+        self.content_layout.addStretch(1)
+        self.content_layout.addLayout(self.statistics_layout)
+        self.content_layout.addStretch(2)
+        self.content_layout.addLayout(self.transactions_layout)
+        self.content_layout.addStretch(1)
+
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addLayout(self.content_layout)
+        self.main_layout.setContentsMargins(30, 10, 30, 20)
 
 
-    window.window_container.setLayout(main_layout)
+        self.window_container.setLayout(self.main_layout)
+
+    def closeEvent(self, event:QEvent):
+        event.accept()
+        self.parent_window.raise_()
+            

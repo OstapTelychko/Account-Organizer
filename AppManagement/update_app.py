@@ -24,11 +24,8 @@ MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_
 
 from languages import LanguageStructure
 
-from GUI.windows.messages import Messages
-from GUI.windows.update_progress import UpdateProgressWindow
-from GUI.windows.main_window import MainWindow
-
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
 try:
@@ -151,7 +148,7 @@ def download_latest_update() -> bool:
                     logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
 
-        UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(total_size/1024/1024, 2))))
+        WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(total_size/1024/1024, 2))))
         
         download_response = req.get(download_url, stream=True, timeout=15)
         download_response.raise_for_status()
@@ -170,7 +167,7 @@ def download_latest_update() -> bool:
             for chunk in download_response.iter_content(chunk_size=chunk_size):
                 download_size += len(chunk)
                 file.write(chunk)
-                UpdateProgressWindow.download_progress.setValue((download_size/total_size)*100)
+                WindowsRegistry.UpdateProgressWindow.download_progress.setValue((download_size/total_size)*100)
         logger.info("Update saved on disk")
 
         with ZipFile(f"{UPDATE_DIRECTORY}/{asset['name']}", "r") as zip_ref:
@@ -184,8 +181,8 @@ def download_latest_update() -> bool:
     
     except (req.exceptions.ConnectionError, req.exceptions.Timeout):
         logger.error("Internet connection was lost during download.")
-        Messages.no_internet.exec()
-        UpdateProgressWindow.window.done(1)
+        WindowsRegistry.Messages.no_internet.exec()
+        WindowsRegistry.UpdateProgressWindow.done(1)
         return False
     
     except Exception as e:
@@ -234,7 +231,7 @@ def prepare_update():
     with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as file:
         update_version = file.read()
 
-    UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(Session.backups))
+    WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(Session.backups))
     upgraded_backups = 0
 
     logger.info("Creating and migrating backups")
@@ -273,7 +270,7 @@ def prepare_update():
         futures = {executor.submit(_migrate_single_backup, backup_path): backup_path for backup_path in updated_backups_paths}
         for future in futures:
             future.result()
-            UpdateProgressWindow.backups_upgrade_progress.setValue(upgraded_backups)
+            WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setValue(upgraded_backups)
     logger.info("Backups created and migrated")
     
     logger.info("Move legacy backups to update directory")
@@ -299,13 +296,13 @@ def apply_update():
         shutil.move(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
         logger.debug("Move new _internal directory to root directory")
         shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), os.path.join(ROOT_DIRECTORY, "dist", "main"))
-        UpdateProgressWindow.apply_update_progress.setValue(1)
+        WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(1)
 
         logger.debug("Deleting backups directory")
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME))
         logger.debug("Move update backups directory to root directory")
         shutil.move(os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(ROOT_DIRECTORY, "dist", "main"))
-        UpdateProgressWindow.apply_update_progress.setValue(2)
+        WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(2)
 
         logger.debug("Move main file to root directory")
         if platform == "win32":
@@ -314,20 +311,20 @@ def apply_update():
         else:
             shutil.move(os.path.join(ROOT_DIRECTORY, "dist", "main", "main"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "main"))
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "dist", "main", "main"))
-        UpdateProgressWindow.apply_update_progress.setValue(3)
+        WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(3)
 
     else:
         logger.debug("Move old _internal directory to previous version copy directory")
         shutil.move(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
         logger.debug("Move new _internal directory to root directory")
         shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), ROOT_DIRECTORY)
-        UpdateProgressWindow.apply_update_progress.setValue(1)
+        WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(1)
 
         logger.debug("Deleting backups directory")
         shutil.rmtree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME))
         logger.debug("Move update backups directory to root directory")
         shutil.move(os.path.join(UPDATE_DIRECTORY, BACKUPS_DIRECTORY_NAME), ROOT_DIRECTORY)
-        UpdateProgressWindow.apply_update_progress.setValue(2)
+        WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(2)
 
         logger.debug("Move main file to root directory")
         if platform == "win32":
@@ -336,18 +333,18 @@ def apply_update():
         else:
             shutil.move(os.path.join(ROOT_DIRECTORY, "main"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "main"))
             shutil.move(os.path.join(UPDATE_DIRECTORY, "main"), os.path.join(ROOT_DIRECTORY, "main"))
-        UpdateProgressWindow.apply_update_progress.setValue(3)
+        WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(3)
     
     logger.debug("Deleting update directory")
     shutil.rmtree(UPDATE_DIRECTORY)
 
-    UpdateProgressWindow.apply_update_progress.setValue(4)
-    UpdateProgressWindow.window.done(0)
-    MainWindow.window.raise_()
-    MainWindow.window.activateWindow()
+    WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(4)
+    WindowsRegistry.UpdateProgressWindow.done(0)
+    WindowsRegistry.MainWindow.raise_()
+    WindowsRegistry.MainWindow.activateWindow()
     logger.info("Update applied")
 
-    Messages.update_finished.exec()
+    WindowsRegistry.Messages.update_finished.exec()
     Session.restart_app()
 
 
@@ -365,8 +362,8 @@ def check_for_updates():
             return
         
         logger.info(f"Latest version: {latest_version} | Current version: {Session.app_version}")
-        Messages.update_available.exec()
-        if Messages.update_available.clickedButton() == Messages.update_available.ok_button:
+        WindowsRegistry.Messages.update_available.exec()
+        if WindowsRegistry.Messages.update_available.clickedButton() == WindowsRegistry.Messages.update_available.ok_button:
             
             def _run_update():
                 logger.info("Running update")
@@ -376,6 +373,6 @@ def check_for_updates():
                     apply_update()
 
             QTimer.singleShot(150, _run_update)
-            UpdateProgressWindow.window.exec()
+            WindowsRegistry.UpdateProgressWindow.exec()
     else:
-        return Messages.failed_update_check.exec()
+        return WindowsRegistry.Messages.failed_update_check.exec()

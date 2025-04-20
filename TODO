@@ -1,9 +1,9 @@
 ☐ update settings window to make it more scalable for further additional settings
 ☐ add shortcut change option to settings window
 ☐ fix all mypy errors @started(25-04-17 19:08)
-☐ migrate gui structure to use a class instances for each window instead of using references to class template @started(25-04-20 16:09)
 
 Archive:
+  ✔ migrate gui structure to use a class instances for each window instead of using references to class template @started(25-04-20 16:09) @done(25-04-20 22:21) @lasted(6h12m52s)
   ✔ split session class into session managers @started(25-04-20 12:37) @done(25-04-20 16:08) @lasted(3h32m)
   ✔ rewrite language usage in project to use LanguageStructure class @started(25-04-17 23:29) @done(25-04-18 21:12) @lasted(21h43m30s)
   ✔ fix empty rows in error log @started(25-04-13 22:39) @done(25-04-16 22:54) @lasted(3d15m8s)

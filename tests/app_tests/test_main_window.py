@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from unittest import TestCase
 from datetime import datetime
 
@@ -6,15 +8,14 @@ from PySide6.QtCore import QTimer
 from languages import LanguageStructure
 from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
 from tests.tests_toolkit import qsleep
 
 from GUI.gui_constants import app
-from GUI.windows.main_window import MainWindow
-from GUI.windows.settings import SettingsWindow
-from GUI.windows.messages import Messages
-from GUI.windows.statistics import StatisticsWindow
-from GUI.windows.category import AddCategoryWindow
 
+if TYPE_CHECKING:
+    from PySide6.QtWidgets import QPushButton
+    from DesktopQtToolkit.sub_window import SubWindow
 
 
 
@@ -24,16 +25,15 @@ class TestMainWindow(TestCase):
     def test_1_windows_opening(self:TestCase):
         """Test opening windows from main window."""
 
-        test_windows_open = {SettingsWindow:MainWindow.settings, StatisticsWindow:MainWindow.statistics, AddCategoryWindow:MainWindow.add_incomes_category}
+        test_windows_open:dict[SubWindow, QPushButton] = {WindowsRegistry.SettingsWindow:WindowsRegistry.MainWindow.settings, WindowsRegistry.StatisticsWindow:WindowsRegistry.MainWindow.statistics, WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category}
 
         for window, open_window_button in test_windows_open.items():
-            window_object = getattr(window, "window")
 
             def _check_window_appearance():
                 """Check if window is visible after clicking button."""
 
-                self.assertTrue(window_object.isVisible(), f"Window {window.__name__} hasn't showed after click on button {open_window_button.text()}")
-                window_object.done(1)
+                self.assertTrue(window.isVisible(), f"Window {window.__class__.__name__} hasn't showed after click on button {open_window_button.text()}")
+                window.done(1)
 
             QTimer.singleShot(100, _check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
             open_window_button.click()
@@ -47,80 +47,80 @@ class TestMainWindow(TestCase):
         current_month = datetime.now().month
         translated_current_month = LanguageStructure.Months.get_translation(current_month)
 
-        current_showed_month = MainWindow.current_month.text()
+        current_showed_month = WindowsRegistry.MainWindow.current_month.text()
         self.assertEqual(translated_current_month, current_showed_month, f"Wrong current month has been showed {current_showed_month} instead of {translated_current_month}")
 
         translated_next_month = LanguageStructure.Months.get_translation(current_month+1) if current_month != 12 else LanguageStructure.Months.get_translation(1)
-        MainWindow.next_month_button.click()
-        current_showed_month = MainWindow.current_month.text()
+        WindowsRegistry.MainWindow.next_month_button.click()
+        current_showed_month = WindowsRegistry.MainWindow.current_month.text()
         self.assertEqual(translated_next_month, current_showed_month, f"Wrong next month has been showed {current_showed_month} instead of {translated_next_month}")
         
         translated_previous_month = LanguageStructure.Months.get_translation(current_month)
-        MainWindow.previous_month_button.click()
-        current_showed_month = MainWindow.current_month.text()
+        WindowsRegistry.MainWindow.previous_month_button.click()
+        current_showed_month = WindowsRegistry.MainWindow.current_month.text()
         self.assertEqual(translated_previous_month, current_showed_month, f"Wrong previous month has been showed {current_showed_month} instead of {translated_previous_month}")
 
         current_year = datetime.now().year
-        current_showed_year = MainWindow.current_year.text()
+        current_showed_year = WindowsRegistry.MainWindow.current_year.text()
         self.assertEqual(str(current_year), current_showed_year, f"Wrong current year has been showed {current_showed_year} instead of {current_year}")
 
-        MainWindow.next_year_button.click()
-        current_showed_year = MainWindow.current_year.text()
+        WindowsRegistry.MainWindow.next_year_button.click()
+        current_showed_year = WindowsRegistry.MainWindow.current_year.text()
         self.assertEqual(str(current_year+1), current_showed_year, f"Wrong next year has been showed {current_showed_year} instead of {current_year+1}")
         
-        MainWindow.previous_year_button.click()
-        current_showed_year = MainWindow.current_year.text()
+        WindowsRegistry.MainWindow.previous_year_button.click()
+        current_showed_year = WindowsRegistry.MainWindow.current_year.text()
         self.assertEqual(str(current_year), current_showed_year, f"Wrong previous year has been showed {current_showed_year} instead of {current_year}")
     
 
     def test_3_mini_calculator(self):
         """Test mini calculator in the application."""
 
-        MainWindow.mini_calculator_text.setText("2*2")
-        MainWindow.calculate.click()
-        result = MainWindow.mini_calculator_text.text()
+        WindowsRegistry.MainWindow.mini_calculator_text.setText("2*2")
+        WindowsRegistry.MainWindow.calculate.click()
+        result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         self.assertEqual("4", result, f"Mini calculator has returned wrong result for expression 2*2 {result} instead of 4")
 
-        MainWindow.mini_calculator_text.setText("100+300+400+500")
-        MainWindow.calculate.click()
-        result = MainWindow.mini_calculator_text.text()
+        WindowsRegistry.MainWindow.mini_calculator_text.setText("100+300+400+500")
+        WindowsRegistry.MainWindow.calculate.click()
+        result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         self.assertEqual("1300", result, f"Mini calculator has returned wrong result for expression 100+300+400+500 {result} instead of 1300")
 
-        MainWindow.mini_calculator_text.setText("1000Money+friends")
-        MainWindow.calculate.click()
-        result = MainWindow.mini_calculator_text.text()
+        WindowsRegistry.MainWindow.mini_calculator_text.setText("1000Money+friends")
+        WindowsRegistry.MainWindow.calculate.click()
+        result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         translated_warning = LanguageStructure.MiniCalculator.get_translation(2)
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for incorrect expression {result} instead of {translated_warning}")
 
-        MainWindow.mini_calculator_text.setText("5/0")
-        MainWindow.calculate.click()
-        result = MainWindow.mini_calculator_text.text()
+        WindowsRegistry.MainWindow.mini_calculator_text.setText("5/0")
+        WindowsRegistry.MainWindow.calculate.click()
+        result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         translated_warning = LanguageStructure.MiniCalculator.get_translation(1)
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for division by zero {result} instead of {translated_warning}")
 
-        MainWindow.mini_calculator_text.setText("")
+        WindowsRegistry.MainWindow.mini_calculator_text.setText("")
         def _check_empty_expression_error():
             """Check if empty expression error is shown."""
 
-            result = MainWindow.mini_calculator_text.text()
+            result = WindowsRegistry.MainWindow.mini_calculator_text.text()
             translated_message = LanguageStructure.Messages.get_translation(12)
-            self.assertTrue(Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
-            Messages.empty_expression.done(1)
+            self.assertTrue(WindowsRegistry.Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
+            WindowsRegistry.Messages.empty_expression.done(1)
 
         QTimer.singleShot(100, _check_empty_expression_error)
-        MainWindow.calculate.click()
+        WindowsRegistry.MainWindow.calculate.click()
 
-        MainWindow.mini_calculator_text.setText("quit()")
+        WindowsRegistry.MainWindow.mini_calculator_text.setText("quit()")
         def _check_forbidden_expression():
             """Check if forbidden expression error is shown."""
 
-            result = MainWindow.mini_calculator_text.text()
+            result = WindowsRegistry.MainWindow.mini_calculator_text.text()
             translated_message = LanguageStructure.Messages.get_translation(13)
-            self.assertTrue(Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
-            Messages.forbidden_calculator_word.done(1)
+            self.assertTrue(WindowsRegistry.Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
+            WindowsRegistry.Messages.forbidden_calculator_word.done(1)
 
         QTimer.singleShot(100, _check_forbidden_expression)
-        MainWindow.calculate.click()
+        WindowsRegistry.MainWindow.calculate.click()
         qsleep(500)
 
 
@@ -135,16 +135,16 @@ class TestMainWindow(TestCase):
         def _open_settings():
             """Change language in the application."""
 
-            SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
+            WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
             expected_translation = LanguageStructure.Settings.get_translation(0)
-            result = SettingsWindow.window.windowTitle()
+            result = WindowsRegistry.SettingsWindow.windowTitle()
 
             self.assertEqual(result, expected_translation, f"Language has't been changed. Expected translation {expected_translation} not {result}")
-            SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(previous_language))
-            SettingsWindow.window.done(1)
+            WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(previous_language))
+            WindowsRegistry.SettingsWindow.done(1)
 
         QTimer.singleShot(100, _open_settings)
-        MainWindow.settings.click()
+        WindowsRegistry.MainWindow.settings.click()
         qsleep(500)
     
 
@@ -156,17 +156,17 @@ class TestMainWindow(TestCase):
 
             current_theme = Session.config.theme
             current_style_sheet = app.styleSheet()
-            current_theme_icon = SettingsWindow.switch_themes_button.icon()
+            current_theme_icon = WindowsRegistry.SettingsWindow.switch_themes_button.icon()
 
-            SettingsWindow.switch_themes_button.click()
+            WindowsRegistry.SettingsWindow.switch_themes_button.click()
 
             self.assertNotEqual(current_theme, Session.config.theme, f"Session theme hasn't changed. Theme {current_theme}")
             self.assertNotEqual(current_style_sheet, app.styleSheet(), f"App style sheet hasn't changed.")
-            self.assertNotEqual(current_theme_icon, SettingsWindow.switch_themes_button.icon(), f"Theme icon  hasn't changed.")
+            self.assertNotEqual(current_theme_icon, WindowsRegistry.SettingsWindow.switch_themes_button.icon(), f"Theme icon  hasn't changed.")
 
-            SettingsWindow.switch_themes_button.click()
-            SettingsWindow.window.done(1)
+            WindowsRegistry.SettingsWindow.switch_themes_button.click()
+            WindowsRegistry.SettingsWindow.done(1)
         
         QTimer.singleShot(100, _open_settings)
-        MainWindow.settings.click()
+        WindowsRegistry.MainWindow.settings.click()
         qsleep(500)
