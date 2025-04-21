@@ -3,12 +3,14 @@ from tests.tests_toolkit import DBTestCase, qsleep
 
 from languages import LanguageStructure
 from backend.models import Category
-from AppObjects.session import Session
-from AppObjects.windows_registry import WindowsRegistry
-
 from GUI.gui_constants import app
 
+from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.logger import get_logger
 
+
+logger = get_logger(__name__)
 
 class TestCategory(DBTestCase):
     """Test category management in the application."""
@@ -111,11 +113,20 @@ class TestCategory(DBTestCase):
 
             QTimer.singleShot(100, _open_settings)
             category.settings.click()
+        
+        income_category = Session.db.category_query.get_category(self.income_category.name, "Incomes")
+        second_income_category = Session.db.category_query.get_category("Second "+self.income_category.name, "Incomes")
+        expenses_category = Session.db.category_query.get_category(self.expenses_category.name, "Expenses")
+        second_expenses_category = Session.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses")
 
-        self.assertEqual(Session.db.category_query.get_category(self.income_category.name, "Incomes").position, 1, "Income category hasn't changed position to 1")
-        self.assertEqual(Session.db.category_query.get_category("Second "+self.income_category.name, "Incomes").position, 0, "Income category hasn't changed position to 0")
-        self.assertEqual(Session.db.category_query.get_category(self.expenses_category.name, "Expenses").position, 1, "Expenses category hasn't changed position to 1")
-        self.assertEqual(Session.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses").position, 0, "Expenses category hasn't changed position to 1")
+        if income_category is None or second_income_category is None or expenses_category is None or second_expenses_category is None:
+            logger.error("Just created categories not found in the database")
+            raise ValueError("Just created categories not found in the database")
+
+        self.assertEqual(income_category.position, 1, "Income category hasn't changed position to 1")
+        self.assertEqual(second_income_category.position, 0, "Income category hasn't changed position to 0")
+        self.assertEqual(expenses_category.position, 1, "Expenses category hasn't changed position to 1")
+        self.assertEqual(second_expenses_category.position, 0, "Expenses category hasn't changed position to 1")
 
         qsleep(500)
     

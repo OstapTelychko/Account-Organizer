@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class StatisticsWindow(SubWindow):
     """Represents Statistics window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.monthly_statistics = create_button("Monthly", (150,40))
@@ -64,7 +64,7 @@ class StatisticsWindow(SubWindow):
 class MonthlyStatistic(SubWindow):
     """Represents Monthly statistics window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet(""" 
@@ -104,7 +104,7 @@ class QuarterlyStatistics(SubWindow):
         `StatisticsView` - is a NamedTuple that contains all quarters statistics.
     """
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet(""" 
@@ -118,8 +118,8 @@ class QuarterlyStatistics(SubWindow):
         self.statistics_window = QWidget()
 
         TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", QListWidget)])
-        MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
-        QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[MonthlyStatisticsView])])
+        QMonthlyStatisticsView = NamedTuple("QMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+        QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[QMonthlyStatisticsView])])
         StatisticsView = NamedTuple("StatisticsView", [("quarters", list[QuarterStatisticsView])])
 
         self.quarters_statistics_list = []
@@ -135,7 +135,7 @@ class QuarterlyStatistics(SubWindow):
             quarter_layout.setSpacing(30)
 
 
-            quarter_months_statistics_list:list[MonthlyStatisticsView] = []
+            quarter_months_statistics_list:list[QMonthlyStatisticsView] = []
             for statistic_list in range(4):              
                 statistic_label = QLabel()
                 statistic_label.setFont(BASIC_FONT)
@@ -157,7 +157,7 @@ class QuarterlyStatistics(SubWindow):
                 if statistic_list == 0:
                     total_quarter_statistics = TotalQuarterStatisticsView(statistic_label, statistic_data)
                 else:
-                    quarter_statistics_part = MonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
+                    quarter_statistics_part = QMonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
                     quarter_months_statistics_list.append(quarter_statistics_part)
             
             quarter_statistics = QuarterStatisticsView(quarter, quarter_label, total_quarter_statistics, quarter_months_statistics_list)
@@ -207,7 +207,7 @@ class YearlyStatistics(SubWindow):
         `StatisticsView` - is a NamedTuple that contains the total year statistics and monthly statistics.\n
     """
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet(""" 
@@ -218,13 +218,13 @@ class YearlyStatistics(SubWindow):
         {background: transparent}""")#Disable background color change on mouseover
         
         TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", QListWidget)])
-        MonthlyStatisticsView = NamedTuple("MonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
-        StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[MonthlyStatisticsView])])
+        YMonthlyStatisticsView = NamedTuple("YMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+        StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[YMonthlyStatisticsView])])
 
         self.statistics_window = QWidget()
         self.statistics_window_layout = QVBoxLayout()
 
-        self.yearly_statistics_parts_list:list[MonthlyStatisticsView] = []
+        self.yearly_statistics_parts_list:list[YMonthlyStatisticsView] = []
         for statistics_list in range(13):
             statistics_label = QLabel()
             statistics_label.setFont(BASIC_FONT)
@@ -247,7 +247,7 @@ class YearlyStatistics(SubWindow):
             if statistics_list == 0:
                 total_year_statistics = TotalYearStatisticsView(statistics_label, statistics_data)
             else:
-                yearly_statistics_part = MonthlyStatisticsView(statistics_list, statistics_label, statistics_data)
+                yearly_statistics_part = YMonthlyStatisticsView(statistics_list, statistics_label, statistics_data)
                 self.yearly_statistics_parts_list.append(yearly_statistics_part)
 
         self.statistics = StatisticsView(total_year_statistics, self.yearly_statistics_parts_list)
@@ -283,7 +283,7 @@ class CustomRangeStatistics(SubWindow):
         `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
     """
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.selected_categories_data:dict[int, tuple[Category, str]] = {}
@@ -393,7 +393,7 @@ class CustomRangeStatistics(SubWindow):
 class CustomRangeStatisticsView(SubWindow):
     """Represents Custom range statistics view structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow], parent_window:CustomRangeStatistics):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow], parent_window:CustomRangeStatistics):
         super().__init__(main_window, sub_windows)
 
         self.parent_window = parent_window

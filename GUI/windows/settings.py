@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class SettingsWindow(SubWindow):
     """Represents Settings window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet("QComboBox:active,QComboBox:focus,QComboBox:disabled{border-color:transparent}")

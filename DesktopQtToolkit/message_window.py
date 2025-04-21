@@ -20,7 +20,7 @@ class MessageWindow(QMessageBox):
     """This class is used to create a message window that can be used to display messages to the user.
     It inherits from QMessageBox and adds some additional functionality."""
     
-    def __init__(self, main_window:QWidget, message_windows_container:dict, type_confirm:bool, message_icon:QMessageBox.Icon | QPixmap, title:str, window_icon:QIcon):
+    def __init__(self, main_window:QWidget, message_windows_container:dict[int, MessageWindow], type_confirm:bool, message_icon:QMessageBox.Icon | QPixmap, title:str, window_icon:QIcon):
         super().__init__(main_window)
         self.main_window = main_window
         message_windows_container[id(self)] = self

@@ -23,12 +23,12 @@ from tests.app_tests.test_shortcuts import TestShortcuts
 from tests.tests_toolkit import ColoredTextTestResult
 
 if TYPE_CHECKING:
-    from types import FunctionType
+    from typing import Callable
 
 
 
 
-def test_main(app_main:FunctionType):
+def test_main(app_main:Callable[[], None]):
     """This function is used to run the tests in the test suite.
         Arguments
         ---------

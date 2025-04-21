@@ -1,15 +1,18 @@
+from typing import cast
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 from PySide6.QtGui import QShortcut, QKeySequence
 from functools import partial
 
 from AppObjects.session import Session
 from AppObjects.windows_registry import WindowsRegistry
-from project_configuration import CATEGORY_TYPE
+from AppObjects.logger import get_logger
 
-from AppObjects.windows_registry import WindowsRegistry
+from project_configuration import CATEGORY_TYPE
 from GUI.gui_constants import FOCUSED_SHADOW_EFFECT_ARGUMENTS
 
 
+
+logger = get_logger(__name__)
 
 def move_to_next_category():
     """Move focus to the next category in the list of categories."""
@@ -19,20 +22,28 @@ def move_to_next_category():
 
     if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
         if len(income_categories) > 1:
+            if Session.focused_income_category is None:
+                logger.error("Focused income category is None")
+                raise ValueError("Focused income category is None")
+
             current_index = income_categories.index(Session.focused_income_category)
             next_index = (current_index + 1) % len(income_categories)
 
-            Session.focused_income_category.table_data.setGraphicsEffect(None)
+            Session.focused_income_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
             Session.focused_income_category = income_categories[next_index]
             Session.focused_income_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_income_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
             WindowsRegistry.MainWindow.Incomes_scroll.ensureWidgetVisible(Session.focused_income_category.table_data, 300)
     
     elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
         if len(expense_categories) > 1:
+            if Session.focused_expense_category is None:
+                logger.error("Focused expense category is None")
+                raise ValueError("Focused expense category is None")
+
             current_index = expense_categories.index(Session.focused_expense_category)
             next_index = (current_index + 1) % len(expense_categories)
 
-            Session.focused_expense_category.table_data.setGraphicsEffect(None)
+            Session.focused_expense_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
             Session.focused_expense_category = expense_categories[next_index]
             Session.focused_expense_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_expense_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
             WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)
@@ -46,20 +57,28 @@ def move_to_previous_category():
 
     if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
         if len(income_categories) > 1:
+            if Session.focused_income_category is None:
+                logger.error("Focused income category is None")
+                raise ValueError("Focused income category is None")
+
             current_index = income_categories.index(Session.focused_income_category)
             previous_index = (current_index - 1) % len(income_categories)
 
-            Session.focused_income_category.table_data.setGraphicsEffect(None)
+            Session.focused_income_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
             Session.focused_income_category = income_categories[previous_index]
             Session.focused_income_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_income_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
             WindowsRegistry.MainWindow.Incomes_scroll.ensureWidgetVisible(Session.focused_income_category.table_data, 300)
     
     elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
         if len(expense_categories) > 1:
+            if Session.focused_expense_category is None:
+                logger.error("Focused expense category is None")
+                raise ValueError("Focused expense category is None")
+
             current_index = expense_categories.index(Session.focused_expense_category)
             previous_index = (current_index - 1) % len(expense_categories)
 
-            Session.focused_expense_category.table_data.setGraphicsEffect(None)
+            Session.focused_expense_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
             Session.focused_expense_category = expense_categories[previous_index]
             Session.focused_expense_category.table_data.setGraphicsEffect(QGraphicsDropShadowEffect(Session.focused_expense_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
             WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)

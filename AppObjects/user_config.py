@@ -44,7 +44,7 @@ class UserConfig:
         self.language:str = "Українська"
         self.theme:str = "Dark"
         self.account_name:str = ""
-        self.auto_backup_status:UserConfig.AutoBackupStatus = UserConfig.AutoBackupStatus.MONTHLY
+        self.auto_backup_status:str = UserConfig.AutoBackupStatus.MONTHLY.value
         self.max_backups:int = MAX_RECOMMENDED_BACKUPS
         self.max_legacy_backups:int = MAX_RECOMMENDED_LEGACY_BACKUPS
         self.auto_backup_removal_enabled:bool = True

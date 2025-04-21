@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 from unittest import TestCase, TextTestRunner, TextTestResult
 import shutil
 from functools import wraps
@@ -16,8 +16,10 @@ from PySide6.QtCore import QEventLoop, QTimer
 from backend.models import Category, Transaction, Account
 from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
+
 from AppObjects.session import Session
 from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.logger import get_logger
 
 from GUI.category import load_category
 
@@ -40,6 +42,8 @@ SUCCESS_COLOR = Fore.GREEN
 SEPARATOR1 = "=" 
 SEPARATOR2 = "-"
 
+logger = get_logger(__name__)
+
 def qsleep(miliseconds:int):
     """Sleep for a given number of milliseconds. time.sleep() is not used because it blocks the main event loop.
 
@@ -57,15 +61,23 @@ class DBTestCase(TestCase):
     """This class is used to create a test case that uses a database.
         It creates a test database and removes it after the test is finished."""
 
+    def __init__(self, methodName = "runTest"):
+        super().__init__(methodName)
+
+        self.income_category:Category
+        self.expenses_category:Category
+
+
     def __init_subclass__(cls) -> None:
-        if "setUp" in cls.__dict__:
-            cls.setUp = DBTestCase.set_up_decorator(cls.setUp)
-        else:
-            cls.setUp = DBTestCase.set_up_decorator(super().setUp)
+        super().__init_subclass__()
+
+        original_setUp = cls.__dict__.get("setUp", super().setUp)
+        wrapped_setUp = cls.set_up_decorator(original_setUp)
+        setattr(cls, "setUp", wrapped_setUp)
 
     
-
-    def set_up_decorator(func):
+    @staticmethod
+    def set_up_decorator(func:Callable[[DBTestCase], None]) -> Callable[[DBTestCase], None]:
         """This decorator is used to set up the test case. It creates first objects so you don't have to create them in every test case.
 
             Arguments
@@ -81,8 +93,15 @@ class DBTestCase(TestCase):
             Session.db.category_query.create_category("Test income category", "Incomes", 0)
             Session.db.category_query.create_category("Test expenses category", "Expenses", 0)
             
-            self.income_category = Session.db.category_query.get_category("Test income category", "Incomes")
-            self.expenses_category = Session.db.category_query.get_category("Test expenses category", "Expenses")
+            new_income_category = Session.db.category_query.get_category("Test income category", "Incomes")
+            new_expenses_category = Session.db.category_query.get_category("Test expenses category", "Expenses")
+
+            if new_income_category is None or new_expenses_category is None:
+                logger.error("Just created categories not found in the database")
+                raise ValueError("Just created categories not found in the database")
+            
+            self.income_category = new_income_category
+            self.expenses_category = new_expenses_category
 
             Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1000, "Test income transaction")
             Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1000, "Test expenses transaction")
@@ -91,7 +110,7 @@ class DBTestCase(TestCase):
             Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
             activate_categories()
 
-            return func(self)
+            return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)
         
         return wrapper
     
@@ -105,19 +124,6 @@ class DBTestCase(TestCase):
         """
 
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
-
-
-    @classmethod
-    def setUpClass(cls):
-        """This method is used to set up the test case. It just tells IDE that class have those variables (they are created dynamically in decorator).
-
-            Arguments
-            ---------
-                `cls` : (DBTestCase) - Test case class.
-        """
-
-        cls.income_category:Category
-        cls.expenses_category:Category
     
 
     def tearDown(self) -> None:

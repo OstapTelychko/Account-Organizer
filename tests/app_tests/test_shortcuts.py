@@ -3,13 +3,16 @@ from PySide6.QtGui import QKeySequence
 from PySide6.QtCore import Qt, QTimer
 
 from tests.tests_toolkit import DBTestCase, qsleep
-from AppObjects.session import Session
-from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.category import reset_focused_category, activate_categories
 from GUI.category import load_category
 
+from AppObjects.session import Session
+from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.logger import get_logger
 
 
+
+logger = get_logger(__name__)
 
 class TestShortcuts(DBTestCase):
     """Test shortcuts in the application."""
@@ -110,6 +113,10 @@ class TestShortcuts(DBTestCase):
 
         Session.db.category_query.create_category("Second test category", "Incomes", 1)
         new_category = Session.db.category_query.get_category("Second test category", "Incomes")
+        if new_category is None:
+            logger.error("Just created category not found in the database")
+            raise ValueError("Just created category not found in the database")
+
         Session.categories[new_category.id] = expected_focused_category = load_category(new_category.category_type, new_category.name, Session.db, new_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
         activate_categories()
 
@@ -119,6 +126,10 @@ class TestShortcuts(DBTestCase):
             WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
         qsleep(100)
+
+        if Session.focused_income_category is None:
+            logger.error("Focused category is None")
+            raise ValueError("Focused category is None")
 
         self.assertEqual(
             Session.focused_income_category, expected_focused_category,
@@ -130,6 +141,10 @@ class TestShortcuts(DBTestCase):
 
         Session.db.category_query.create_category("Second test category", "Incomes", 1)
         new_category = Session.db.category_query.get_category("Second test category", "Incomes")
+        if new_category is None:
+            logger.error("Just created category not found in the database")
+            raise ValueError("Just created category not found in the database")
+
         Session.categories[new_category.id] = load_category(new_category.category_type, new_category.name, Session.db, new_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
         activate_categories()
 
@@ -145,6 +160,10 @@ class TestShortcuts(DBTestCase):
             WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]))
         qsleep(100)
+
+        if Session.focused_income_category is None:
+            logger.error("Focused category is None")
+            raise ValueError("Focused category is None")
 
         self.assertEqual(
             Session.focused_income_category, Session.categories[self.income_category.id],

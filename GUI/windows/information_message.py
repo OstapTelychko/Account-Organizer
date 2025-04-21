@@ -46,7 +46,7 @@ class InformationMessage(QWidget):
     def run(self):
         """This method is used to show the information message window and center it on the main window."""
 
-        opacity = 0
+        opacity = 0.0
         self.setWindowOpacity(0)
         self.show()
 

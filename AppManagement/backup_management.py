@@ -273,10 +273,10 @@ def save_auto_backup_settings():
     else:
         Session.config.auto_backup_removal_enabled = True
 
-    new_max_backups = WindowsRegistry.AutoBackupWindow.max_backups.text()
-    if new_max_backups:
+    raw_new_max_backups = WindowsRegistry.AutoBackupWindow.max_backups.text()
+    if raw_new_max_backups:
         if Session.config.auto_backup_removal_enabled:
-            new_max_backups = int(new_max_backups)
+            new_max_backups = int(raw_new_max_backups)
 
             if new_max_backups < MIN_RECOMMENDED_BACKUPS:
                 WindowsRegistry.Messages.below_recommended_min_backups.exec()
@@ -293,10 +293,10 @@ def save_auto_backup_settings():
         else:
             WindowsRegistry.Messages.auto_removal_disabled.exec()
 
-    new_max_legacy_backups = WindowsRegistry.AutoBackupWindow.max_legacy_backups.text()
-    if new_max_legacy_backups:
+    raw_new_max_legacy_backups = WindowsRegistry.AutoBackupWindow.max_legacy_backups.text()
+    if raw_new_max_legacy_backups:
         if Session.config.auto_backup_removal_enabled:
-            new_max_legacy_backups = int(new_max_legacy_backups)
+            new_max_legacy_backups = int(raw_new_max_legacy_backups)
 
             if new_max_legacy_backups < MIN_RECOMMENDED_LEGACY_BACKUPS:
                 WindowsRegistry.Messages.below_recommended_min_backups.exec()

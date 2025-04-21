@@ -5,7 +5,7 @@ if platform == "win32":
     import ctypes
 
 from PySide6.QtGui import QIcon
-from qdarktheme._style_loader import load_stylesheet
+from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped] #I don't want to write a stub for this library
 
 from project_configuration import THEME_DIRECTORY
 
@@ -211,6 +211,6 @@ if platform == "win32":
     def set_theme_mode_on_window(window:QWidget, value:ctypes.c_uint):
         """Set theme mode on window. This is used to set the theme mode on windows OS."""
 
-        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(# type: ignore[attr-defined]  #Mypy doesn't understand that this attribute exists only on windows
             window.winId(), DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
         )

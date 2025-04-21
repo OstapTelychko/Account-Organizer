@@ -84,14 +84,14 @@ def change_language():
         quarter.label.setText(quarters_numbers[quarter.quarter_number-1]+LanguageStructure.Statistics.get_translation(23))
         quarter.total_quarter_statistics.label.setText(LanguageStructure.Categories.get_translation(10))
 
-        for month in quarter.months:
-            month.label.setText(LanguageStructure.Months.get_translation(month.month_number))
+        for qmonth in quarter.months:
+            qmonth.label.setText(LanguageStructure.Months.get_translation(qmonth.month_number))
     
     WindowsRegistry.YearlyStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(3))
     WindowsRegistry.YearlyStatistics.copy_statistics.setText(LanguageStructure.Statistics.get_translation(32))
     WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.label.setText(LanguageStructure.Categories.get_translation(10))
-    for month in WindowsRegistry.YearlyStatistics.statistics.months:
-        month.label.setText(LanguageStructure.Months.get_translation(month.month_number))
+    for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
+        ymonth.label.setText(LanguageStructure.Months.get_translation(ymonth.month_number))
     
     WindowsRegistry.CustomRangeStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(34))
     WindowsRegistry.CustomRangeStatistics.show_statistics.setText(LanguageStructure.Statistics.get_translation(0))
@@ -163,7 +163,7 @@ def change_language():
 def change_language_during_add_account(language:int | str):
     """Change language during adding account. In case db have no account, not all windows are loaded."""
 
-    if type(language) is int:# var language is a string when the language is loaded from the user config
+    if isinstance(language, int):# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
         Session.config.language = language
     else:

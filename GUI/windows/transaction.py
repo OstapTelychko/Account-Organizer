@@ -27,7 +27,7 @@ class TransactionManagementWindow(SubWindow):
         `transaction_id` - is a variable that stores the ID of the transaction for editing or deleting.
     """
         
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.message = QLabel()
@@ -46,7 +46,7 @@ class TransactionManagementWindow(SubWindow):
         self.transaction_value_validator.setNotation(StrictDoubleValidator.Notation.StandardNotation)
         self.transaction_value.setValidator(self.transaction_value_validator)
 
-        self.transaction_id = None
+        self.transaction_id:int
 
         self.transaction_layout.addWidget(self.transaction_name, alignment=ALIGN_V_CENTER)
         self.transaction_layout.addWidget(self.transaction_day, alignment=ALIGN_V_CENTER)

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class UpdateProgressWindow(SubWindow):
     """Represents Update progress window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.update_progress_title = QLabel("Update progress")

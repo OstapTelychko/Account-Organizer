@@ -37,14 +37,14 @@ class Session:
 
     current_month = 4
     current_year = 2023
-    current_balance = 0
-    current_total_income = 0
-    current_total_expenses = 0
+    current_balance:float = 0.0
+    current_total_income:float = 0.0
+    current_total_expenses:float = 0.0
 
     accounts_list:list[Account] = []
     categories:dict[int, Category] = {}
-    focused_income_category:Category
-    focused_expense_category:Category
+    focused_income_category:Category | None
+    focused_expense_category:Category | None
 
     account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
 

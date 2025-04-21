@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sys import platform
 from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect
@@ -10,7 +11,7 @@ from DesktopQtToolkit.create_button import create_button
 class SubWindow(QDialog):
     """This class is used to create a sub window that can be used to display sub windows."""
 
-    def __init__(self, main_window:QWidget, sub_window_container:dict) -> None:
+    def __init__(self, main_window:QWidget, sub_window_container:dict[int, SubWindow]) -> None:
         super().__init__(main_window)
         self.main_window = main_window
         sub_window_container[id(self)] = self

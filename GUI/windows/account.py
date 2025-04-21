@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 class AddAccountWindow(SubWindow):
     """Represents Add account window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.languages = QComboBox()
@@ -74,7 +74,7 @@ class AddAccountWindow(SubWindow):
 class RenameAccountWindow(SubWindow):
     """Represents Rename account window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
         
         self.message = QLabel()
@@ -141,7 +141,7 @@ class SwitchAccountWindow(SubWindow):
             self.account_widget.setProperty("class", "wrapper")
             self.account_widget.setGraphicsEffect(QGraphicsDropShadowEffect(self.account_widget, **SHADOW_EFFECT_ARGUMENTS))
 
-    def __init__(self, main_window:MainWindow, sub_windows:list[SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
         super().__init__(main_window, sub_windows)
 
         self.accounts_layout = QHBoxLayout()

@@ -33,11 +33,6 @@ class Account(Base):
     )
 
 
-    # def __init__(self, name:Column[str], start_balance:Column[float]):
-    #     self.name = name
-    #     self.start_balance = start_balance
-
-
     def __repr__(self):
         return f"{self.name} created {self.created_date}"
 
@@ -59,13 +54,6 @@ class Category(Base):
         back_populates="category",
         cascade="all, delete, delete-orphan"
     )
-
-
-    # def __init__(self, name:Column[str], category_type:Column[str], position:Column[int], account:Column[int]):
-    #     self.name = name
-    #     self.category_type = category_type
-    #     self.position = position
-    #     self.account_id = account
     
 
     def __repr__(self):
@@ -90,16 +78,8 @@ class Transaction(Base):
     category: Mapped["Category"] = relationship(
         back_populates="transactions"
     )
-
-
-    # def __init__(self, year:Column[int], month:Column[int], day:Column[int], value:Column[float], name:Column[str], category:Column[int]):
-    #     self.year = year
-    #     self.month = month
-    #     self.day = day
-    #     self.value = value
-    #     self.name = name
-    #     self.category_id = category
     
+
     def __repr__(self):
         return f"{self.year}-{self.month}-{self.day}-{self.name} value:{self.value}"
     

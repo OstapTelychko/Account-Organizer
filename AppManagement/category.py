@@ -82,7 +82,13 @@ def create_category():
     position = Session.db.category_query.get_available_position(category_type) 
 
     Session.db.category_query.create_category(category_name, category_type, position)
-    category_id = Session.db.category_query.get_category(category_name, category_type).id 
+    category = Session.db.category_query.get_category(category_name, category_type)
+
+    if category is None:
+        logger.error(f"Category {category_name} haven't been created.")
+        raise RuntimeError(f"Category {category_name} haven't been created.")
+    
+    category_id = category.id 
     Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month, Session.config.language)
 
     #Activate Category
@@ -126,23 +132,30 @@ def remove_category():
     category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
 
     WindowsRegistry.Messages.delete_category_confirmation.exec()
-    if WindowsRegistry.Messages.delete_category_confirmation.clickedButton() == WindowsRegistry.Messages.delete_category_confirmation.ok_button:
-        category_id = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]).id
-        Session.db.category_query.delete_category(category_id)
-        WindowsRegistry.CategorySettingsWindow.setWindowTitle(" ")
-        WindowsRegistry.CategorySettingsWindow.hide()
+    if not WindowsRegistry.Messages.delete_category_confirmation.clickedButton() == WindowsRegistry.Messages.delete_category_confirmation.ok_button:
+        return
+    
+    category = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+    if category is None:
+        logger.error(f"Category {category_name} not found. Category can't be removed.")
+        raise RuntimeError(f"Category {category_name} not found. Category can't be removed.")
+    
+    category_id = category.id
+    Session.db.category_query.delete_category(category_id)
+    WindowsRegistry.CategorySettingsWindow.setWindowTitle(" ")
+    WindowsRegistry.CategorySettingsWindow.hide()
 
-        Session.categories[category_id].window.deleteLater()
-        Session.categories[category_id].settings.deleteLater()
-        Session.categories[category_id].add_transaction.deleteLater()
-        Session.categories[category_id].edit_transaction.deleteLater()
-        Session.categories[category_id].delete_transaction.deleteLater()
-        del Session.categories[category_id]
-        logger.debug(f"Category {category_name} removed")
+    Session.categories[category_id].window.deleteLater()
+    Session.categories[category_id].settings.deleteLater()
+    Session.categories[category_id].add_transaction.deleteLater()
+    Session.categories[category_id].edit_transaction.deleteLater()
+    Session.categories[category_id].delete_transaction.deleteLater()
+    del Session.categories[category_id]
+    logger.debug(f"Category {category_name} removed")
 
-        calculate_current_balance()
-        reset_focused_category()
-        show_information_message(LanguageStructure.Categories.get_translation(7))
+    calculate_current_balance()
+    reset_focused_category()
+    show_information_message(LanguageStructure.Categories.get_translation(7))
 
 
 def rename_category():
@@ -155,7 +168,12 @@ def rename_category():
     if Session.db.category_query.category_exists(new_category_name, category_type):
         return WindowsRegistry.Messages.category_exists.exec()
 
-    category = Session.categories[Session.db.category_query.get_category(current_name, category_type).id]
+    db_category = Session.db.category_query.get_category(current_name, category_type)
+    if db_category is None:
+        logger.error(f"Category {current_name} not found. Category can't be renamed.")
+        raise RuntimeError(f"Category {current_name} not found. Category can't be renamed.")
+    
+    category = Session.categories[db_category.id]
     category.name = new_category_name
 
     #Update connections
@@ -181,6 +199,9 @@ def show_change_category_position(category_name:str):
 
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
     selected_category = Session.db.category_query.get_category(category_name, category_type)
+    if selected_category is None:
+        logger.error(f"Category {category_name} not found. Category position can't be changed.")
+        raise RuntimeError(f"Category {category_name} not found. Category position can't be changed.")
 
     WindowsRegistry.ChangeCategoryPositionWindow.preview_category_name.setText(selected_category.name)
     WindowsRegistry.ChangeCategoryPositionWindow.setWindowTitle(selected_category.name)
@@ -190,11 +211,11 @@ def show_change_category_position(category_name:str):
     while WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.count():
         widget = WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.takeAt(0).widget()
         if widget:
-            widget.setParent(None)
+            widget.setParent(None) #type: ignore[call-overload] #Mypy doesn't know that None just means that the widget will be deleted
     
 
-    for category in Session.db.category_query.get_all_categories():
-        if category is not selected_category and category.category_type == selected_category.category_type:
+    for category_id, category in Session.categories.items():
+        if category_id != selected_category.id and category.type == selected_category.category_type:
             add_category_to_position_list(category)
     
     WindowsRegistry.ChangeCategoryPositionWindow.exec()
@@ -207,19 +228,23 @@ def change_category_position():
     category_name = WindowsRegistry.ChangeCategoryPositionWindow.preview_category_name.text()
     category = Session.db.category_query.get_category(category_name, category_type)
 
-    new_position = WindowsRegistry.ChangeCategoryPositionWindow.new_position.text()
+    if category is None:
+        logger.error(f"Category {category_name} not found. Category position can't be changed.")
+        raise RuntimeError(f"Category {category_name} not found. Category position can't be changed.")
+
+    raw_new_position = WindowsRegistry.ChangeCategoryPositionWindow.new_position.text()
     old_position = category.position
     max_position = Session.db.category_query.get_available_position(category_type)-1
 
-    if new_position == "":
+    if raw_new_position == "":
         return WindowsRegistry.Messages.empty_fields.exec()
 
-    if not new_position.isdigit():
+    if not raw_new_position.isdigit():
         return WindowsRegistry.Messages.incorrect_data_type.exec()
-    new_position = int(new_position)
+    new_position = int(raw_new_position)
 
     if not 0 <= new_position <= max_position:
-        WindowsRegistry.Messages.position_out_range.setText(LanguageStructure.WindowsRegistry.Messages.get_translation(17).replace("max_position", str(max_position)))
+        WindowsRegistry.Messages.position_out_range.setText(LanguageStructure.Messages.get_translation(17).replace("max_position", str(max_position)))
         return WindowsRegistry.Messages.position_out_range.exec()
     
     if new_position == old_position:

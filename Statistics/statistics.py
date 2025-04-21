@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
+def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tuple[dict, dict, dict]:
     """Get categories with highest and lowest values based on transactions in month
 
         Arguments
@@ -35,12 +35,12 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
         Returns
         -------
             `tuple`:
-                `Categories_with_highest_total_value` (dict) - all categories with highest value, if more then one category have the same top value\n
-                `Categories_with_lowest_total_value` (dict) - all categories with lowest value, if more then one category have the same bottom value returns 0 categories if only 1 category exists\n
-                `Categories_total_values` (dict) - all categories with their total value 
+            `Categories_with_highest_total_value` (dict) - all categories with highest value, if more then one category have the same top value\n
+            `Categories_with_lowest_total_value` (dict) - all categories with lowest value, if more then one category have the same bottom value returns 0 categories if only 1 category exists\n
+            `Categories_total_values` (dict) - all categories with their total value 
     """
 
-    Categories_total_values = {}
+    Categories_total_values:dict[int, float] = {}
 
     for category in unsorted_categories:
         Categories_total_values[category] = round(Session.db.statistics_query.get_monthly_transactions_sum(category, Session.current_year, month), 2)
@@ -66,30 +66,30 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
         highest_transaction_value = Session.db.statistics_query.get_monthly_transactions_max_value(category, year, month)
         transactions_with_highest_value = Session.db.statistics_query.get_monthly_transactions_by_value(category, year, month, highest_transaction_value)
 
-        transactions_names = [transaction.name for transaction in transactions_with_highest_value]
-        transactions_with_highest_value = {}
+        transactions_names = [str(transaction.name) for transaction in transactions_with_highest_value]
+        counted_transactions_with_highest_value:dict[str, int | float] = {}
         for transaction_name in set(transactions_names):
-            transactions_with_highest_value[transaction_name] = transactions_names.count(transaction_name)
-        transactions_with_highest_value["Highest value"] = highest_transaction_value
+            counted_transactions_with_highest_value[transaction_name] = transactions_names.count(transaction_name)
+        counted_transactions_with_highest_value["Highest value"] = highest_transaction_value
         
         #Lowest transactions
         lowest_transaction_value = Session.db.statistics_query.get_monthly_transactions_min_value(category, year, month)
         transactions_with_lowest_value = Session.db.statistics_query.get_monthly_transactions_by_value(category, year, month, lowest_transaction_value)
 
-        transactions_names = [transaction.name for transaction in transactions_with_lowest_value]
-        transactions_with_lowest_value = {}
+        transactions_names = [str(transaction.name) for transaction in transactions_with_lowest_value]
+        counted_transactions_with_lowest_value:dict[str, int|float] = {}
         for transaction_name in set(transactions_names):
-            transactions_with_lowest_value[transaction_name] = transactions_names.count(transaction_name)
-        transactions_with_lowest_value["Lowest value"] = lowest_transaction_value
+            counted_transactions_with_lowest_value[transaction_name] = transactions_names.count(transaction_name)
+        counted_transactions_with_lowest_value["Lowest value"] = lowest_transaction_value
 
-        return (transactions_with_highest_value, transactions_with_lowest_value)
+        return (counted_transactions_with_highest_value, counted_transactions_with_lowest_value)
 
     #Highest categories
-    Categories_with_highest_total_value = {}
+    Categories_with_highest_total_value:dict[int|str, tuple[tuple, tuple]| float] = {}
     for category in Categories_total_values:
         if Categories_total_values[category] == highest_total_value:
             transactions_statistic = _get_min_and_max_transactions(category, Session.current_year, month)
-            Categories_with_highest_total_value[category] = [transactions_statistic[0],transactions_statistic[1]]
+            Categories_with_highest_total_value[category] = (transactions_statistic[0], transactions_statistic[1])
     Categories_with_highest_total_value["Highest total value"] = highest_total_value
 
     #Lowest categories
@@ -97,19 +97,20 @@ def get_min_and_max_categories(unsorted_categories:list, month:int) -> tuple:
         if total_value == 0:
             del Categories_total_values[category]
 
+    Categories_with_lowest_total_value:dict[int|str, tuple[tuple, tuple]| float] = {}
     if len(Categories_total_values) != 0:
         lowest_total_value = min([total_value for total_value in Categories_total_values.values() if total_value])
-        Categories_with_lowest_total_value = {}
+        
         for category in Categories_total_values:
             if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
                 transactions_statistic = _get_min_and_max_transactions(category, Session.current_year, month)
-                Categories_with_lowest_total_value[category] = [transactions_statistic[0], transactions_statistic[1]]
+                Categories_with_lowest_total_value[category] = (transactions_statistic[0], transactions_statistic[1])
         Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
 
     return (Categories_with_highest_total_value, Categories_with_lowest_total_value, Categories_total_values)
 
 
-def add_statistic(statistic_list:QListWidget, statistic_data:dict, words:list):
+def add_statistic(statistic_list:QListWidget, statistic_data:tuple[dict, dict, dict], words:list):
     """Add statistic to the list
 
         Arguments
@@ -204,7 +205,7 @@ def add_total_statistics(statistic:dict, words:list, total_statistics_list:QList
         total_statistics_list.addItem(f"{Session.categories[category].name} - {total_value}")
 
 
-def add_month_statistics(Incomes_categories:dict, Expenses_categories:dict, month_statistics:QListWidget, current_month:int):
+def add_month_statistics(Incomes_categories:list[int], Expenses_categories:list[int], month_statistics:QListWidget, current_month:int):
     """Add month statistics to the list
 
         Arguments
@@ -277,26 +278,28 @@ def show_quarterly_statistics():
         return WindowsRegistry.Messages.no_category.exec()
     
     for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
-        Incomes_categories_total_values:dict[int, list] = {}
-        Expenses_categories_total_values:dict[int, list] = {}
+        Incomes_categories_total_values:dict[int, float] = {}
+        Expenses_categories_total_values:dict[int, float] = {}
 
+        categories_total_values:dict[int, list[float]] = {}
         for income_category in Incomes_categories:
-            Incomes_categories_total_values[income_category] = []
+            categories_total_values[income_category] = []
 
             for month in quarter.months:
-                Incomes_categories_total_values[income_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(income_category, Session.current_year, month.month_number), 2))
-            Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
+                categories_total_values[income_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(income_category, Session.current_year, month.month_number), 2))
+            Incomes_categories_total_values[income_category] = round(sum(categories_total_values[income_category]), 2)
         
+        categories_total_values.clear()
         for expenses_category in Expenses_categories:
-            Expenses_categories_total_values[expenses_category] = []
+            categories_total_values[expenses_category] = []
 
             for month in quarter.months:
-                Expenses_categories_total_values[expenses_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(expenses_category, Session.current_year, month.month_number), 2))
-            Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
+                categories_total_values[expenses_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(expenses_category, Session.current_year, month.month_number), 2))
+            Expenses_categories_total_values[expenses_category] = round(sum(categories_total_values[expenses_category]), 2)
 
         #Entire quarter statistics
-        total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
-        total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
+        total_income:float = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
+        total_expense:float = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
         quarter_number = quarter.quarter_number
         days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
 
@@ -336,8 +339,8 @@ def show_yearly_statistics():
 
     #Clear yearly statistics
     WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data.clear()
-    for month in WindowsRegistry.YearlyStatistics.statistics.months:
-        month.data.clear()
+    for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
+        ymonth.data.clear()
     
     Incomes_categories = [category for category in Session.categories if Session.categories[category].type == "Incomes"]
     Expenses_categories = [category for category in Session.categories if Session.categories[category].type == "Expenses"]
@@ -345,22 +348,24 @@ def show_yearly_statistics():
     if len(Session.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
         return WindowsRegistry.Messages.no_category.exec()
     
-    Incomes_categories_total_values:dict[int, list] = {}
-    Expenses_categories_total_values:dict[int, list] = {}
+    Incomes_categories_total_values:dict[int, float] = {}
+    Expenses_categories_total_values:dict[int, float] = {}
 
+    categories_total_values:dict[int, list[float]] = {}
     for income_category in Incomes_categories:
-        Incomes_categories_total_values[income_category] = []
+        categories_total_values[income_category] = []
 
         for month in range(1,13):
-            Incomes_categories_total_values[income_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(income_category, Session.current_year, month), 2))
-        Incomes_categories_total_values[income_category] = round(sum(Incomes_categories_total_values[income_category]), 2)
+            categories_total_values[income_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(income_category, Session.current_year, month), 2))
+        Incomes_categories_total_values[income_category] = round(sum(categories_total_values[income_category]), 2)
     
+    categories_total_values.clear()
     for expenses_category in Expenses_categories:
-        Expenses_categories_total_values[expenses_category] = []
+        categories_total_values[expenses_category] = []
 
         for month in range(1,13):
-            Expenses_categories_total_values[expenses_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(expenses_category, Session.current_year, month), 2))
-        Expenses_categories_total_values[expenses_category] = round(sum(Expenses_categories_total_values[expenses_category]), 2)
+            categories_total_values[expenses_category].append(round(Session.db.statistics_query.get_monthly_transactions_sum(expenses_category, Session.current_year, month), 2))
+        Expenses_categories_total_values[expenses_category] = round(sum(categories_total_values[expenses_category]), 2)
 
     #Entire year statistics
     total_income = round(sum(Incomes_categories_total_values.values()), 2)
@@ -385,14 +390,14 @@ def show_yearly_statistics():
     Total_statistic_list.addItem("\n\n"+LanguageStructure.MainWindow.get_translation(2))
     add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list)
 
-    for month in WindowsRegistry.YearlyStatistics.statistics.months:
-        Incomes_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Incomes_categories])
-        Expenses_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, month.month_number))) for category in Expenses_categories])
+    for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
+        Incomes_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, ymonth.month_number))) for category in Incomes_categories])
+        Expenses_categories_have_transactions = any([bool(len(Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, ymonth.month_number))) for category in Expenses_categories])
 
         if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
-            add_month_statistics(Incomes_categories, Expenses_categories, month.data, month.month_number)
+            add_month_statistics(Incomes_categories, Expenses_categories, ymonth.data, ymonth.month_number)
         else:
-            month.data.addItem(WindowsRegistry.Messages.no_transactions.text())
+            ymonth.data.addItem(WindowsRegistry.Messages.no_transactions.text())
 
     WindowsRegistry.StatisticsWindow.done(1)
     logger.debug(f"Yearly statistics window is shown. Current year: {Session.current_year}")
@@ -404,10 +409,10 @@ def show_custom_range_statistics_window():
 
     #Remove previous categories
     while WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count():
-        WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)
+        WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)#type: ignore[call-overload] #MyPy doesn't recognize that None works as detaching method
 
     while WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count():
-        WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.takeAt(0).widget().setParent(None)
+        WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.takeAt(0).widget().setParent(None)#type: ignore[call-overload]
 
     WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
     WindowsRegistry.CustomRangeStatistics.selected_categories_data.clear()
@@ -559,7 +564,7 @@ def show_custom_range_statistics_view():
     from_date = WindowsRegistry.CustomRangeStatistics.from_date.date()
     to_date = WindowsRegistry.CustomRangeStatistics.to_date.date()
 
-    if from_date >= to_date:
+    if from_date.daysTo(to_date) <= 0:
         return WindowsRegistry.Messages.wrong_date.exec()
     
     if len(WindowsRegistry.CustomRangeStatistics.selected_categories_data) == 0:
@@ -568,13 +573,13 @@ def show_custom_range_statistics_view():
     date_difference = date(to_date.year(), to_date.month(), to_date.day()) - date(from_date.year(), from_date.month(), from_date.day()) 
     days_amount = date_difference.days
 
-    from_date = from_date.year()*1000 + from_date.month()*100 + from_date.day()
-    to_date = to_date.year()*1000 + to_date.month()*100 + to_date.day()
+    from_date_number = from_date.year()*1000 + from_date.month()*100 + from_date.day()
+    to_date_number = to_date.year()*1000 + to_date.month()*100 + to_date.day()
 
     Incomes_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
     Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
 
-    all_transactions = Session.db.statistics_query.get_transactions_by_range(map(lambda category: category.id, Incomes_categories+Expenses_categories), from_date, to_date)
+    all_transactions = Session.db.statistics_query.get_transactions_by_range(list(map(lambda category: category.id, Incomes_categories+Expenses_categories)), from_date_number, to_date_number)
     categorized_transactions:defaultdict[int, list[Transaction]] = defaultdict(list)
     for transaction in all_transactions:
         categorized_transactions[transaction.category_id].append(transaction)
@@ -626,15 +631,10 @@ def show_custom_range_statistics_view():
             WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
             for transaction in category_transactions:
-                day = transaction.day
-                if day < 10:
-                    day = f"0{day}"
-                
+                day = transaction.day                
                 month = transaction.month
-                if month < 10:
-                    month = f"0{month}"
 
-                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
+                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"{day:02}/{month:02}/{transaction.year}\t{transaction.value}\t{transaction.name}")
     
     if len(Expenses_categories_transactions):
         WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("\n\n\n"+LanguageStructure.MainWindow.get_translation(2)+"\n\n")
@@ -642,15 +642,10 @@ def show_custom_range_statistics_view():
             WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("\n"+category.name+"\n")
 
             for transaction in category_transactions:
-                day = transaction.day
-                if day < 10:
-                    day = f"0{day}"
-                
+                day = transaction.day                
                 month = transaction.month
-                if month < 10:
-                    month = f"0{month}"
 
-                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"{day}/{month}/{transaction.year}\t{transaction.value}\t{transaction.name}")
+                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"{day:02}/{month:02}/{transaction.year}\t{transaction.value}\t{transaction.name}")
         
     logger.debug(f"Custom range statistics window is shown. From date: {from_date} To date: {to_date}")
     WindowsRegistry.CustomRangeStatisticsView.exec()

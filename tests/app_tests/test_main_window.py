@@ -14,7 +14,7 @@ from tests.tests_toolkit import qsleep
 from GUI.gui_constants import app
 
 if TYPE_CHECKING:
-    from PySide6.QtWidgets import QPushButton
+    from PySide6.QtWidgets import QPushButton, QToolButton
     from DesktopQtToolkit.sub_window import SubWindow
 
 
@@ -25,7 +25,7 @@ class TestMainWindow(TestCase):
     def test_1_windows_opening(self:TestCase):
         """Test opening windows from main window."""
 
-        test_windows_open:dict[SubWindow, QPushButton] = {WindowsRegistry.SettingsWindow:WindowsRegistry.MainWindow.settings, WindowsRegistry.StatisticsWindow:WindowsRegistry.MainWindow.statistics, WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category}
+        test_windows_open:dict[SubWindow, QPushButton | QToolButton] = {WindowsRegistry.SettingsWindow:WindowsRegistry.MainWindow.settings, WindowsRegistry.StatisticsWindow:WindowsRegistry.MainWindow.statistics, WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category}
 
         for window, open_window_button in test_windows_open.items():
 

@@ -31,7 +31,7 @@ from AppObjects.logger import get_logger
 try:
     from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
 except ImportError:
-    UPDATE_API_TOKEN = None
+    UPDATE_API_TOKEN:str|None = None#type: ignore[no-redef]
 
 if TYPE_CHECKING:
     from AppObjects.backup import Backup
@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def requests_retry_session(retries:int = 3, backoff_factor:int = 0.3, status_forcelist:tuple = (429, 500, 502, 503, 504)):
+def requests_retry_session(retries:int = 3, backoff_factor:float = 0.3, status_forcelist:tuple = (429, 500, 502, 503, 504)):
     """Create a requests session with retry logic.
 
         Arguments
@@ -91,6 +91,7 @@ def check_internet_connection() -> bool:
 
 def get_latest_version() -> str:
     """Get the latest version of the app from GitHub releases.
+
         Returns
         -------
         `str`: The latest version of the app.
@@ -98,7 +99,7 @@ def get_latest_version() -> str:
 
     logger.info("Checking for internet connection")
     if not check_internet_connection():
-        return
+        return ""
     
     try:
         request_session = requests_retry_session()
@@ -113,6 +114,8 @@ def get_latest_version() -> str:
     
     except req.exceptions.HTTPError as e:
         logger.error(f"HTTP error: {e}")
+        return ""
+
 
 
 def download_latest_update() -> bool:
@@ -132,6 +135,7 @@ def download_latest_update() -> bool:
         response.raise_for_status()
         assets = response.json()["assets"]
 
+        total_size = 0
         for asset in assets:
             if platform == "win32":
                 if asset["name"] == WINDOWS_UPDATE_ZIP:
@@ -147,6 +151,10 @@ def download_latest_update() -> bool:
                     logger.info(f"Starting download of {LINUX_UPDATE_ZIP}")
                     logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
+        
+        if total_size == 0:
+            logger.error("No update found or update is not available for this platform.")
+            return False
 
         WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(total_size/1024/1024, 2))))
         
@@ -167,7 +175,7 @@ def download_latest_update() -> bool:
             for chunk in download_response.iter_content(chunk_size=chunk_size):
                 download_size += len(chunk)
                 file.write(chunk)
-                WindowsRegistry.UpdateProgressWindow.download_progress.setValue((download_size/total_size)*100)
+                WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/total_size)*100))
         logger.info("Update saved on disk")
 
         with ZipFile(f"{UPDATE_DIRECTORY}/{asset['name']}", "r") as zip_ref:
@@ -228,8 +236,8 @@ def prepare_update():
         os.chmod(os.path.join(UPDATE_DIRECTORY, "main"), 0o755)#The octal value 0o755 sets these file permissions: • Owner: Read/write/execute • Group: Read/execute • Others: Read/execute
         logger.debug("Changed main file permissions")
 
-    with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as file:
-        update_version = file.read()
+    with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as version_file:
+        update_version = version_file.read()
 
     WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(Session.backups))
     upgraded_backups = 0

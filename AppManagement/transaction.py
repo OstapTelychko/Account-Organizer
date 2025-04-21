@@ -52,7 +52,7 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     WindowsRegistry.TransactionManagementWindow.exec()
 
 
-def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget):
+def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float, category_data:CustomTableWidget):
     """Update transaction data. It updates transaction data in database and GUI.
 
         Arguments
@@ -61,7 +61,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
         `transaction_id` : (int) - Transaction id. It will be used to find transaction to update.
         `transaction_name` : (str) - Transaction name.
         `transaction_day` : (int) - Transaction day.
-        `transaction_value` : (int|float) - Transaction value.
+        `transaction_value` : (float) - Transaction value.
         `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to update selected row data.
     """
 
@@ -158,34 +158,35 @@ def transaction_data_handler():
     """Handle transaction data. It checks if transaction data is valid and adds or updates transaction data."""
 
     transaction_name = WindowsRegistry.TransactionManagementWindow.transaction_name.text().strip()
-    transaction_day = WindowsRegistry.TransactionManagementWindow.transaction_day.text()
-    transaction_value = WindowsRegistry.TransactionManagementWindow.transaction_value.text()
-    transaction_id = WindowsRegistry.TransactionManagementWindow.transaction_id
-    category_id = Session.db.category_query.get_category(WindowsRegistry.TransactionManagementWindow.windowTitle(), CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]).id
+    raw_transaction_day = WindowsRegistry.TransactionManagementWindow.transaction_day.text()
+    raw_transaction_value = WindowsRegistry.TransactionManagementWindow.transaction_value.text()
+
+    category = Session.db.category_query.get_category(WindowsRegistry.TransactionManagementWindow.windowTitle(), CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+    if category is None:
+        logger.error(f"Category {WindowsRegistry.TransactionManagementWindow.windowTitle()} not found. Transaction haven't been handled.")
+        raise RuntimeError(f"Category {WindowsRegistry.TransactionManagementWindow.windowTitle()} not found. Transaction haven't been handled.")
+    
+    category_id = category.id
     category_data = Session.categories[category_id].table_data
 
     max_month_day = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
 
-    if transaction_day == "" or transaction_value == "":
+    if raw_transaction_day == "" or raw_transaction_value == "":
         return WindowsRegistry.Messages.empty_fields.exec()
     
-    if transaction_value.replace(".","").replace(",","").isdigit() and transaction_day.isdigit():
-        transaction_day = int(transaction_day)
+    if raw_transaction_value.replace(".","").replace(",","").isdigit() and raw_transaction_day.isdigit():
+        transaction_day = int(raw_transaction_day)
     else:
         return WindowsRegistry.Messages.incorrect_data_type.exec()
 
     if not 0 < transaction_day <= max_month_day:
-        WindowsRegistry.Messages.day_out_range.setText(LanguageStructure.WindowsRegistry.Messages.get_translation(8)+f"1-{max_month_day}")
+        WindowsRegistry.Messages.day_out_range.setText(LanguageStructure.Messages.get_translation(8)+f"1-{max_month_day}")
         return WindowsRegistry.Messages.day_out_range.exec()
 
-    if transaction_value.find(","):#if transaction_value contains "," for example: 4,5 will be 4.5 
-        transaction_value = float(".".join(transaction_value.split(",")))
-    elif transaction_value.find("."):
-        transaction_value = float(transaction_value)
-    else:
-        transaction_value = int(transaction_value)
+    transaction_value = float(raw_transaction_value)
 
     if WindowsRegistry.TransactionManagementWindow.button.text() == LanguageStructure.GeneralManagement.get_translation(5): #Update 
+        transaction_id = WindowsRegistry.TransactionManagementWindow.transaction_id
         update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
         logger.debug(f"Transaction updated: {transaction_name} | {transaction_day} | {transaction_value} | Transaction id: {transaction_id} | Category id: {category_id}")
     else: #Add

@@ -33,10 +33,10 @@ def add_account():
         return WindowsRegistry.Messages.empty_fields.exec()
         
     if Session.db.account_query.account_exists(account_name):
-        WindowsRegistry.Messages.account_already_exists.setText(LanguageStructure.WindowsRegistry.Messages.get_translation(1))
+        WindowsRegistry.Messages.account_already_exists.setText(LanguageStructure.Messages.get_translation(1))
         return WindowsRegistry.Messages.account_already_exists.exec()
 
-    balance = WindowsRegistry.AddAccountWindow.current_balance.text()
+    raw_balance = WindowsRegistry.AddAccountWindow.current_balance.text()
 
     def _complete_adding_account():
         """Complete adding account. Close add account window, update user config, load accounts and load account data. Created to avoid code duplication."""
@@ -52,20 +52,21 @@ def add_account():
         change_language()
         logger.info(f"Account {account_name} added")  
 
-    if balance != "":
-        if balance.replace(",","").replace(".","").isdigit():
+    if raw_balance != "":
+        if not raw_balance.replace(",","").replace(".","").isdigit():
+            return
+        
+        if "." in raw_balance:
+            balance = float(raw_balance)
+        elif "," in raw_balance:#if balance contains "," for example: 4,5 will be 4.5 
+            balance = float(".".join(raw_balance.split(",")))
+        else:
+            balance = int(raw_balance)
 
-            if balance.find("."):
-                balance = float(balance)
-            elif balance.find(","):#if balance contains "," for example: 4,5 will be 4.5 
-                balance = float(".".join(balance.split(",")))
-            else:
-                balance = int(balance)
-
-            Session.db.create_account(account_name, balance)
-            _complete_adding_account()    
+        Session.db.create_account(account_name, balance)
+        _complete_adding_account()    
     else:
-        WindowsRegistry.Messages.zero_current_balance.setText(LanguageStructure.WindowsRegistry.Messages.get_translation(2))
+        WindowsRegistry.Messages.zero_current_balance.setText(LanguageStructure.Messages.get_translation(2))
 
         WindowsRegistry.Messages.zero_current_balance.exec()
         if WindowsRegistry.Messages.zero_current_balance.clickedButton() == WindowsRegistry.Messages.zero_current_balance.ok_button:
@@ -117,7 +118,7 @@ def clear_accounts_layout():
     while WindowsRegistry.SwitchAccountWindow.accounts_layout.count() > 0:
         widget = WindowsRegistry.SwitchAccountWindow.accounts_layout.itemAt(0).widget()
         if widget:
-            widget.setParent(None)
+            widget.setParent(None) #type: ignore[call-overload] #Mypy doesn't understand that setParent can be None
 
 
 def switch_account(name:str):
@@ -128,7 +129,7 @@ def switch_account(name:str):
             `name` : (str) - Account name to switch to.
     """
 
-    WindowsRegistry.Messages.load_account_question.setText(LanguageStructure.WindowsRegistry.Messages.get_translation(10).replace("account", name))
+    WindowsRegistry.Messages.load_account_question.setText(LanguageStructure.Messages.get_translation(10).replace("account", name))
     WindowsRegistry.Messages.load_account_question.exec()
 
     if WindowsRegistry.Messages.load_account_question.clickedButton() == WindowsRegistry.Messages.load_account_question.ok_button:

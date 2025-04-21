@@ -41,7 +41,7 @@ from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
 if TYPE_CHECKING:
-    from PySide6.QtCore import QEvent
+    from PySide6.QtGui import QMoveEvent
     from DesktopQtToolkit.message_window import MessageWindow
 
 
@@ -200,7 +200,7 @@ class MainWindow(QWidget):
         self.message_windows:dict[int, MessageWindow] = dict()
     
 
-    def moveEvent(self, event:QEvent):
+    def moveEvent(self, event:QMoveEvent):
         """This method is used to move all sub windows and message windows when the main window is moved."""
 
         for sub_window in self.sub_windows.values():

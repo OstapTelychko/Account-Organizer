@@ -27,7 +27,7 @@ class TransactionQuery:
         self.session.commit()
             
 
-    def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:int):
+    def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float):
         """Update a transaction in the database.
 
             Arguments
@@ -45,7 +45,7 @@ class TransactionQuery:
         self.session.commit()
 
 
-    def add_transaction(self, category_id:int, year:int, month:int, day:int, value:int|float, name:str) -> Transaction:
+    def add_transaction(self, category_id:int, year:int, month:int, day:int, value:float, name:str) -> Transaction:
         """Add a new transaction to the database.
 
             Arguments

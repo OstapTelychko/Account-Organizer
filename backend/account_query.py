@@ -60,7 +60,7 @@ class AccountQuery:
         self.session.commit()
 
 
-    def get_account(self) -> Account|None:
+    def get_account(self) -> Account:
         """Get the account object from the database.
 
             Returns
@@ -73,7 +73,7 @@ class AccountQuery:
             return account
         else:
             logger.error(f"Account with ID {self.account_id} not found.")
-            return None
+            raise ValueError(f"Account with ID {self.account_id} not found.")
 
 
     def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float):
