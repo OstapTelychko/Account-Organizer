@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class StatisticsWindow(SubWindow):
     """Represents Statistics window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.monthly_statistics = create_button("Monthly", (150,40))
@@ -64,7 +64,7 @@ class StatisticsWindow(SubWindow):
 class MonthlyStatistic(SubWindow):
     """Represents Monthly statistics window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet(""" 
@@ -104,7 +104,7 @@ class QuarterlyStatistics(SubWindow):
         `StatisticsView` - is a NamedTuple that contains all quarters statistics.
     """
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet(""" 
@@ -207,7 +207,7 @@ class YearlyStatistics(SubWindow):
         `StatisticsView` - is a NamedTuple that contains the total year statistics and monthly statistics.\n
     """
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.setStyleSheet(""" 
@@ -283,7 +283,7 @@ class CustomRangeStatistics(SubWindow):
         `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
     """
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.selected_categories_data:dict[int, tuple[Category, str]] = {}
@@ -393,7 +393,7 @@ class CustomRangeStatistics(SubWindow):
 class CustomRangeStatisticsView(SubWindow):
     """Represents Custom range statistics view structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow], parent_window:CustomRangeStatistics):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow], parent_window:CustomRangeStatistics) -> None:
         super().__init__(main_window, sub_windows)
 
         self.parent_window = parent_window
@@ -438,7 +438,7 @@ class CustomRangeStatisticsView(SubWindow):
 
         self.window_container.setLayout(self.main_layout)
 
-    def closeEvent(self, event:QEvent):
+    def closeEvent(self, event:QEvent) -> None:
         event.accept()
         self.parent_window.raise_()
             

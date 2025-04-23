@@ -33,7 +33,7 @@ class Account(Base):
     )
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.name} created {self.created_date}"
 
 
@@ -56,7 +56,7 @@ class Category(Base):
     )
     
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Name {self.name} type {self.category_type} account {self.account.name}"
     
 
@@ -80,7 +80,7 @@ class Transaction(Base):
     )
     
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.year}-{self.month}-{self.day}-{self.name} value:{self.value}"
     
 

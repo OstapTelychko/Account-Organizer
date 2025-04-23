@@ -58,9 +58,9 @@ class SubWindow(QDialog):
         self.setLayout(self.window_layout)
 
 
-    def exec(self):
+    def exec(self) -> int:
         """This method is used to show the sub window and center it on the main window."""
-        def show_window():
+        def show_window() -> None:
             main_window_center = self.main_window.geometry().center()
             sub_window_geometry = self.geometry()
 
@@ -90,13 +90,13 @@ class SubWindow(QDialog):
             self.activateWindow()
 
         QTimer.singleShot(10, show_window)
-        super().exec()
+        return super().exec()
     
 
-    def done(self, return_code:int):
+    def done(self, return_code:int) -> None:
         """This method is used to close the sub window and hide it."""
 
-        def hide_window():
+        def hide_window() -> None:
             QDialog.done(self, return_code)
             self.window_container.setGeometry(self.size_animation.endValue())
 
@@ -108,7 +108,7 @@ class SubWindow(QDialog):
             QDialog.done(self, return_code)
 
 
-    def setWindowTitle(self, text:str):
+    def setWindowTitle(self, text:str) -> None:
         """This method is used to set the window title of the sub window."""
         
         self.sub_window_title.setText(text)

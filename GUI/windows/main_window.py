@@ -57,7 +57,7 @@ class MainWindow(QWidget):
 
         `message_windows` - is a dictionary that contains all message windows.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.resize(1500, 770)
         self.setMinimumHeight(770)
@@ -200,7 +200,7 @@ class MainWindow(QWidget):
         self.message_windows:dict[int, MessageWindow] = dict()
     
 
-    def moveEvent(self, event:QMoveEvent):
+    def moveEvent(self, event:QMoveEvent) -> None:
         """This method is used to move all sub windows and message windows when the main window is moved."""
 
         for sub_window in self.sub_windows.values():

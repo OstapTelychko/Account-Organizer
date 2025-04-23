@@ -22,14 +22,14 @@ if TYPE_CHECKING:
 class TestMainWindow(TestCase):
     """Test main window of the application."""
 
-    def test_1_windows_opening(self:TestCase):
+    def test_1_windows_opening(self:TestCase) -> None:
         """Test opening windows from main window."""
 
         test_windows_open:dict[SubWindow, QPushButton | QToolButton] = {WindowsRegistry.SettingsWindow:WindowsRegistry.MainWindow.settings, WindowsRegistry.StatisticsWindow:WindowsRegistry.MainWindow.statistics, WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category}
 
         for window, open_window_button in test_windows_open.items():
 
-            def _check_window_appearance():
+            def _check_window_appearance() -> None:
                 """Check if window is visible after clicking button."""
 
                 self.assertTrue(window.isVisible(), f"Window {window.__class__.__name__} hasn't showed after click on button {open_window_button.text()}")
@@ -41,7 +41,7 @@ class TestMainWindow(TestCase):
         qsleep(500)
 
 
-    def test_2_date_change(self):
+    def test_2_date_change(self) -> None:
         """Test changing date in the application."""
 
         current_month = datetime.now().month
@@ -73,7 +73,7 @@ class TestMainWindow(TestCase):
         self.assertEqual(str(current_year), current_showed_year, f"Wrong previous year has been showed {current_showed_year} instead of {current_year}")
     
 
-    def test_3_mini_calculator(self):
+    def test_3_mini_calculator(self) -> None:
         """Test mini calculator in the application."""
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("2*2")
@@ -99,7 +99,7 @@ class TestMainWindow(TestCase):
         self.assertEqual(translated_warning, result, f"Mini calculator has returned wrong result for division by zero {result} instead of {translated_warning}")
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("")
-        def _check_empty_expression_error():
+        def _check_empty_expression_error() -> None:
             """Check if empty expression error is shown."""
 
             result = WindowsRegistry.MainWindow.mini_calculator_text.text()
@@ -111,7 +111,7 @@ class TestMainWindow(TestCase):
         WindowsRegistry.MainWindow.calculate.click()
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("quit()")
-        def _check_forbidden_expression():
+        def _check_forbidden_expression() -> None:
             """Check if forbidden expression error is shown."""
 
             result = WindowsRegistry.MainWindow.mini_calculator_text.text()
@@ -124,7 +124,7 @@ class TestMainWindow(TestCase):
         qsleep(500)
 
 
-    def test_4_language_change(self):
+    def test_4_language_change(self) -> None:
         """Test changing language in the application."""
 
         all_languages = AVAILABLE_LANGUAGES.copy()
@@ -132,7 +132,7 @@ class TestMainWindow(TestCase):
         previous_language = Session.config.language
         language_to_change = all_languages[0]
 
-        def _open_settings():
+        def _open_settings() -> None:
             """Change language in the application."""
 
             WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(language_to_change))
@@ -148,10 +148,10 @@ class TestMainWindow(TestCase):
         qsleep(500)
     
 
-    def test_5_theme_change(self):
+    def test_5_theme_change(self) -> None:
         """Test changing theme in the application."""
 
-        def _open_settings():
+        def _open_settings() -> None:
             """Change theme in the application."""
 
             current_theme = Session.config.theme

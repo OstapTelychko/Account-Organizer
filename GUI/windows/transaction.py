@@ -27,7 +27,7 @@ class TransactionManagementWindow(SubWindow):
         `transaction_id` - is a variable that stores the ID of the transaction for editing or deleting.
     """
         
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.message = QLabel()

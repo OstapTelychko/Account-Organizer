@@ -11,7 +11,7 @@ from languages import LanguageStructure
 
 logger = get_logger(__name__)
 
-def change_language():
+def change_language() -> None:
     """Change language of the application. It changes the text of all widgets in the application."""
 
     WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.config.language))
@@ -159,8 +159,8 @@ def change_language():
     WindowsRegistry.UpdateProgressWindow.update_progress_title.setText(LanguageStructure.Update.get_translation(1))
     WindowsRegistry.UpdateProgressWindow.backups_upgrade_label.setText(LanguageStructure.Update.get_translation(3))
 
-
-def change_language_during_add_account(language:int | str):
+ 
+def change_language_during_add_account(language:int | str) -> None:
     """Change language during adding account. In case db have no account, not all windows are loaded."""
 
     if isinstance(language, int):# var language is a string when the language is loaded from the user config
@@ -180,7 +180,7 @@ def change_language_during_add_account(language:int | str):
     WindowsRegistry.AddAccountWindow.account_name.setPlaceholderText(LanguageStructure.Account.get_translation(5))
 
 
-def load_language(language):
+def load_language(language:str|int) -> None:
     """Load language. It loads language from user config or by user choice.
 
         Arguments
@@ -190,7 +190,7 @@ def load_language(language):
     """
 
     logger.info("Loading language")
-    if type(language) is int:# var language is a string when the language is loaded from the user config
+    if isinstance(language, int):# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
         Session.config.language = language
     else:

@@ -162,7 +162,7 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
 """
 
 
-def switch_theme():
+def switch_theme() -> None:
     """Switch theme between dark and light. If current theme is dark, switch to light and vice versa."""
 
     if Session.config.theme == "Dark":
@@ -186,7 +186,7 @@ def switch_theme():
     Session.config.update_user_config()
 
 
-def load_theme():
+def load_theme() -> None:
     """Load theme from user config."""
 
     logger.info("Loading theme")
@@ -208,7 +208,7 @@ def load_theme():
 
 
 if platform == "win32":
-    def set_theme_mode_on_window(window:QWidget, value:ctypes.c_uint):
+    def set_theme_mode_on_window(window:QWidget, value:ctypes.c_uint) -> None:
         """Set theme mode on window. This is used to set the theme mode on windows OS."""
 
         ctypes.windll.dwmapi.DwmSetWindowAttribute(# type: ignore[attr-defined]  #Mypy doesn't understand that this attribute exists only on windows

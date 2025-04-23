@@ -7,7 +7,7 @@ class Backup:
     Represents a backup of the database.
     It contains the path to the backup file, the timestamp of the backup, and the app version."""
 
-    def __init__(self, db_file_path:str, timestamp:str, app_version:str):
+    def __init__(self, db_file_path:str, timestamp:str, app_version:str) -> None:
         self.db_file_path = db_file_path
         self.db_path = f"sqlite:///{db_file_path}"
         self.timestamp = timestamp

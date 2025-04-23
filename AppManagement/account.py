@@ -17,14 +17,14 @@ from AppManagement.language import change_language_during_add_account, change_la
 
 logger = get_logger(__name__)
 
-def show_add_user_window():
+def show_add_user_window() -> None:
     """Show add user window. First window if db doesn't contain any account."""
 
     change_language_during_add_account(Session.config.language)
     WindowsRegistry.AddAccountWindow.exec()
 
 
-def add_account():
+def add_account() -> int:
     """Add account to database. If account already exists, show warning message."""
 
     account_name = WindowsRegistry.AddAccountWindow.account_name.text().strip()
@@ -38,7 +38,7 @@ def add_account():
 
     raw_balance = WindowsRegistry.AddAccountWindow.current_balance.text()
 
-    def _complete_adding_account():
+    def _complete_adding_account() -> None:
         """Complete adding account. Close add account window, update user config, load accounts and load account data. Created to avoid code duplication."""
 
         WindowsRegistry.AddAccountWindow.done(1)
@@ -54,7 +54,7 @@ def add_account():
 
     if raw_balance != "":
         if not raw_balance.replace(",","").replace(".","").isdigit():
-            return
+            return 0
         
         if "." in raw_balance:
             balance = float(raw_balance)
@@ -72,9 +72,11 @@ def add_account():
         if WindowsRegistry.Messages.zero_current_balance.clickedButton() == WindowsRegistry.Messages.zero_current_balance.ok_button:
             Session.db.create_account(account_name, 0)
             _complete_adding_account()
+    
+    return 1
 
 
-def load_account_data(name:str):
+def load_account_data(name:str) -> None:
     """Load account data. Load categories, set account name and balance."""
 
     #Remove loaded categories
@@ -91,7 +93,7 @@ def load_account_data(name:str):
     logger.info(f"Account {name} data loaded")
 
 
-def load_accounts():
+def load_accounts() -> None:
     """Load accounts from database. Clear account switch widgets and load all accounts."""
 
     Session.accounts_list = Session.db.account_query.get_all_accounts()
@@ -111,7 +113,7 @@ def load_accounts():
         Session.account_switch_widgets.append(account_switch_widget)
  
 
-def clear_accounts_layout():
+def clear_accounts_layout() -> None:
     """Clear account switch widgets. Remove all widgets from layout and clear account switch widgets list."""
 
     Session.account_switch_widgets.clear()
@@ -121,7 +123,7 @@ def clear_accounts_layout():
             widget.setParent(None) #type: ignore[call-overload] #Mypy doesn't understand that setParent can be None
 
 
-def switch_account(name:str):
+def switch_account(name:str) -> None:
     """Switch account. Show warning message and load account data. Disable switch button for current account and enable for other accounts.
 
         Arguments
@@ -143,7 +145,7 @@ def switch_account(name:str):
     
 
 
-def remove_account():
+def remove_account() -> None:
     """Remove account. Show warning message and remove account from database. If last account is removed, close app."""
 
     WindowsRegistry.Messages.delete_account_warning.setText(LanguageStructure.Messages.get_translation(11).replace("account", Session.config.account_name))
@@ -168,14 +170,14 @@ def remove_account():
             exit()
 
 
-def show_rename_account_window():
+def show_rename_account_window() -> None:
     """Show rename account window. Set current account name to line edit."""
 
     WindowsRegistry.RenameAccountWindow.new_account_name.setText(Session.config.account_name)
     WindowsRegistry.RenameAccountWindow.exec()
 
 
-def rename_account():
+def rename_account() -> int:
     """Rename account. Show warning message and rename account in database. If account already exists, show warning message."""
     
     new_account_name = WindowsRegistry.RenameAccountWindow.new_account_name.text().strip()
@@ -195,3 +197,4 @@ def rename_account():
 
     WindowsRegistry.RenameAccountWindow.done(1)
     logger.info(f"Account renamed to {new_account_name}")
+    return 1

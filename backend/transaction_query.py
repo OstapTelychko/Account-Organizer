@@ -10,12 +10,12 @@ if TYPE_CHECKING:
 class TransactionQuery:
     """This class is used to manage transactions and related data in the database."""
 
-    def __init__(self, session:sql_Session):
+    def __init__(self, session:sql_Session) -> None:
         self.session = session
         self.account_id:int
     
 
-    def delete_transaction(self, transaction_id:int):
+    def delete_transaction(self, transaction_id:int) -> None:
         """Delete a transaction from the database.
 
             Arguments
@@ -27,7 +27,7 @@ class TransactionQuery:
         self.session.commit()
             
 
-    def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float):
+    def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float) -> None:
         """Update a transaction in the database.
 
             Arguments

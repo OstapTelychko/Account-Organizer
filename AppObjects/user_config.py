@@ -38,7 +38,7 @@ class UserConfig:
         EDIT_TRANSACTION = "Edit_transaction"
     
 
-    def __init__(self, test_mode:bool = False):
+    def __init__(self, test_mode:bool = False) -> None:
         self.test_mode = test_mode
 
         self.language:str = "Українська"
@@ -69,7 +69,7 @@ class UserConfig:
 
 
 
-    def load_user_config(self):
+    def load_user_config(self) -> None:
         """Load user configuration. It reads the configuration from the file and sets it to the session variables."""
 
         if self.test_mode:
@@ -117,7 +117,7 @@ class UserConfig:
             self.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled)
     
 
-    def create_user_config(self):
+    def create_user_config(self) -> None:
         """Create user configuration file. It creates a new file with default values if the file doesn't exist."""
 
         default_user_configuration = {
@@ -145,7 +145,7 @@ class UserConfig:
                 toml.dump(default_user_configuration, file)
 
 
-    def update_user_config(self):
+    def update_user_config(self) -> None:
         """Update user configuration file. It updates the file with the current values of the session variables."""
 
         user_config = {

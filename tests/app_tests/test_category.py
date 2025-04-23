@@ -15,10 +15,10 @@ logger = get_logger(__name__)
 class TestCategory(DBTestCase):
     """Test category management in the application."""
 
-    def test_1_category_creation(self):
+    def test_1_category_creation(self) -> None:
         """Test adding category to the application."""
 
-        def _add_category(name:str):
+        def _add_category(name:str) -> None:
             """Set category name and click add button."""
 
             WindowsRegistry.AddCategoryWindow.category_name.setText(name)
@@ -36,7 +36,7 @@ class TestCategory(DBTestCase):
         qsleep(500)
     
 
-    def test_2_category_deletion(self):
+    def test_2_category_deletion(self) -> None:
         """Test deleting category from the application."""
 
         income_category_name = self.income_category.name
@@ -45,7 +45,7 @@ class TestCategory(DBTestCase):
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
 
-            def _delete_category():
+            def _delete_category() -> None:
                 """Click delete button and confirm deletion."""
 
                 QTimer.singleShot(100, lambda: WindowsRegistry.Messages.delete_category_confirmation.ok_button.click())
@@ -60,7 +60,7 @@ class TestCategory(DBTestCase):
         qsleep(500)
     
 
-    def test_3_category_rename(self):
+    def test_3_category_rename(self) -> None:
         """Test renaming category in the application."""
 
         income_category_name = self.income_category.name
@@ -69,10 +69,10 @@ class TestCategory(DBTestCase):
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
 
-            def _open_settings():
+            def _open_settings() -> None:
                 """Click button that show rename category window."""
 
-                def _rename_category():
+                def _rename_category() -> None:
                     """Set new category name and click rename button."""
 
                     WindowsRegistry.RenameCategoryWindow.new_category_name.setText(f"{category.name} rename test")
@@ -90,7 +90,7 @@ class TestCategory(DBTestCase):
         qsleep(500)
     
 
-    def test_4_category_position_change(self):
+    def test_4_category_position_change(self) -> None:
         """Test changing category position in the application."""
 
         Session.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
@@ -99,10 +99,10 @@ class TestCategory(DBTestCase):
         for category in Session.categories.copy().values():
             self.select_correct_tab(category)
 
-            def _open_settings():
+            def _open_settings() -> None:
                 """Click button that show change category position window."""
 
-                def _change_position():
+                def _change_position() -> None:
                     """Set new category position and click change button."""
 
                     WindowsRegistry.ChangeCategoryPositionWindow.new_position.setText("1")
@@ -131,14 +131,14 @@ class TestCategory(DBTestCase):
         qsleep(500)
     
 
-    def test_5_copy_month_transactions(self):
+    def test_5_copy_month_transactions(self) -> None:
         """Test copying monthly transactions to the clipboard."""
 
         for category in Session.categories.values():
-            def _copy_transactions():
+            def _copy_transactions() -> None:
                 """Click copy transactions button and check if transactions are copied to the clipboard."""
 
-                def _check_copied_transactions():
+                def _check_copied_transactions() -> None:
                     """Check if transactions are copied to the clipboard."""
 
                     if category.type == "Incomes":

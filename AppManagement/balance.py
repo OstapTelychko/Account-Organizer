@@ -7,7 +7,7 @@ from languages import LanguageStructure
 
 logger = get_logger(__name__)
 
-def calculate_current_balance():
+def calculate_current_balance() -> None:
     """Calculate current balance. It sums up all incomes and expenses and updates the account balance."""
 
     Session.current_total_income = 0
@@ -34,7 +34,7 @@ def calculate_current_balance():
     WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Session.current_total_expenses))
 
 
-def load_account_balance():
+def load_account_balance() -> None:
     """Load account balance from database. If total income and expenses are 0, recalculate the balance."""
 
     logger.info("Loading account balance")
@@ -53,7 +53,7 @@ def load_account_balance():
     logger.info(f"Current balance: {Session.current_balance} | Total income: {Session.current_total_income} | Total expenses: {Session.current_total_expenses}")
 
 
-def update_account_balance():
+def update_account_balance() -> None:
     """Update account balance. It updates balance in database and GUI."""
 
     Session.db.account_query.update_account_balance(Session.current_balance, Session.current_total_income, Session.current_total_expenses)

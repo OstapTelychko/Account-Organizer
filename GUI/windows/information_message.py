@@ -10,7 +10,7 @@ from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
 class InformationMessage(QWidget):
     """Represents information message window structure."""
 
-    def __init__(self, buttons:list[QPushButton]):
+    def __init__(self, buttons:list[QPushButton]) -> None:
         """Initialize the information message window with buttons.
 
             Arguments
@@ -43,7 +43,7 @@ class InformationMessage(QWidget):
         self.setLayout(self.main_layout)
 
 
-    def run(self):
+    def run(self) -> None:
         """This method is used to show the information message window and center it on the main window."""
 
         opacity = 0.0

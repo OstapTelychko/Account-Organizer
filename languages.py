@@ -22,7 +22,7 @@ class LanguageCategory:
         ['Main', 'Subcategory']"""
 
 
-    def __init__(self, name:str, parent:LanguageCategory|None = None):
+    def __init__(self, name:str, parent:LanguageCategory|None = None) -> None:
         self.name = name
         self.parent = parent
         self._children:dict[str, LanguageCategory] = {}

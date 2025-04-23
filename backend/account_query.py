@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 class AccountQuery:
     """This class is used to manage accounts and related to accounts data in the database."""
 
-    def __init__(self, session:sql_Session):
+    def __init__(self, session:sql_Session) -> None:
         self.session = session
         self.account_id:int
     
@@ -47,7 +47,7 @@ class AccountQuery:
         return accounts
 
 
-    def create_account(self, account_name:str, balance:float|int=0):
+    def create_account(self, account_name:str, balance:float|int=0) -> None:
         """Create a new account in the database.
 
             Arguments
@@ -76,7 +76,7 @@ class AccountQuery:
             raise ValueError(f"Account with ID {self.account_id} not found.")
 
 
-    def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float):
+    def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float) -> None:
         """Update the account balance in the database.
 
             Arguments
@@ -94,7 +94,7 @@ class AccountQuery:
         self.session.commit()
 
 
-    def rename_account(self, new_account_name:str):
+    def rename_account(self, new_account_name:str) -> None:
         """Rename the account in the database.
 
             Arguments
@@ -111,7 +111,7 @@ class AccountQuery:
             logger.error(f"Account with ID {self.account_id} not found.")
     
 
-    def delete_account(self):
+    def delete_account(self) -> None:
         """Delete the account from the database."""
         
         account = self.session.query(Account).filter_by(id=self.account_id).first()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from datetime import date
 from PySide6.QtCore import QTimer, QDate
 from tests.tests_toolkit import DBTestCase, qsleep
@@ -7,19 +9,21 @@ from project_configuration import MONTHS_DAYS
 from AppObjects.session import Session
 from AppObjects.windows_registry import WindowsRegistry
 
+if TYPE_CHECKING:
+    from typing import Callable
 
 
 class TestStatistics(DBTestCase):
     """Test statistics of the application."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test case. It creates translations so you don't have to create them in every test case."""
 
         self.translated_incomes = LanguageStructure.MainWindow.get_translation(1)
         self.translated_expenses = LanguageStructure.MainWindow.get_translation(2)
 
 
-    def open_statistics_window(self, func):
+    def open_statistics_window(self, func:Callable[[], None]) -> None:
         """Open statistics window and call function after some delay."""
 
         QTimer.singleShot(100, func)
@@ -53,15 +57,15 @@ class TestStatistics(DBTestCase):
             f"Test expenses transaction - 1000.0",]
 
 
-    def test_1_show_monthly_statistics(self):
+    def test_1_show_monthly_statistics(self) -> None:
         """Test showing monthly statistics."""
 
         days_amount = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)
 
-        def _open_monthly_statics_window():
+        def _open_monthly_statics_window() -> None:
             """Click button that show monthly statistics window."""
 
-            def _check_monthly_statistics():
+            def _check_monthly_statistics() -> None:
                 """Check if monthly statistics are correct."""
 
                 expected_monthly_statistics = self.create_monthly_statistics(days_amount)
@@ -83,7 +87,7 @@ class TestStatistics(DBTestCase):
         qsleep(500)
     
 
-    def test_2_show_quarterly_statistics(self):
+    def test_2_show_quarterly_statistics(self) -> None:
         """Test showing quarterly statistics."""
 
         month_without_transactions = 12 if Session.current_month != 12 else 1
@@ -94,10 +98,10 @@ class TestStatistics(DBTestCase):
                 Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
                 Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
-        def _open_quarterly_statistics_window():
+        def _open_quarterly_statistics_window() -> None:
             """Click button that show quarterly statistics window."""
 
-            def _check_quarterly_statistics():
+            def _check_quarterly_statistics() -> None:
                 """Check if quarterly statistics are correct."""
 
                 for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
@@ -164,7 +168,7 @@ class TestStatistics(DBTestCase):
         qsleep(2000)
                         
 
-    def test_3_show_yearly_statistics(self):
+    def test_3_show_yearly_statistics(self) -> None:
         """Test showing yearly statistics."""
 
         month_without_transactions = 12 if Session.current_month != 12 else 1
@@ -174,10 +178,10 @@ class TestStatistics(DBTestCase):
                 Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
                 Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
-        def _open_yearly_statistics_window():
+        def _open_yearly_statistics_window() -> None:
             """Click button that show yearly statistics window."""
 
-            def _check_yearly_statistics():
+            def _check_yearly_statistics() -> None:
                 """Check if yearly statistics are correct."""
 
                 days_amount = 365 if Session.current_year % 4 != 0 else 366
@@ -239,7 +243,7 @@ class TestStatistics(DBTestCase):
         qsleep(2000)
     
 
-    def test_4_show_custom_range_statistics(self):
+    def test_4_show_custom_range_statistics(self) -> None:
         """Test showing custom range statistics."""
 
         for month in range(1, 7):
@@ -247,10 +251,10 @@ class TestStatistics(DBTestCase):
                 Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
                 Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
         
-        def _open_custom_range_statistics_window():
+        def _open_custom_range_statistics_window() -> None:
             """Click button that show custom range statistics window."""
 
-            def _select_custom_range():
+            def _select_custom_range() -> None:
                 """Select custom range and click show statistics button."""
 
                 WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.click()
@@ -259,7 +263,7 @@ class TestStatistics(DBTestCase):
                 WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
                 WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))
 
-                def _check_custom_range_statistics():
+                def _check_custom_range_statistics() -> None:
                     """Check if custom range statistics are correct."""
 
                     total_income = 6000.0

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class BackupManagementWindow(SubWindow):
     """Represents Backup management window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.backups_table = CustomTableWidget()
@@ -81,7 +81,7 @@ class BackupManagementWindow(SubWindow):
 class AutoBackupWindow(SubWindow):
     """Represents Auto backup window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.current_status = QLabel("Status: monthly")

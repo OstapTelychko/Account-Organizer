@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
-from unittest import TestCase, TextTestRunner, TextTestResult
+from unittest import TestCase, TextTestResult
 import shutil
 from functools import wraps
 
@@ -25,6 +25,11 @@ from GUI.category import load_category
 
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
+    from unittest.runner import _WritelnDecorator
+    from typing import Type, Optional, Tuple, Iterable
+    from types import TracebackType
+
+    OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
 
 
 
@@ -44,7 +49,7 @@ SEPARATOR2 = "-"
 
 logger = get_logger(__name__)
 
-def qsleep(miliseconds:int):
+def qsleep(miliseconds:int) -> None:
     """Sleep for a given number of milliseconds. time.sleep() is not used because it blocks the main event loop.
 
         Arguments
@@ -61,7 +66,7 @@ class DBTestCase(TestCase):
     """This class is used to create a test case that uses a database.
         It creates a test database and removes it after the test is finished."""
 
-    def __init__(self, methodName = "runTest"):
+    def __init__(self, methodName:str = "runTest") -> None:
         super().__init__(methodName)
 
         self.income_category:Category
@@ -89,7 +94,7 @@ class DBTestCase(TestCase):
         """
 
         @wraps(func)
-        def wrapper(self:DBTestCase):
+        def wrapper(self:DBTestCase) -> None:
             Session.db.category_query.create_category("Test income category", "Incomes", 0)
             Session.db.category_query.create_category("Test expenses category", "Expenses", 0)
             
@@ -106,8 +111,8 @@ class DBTestCase(TestCase):
             Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1000, "Test income transaction")
             Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1000, "Test expenses transaction")
 
-            Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
-            Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month, Session.config.language)
+            Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month)
+            Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month)
             activate_categories()
 
             return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)
@@ -115,7 +120,7 @@ class DBTestCase(TestCase):
         return wrapper
     
 
-    def select_correct_tab(self, category:GUICategory):
+    def select_correct_tab(self, category:GUICategory) -> None:
         """This method is used to select the correct tab in the main window.
 
             Arguments
@@ -143,17 +148,17 @@ class DBTestCase(TestCase):
 
 class ColoredTextTestResult(TextTestResult):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, stream:_WritelnDecorator, descriptions:bool, verbosity:int) -> None:
+        super().__init__(stream, descriptions, verbosity)
 
 
-    def _print_separator(self, separator: str = SEPARATOR1):
+    def _print_separator(self, separator: str = SEPARATOR1) -> None:
         """Print a separator line with dynamic length (based on console width)."""
         width = shutil.get_terminal_size().columns-1
         self.stream.writeln("\n"+separator * width)
 
 
-    def startTest(self, test):
+    def startTest(self, test:TestCase) -> None:
         """Override startTest to print separators and the test name."""
         self._print_separator()
         self.stream.writeln(f"Running test: {test}")
@@ -161,18 +166,18 @@ class ColoredTextTestResult(TextTestResult):
         super().startTest(test)
 
 
-    def stopTest(self, test):
+    def stopTest(self, test:TestCase) -> None:
         """Override stopTest to print a separator at the end of the test."""
         super().stopTest(test)
 
 
-    def addSuccess(self, test):
+    def addSuccess(self, test:TestCase) -> None:
         """Override to print success message in green."""
         self.stream.write(SUCCESS_COLOR + f"{SUCCESS}: {test}")
         super().addSuccess(test)
 
 
-    def addFailure(self, test, err):
+    def addFailure(self, test:TestCase, err:OptExcInfo) -> None:
         """Override to print failure message in red."""
         self.stream.write(FAIL_COLOR + f"{FAIL}: {test}")
 
@@ -185,7 +190,7 @@ class ColoredTextTestResult(TextTestResult):
         #I don't use super method because it will print extra traceback message
 
 
-    def addError(self, test, err):
+    def addError(self, test:TestCase, err:OptExcInfo) -> None:
         """Override to print error message in yellow."""
         self.stream.write(ERROR_COLOR + f"{ERROR}: {test}")
 
@@ -198,7 +203,7 @@ class ColoredTextTestResult(TextTestResult):
         #I don't use super method because it will print extra traceback message
     
 
-    def printErrorList(self, flavour, errors):
+    def printErrorList(self, flavour:str, errors:Iterable[tuple[TestCase, str]]) -> None:
         """Override to print errors in colored format."""
         for test, err in errors:
             self._print_separator()

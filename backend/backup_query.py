@@ -14,13 +14,13 @@ class BackupQuery:
     """This class is used to manage the backup logic of the database.
     It contains methods to create a backup of the database and to restore the database from a backup."""
 
-    def __init__(self, session:sql_Session, engine:Engine):
+    def __init__(self, session:sql_Session, engine:Engine) -> None:
         self.session = session
         self.engine = engine
         self.account_id:int
     
 
-    def create_backup(self, backup_file_path:str ):
+    def create_backup(self, backup_file_path:str) -> None:
         """Create a backup of the database.
         
             Arguments
@@ -44,7 +44,7 @@ class BackupQuery:
             logger.error("Database file path is None. Cannot create backup.")
 
 
-    def create_backup_based_on_external_db(self, external_db_path:str, backup_file_path:str):
+    def create_backup_based_on_external_db(self, external_db_path:str, backup_file_path:str) -> None:
         """Create a backup of the database based on an external database.
         
             Arguments

@@ -42,20 +42,20 @@ class SingleInstanceGuard(QObject):
             self.start_server()
     
 
-    def start_server(self):
+    def start_server(self) -> None:
         """Start the server to listen for incoming connections from other instances of the application."""
 
         self.server_socket.listen(QHostAddress.SpecialAddress.LocalHost, APP_PORT)
 
 
-    def handle_new_connection(self):
+    def handle_new_connection(self) -> None:
         """Handle new incoming connection from another instance of the application."""
 
         client_connection = self.server_socket.nextPendingConnection()
         client_connection.readyRead.connect(self.read_client)
     
 
-    def read_client(self):
+    def read_client(self) -> None:
         """Read data from the client connection. If the data is "RAISE_WINDOW", raise the main window."""
 
         client_connection:QTcpSocket = cast(QTcpSocket, self.sender())
@@ -69,7 +69,7 @@ class SingleInstanceGuard(QObject):
         client_connection.disconnectFromHost()
     
 
-    def close_sockets(self):
+    def close_sockets(self) -> None:
         """Close the server and client sockets."""
         
         if self.server_socket.isListening():

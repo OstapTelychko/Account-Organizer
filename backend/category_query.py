@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 class CategoryQuery:
     """This class is used to manage categories and related data in the database."""
 
-    def __init__(self, session:sql_Session):
+    def __init__(self, session:sql_Session) -> None:
         self.session = session
         self.account_id:int
     
@@ -37,7 +37,7 @@ class CategoryQuery:
         return bool(result)
 
 
-    def create_category(self, name:str, category_type:str, position:int):
+    def create_category(self, name:str, category_type:str, position:int) -> None:
         """Create a new category in the database.
 
             Arguments
@@ -69,7 +69,7 @@ class CategoryQuery:
         return last_category.position + 1
 
 
-    def change_category_position(self, new_position:int, old_position:int, category_id:int, category_type:str):
+    def change_category_position(self, new_position:int, old_position:int, category_id:int, category_type:str) -> None:
         """Change the position of a category in the database.
 
             Arguments
@@ -90,7 +90,7 @@ class CategoryQuery:
         self.session.commit()
 
 
-    def remove_position(self, category_id:int):
+    def remove_position(self, category_id:int) -> None:
         """Remove the position of a category in the database.
 
             Arguments
@@ -141,7 +141,7 @@ class CategoryQuery:
         return self.session.query(Category).filter_by(account_id=self.account_id).order_by(Category.position).all()
 
 
-    def rename_category(self, category_id:int, new_name:str):
+    def rename_category(self, category_id:int, new_name:str) -> None:
         """Rename a category in the database.
 
             Arguments
@@ -153,7 +153,7 @@ class CategoryQuery:
         self.session.commit()
 
 
-    def delete_category(self, category_id:int):
+    def delete_category(self, category_id:int) -> None:
         """Delete a category from the database.
 
             Arguments

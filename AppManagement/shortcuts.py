@@ -14,7 +14,7 @@ from GUI.gui_constants import FOCUSED_SHADOW_EFFECT_ARGUMENTS
 
 logger = get_logger(__name__)
 
-def move_to_next_category():
+def move_to_next_category() -> None:
     """Move focus to the next category in the list of categories."""
 
     income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
@@ -49,7 +49,7 @@ def move_to_next_category():
             WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)
 
 
-def move_to_previous_category():
+def move_to_previous_category() -> None:
     """Move focus to the previous category in the list of categories."""
 
     income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
@@ -84,7 +84,7 @@ def move_to_previous_category():
             WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(Session.focused_expense_category.table_data, 300)
 
 
-def add_transaction_to_focused_category():
+def add_transaction_to_focused_category() -> None:
     """
     Adds a transaction to the focused category.
     """
@@ -97,7 +97,7 @@ def add_transaction_to_focused_category():
             Session.focused_expense_category.add_transaction.click()
 
 
-def select_previous_transaction():
+def select_previous_transaction() -> None:
     """
     Selects the previous transaction in the focused category.
     """
@@ -114,7 +114,7 @@ def select_previous_transaction():
                 Session.focused_expense_category.table_data.selectRow(current_index - 1)
 
 
-def select_next_transaction():
+def select_next_transaction() -> None:
     """
     Selects the next transaction in the focused category.
     """
@@ -133,7 +133,7 @@ def select_next_transaction():
                 Session.focused_expense_category.table_data.selectRow(current_index + 1)
 
 
-def delete_transaction():
+def delete_transaction() -> None:
     """
     Deletes the selected transaction in the focused category.
     """
@@ -146,7 +146,7 @@ def delete_transaction():
             Session.focused_expense_category.delete_transaction.click()
 
 
-def edit_transaction():
+def edit_transaction() -> None:
     """
     Edits the selected transaction in the focused category.
     """
@@ -159,7 +159,7 @@ def edit_transaction():
             Session.focused_expense_category.edit_transaction.click()
 
 
-def assign_shortcuts():
+def assign_shortcuts() -> None:
     """
     Assign shortcuts to the application.
     """

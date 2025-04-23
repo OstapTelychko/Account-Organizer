@@ -11,13 +11,13 @@ class TestTransaction(DBTestCase):
     """Test transaction management in the application."""
 
 
-    def test_1_add_transaction(self):
+    def test_1_add_transaction(self) -> None:
         """Test adding transaction to the application."""
 
         for category in Session.categories.values():
             WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
 
-            def _add_transaction():
+            def _add_transaction() -> None:
                 """Set transaction data and click add button."""
 
                 WindowsRegistry.TransactionManagementWindow.transaction_name.setText("New test transaction")
@@ -35,14 +35,14 @@ class TestTransaction(DBTestCase):
         qsleep(500)
     
 
-    def test_2_update_transaction(self):
+    def test_2_update_transaction(self) -> None:
         """Test updating transaction in the application."""
 
         for category in Session.categories.values():
             WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
             category.table_data.selectRow(0)
 
-            def _update_transaction():
+            def _update_transaction() -> None:
                 """Set transaction data and click update button."""
 
                 WindowsRegistry.TransactionManagementWindow.transaction_name.setText("Updated transaction name")
@@ -60,14 +60,14 @@ class TestTransaction(DBTestCase):
         qsleep(500)
     
 
-    def test_3_delete_transaction(self):
+    def test_3_delete_transaction(self) -> None:
         """Test deleting transaction from the application."""
 
         for category in Session.categories.values():
             self.select_correct_tab(category)
             category.table_data.selectRow(0)
 
-            def _confirm_deletion():
+            def _confirm_deletion() -> None:
                 WindowsRegistry.Messages.delete_transaction_confirmation.ok_button.click()
 
             QTimer.singleShot(100, _confirm_deletion)

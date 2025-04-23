@@ -47,7 +47,7 @@ from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_
 
 from AppManagement.language import load_language, change_language_during_add_account
 from AppManagement.balance import load_account_balance
-from AppManagement.category import create_category, load_categories, remove_category, rename_category,  activate_categories, show_change_category_position, change_category_position
+from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window, rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_account, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
@@ -62,7 +62,7 @@ from tests.init_tests import test_main
 logger = get_logger(__name__)
 
 
-def calculate_expression():
+def calculate_expression() -> None:
     """Calculate the expression from the mini calculator input field"""
 
     expression = WindowsRegistry.MainWindow.mini_calculator_text.text()
@@ -90,7 +90,7 @@ def calculate_expression():
         WindowsRegistry.Messages.empty_expression.exec()
 
 
-def main():
+def main() -> None:
     """Main function to start the application"""
 
     Session.start_session()
@@ -138,7 +138,7 @@ def main():
     
     #Category settings
     WindowsRegistry.CategorySettingsWindow.delete_category.clicked.connect(remove_category)
-    WindowsRegistry.CategorySettingsWindow.rename_category.clicked.connect(lambda: (WindowsRegistry.RenameCategoryWindow.setWindowTitle(WindowsRegistry.CategorySettingsWindow.windowTitle()), WindowsRegistry.RenameCategoryWindow.exec()))
+    WindowsRegistry.CategorySettingsWindow.rename_category.clicked.connect(show_rename_category_window)
     WindowsRegistry.CategorySettingsWindow.change_category_position.clicked.connect(lambda: show_change_category_position(WindowsRegistry.CategorySettingsWindow.windowTitle()))
     WindowsRegistry.CategorySettingsWindow.copy_transactions.clicked.connect(copy_monthly_transactions)
     WindowsRegistry.RenameCategoryWindow.button.clicked.connect(rename_category)

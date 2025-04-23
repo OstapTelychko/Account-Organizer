@@ -20,7 +20,7 @@ from AppManagement.transaction import show_add_transaction_window, show_edit_tra
 
 logger = get_logger(__name__)
 
-def remove_categories_from_list():
+def remove_categories_from_list() -> None:
     """Remove all categories from Session.categories. It's used in case you need to update or load all categories."""
 
     for category in Session.categories.copy():
@@ -32,7 +32,7 @@ def remove_categories_from_list():
         del Session.categories[category]
 
 
-def load_categories_data():
+def load_categories_data() -> None:
     """Load all categories data from database. It loads all monthly transactions for each category """
 
     for category in Session.categories:
@@ -46,7 +46,7 @@ def load_categories_data():
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
-                name = CustomTableWidgetItem(transaction.name)
+                name = CustomTableWidgetItem(str(transaction.name))
                 name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
                 day = CustomTableWidgetItem(str(transaction.day))
@@ -67,7 +67,7 @@ def load_categories_data():
         update_category_total_value(category)
 
 
-def create_category():
+def create_category() -> int:
     """Create category. It creates a new category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
 
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
@@ -89,7 +89,7 @@ def create_category():
         raise RuntimeError(f"Category {category_name} haven't been created.")
     
     category_id = category.id 
-    Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month, Session.config.language)
+    Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month)
 
     #Activate Category
     Session.categories[category_id].settings.clicked.connect(partial(show_category_settings, Session.categories[category_id].name))
@@ -103,17 +103,19 @@ def create_category():
     show_information_message(LanguageStructure.Categories.get_translation(8))
     reset_focused_category()
 
+    return 1
 
-def load_categories():
+
+def load_categories() -> None:
     """Load all categories from database for current account."""
 
     for category in Session.db.category_query.get_all_categories():
-        Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month, Session.config.language)
+        Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month)
         logger.debug(f"Category {category.name} loaded")
     reset_focused_category()
         
 
-def show_category_settings(category_name:str):
+def show_category_settings(category_name:str) -> None:
     """Show category settings.
 
         Arguments
@@ -126,7 +128,7 @@ def show_category_settings(category_name:str):
         WindowsRegistry.CategorySettingsWindow.exec()
 
 
-def remove_category():
+def remove_category() -> None:
     """Remove category. It removes the category from the database and from the GUI. It also shows a confirmation message before removing the category."""
 
     category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
@@ -158,7 +160,12 @@ def remove_category():
     show_information_message(LanguageStructure.Categories.get_translation(7))
 
 
-def rename_category():
+def show_rename_category_window() -> None:
+    WindowsRegistry.RenameCategoryWindow.setWindowTitle(WindowsRegistry.CategorySettingsWindow.windowTitle())
+    WindowsRegistry.RenameCategoryWindow.exec()
+
+
+def rename_category() -> int:
     """Rename category. It renames the category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
 
     new_category_name = WindowsRegistry.RenameCategoryWindow.new_category_name.text().strip()
@@ -193,8 +200,10 @@ def rename_category():
     WindowsRegistry.RenameCategoryWindow.new_category_name.setText("")
     show_information_message(LanguageStructure.Categories.get_translation(6))
 
+    return 1
 
-def show_change_category_position(category_name:str):
+
+def show_change_category_position(category_name:str) -> None:
     """Show change category position window. It shows the current category position and all other categories in the same type."""
 
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
@@ -221,7 +230,7 @@ def show_change_category_position(category_name:str):
     WindowsRegistry.ChangeCategoryPositionWindow.exec()
 
 
-def change_category_position():
+def change_category_position() -> int:
     """Change category position. It changes the category position in the database and in the GUI. It also checks if the new position is valid"""
 
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
@@ -259,8 +268,10 @@ def change_category_position():
     WindowsRegistry.ChangeCategoryPositionWindow.hide()
     WindowsRegistry.CategorySettingsWindow.hide()
 
+    return 1
 
-def update_category_total_value(category_id:int):
+
+def update_category_total_value(category_id:int) -> None:
     """Update category total value. It updates the total value label for the category in the GUI."""
 
     Session.categories[category_id].total_value_label.setText(
@@ -268,7 +279,7 @@ def update_category_total_value(category_id:int):
         str(round(Session.db.statistics_query.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
 
 
-def activate_categories():
+def activate_categories() -> None:
     """Activate all categories. It connects all category buttons to their respective functions."""
 
     for category_id, category in Session.categories.items():
@@ -279,7 +290,7 @@ def activate_categories():
         logger.debug(f"Category {category.name} activated")
 
 
-def reset_focused_category():
+def reset_focused_category() -> None:
     """Reset focused category. It sets the focused income and expense categories to the first category of their type."""
 
     income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])

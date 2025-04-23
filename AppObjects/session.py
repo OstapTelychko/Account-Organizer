@@ -59,7 +59,7 @@ class Session:
 
  
     @staticmethod
-    def start_session():
+    def start_session() -> None:
         """Start session. It loads user configuration, app version, and backups. It also sets the current date and creates the backups directory if it doesn't exist."""
 
         logger.info("__BREAK_LINE__")
@@ -103,7 +103,7 @@ class Session:
     
 
     @staticmethod
-    def load_app_version():
+    def load_app_version() -> None:
         """Load app version from file. It reads the version from the file and sets it to the app_version variable."""
 
         with open(f"{APP_DIRECTORY}/app version.txt") as file:
@@ -111,7 +111,7 @@ class Session:
 
         
     @staticmethod
-    def load_backups():
+    def load_backups() -> None:
         """Load backups from the backups directory. It loads all backups and adds them to the session."""
 
         for backup_path in os.listdir(BACKUPS_DIRECTORY) if not Session.test_mode else os.listdir(TEST_BACKUPS_DIRECTORY):
@@ -124,7 +124,7 @@ class Session:
 
 
     @staticmethod
-    def end_session():
+    def end_session() -> None:
         """End session. It closes the database connection, removes the instance guard, and closes all sockets."""
 
         Session.instance_guard.close_sockets()
@@ -133,7 +133,7 @@ class Session:
     
 
     @staticmethod
-    def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType | None):
+    def custom_excepthook(exc_type:type[BaseException], exc_value:BaseException, exc_traceback:TracebackType | None) -> None:
         """Custom excepthook. It logs the exception to Error log."""
 
         logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -142,7 +142,7 @@ class Session:
 
 
     @staticmethod
-    def restart_app():
+    def restart_app() -> None:
         """Restart the app. It closes the current session and starts a new one."""
 
         Session.end_session()

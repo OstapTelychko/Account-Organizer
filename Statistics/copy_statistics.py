@@ -13,7 +13,7 @@ from GUI.gui_constants import app
 
 logger = get_logger(__name__)
 
-def show_information_message(text:str):
+def show_information_message(text:str) -> None:
     """This method is used to show the information message window and center it on the main window.
 
         Arguments
@@ -33,7 +33,7 @@ def show_information_message(text:str):
 
 
 
-def copy_monthly_transactions():
+def copy_monthly_transactions() -> None:
     """This method is used to copy the transactions of the selected category to the clipboard."""
 
     if WindowsRegistry.CategorySettingsWindow.copy_transactions.isEnabled():
@@ -62,7 +62,7 @@ def copy_monthly_transactions():
         show_information_message(LanguageStructure.Categories.get_translation(5))
 
 
-def copy_monthly_statistics():
+def copy_monthly_statistics() -> None:
     """This method is used to copy the monthly statistics to the clipboard."""
 
     if WindowsRegistry.MonthlyStatistics.copy_statistics.isEnabled():
@@ -78,7 +78,7 @@ def copy_monthly_statistics():
         show_information_message(LanguageStructure.Statistics.get_translation(29))
 
 
-def copy_quarterly_statistics():
+def copy_quarterly_statistics() -> None:
     """This method is used to copy the quarterly statistics to the clipboard."""
 
     if WindowsRegistry.QuarterlyStatistics.copy_statistics.isEnabled():
@@ -107,7 +107,7 @@ def copy_quarterly_statistics():
         show_information_message(LanguageStructure.Statistics.get_translation(31))
 
 
-def copy_yearly_statistics():
+def copy_yearly_statistics() -> None:
     """This method is used to copy the yearly statistics to the clipboard."""
 
     if WindowsRegistry.YearlyStatistics.copy_statistics.isEnabled():
@@ -132,7 +132,7 @@ def copy_yearly_statistics():
         show_information_message(LanguageStructure.Statistics.get_translation(33))
 
 
-def copy_custom_range_statistics():
+def copy_custom_range_statistics() -> None:
     """This method is used to copy the custom range statistics to the clipboard."""
 
     if WindowsRegistry.CustomRangeStatisticsView.copy_statistics.isEnabled():
@@ -147,7 +147,7 @@ def copy_custom_range_statistics():
         show_information_message(LanguageStructure.Statistics.get_translation(36))
 
 
-def copy_custom_range_transactions():
+def copy_custom_range_transactions() -> None:
     """This method is used to copy the custom range transactions to the clipboard."""
 
     if WindowsRegistry.CustomRangeStatisticsView.copy_transactions.isEnabled():

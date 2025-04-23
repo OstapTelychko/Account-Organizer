@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class StatisticsQuery:
     """This class is used to create statistics."""
 
-    def __init__(self, session:sql_Session):
+    def __init__(self, session:sql_Session) -> None:
         self.session = session
         self.account_id:int
     

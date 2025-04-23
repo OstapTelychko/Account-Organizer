@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class Messages():
     """Represents all application messages."""
 
-    def __init__(self, main_window:MainWindow, message_windows:dict[int, MessageWindow]):
+    def __init__(self, main_window:MainWindow, message_windows:dict[int, MessageWindow]) -> None:
 
         self.incorrect_data_type = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
         self.account_already_exists  = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)

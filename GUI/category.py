@@ -23,7 +23,7 @@ EDIT_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/edit transaction.png")
 
 
 
-def load_category(category_type:str, name:str, db:DBController, category_id:int, position:int, year:int, month:int, Language:str) -> Category:
+def load_category(category_type:str, name:str, db:DBController, category_id:int, position:int, year:int, month:int) -> Category:
     """Add category to user window
 
         Arguments
@@ -109,7 +109,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
             transaction_id = CustomTableWidgetItem(str(transaction.id))
             transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
-            transaction_name = CustomTableWidgetItem(transaction.name)
+            transaction_name = CustomTableWidgetItem(str(transaction.name))
             transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
 
             category_data.setItem(index, 0, transaction_name)
@@ -168,7 +168,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     )
 
 
-def add_category_to_position_list(category:Category):
+def add_category_to_position_list(category:Category) -> None:
     """Add category to categories positions list
 
         Arguments

@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, Literal
 import os
 import logging
 from collections.abc import Set, Mapping
@@ -6,6 +8,9 @@ from project_configuration import APP_LOG_FILE, ERROR_LOG_FILE, MAX_LOG_SIZE, MA
 ERROR_LOG_FORMAT, LOG_DATE_FORMAT, LOGS_DIRECTORY, MAX_ERROR_LOG_SIZE, TERMINAL_IGNORE_LOG_MESSAGES, \
 REPLACE_LOG_MESSAGES
 
+if TYPE_CHECKING:
+    from logging import LogRecord
+
 
 os.makedirs(LOGS_DIRECTORY, exist_ok=True)
 
@@ -13,7 +18,7 @@ os.makedirs(LOGS_DIRECTORY, exist_ok=True)
 class InfoFilter(logging.Filter):
     """This class is used to filter out logs with level INFO and below"""
 
-    def filter(self, record):
+    def filter(self, record:LogRecord) -> bool:
         return record.levelno <= logging.INFO
     
 
@@ -21,7 +26,7 @@ class InfoFilter(logging.Filter):
 class IgnoreFilter(logging.Filter):
     """This class is used to filter out logs that are in the ignored_messages set"""
 
-    def __init__(self, ignored_messages:Set|None=None):
+    def __init__(self, ignored_messages:Set[str]|None=None) -> None:
         super().__init__()
 
         if ignored_messages is None:
@@ -33,7 +38,7 @@ class IgnoreFilter(logging.Filter):
         self.ignored_messages = ignored_messages
 
 
-    def filter(self, record) -> bool:
+    def filter(self, record:LogRecord) -> bool:
         """This method is used to filter out logs that are in the ignored_messages set"""
 
         message = record.getMessage()
@@ -45,7 +50,7 @@ class IgnoreFilter(logging.Filter):
 
 class ReplaceMessageFormatter(logging.Formatter):
 
-    def __init__(self, fmt = None, datefmt = None, style = "%", validate = True, *, replace_messages:Mapping[str, str]|None=None, defaults = None):
+    def __init__(self, fmt:str|None = None, datefmt:str|None = None, style:Literal['%', '{', '$'] = "%", validate:bool = True, *, replace_messages:Mapping[str, str]|None=None, defaults:dict[str, str]|None = None) -> None:
         """This formatter is used to replace messages in the log with the values in the replace_messages dict.
 
             Arguments
@@ -68,7 +73,7 @@ class ReplaceMessageFormatter(logging.Formatter):
         self.replace_messages = replace_messages
 
     
-    def format(self, record):
+    def format(self, record:LogRecord) -> str:
         message = record.getMessage()
 
         for key in self.replace_messages:
@@ -102,7 +107,7 @@ console_handler.addFilter(IgnoreFilter(TERMINAL_IGNORE_LOG_MESSAGES))
 logger.addHandler(console_handler)
 
 
-def get_logger(name) -> logging.Logger:
+def get_logger(name:str) -> logging.Logger:
     """Get a logger with the specified name. If the logger already exists, return it.
 
         Arguments

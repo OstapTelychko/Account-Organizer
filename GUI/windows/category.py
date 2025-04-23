@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class CategorySettingsWindow(SubWindow):
     """Represents Category settings window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.rename_category = create_button("Rename category",(255,40))
@@ -40,7 +40,7 @@ class CategorySettingsWindow(SubWindow):
 class AddCategoryWindow(SubWindow):
     """Represents Add category window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.category_name = QLineEdit()
@@ -63,7 +63,7 @@ class AddCategoryWindow(SubWindow):
 class ChangeCategoryPositionWindow(SubWindow):
     """Represents Change category position window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.preview_category_position = QLabel()
@@ -124,7 +124,7 @@ class ChangeCategoryPositionWindow(SubWindow):
 class RenameCategoryWindow(SubWindow):
     """Represents Rename category window structure."""
 
-    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]):
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.new_category_name = QLineEdit()

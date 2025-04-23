@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer
 
 from tests.tests_toolkit import DBTestCase, qsleep
@@ -6,14 +8,15 @@ from AppObjects.session import Session
 from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
-
+if TYPE_CHECKING:
+    from typing import Callable
 
 
 
 class TestAccount(DBTestCase):
     """Test account management in the application."""
 
-    def open_settings(self, func):
+    def open_settings(self, func:Callable[[], None]) -> None:
         """Open settings window and call function after some delay.
 
             Arguments
@@ -25,19 +28,19 @@ class TestAccount(DBTestCase):
         WindowsRegistry.MainWindow.settings.click()
 
 
-    def test_1_account_adding(self):
+    def test_1_account_adding(self) -> None:
         """Test adding account to the application."""
 
-        def _open_add_window():
+        def _open_add_window() -> None:
             """Click button that show add account window."""
 
-            def _add_account():
+            def _add_account() -> None:
                 """Fill account data and click add button."""
 
                 WindowsRegistry.AddAccountWindow.account_name.setText("Second test user")
                 WindowsRegistry.AddAccountWindow.current_balance.setText("100")
 
-                def _check_account_existance():
+                def _check_account_existance() -> None:
                     """Check if account exists in the database."""
 
                     self.assertTrue(Session.db.account_query.account_exists("Second test user"), "Second test user hasn't been created")
@@ -52,18 +55,18 @@ class TestAccount(DBTestCase):
         qsleep(500)           
     
 
-    def test_2_account_rename(self):
+    def test_2_account_rename(self) -> None:
         """Test renaming account."""
 
-        def _open_rename_window():
+        def _open_rename_window() -> None:
             """Click button that show rename account window."""
 
-            def _rename_account():
+            def _rename_account() -> None:
                 """Set new account name and click rename button."""
 
                 WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user rename test")
 
-                def _check_account_name():
+                def _check_account_name() -> None:
                     """Check if account name has been changed."""
 
                     self.assertEqual(Session.db.account_query.get_account().name, "Test user rename test", "Test user hasn't been renamed")
@@ -73,7 +76,7 @@ class TestAccount(DBTestCase):
                 qsleep(300)
 
                 WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user")
-                def _rename_back():
+                def _rename_back() -> None:
                     """Rename account back to original name. So it doesn't affect other tests."""
 
                     self.assertEqual(Session.db.account_query.get_account().name, "Test user", "Test user hasn't been renamed back")
@@ -89,7 +92,7 @@ class TestAccount(DBTestCase):
         qsleep(700)
     
 
-    def test_3_account_deletion(self):
+    def test_3_account_deletion(self) -> None:
         """Test deleting account."""
 
         Session.config.account_name = "Second test user"
@@ -99,14 +102,14 @@ class TestAccount(DBTestCase):
         load_accounts()
         load_account_data(Session.config.account_name)
 
-        def _delete_account():
+        def _delete_account() -> None:
             """Click button that show delete account window."""
 
-            def _confirm_deletion():
+            def _confirm_deletion() -> None:
                 """Click delete account button."""
 
                 WindowsRegistry.Messages.delete_account_warning.ok_button.click()
-                def _check_deletion():
+                def _check_deletion() -> None:
                     """Check if account has been deleted."""
 
                     self.assertFalse(Session.db.account_query.account_exists("Second test user"), "Account hasn't been removed")

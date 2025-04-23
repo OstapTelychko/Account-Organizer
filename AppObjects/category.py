@@ -26,7 +26,7 @@ class Category:
             add_transaction:QPushButton,
             delete_transaction:QPushButton,
             edit_transaction:QPushButton,
-            window:QWidget):
+            window:QWidget) -> None:
     
         self.id = id
         self.type = type

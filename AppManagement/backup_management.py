@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-def load_backups():
+def load_backups() -> None:
     """Load backups from database and display them in the table."""
 
     WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(0)
@@ -48,7 +48,7 @@ def load_backups():
         logger.debug(f"Backup {backup.timestamp} loaded into list")
 
 
-def create_backup():
+def create_backup() -> None:
     """Create a backup of the database. The backup is created in the BACKUPS_DIRECTORY folder."""
     
     app_version = Session.app_version
@@ -63,7 +63,7 @@ def create_backup():
     backup = Backup(backup_name, timestamp, app_version)
     Session.backups[str(id(backup))] = backup
 
-    def _enable_button():
+    def _enable_button() -> None:
         WindowsRegistry.BackupManagementWindow.create_backup.setEnabled(True)
     WindowsRegistry.BackupManagementWindow.create_backup.setEnabled(False)
 
@@ -72,7 +72,7 @@ def create_backup():
     QTimer.singleShot(1000, _enable_button)
 
 
-def remove_backup():
+def remove_backup() -> int:
     """Remove a backup from the table and delete the backup file."""
 
     selected_items = WindowsRegistry.BackupManagementWindow.backups_table.selectedItems()
@@ -86,12 +86,12 @@ def remove_backup():
     if len(Session.backups)-1 < MIN_RECOMMENDED_BACKUPS:
         WindowsRegistry.Messages.below_recommended_min_backups.exec()
         if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
-            return
+            return 0
     
     else:
         WindowsRegistry.Messages.delete_buckup_confirmation.exec()
         if WindowsRegistry.Messages.delete_buckup_confirmation.clickedButton() != WindowsRegistry.Messages.delete_buckup_confirmation.ok_button:
-            return
+            return 0
     
     row = selected_items[0].row()
     backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()]
@@ -105,8 +105,10 @@ def remove_backup():
     columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
     columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
+    return 1
 
-def load_backup():
+
+def load_backup() -> int:
     """Load a selected backup from the table. The backup is replaced with the current database. Current database is saved in the BACKUPS_DIRECTORY folder."""
 
     selected_items = WindowsRegistry.BackupManagementWindow.backups_table.selectedItems()
@@ -126,7 +128,7 @@ def load_backup():
     WindowsRegistry.Messages.load_backup_confirmation.setText(LanguageStructure.Messages.get_translation(24).replace("timestamp", backup.timestamp))
     WindowsRegistry.Messages.load_backup_confirmation.exec()
     if WindowsRegistry.Messages.load_backup_confirmation.clickedButton() != WindowsRegistry.Messages.load_backup_confirmation.ok_button:
-        return
+        return 0
     
     create_backup()
 
@@ -149,9 +151,10 @@ def load_backup():
     load_account_data(Session.config.account_name)
     WindowsRegistry.BackupManagementWindow.done(0)
     WindowsRegistry.SettingsWindow.done(0)
+    return 1
 
 
-def auto_backup():
+def auto_backup() -> None:
     """Check if the auto backup is enabled and create a backup if necessary."""
 
     if len(Session.backups) == 0:
@@ -175,7 +178,7 @@ def auto_backup():
         logger.debug("Daily backup created")
 
 
-def open_auto_backup_window():
+def open_auto_backup_window() -> None:
     """Open the auto backup window and set the current status of the auto backup."""
 
     WindowsRegistry.AutoBackupWindow.monthly.setCheckState(Qt.CheckState.Unchecked)
@@ -200,7 +203,7 @@ def open_auto_backup_window():
     WindowsRegistry.AutoBackupWindow.exec()
 
 
-def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
+def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int) -> None:
     """Prevent the same auto backup status from being selected. If one is selected, the others are unchecked.
 
         Arguments
@@ -231,7 +234,7 @@ def prevent_same_auto_backup_status(status_checkbox:QCheckBox, state:int):
             WindowsRegistry.AutoBackupWindow.daily.setCheckState(Qt.CheckState.Unchecked)
 
 
-def save_auto_backup_settings():
+def save_auto_backup_settings() -> None:
     """Save the auto backup settings. Check if the auto backup is enabled and set the status. If the auto backup is disabled, show a warning message."""
 
     if WindowsRegistry.AutoBackupWindow.monthly.isChecked():
@@ -320,7 +323,7 @@ def save_auto_backup_settings():
     logger.info("Auto backup settings saved")
 
 
-def auto_remove_backups():
+def auto_remove_backups() -> None:
     """Remove backups if the auto backup removal is enabled. The backups are removed if the number of backups is greater than the maximum number of backups."""
 
     sorted_backups = sorted(Session.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT))

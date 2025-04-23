@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def requests_retry_session(retries:int = 3, backoff_factor:float = 0.3, status_forcelist:tuple = (429, 500, 502, 503, 504)):
+def requests_retry_session(retries:int = 3, backoff_factor:float = 0.3, status_forcelist:tuple[int, ...] = (429, 500, 502, 503, 504)) -> req.Session:
     """Create a requests session with retry logic.
 
         Arguments
@@ -109,7 +109,7 @@ def get_latest_version() -> str:
             response = request_session.get(LATEST_RELEASE_URL, timeout=15)
         response.raise_for_status()
 
-        latest_version = response.json()["tag_name"]
+        latest_version:str = response.json()["tag_name"]
         return latest_version
     
     except req.exceptions.HTTPError as e:
@@ -198,7 +198,7 @@ def download_latest_update() -> bool:
         return False
 
 
-def prepare_update():
+def prepare_update() -> None:
     """Prepare the update by copying the GUI library and creating backups of the database files."""
 
     logger.info("Preparing update")
@@ -243,7 +243,7 @@ def prepare_update():
     upgraded_backups = 0
 
     logger.info("Creating and migrating backups")
-    def _create_single_backup(backup:Backup):
+    def _create_single_backup(backup:Backup) -> str:
         """Create a copy of the backup and upgrade it version but doesn't upgrade the database schema."""
 
         updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
@@ -252,10 +252,10 @@ def prepare_update():
         return updated_backup_file_path
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = {executor.submit(_create_single_backup, backup): backup for backup in Session.backups.values()}
-        updated_backups_paths = [future.result() for future in futures]
+        backup_futures = {executor.submit(_create_single_backup, backup): backup for backup in Session.backups.values()}
+        updated_backups_paths = [future.result() for future in backup_futures]
 
-    def _migrate_single_backup(backup_path:str):
+    def _migrate_single_backup(backup_path:str) -> str:
         """Upgrade the copied backup database schema to the latest version."""
 
         nonlocal upgraded_backups
@@ -273,10 +273,11 @@ def prepare_update():
         
         logger.debug(f"Migrated backup: {backup_path}")
         upgraded_backups += 1
+        return backup_path
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = {executor.submit(_migrate_single_backup, backup_path): backup_path for backup_path in updated_backups_paths}
-        for future in futures:
+        path_futures = {executor.submit(_migrate_single_backup, backup_path): backup_path for backup_path in updated_backups_paths}
+        for future in path_futures:
             future.result()
             WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setValue(upgraded_backups)
     logger.info("Backups created and migrated")
@@ -293,7 +294,7 @@ def prepare_update():
     logger.info("Update preparation finished")
         
         
-def apply_update():
+def apply_update() -> None:
     """Apply the update by moving files and."""
 
     logger.info("Applying update")
@@ -356,7 +357,7 @@ def apply_update():
     Session.restart_app()
 
 
-def check_for_updates():
+def check_for_updates() -> None:
     """Check for updates and ask to download them if available."""
 
     logger.info("__BREAK_LINE__")
@@ -373,7 +374,7 @@ def check_for_updates():
         WindowsRegistry.Messages.update_available.exec()
         if WindowsRegistry.Messages.update_available.clickedButton() == WindowsRegistry.Messages.update_available.ok_button:
             
-            def _run_update():
+            def _run_update() -> None:
                 logger.info("Running update")
                 if download_latest_update():
                     logger.info("Downloaded latest update")
@@ -383,4 +384,4 @@ def check_for_updates():
             QTimer.singleShot(150, _run_update)
             WindowsRegistry.UpdateProgressWindow.exec()
     else:
-        return WindowsRegistry.Messages.failed_update_check.exec()
+        WindowsRegistry.Messages.failed_update_check.exec()

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 import logging
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
@@ -22,6 +22,7 @@ from backend.statistics_query import StatisticsQuery
 
 if TYPE_CHECKING:
     from sqlalchemy import Engine
+    from sqlite3 import Connection as SQLiteConnection
 
 
 
@@ -31,7 +32,7 @@ class DBController():
     """This class is used to manage the database connection and queries.
     It handles the creation of the database engine, session, and queries for accounts, categories, transactions, backups, and statistics."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Init db connection 
 
         logger.info("Loadin alembic config")
@@ -47,7 +48,7 @@ class DBController():
             logger.debug("Engine created")
 
         @event.listens_for(self.engine, "connect")
-        def set_sqlite_pragma(dbapi_connection, connection_record):
+        def set_sqlite_pragma(dbapi_connection:SQLiteConnection, connection_record:Any) -> None:
             """Set SQLite PRAGMA settings for the connection."""
 
             cursor = dbapi_connection.cursor()
@@ -60,7 +61,7 @@ class DBController():
             logger.info("Upgrading database")
             command.upgrade(self.alembic_config, "head")
 
-        self.account_id = None
+        self.account_id:int|None = None
         self.session = sessionmaker(bind=self.engine)()
 
         self.account_query = AccountQuery(self.session)
@@ -72,7 +73,7 @@ class DBController():
         logger.info("Db session created")
 
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         """Close the database connection and commit the session."""
 
         logger.info("Closing db connection")
@@ -114,7 +115,7 @@ class DBController():
             return set(context.get_current_heads()) == set(directory.get_heads())
 
 
-    def set_account_id(self, account_name:str):
+    def set_account_id(self, account_name:str) -> None:
         """Set the account ID based on the account name.
 
             Arguments
@@ -135,7 +136,7 @@ class DBController():
         self.statistics_query.account_id = self.account_id
     
 
-    def create_account(self, account_name:str, balance:float|int=0):
+    def create_account(self, account_name:str, balance:float|int=0) -> None:
         """Create a new account in the database.
 
             Arguments

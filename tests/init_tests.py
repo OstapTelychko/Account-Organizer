@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 
 
-def test_main(app_main:Callable[[], None]):
+def test_main(app_main:Callable[[], None]) -> None:
     """This function is used to run the tests in the test suite.
         Arguments
         ---------
@@ -74,7 +74,7 @@ def test_main(app_main:Callable[[], None]):
         
         print(f"Tests found: {suite.countTestCases()}")
 
-        TextTestRunner(resultclass=ColoredTextTestResult).run(suite)
+        TextTestRunner(resultclass=ColoredTextTestResult).run(suite) #type: ignore[arg-type] #Mypy doesn't recognize ColoredTextTestResult as a valid type for resultclass
 
     except Exception as ex:
         print(ex)

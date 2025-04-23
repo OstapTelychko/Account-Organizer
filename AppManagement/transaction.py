@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget):
+def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget) -> int:
     """Show edit transaction window. It allows to edit transaction data.
 
         Arguments
@@ -49,10 +49,10 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     WindowsRegistry.TransactionManagementWindow.transaction_value.setText(selected_row[2].text())
 
     WindowsRegistry.TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(), 3).text())
-    WindowsRegistry.TransactionManagementWindow.exec()
+    return WindowsRegistry.TransactionManagementWindow.exec()
 
 
-def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float, category_data:CustomTableWidget):
+def update_transaction(transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float, category_data:CustomTableWidget) -> None:
     """Update transaction data. It updates transaction data in database and GUI.
 
         Arguments
@@ -89,7 +89,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             category_data.item(row,2).setText(str(transaction_value))
 
 
-def show_add_transaction_window(category_name:str):
+def show_add_transaction_window(category_name:str) -> None:
     """Show add transaction window. It allows to add transaction data.
         Arguments
         ---------
@@ -109,7 +109,7 @@ def show_add_transaction_window(category_name:str):
     WindowsRegistry.TransactionManagementWindow.exec()
 
 
-def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget, category_id:int):
+def add_transaction(transaction_name:str, transaction_day:int, transaction_value:int|float, category_data:CustomTableWidget, category_id:int) -> None:
     """Add transaction data. It adds transaction data to database and GUI.
         Arguments
         ---------
@@ -154,7 +154,7 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     WindowsRegistry.TransactionManagementWindow.hide()
 
 
-def transaction_data_handler():
+def transaction_data_handler() -> int:
     """Handle transaction data. It checks if transaction data is valid and adds or updates transaction data."""
 
     transaction_name = WindowsRegistry.TransactionManagementWindow.transaction_name.text().strip()
@@ -201,10 +201,11 @@ def transaction_data_handler():
     
     update_account_balance()
     WindowsRegistry.TransactionManagementWindow.hide()
+    return 1
         
 
 
-def remove_transaction(category_data:CustomTableWidget, category_id:int):
+def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
     """Remove transaction. It removes transaction from database and GUI.
 
         Arguments
@@ -252,3 +253,5 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int):
 
         columns = category_data.verticalHeader()
         columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+    
+    return 1

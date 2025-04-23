@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QScrollArea
 from PySide6.QtCore import Qt, QPropertyAnimation
 
 if TYPE_CHECKING:
+    from PySide6.QtWidgets import QWidget
     from PySide6.QtGui import QWheelEvent
 
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 class HorizontalScrollArea(QScrollArea):
     """This class is used to create a horizontal scroll area that can be scrolled using the mouse wheel."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:QWidget|None =None) -> None:
         super().__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
@@ -22,7 +23,7 @@ class HorizontalScrollArea(QScrollArea):
         self.animation.setDuration(self.default_duration)
 
 
-    def wheelEvent(self, event:QWheelEvent):
+    def wheelEvent(self, event:QWheelEvent) -> None:
         """Override the wheel event to scroll horizontally instead of vertically.
 
             Arguments
