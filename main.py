@@ -194,7 +194,7 @@ def main() -> None:
     WindowsRegistry.BackupManagementWindow.create_backup.clicked.connect(create_backup)
     WindowsRegistry.BackupManagementWindow.delete_backup.clicked.connect(remove_backup)
     WindowsRegistry.BackupManagementWindow.load_backup.clicked.connect(load_backup)
-    WindowsRegistry.BackupManagementWindow.auto_backup.clicked.connect(open_auto_backup_window)
+    WindowsRegistry.SettingsWindow.auto_backup.clicked.connect(open_auto_backup_window)
 
     WindowsRegistry.AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.monthly))
     WindowsRegistry.AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.weekly))

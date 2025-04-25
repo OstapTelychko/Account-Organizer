@@ -71,6 +71,10 @@
                 "0": "Settings",
                 "1": "Created ",
                 "2": "App version: ",
+                "3": "<b>General</b>",
+                "4": "<b>Account</b>",
+                "5": "<b>Info</b>",
+                "6": "<b>Backup</b>",
 
                 "Backup management":{
                     "0": "Database management",
@@ -272,6 +276,10 @@
                 "0": "Налаштування",
                 "1": "Акаунт створений ",
                 "2": "Версія додатку: ",
+                "3": "<b>Загальні</b>",
+                "4": "<b>Акаунт</b>",
+                "5": "<b>Інформація</b>",
+                "6": "<b>Резервне копіювання</b>",
 
                 "Backup management":{
                     "0": "Управління базою даних",
@@ -472,6 +480,10 @@
                 "0": "Ustawienia",
                 "1": "Konto dodane ",
                 "2": "Wersja aplikacji: ",
+                "3": "<b>Ogólne</b>",
+                "4": "<b>Konto</b>",
+                "5": "<b>Informacje</b>",
+                "6": "<b>Przechowywanie rezerwowe</b>",
 
                 "Backup management":{
                     "0": "Zarządzanie bazą danych",

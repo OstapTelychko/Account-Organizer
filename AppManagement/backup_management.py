@@ -254,19 +254,19 @@ def save_auto_backup_settings() -> None:
 
     if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
 
     if WindowsRegistry.AutoBackupWindow.no_auto_removal.isChecked():
         if Session.config.auto_backup_removal_enabled:

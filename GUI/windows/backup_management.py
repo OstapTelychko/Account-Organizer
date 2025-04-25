@@ -53,26 +53,10 @@ class BackupManagementWindow(SubWindow):
         self.backups_wrapper.setLayout(self.backups_layout)
         self.backups_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.backups_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
-        self.auto_backup = create_button("Auto backup", (220, 40))
-        self.auto_backup_status = QLabel("Status monthly")
-        self.auto_backup_status.setProperty("class", "light-text")
-        self.auto_backup_status.setFont(BASIC_FONT)
-
-        self.auto_backup_layout = QVBoxLayout()
-        self.auto_backup_layout.addWidget(self.auto_backup, alignment=ALIGN_H_CENTER)
-        self.auto_backup_layout.addWidget(self.auto_backup_status, alignment=ALIGN_H_CENTER)
-
-        self.auto_backup_wrapper = QWidget()
-        self.auto_backup_wrapper.setProperty("class", "wrapper")
-        self.auto_backup_wrapper.setLayout(self.auto_backup_layout)
-        self.auto_backup_wrapper.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        self.auto_backup_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.auto_backup_wrapper, **SHADOW_EFFECT_ARGUMENTS))
-
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)
         self.main_layout.setSpacing(25)
         self.main_layout.addWidget(self.backups_wrapper)
-        self.main_layout.addWidget(self.auto_backup_wrapper, alignment=ALIGN_H_CENTER)
         self.main_layout.setContentsMargins(20, 10, 20, 20)
 
         self.window_container.setLayout(self.main_layout)

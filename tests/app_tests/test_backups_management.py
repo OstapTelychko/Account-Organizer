@@ -259,12 +259,12 @@ class TestBackupsManagement(DBTestCase):
 
                 translated_daily_status = LanguageStructure.BackupManagement.get_translation(7)
                 self.assertNotEqual(WindowsRegistry.AutoBackupWindow.current_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
-                self.assertNotEqual(WindowsRegistry.BackupManagementWindow.auto_backup_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
+                self.assertNotEqual(WindowsRegistry.SettingsWindow.auto_backup_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
 
             QTimer.singleShot(100, _choose_daily_auto_backup)
-            WindowsRegistry.BackupManagementWindow.auto_backup.click()
+            WindowsRegistry.SettingsWindow.auto_backup.click()
 
         self.open_backup_management_window(_set_daily_status)
         qsleep(500)
@@ -292,12 +292,12 @@ class TestBackupsManagement(DBTestCase):
 
                 translated_weekly_status = LanguageStructure.BackupManagement.get_translation(6)
                 self.assertNotEqual(WindowsRegistry.AutoBackupWindow.current_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
-                self.assertNotEqual(WindowsRegistry.BackupManagementWindow.auto_backup_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
+                self.assertNotEqual(WindowsRegistry.SettingsWindow.auto_backup_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
 
             QTimer.singleShot(100, _choose_weekly_auto_backup)
-            WindowsRegistry.BackupManagementWindow.auto_backup.click()
+            WindowsRegistry.SettingsWindow.auto_backup.click()
 
         self.open_backup_management_window(_set_weekly_status)
         qsleep(500)
@@ -325,12 +325,12 @@ class TestBackupsManagement(DBTestCase):
 
                 translated_monthly_status = LanguageStructure.BackupManagement.get_translation(5)
                 self.assertNotEqual(WindowsRegistry.AutoBackupWindow.current_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
-                self.assertNotEqual(WindowsRegistry.BackupManagementWindow.auto_backup_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
+                self.assertNotEqual(WindowsRegistry.SettingsWindow.auto_backup_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
 
             QTimer.singleShot(100, _choose_monthly_auto_backup)
-            WindowsRegistry.BackupManagementWindow.auto_backup.click()
+            WindowsRegistry.SettingsWindow.auto_backup.click()
 
         self.open_backup_management_window(_set_monthly_status)
         qsleep(500)
@@ -640,7 +640,7 @@ class TestBackupsManagement(DBTestCase):
                 WindowsRegistry.AutoBackupWindow.save.click()
 
             QTimer.singleShot(100, _set_new_max_backups)
-            WindowsRegistry.BackupManagementWindow.auto_backup.click()
+            WindowsRegistry.SettingsWindow.auto_backup.click()
             
         self.open_backup_management_window(_open_auto_backup_settings)
         qsleep(1000)

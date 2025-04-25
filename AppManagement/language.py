@@ -36,6 +36,10 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Expenses))
     WindowsRegistry.SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
     WindowsRegistry.SettingsWindow.backup_management.setText(LanguageStructure.BackupManagement.get_translation(0))
+    WindowsRegistry.SettingsWindow.general_section.section_name.setText(LanguageStructure.Settings.get_translation(3))
+    WindowsRegistry.SettingsWindow.account_section.section_name.setText(LanguageStructure.Settings.get_translation(4))
+    WindowsRegistry.SettingsWindow.account_info_section.section_name.setText(LanguageStructure.Settings.get_translation(5))
+    WindowsRegistry.SettingsWindow.backup_section.section_name.setText(LanguageStructure.Settings.get_translation(6))
     
     WindowsRegistry.SettingsWindow.app_version.setText(LanguageStructure.Settings.get_translation(2) + Session.app_version)
                                        
@@ -125,25 +129,25 @@ def change_language() -> None:
     WindowsRegistry.BackupManagementWindow.create_backup.setText(LanguageStructure.BackupManagement.get_translation(1))
     WindowsRegistry.BackupManagementWindow.delete_backup.setText(LanguageStructure.BackupManagement.get_translation(2))
     WindowsRegistry.BackupManagementWindow.load_backup.setText(LanguageStructure.BackupManagement.get_translation(3))
-    WindowsRegistry.BackupManagementWindow.auto_backup.setText(LanguageStructure.BackupManagement.get_translation(4))
-    WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+    WindowsRegistry.SettingsWindow.auto_backup.setText(LanguageStructure.BackupManagement.get_translation(4))
+    WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     WindowsRegistry.AutoBackupWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(4))
     if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
     elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
-        WindowsRegistry.BackupManagementWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
     WindowsRegistry.AutoBackupWindow.monthly.setText(LanguageStructure.BackupManagement.get_translation(9))
     WindowsRegistry.AutoBackupWindow.weekly.setText(LanguageStructure.BackupManagement.get_translation(10))
     WindowsRegistry.AutoBackupWindow.daily.setText(LanguageStructure.BackupManagement.get_translation(11))
