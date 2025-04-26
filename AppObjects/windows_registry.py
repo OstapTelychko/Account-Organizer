@@ -8,6 +8,7 @@ from GUI.windows.statistics import StatisticsWindow, MonthlyStatistic, Quarterly
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.windows.update_progress import UpdateProgressWindow
 from GUI.windows.information_message import InformationMessage
+from GUI.windows.shortcuts import ShortcutsWindow
 
 
 
@@ -52,3 +53,5 @@ class WindowsRegistry:
         CustomRangeStatisticsView.copy_statistics,
         CustomRangeStatisticsView.copy_transactions
     ])
+
+    ShortcutsWindow = ShortcutsWindow(MainWindow, MainWindow.sub_windows)

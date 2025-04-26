@@ -113,6 +113,10 @@
                         "0": "Enter account name to create a new account.",
                         "1": "Enter new account name. "
                     }
+                },
+
+                "Shortcuts management":{
+                    "0": "Shortcuts management"
                 }
             },
 
@@ -318,7 +322,12 @@
                         "0": "Введіть назву акаунта для створення нового акаунта.",
                         "1": "Введіть нову назву акаунта. "
                     }
+                },
+
+                "Shortcuts management":{
+                    "0": "Сполучення клавіш"
                 }
+
             },
 
             "Statistics":{
@@ -522,6 +531,10 @@
                         "0": "Wprowadź nazwę konta, aby dodać nowe konto.",
                         "1": "Wprowadź nową nazwę konta. "
                     }
+                },
+
+                "Shortcuts management":{
+                    "0": "Zarządzanie skrótami"
                 }
             },
 

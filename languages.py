@@ -96,11 +96,14 @@ class LanguageStructure():
     BackupManagement = Settings.add_subcategory("Backup management")
     Account = Settings.add_subcategory("Account")
     AccountMessages = Account.add_subcategory("Messages")
+    ShortcutsManagement = Settings.add_subcategory("Shortcuts management")
 
     Statistics = Windows.add_subcategory("Statistics")
     Update = Windows.add_subcategory("Update")
 
     Messages = LanguageCategory("Messages")
+
+
 
 
 

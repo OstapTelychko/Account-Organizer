@@ -40,6 +40,7 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.account_section.section_name.setText(LanguageStructure.Settings.get_translation(4))
     WindowsRegistry.SettingsWindow.account_info_section.section_name.setText(LanguageStructure.Settings.get_translation(5))
     WindowsRegistry.SettingsWindow.backup_section.section_name.setText(LanguageStructure.Settings.get_translation(6))
+    WindowsRegistry.SettingsWindow.shortcuts_management.setText(LanguageStructure.ShortcutsManagement.get_translation(0))
     
     WindowsRegistry.SettingsWindow.app_version.setText(LanguageStructure.Settings.get_translation(2) + Session.app_version)
                                        
@@ -162,6 +163,8 @@ def change_language() -> None:
     WindowsRegistry.UpdateProgressWindow.setWindowTitle(LanguageStructure.Update.get_translation(0))
     WindowsRegistry.UpdateProgressWindow.update_progress_title.setText(LanguageStructure.Update.get_translation(1))
     WindowsRegistry.UpdateProgressWindow.backups_upgrade_label.setText(LanguageStructure.Update.get_translation(3))
+
+    WindowsRegistry.ShortcutsWindow.setWindowTitle(LanguageStructure.ShortcutsManagement.get_translation(0))
 
  
 def change_language_during_add_account(language:int | str) -> None:

@@ -115,6 +115,7 @@ def main() -> None:
     WindowsRegistry.SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
     WindowsRegistry.SettingsWindow.switch_account.clicked.connect(WindowsRegistry.SwitchAccountWindow.exec)
     WindowsRegistry.SettingsWindow.backup_management.clicked.connect(WindowsRegistry.BackupManagementWindow.exec)
+    WindowsRegistry.SettingsWindow.shortcuts_management.clicked.connect(WindowsRegistry.ShortcutsWindow.exec)
 
     #Activate mini calculator
     WindowsRegistry.MainWindow.calculate.clicked.connect(calculate_expression)
