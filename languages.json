@@ -26,8 +26,8 @@
             "7":"Edit",
             "8":"Load",
             "9":"Add all",
-            "10":"Remove all"
-
+            "10":"Remove all",
+            "11":"Reset"
         },
 
         "Windows":{
@@ -116,7 +116,43 @@
                 },
 
                 "Shortcuts management":{
-                    "0": "Shortcuts management"
+                    "0": "Shortcuts management",
+
+                    "Shortcuts names":{
+                        "0":"Close current window",
+                        "1":"Open settings",
+                        "2":"Open statistics",
+                        "3":"Switch account",
+                        "4":"Switch to income",
+                        "5":"Switch to expenses",
+                        "6":"Load previous month",
+                        "7":"Load next month",
+                        "8":"Focus on next category",
+                        "9":"Focus on previous category",
+                        "10":"Add transaction to focused category",
+                        "11":"Select previous transaction",
+                        "12":"Select next transaction",
+                        "13":"Delete selected transaction",
+                        "14":"Edit selected transaction"
+                    },
+
+                    "Shortcuts descriptions":{
+                        "0":"Close current window. Does not close the app.",
+                        "1":"Open settings window",
+                        "2":"Open statistics window",
+                        "3":"Open account switcher window. Instead of opening settings window and then that window",
+                        "4":"Switch showed categories to income",
+                        "5":"Switch showed categories to expenses",
+                        "6":"Load previous month categories and their transactions",
+                        "7":"Load next month categories and their transactions",
+                        "8":"Focus on next category. If you are at the last category, it will focus on the first one",
+                        "9":"Focus on previous category. If you are at the first category, it will focus on the last one",
+                        "10":"Add transaction to focused category. Category have to be focused",
+                        "11":"Select previous transaction. Category have to be focused",
+                        "12":"Select next transaction. Category have to be focused",
+                        "13":"Delete selected transaction. Transaction have to be selected",
+                        "14":"Edit selected transaction. Transaction have to be selected"
+                    }
                 }
             },
 
@@ -235,7 +271,8 @@
             "7":"Редагувати",
             "8":"Завантажити",
             "9":"Додати всі",
-            "10":"Видалити всі"
+            "10":"Видалити всі",
+            "11":"Скинути"
         },
 
         "Windows":{
@@ -325,7 +362,44 @@
                 },
 
                 "Shortcuts management":{
-                    "0": "Сполучення клавіш"
+                    "0": "Сполучення клавіш",
+
+                    "Shortcuts names":{
+                        "0":"Закрити поточне вікно",
+                        "1":"Відкрити налаштування",
+                        "2":"Відкрити статистику",
+                        "3":"Змінити акаунт",
+                        "4":"Переключити на дохід",
+                        "5":"Переключити на витрати",
+                        "6":"Завантажити попередній місяць",
+                        "7":"Завантажити наступний місяць",
+                        "8":"Змістити фокус на наступну категорію",
+                        "9":"Змістити фокус на попередню категорію",
+                        "10":"Додати транзакцію до сфокусованої категорії",
+                        "11":"Вибрати попередню транзакцію",
+                        "12":"Вибрати наступну транзакцію",
+                        "13":"Видалити вибрану транзакцію",
+                        "14":"Редагувати вибрану транзакцію"
+                    },
+
+                    "Shortcuts descriptions":{
+                        "0":"Закрити поточне вікно. Не закриває додаток.",
+                        "1":"Відкрити вікно налаштувань",
+                        "2":"Відкрити вікно статистики",
+                        "3":"Відкрити вікно зміни акаунта. Замість того, щоб відкривати вікно налаштувань, а потім це вікно",
+                        "4":"Переключити показані категорії на дохід",
+                        "5":"Переключити показані категорії на витрати",
+                        "6":"Завантажити попередні категорії місяця та їх транзакції",
+                        "7":"Завантажити наступні категорії місяця та їх транзакції",
+                        "8":"Змістити фокус на наступній категорії. Якщо ви знаходитесь на останній категорії, фокус буде на першій",
+                        "9":"Змістити фокус на попередній категорії. Якщо ви знаходитесь на першій категорії, фокус буде на останній",
+                        "10":"Додати транзакцію до сфокусованої категорії. Категорія повинна бути сфокусована",
+                        "11":"Вибрати попередню транзакцію. Категорія повинна бути сфокусована",
+                        "12":"Вибрати наступну транзакцію. Категорія повинна бути сфокусована",
+                        "13":"Видалити вибрану транзакцію. Транзакція повинна бути вибрана",
+                        "14":"Редагувати вибрану транзакцію. Транзакція повинна бути вибрана"
+                    }
+
                 }
 
             },
@@ -444,7 +518,8 @@
             "7": "Edytować",
             "8": "Załaduj",
             "9": "Dodać wszystkie",
-            "10": "Usunąć wszystkie"
+            "10": "Usunąć wszystkie",
+            "11": "Resetować"
         },
 
         "Windows":{
@@ -534,7 +609,43 @@
                 },
 
                 "Shortcuts management":{
-                    "0": "Zarządzanie skrótami"
+                    "0": "Zarządzanie skrótami",
+
+                    "Shortcuts names":{
+                        "0":"Zamknąć aktualne okno",
+                        "1":"Otworzyć okno ustawień",
+                        "2":"Otworzyć okno statystyk",
+                        "3":"Źmienić konto",
+                        "4":"Przełącz na dochody",
+                        "5":"Przełącz na wydatki",
+                        "6":"Załaduj poprzedni miesiąc",
+                        "7":"Załaduj następny miesiąc",
+                        "8":"Przenieś fokus na następną kategorię",
+                        "9":"Przenieś fokus na poprzednią kategorię",
+                        "10":"Dodaj transakcję do sfokusowanej kategorii",
+                        "11":"Wybierz poprzednią transakcję",
+                        "12":"Wybierz następną transakcję",
+                        "13":"Usunąć wybraną transakcję",
+                        "14":"Edytować wybraną transakcję"
+                    },
+
+                    "Shortcuts descriptions":{
+                        "0":"Zamknie aktualne okno, ale nie zamknie aplikacji",
+                        "1":"Otworzy okno ustawień",
+                        "2":"Otworzy okno statystyk",
+                        "3":"Otworzy okno zmiany konta, zmiast otwierać okno ustawień po sto razy",
+                        "4":"Przełączy pokazywane kategorie na dochody",
+                        "5":"Przełączy pokazywane kategorie na wydatki",
+                        "6":"Załaduje kategorie i ich transakcje z poprzedniego miesiąca",
+                        "7":"Załaduje kategorie i ich transakcje z następnego miesiąca",
+                        "8":"Przeniesie fokus na następną kategorię. Jeśli fokus jest na ostatniej kategorii, przeniesie fokus na pierwszą kategorię",
+                        "9":"Przeniesie fokus na poprzednią kategorię. Jeśli fokus jest na pierwszej kategorii, przeniesie fokus na ostatnią kategorię",
+                        "10":"Doda transakcję do sfokusowanej kategorii. Kategoria musi być sfokusowana",
+                        "11":"Wybierze poprzednią transakcję. Kategoria musi być sfokusowana",
+                        "12":"Wybierze następną transakcję. Kategoria musi być sfokusowana",
+                        "13":"Usunie wybraną transakcję. Transakcja musi być wybrana",
+                        "14":"Edytuje wybraną transakcję. Transakcja musi być wybrana"
+                    }
                 }
             },
 
