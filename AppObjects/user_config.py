@@ -50,23 +50,22 @@ class UserConfig:
         self.auto_backup_removal_enabled:bool = True
 
         self.shortcuts = {
-            UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW:"x",
-            UserConfig.ShortcutId.OPEN_SETTINGS:"s",
-            UserConfig.ShortcutId.OPEN_STATISTICS:"a",
-            UserConfig.ShortcutId.SWITCH_ACCOUNT:"shift+s",
-            UserConfig.ShortcutId.SWITCH_TO_INCOME:"q",
-            UserConfig.ShortcutId.SWITCH_TO_EXPENSE:"w",
-            UserConfig.ShortcutId.LOAD_PREVIOUS_MONTH:"shift+q",
-            UserConfig.ShortcutId.LOAD_NEXT_MONTH:"shift+w",
-            UserConfig.ShortcutId.FOCUS_ON_NEXT_CATEGORY:"ctrl+right",
-            UserConfig.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY:"ctrl+left",
-            UserConfig.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY:"e",
-            UserConfig.ShortcutId.SELECT_PREVIOUS_TRANSACTION:"up",
-            UserConfig.ShortcutId.SELECT_NEXT_TRANSACTION:"down",
-            UserConfig.ShortcutId.DELETE_TRANSACTION:"d",
-            UserConfig.ShortcutId.EDIT_TRANSACTION:"c"
+            UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW:"X",
+            UserConfig.ShortcutId.OPEN_SETTINGS:"S",
+            UserConfig.ShortcutId.OPEN_STATISTICS:"A",
+            UserConfig.ShortcutId.SWITCH_ACCOUNT:"Shift+S",
+            UserConfig.ShortcutId.SWITCH_TO_INCOME:"Q",
+            UserConfig.ShortcutId.SWITCH_TO_EXPENSE:"W",
+            UserConfig.ShortcutId.LOAD_PREVIOUS_MONTH:"Shift+Q",
+            UserConfig.ShortcutId.LOAD_NEXT_MONTH:"Shift+W",
+            UserConfig.ShortcutId.FOCUS_ON_NEXT_CATEGORY:"Ctrl+Right",
+            UserConfig.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY:"Ctrl+Left",
+            UserConfig.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY:"E",
+            UserConfig.ShortcutId.SELECT_PREVIOUS_TRANSACTION:"Up",
+            UserConfig.ShortcutId.SELECT_NEXT_TRANSACTION:"Down",
+            UserConfig.ShortcutId.DELETE_TRANSACTION:"D",
+            UserConfig.ShortcutId.EDIT_TRANSACTION:"C"
         }
-
 
 
     def load_user_config(self) -> None:
@@ -89,22 +88,11 @@ class UserConfig:
             self.max_legacy_backups = User_conf["Backup"].get("Max_legacy_backups", self.max_legacy_backups)
             self.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled)
 
-            self.shortcuts[UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW, self.shortcuts[UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW])
-            self.shortcuts[UserConfig.ShortcutId.OPEN_SETTINGS] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.OPEN_SETTINGS, self.shortcuts[UserConfig.ShortcutId.OPEN_SETTINGS])
-            self.shortcuts[UserConfig.ShortcutId.OPEN_STATISTICS] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.OPEN_STATISTICS, self.shortcuts[UserConfig.ShortcutId.OPEN_STATISTICS])
-            self.shortcuts[UserConfig.ShortcutId.SWITCH_ACCOUNT] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.SWITCH_ACCOUNT, self.shortcuts[UserConfig.ShortcutId.SWITCH_ACCOUNT])
-            self.shortcuts[UserConfig.ShortcutId.SWITCH_TO_INCOME] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.SWITCH_TO_INCOME, self.shortcuts[UserConfig.ShortcutId.SWITCH_TO_INCOME])
-            self.shortcuts[UserConfig.ShortcutId.SWITCH_TO_EXPENSE] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.SWITCH_TO_EXPENSE, self.shortcuts[UserConfig.ShortcutId.SWITCH_TO_EXPENSE])
-            self.shortcuts[UserConfig.ShortcutId.SELECT_PREVIOUS_TRANSACTION] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.SELECT_PREVIOUS_TRANSACTION, self.shortcuts[UserConfig.ShortcutId.SELECT_PREVIOUS_TRANSACTION])
-            self.shortcuts[UserConfig.ShortcutId.SELECT_NEXT_TRANSACTION] = User_conf["Shortcuts"].get(
-                UserConfig.ShortcutId.SELECT_NEXT_TRANSACTION, self.shortcuts[UserConfig.ShortcutId.SELECT_NEXT_TRANSACTION])
+            for shortcut_id, shortcut_value in self.shortcuts.items():
+                if shortcut_id in User_conf["Shortcuts"]:
+                    self.shortcuts[shortcut_id] = User_conf["Shortcuts"].get(shortcut_id, shortcut_value)
+                else:
+                    self.shortcuts[shortcut_id] = shortcut_value
 
         else:
             # If the file is not in the new format, load it as a legacy configuration (1.1.1)

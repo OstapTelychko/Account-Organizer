@@ -16,12 +16,15 @@ if TYPE_CHECKING:
 
 class ShortcutsWindow(SubWindow):
 
-    class Shortcut(QWidget):
+    class ShortcutWidget(QWidget):
         def __init__(self, parent:QWidget|None=None) -> None:
             super().__init__(parent)
             
             self.shortcut_name = QLabel()
+            self.shortcut_name.setProperty("class", "light-text")
+
             self.shortcut_description = QLabel()
+            self.shortcut_description.setProperty("class", "light-text")
             self.shortcut_description.setWordWrap(True)
             
             self.shortcut_info_layout = QVBoxLayout()
@@ -46,21 +49,21 @@ class ShortcutsWindow(SubWindow):
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
-        self.close_current_window_shortcut = self.Shortcut()
-        self.open_settings_shortcut = self.Shortcut()
-        self.open_statistics_shortcut = self.Shortcut()
-        self.switch_account_shortcut = self.Shortcut()
-        self.switch_to_income_shortcut = self.Shortcut()
-        self.switch_to_expense_shortcut = self.Shortcut()
-        self.load_previous_month_shortcut = self.Shortcut()
-        self.load_next_month_shortcut = self.Shortcut()
-        self.focus_on_next_category_shortcut = self.Shortcut()
-        self.focus_on_previous_category_shortcut = self.Shortcut()
-        self.add_transaction_to_focused_category_shortcut = self.Shortcut()
-        self.select_previous_transaction_shortcut = self.Shortcut()
-        self.select_next_transaction_shortcut = self.Shortcut()
-        self.delete_transaction_shortcut = self.Shortcut()
-        self.edit_transaction_shortcut = self.Shortcut()
+        self.close_current_window_shortcut = self.ShortcutWidget()
+        self.open_settings_shortcut = self.ShortcutWidget()
+        self.open_statistics_shortcut = self.ShortcutWidget()
+        self.switch_account_shortcut = self.ShortcutWidget()
+        self.switch_to_income_shortcut = self.ShortcutWidget()
+        self.switch_to_expense_shortcut = self.ShortcutWidget()
+        self.load_previous_month_shortcut = self.ShortcutWidget()
+        self.load_next_month_shortcut = self.ShortcutWidget()
+        self.focus_on_next_category_shortcut = self.ShortcutWidget()
+        self.focus_on_previous_category_shortcut = self.ShortcutWidget()
+        self.add_transaction_to_focused_category_shortcut = self.ShortcutWidget()
+        self.select_previous_transaction_shortcut = self.ShortcutWidget()
+        self.select_next_transaction_shortcut = self.ShortcutWidget()
+        self.delete_transaction_shortcut = self.ShortcutWidget()
+        self.edit_transaction_shortcut = self.ShortcutWidget()
         
         self.shortcuts_layout = QVBoxLayout()
         self.shortcuts_layout.addWidget(self.close_current_window_shortcut)

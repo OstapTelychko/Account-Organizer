@@ -117,23 +117,24 @@
 
                 "Shortcuts management":{
                     "0": "Shortcuts management",
+                    "1": "Shortcuts saved",
 
                     "Shortcuts names":{
-                        "0":"Close current window",
-                        "1":"Open settings",
-                        "2":"Open statistics",
-                        "3":"Switch account",
-                        "4":"Switch to income",
-                        "5":"Switch to expenses",
-                        "6":"Load previous month",
-                        "7":"Load next month",
-                        "8":"Focus on next category",
-                        "9":"Focus on previous category",
-                        "10":"Add transaction to focused category",
-                        "11":"Select previous transaction",
-                        "12":"Select next transaction",
-                        "13":"Delete selected transaction",
-                        "14":"Edit selected transaction"
+                        "0":"<b>Close current window</b>",
+                        "1":"<b>Open settings</b>",
+                        "2":"<b>Open statistics</b>",
+                        "3":"<b>Switch account</b>",
+                        "4":"<b>Switch to income</b>",
+                        "5":"<b>Switch to expenses</b>",
+                        "6":"<b>Load previous month</b>",
+                        "7":"<b>Load next month</b>",
+                        "8":"<b>Focus on next category</b>",
+                        "9":"<b>Focus on previous category</b>",
+                        "10":"<b>Add transaction to focused category</b>",
+                        "11":"<b>Select previous transaction</b>",
+                        "12":"<b>Select next transaction</b>",
+                        "13":"<b>Delete selected transaction</b>",
+                        "14":"<b>Edit selected transaction</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -239,7 +240,8 @@
             "29": "Update is available. Would you like to update?",
             "30": "No internet connection. Check connection and try again",
             "31": "Failed to check for updates. Check connection and try again",
-            "32": "Update is successfuly applied. App will restart now"
+            "32": "Update is successfuly applied. App will restart now",
+            "33": "Keystroke `keystroke_value` is already assigned to another shortcut. Please choose another key"
         }
             
     },
@@ -363,23 +365,24 @@
 
                 "Shortcuts management":{
                     "0": "Сполучення клавіш",
+                    "1": "Сполучення клавіш збережено",
 
                     "Shortcuts names":{
-                        "0":"Закрити поточне вікно",
-                        "1":"Відкрити налаштування",
-                        "2":"Відкрити статистику",
-                        "3":"Змінити акаунт",
-                        "4":"Переключити на дохід",
-                        "5":"Переключити на витрати",
-                        "6":"Завантажити попередній місяць",
-                        "7":"Завантажити наступний місяць",
-                        "8":"Змістити фокус на наступну категорію",
-                        "9":"Змістити фокус на попередню категорію",
-                        "10":"Додати транзакцію до сфокусованої категорії",
-                        "11":"Вибрати попередню транзакцію",
-                        "12":"Вибрати наступну транзакцію",
-                        "13":"Видалити вибрану транзакцію",
-                        "14":"Редагувати вибрану транзакцію"
+                        "0":"<b>Закрити поточне вікно</b>",
+                        "1":"<b>Відкрити налаштування</b>",
+                        "2":"<b>Відкрити статистику</b>",
+                        "3":"<b>Змінити акаунт</b>",
+                        "4":"<b>Переключити на дохід</b>",
+                        "5":"<b>Переключити на витрати</b>",
+                        "6":"<b>Завантажити попередній місяць</b>",
+                        "7":"<b>Завантажити наступний місяць</b>",
+                        "8":"<b>Змістити фокус на наступну категорію</b>",
+                        "9":"<b>Змістити фокус на попередню категорію</b>",
+                        "10":"<b>Додати транзакцію до сфокусованої категорії</b>",
+                        "11":"<b>Вибрати попередню транзакцію</b>",
+                        "12":"<b>Вибрати наступну транзакцію</b>",
+                        "13":"<b>Видалити вибрану транзакцію</b>",
+                        "14":"<b>Редагувати вибрану транзакцію</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -487,7 +490,8 @@
             "29": "Оновлення програми доступне. Бажаєте оновитися?",
             "30": "Немає зєднання з інтернетом. Перевірте зєднання та спробуйте знову",
             "31": "Не вдалося перевірити на наявність оновлень. Перевірте зєднання та спробуйте знову",
-            "32": "Оновлення успішно застосовано. Додаток зараз перезапуститься"
+            "32": "Оновлення успішно застосовано. Додаток зараз перезапуститься",
+            "33": "Комбінація клавіш `keystroke_value` - вже призначена до іншого сполучення клавіш. Будь ласка, виберіть іншу клавішу"
         }
     },
     
@@ -610,23 +614,24 @@
 
                 "Shortcuts management":{
                     "0": "Zarządzanie skrótami",
+                    "1": "Skróty zapisane",
 
                     "Shortcuts names":{
-                        "0":"Zamknąć aktualne okno",
-                        "1":"Otworzyć okno ustawień",
-                        "2":"Otworzyć okno statystyk",
-                        "3":"Źmienić konto",
-                        "4":"Przełącz na dochody",
-                        "5":"Przełącz na wydatki",
-                        "6":"Załaduj poprzedni miesiąc",
-                        "7":"Załaduj następny miesiąc",
-                        "8":"Przenieś fokus na następną kategorię",
-                        "9":"Przenieś fokus na poprzednią kategorię",
-                        "10":"Dodaj transakcję do sfokusowanej kategorii",
-                        "11":"Wybierz poprzednią transakcję",
-                        "12":"Wybierz następną transakcję",
-                        "13":"Usunąć wybraną transakcję",
-                        "14":"Edytować wybraną transakcję"
+                        "0":"<b>Zamknąć aktualne okno</b>",
+                        "1":"<b>Otworzyć okno ustawień</b>",
+                        "2":"<b>Otworzyć okno statystyk</b>",
+                        "3":"<b>Źmienić konto</b>",
+                        "4":"<b>Przełącz na dochody</b>",
+                        "5":"<b>Przełącz na wydatki</b>",
+                        "6":"<b>Załaduj poprzedni miesiąc</b>",
+                        "7":"<b>Załaduj następny miesiąc</b>",
+                        "8":"<b>Przenieś fokus na następną kategorię</b>",
+                        "9":"<b>Przenieś fokus na poprzednią kategorię</b>",
+                        "10":"<b>Dodaj transakcję do sfokusowanej kategorii</b>",
+                        "11":"<b>Wybierz poprzednią transakcję</b>",
+                        "12":"<b>Wybierz następną transakcję</b>",
+                        "13":"<b>Usunąć wybraną transakcję</b>",
+                        "14":"<b>Edytować wybraną transakcję</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -732,7 +737,8 @@
             "29": "Aktualizacja programu jest dostępna. Czy chcesz zaktualizować?",
             "30": "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie",
             "31": "Nie udało się sprawdzić dostępności aktualizacji. Sprawdź połączenie i spróbuj ponownie",
-            "32": "Aktualizacja została pomyślnie zastosowana. Aplikacja zostanie teraz ponownie uruchomiona"
+            "32": "Aktualizacja została pomyślnie zastosowana. Aplikacja zostanie teraz ponownie uruchomiona",
+            "33": "Skrót `keystroke_value` jest już przypisany do innego skrótu. Proszę wybrać inny klawisz"
         }
     }
 }

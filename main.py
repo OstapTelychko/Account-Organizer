@@ -52,7 +52,7 @@ from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
 from AppManagement.account import show_add_user_window, add_account, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
-from AppManagement.shortcuts import assign_shortcuts
+from AppManagement.shortcuts import load_shortcuts, save_shortcuts
 from AppManagement.update_app import check_for_updates
 
 from tests.init_tests import test_main
@@ -219,8 +219,9 @@ def main() -> None:
     logger.info("__BREAK_LINE__")
 
     #Shortcuts
-    assign_shortcuts()
-    logger.info("Shortcuts assigned")
+    WindowsRegistry.ShortcutsWindow.save_shortcuts.clicked.connect(save_shortcuts)
+    load_shortcuts()
+    logger.info("Shortcuts loaded")
     logger.info("__BREAK_LINE__")
 
     #Account management

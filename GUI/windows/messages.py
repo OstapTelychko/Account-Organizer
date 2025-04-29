@@ -60,3 +60,5 @@ class Messages():
         self.no_internet = MessageWindow(main_window, message_windows, False, NO_INTERNET_ICON, APP_NAME, APP_ICON)
         self.failed_update_check = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
         self.update_finished = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
+
+        self.shortcut_already_used = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
