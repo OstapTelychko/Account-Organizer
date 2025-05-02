@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import os
 import shutil
+import json
 import concurrent.futures
 
 from sys import platform
@@ -117,7 +118,6 @@ def get_latest_version() -> str:
         return ""
 
 
-
 def download_latest_update() -> bool:
     """Download the latest update from GitHub releases.
 
@@ -133,26 +133,46 @@ def download_latest_update() -> bool:
         else:
             response = request_session.get(LATEST_RELEASE_URL, timeout=15)
         response.raise_for_status()
-        assets = response.json()["assets"]
+
+        if response.status_code != 200:
+            logger.error(f"Failed to get latest release: {response.status_code}")
+            return False
+        
+        try:
+            assets = response.json()["assets"]
+        except KeyError:
+            logger.error("No assets found in the latest release.")
+            return False
+
+        except json.JSONDecodeError:
+            logger.error("Failed to decode JSON response.")
+            return False
 
         total_size = 0
+        download_name = ""
+        download_url = ""
+
         for asset in assets:
             if platform == "win32":
                 if asset["name"] == WINDOWS_UPDATE_ZIP:
                     download_url = asset["browser_download_url"]
+                    download_name = asset["name"]
                     total_size = int(asset["size"])
+
                     logger.info(f"Starting download of {WINDOWS_UPDATE_ZIP}")
                     logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
             else:
                 if asset["name"] == LINUX_UPDATE_ZIP:
                     download_url = asset["browser_download_url"]
+                    download_name = asset["name"]
                     total_size = int(asset["size"])
+
                     logger.info(f"Starting download of {LINUX_UPDATE_ZIP}")
                     logger.debug(f"Download url: {download_url} | Size: {total_size}")
                     break
         
-        if total_size == 0:
+        if not (total_size > 0 and isinstance(download_url, str) and download_url.strip() and isinstance(download_name, str) and download_name.strip()):
             logger.error("No update found or update is not available for this platform.")
             return False
 
@@ -171,14 +191,14 @@ def download_latest_update() -> bool:
         logger.debug("Created update directory")
 
         logger.info("Saving update on disk")
-        with open(f"{UPDATE_DIRECTORY}/{asset['name']}", "wb") as file:
+        with open(f"{UPDATE_DIRECTORY}/{download_name}", "wb") as file:
             for chunk in download_response.iter_content(chunk_size=chunk_size):
                 download_size += len(chunk)
                 file.write(chunk)
                 WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/total_size)*100))
         logger.info("Update saved on disk")
 
-        with ZipFile(f"{UPDATE_DIRECTORY}/{asset['name']}", "r") as zip_ref:
+        with ZipFile(f"{UPDATE_DIRECTORY}/{download_name}", "r") as zip_ref:
             zip_ref.extractall(UPDATE_DIRECTORY)
         logger.info("Update extracted")
         return True
@@ -215,13 +235,13 @@ def prepare_update() -> None:
     logger.debug("Created previous version copy directory")
 
     if DEVELOPMENT_MODE:
-        GUI_LIBRARY_CURRENT_PATH = os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal", GUI_LIBRARY)
+        gui_library_current_path = os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal", GUI_LIBRARY)
     else:
-        GUI_LIBRARY_CURRENT_PATH = os.path.join(ROOT_DIRECTORY, "_internal", GUI_LIBRARY)
+        gui_library_current_path = os.path.join(ROOT_DIRECTORY, "_internal", GUI_LIBRARY)
 
     GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
     if not os.path.exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
-        shutil.copytree(GUI_LIBRARY_CURRENT_PATH, GUI_LIBRARY_UPDATE_PATH)
+        shutil.copytree(gui_library_current_path, GUI_LIBRARY_UPDATE_PATH)
         logger.info("Copied GUI library to update directory")
     
     for file in MOVE_FILES_TO_UPDATE:

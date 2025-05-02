@@ -1,16 +1,13 @@
 from __future__ import annotations
-import toml
 import os
 import sys
 from typing import TYPE_CHECKING
 from datetime import datetime
-from enum import Enum
 
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MAX_RECOMMENDED_BACKUPS, \
-MAX_RECOMMENDED_LEGACY_BACKUPS, DEVELOPMENT_MODE, ERROR_LOG_FILE, TEST_USER_CONF_PATH, ERROR_LOG_START_MESSAGE
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.backup import Backup

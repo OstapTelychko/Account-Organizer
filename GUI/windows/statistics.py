@@ -133,7 +133,7 @@ class QuarterlyStatistics(SubWindow):
             self.quarter_window = QWidget()
             quarter_layout = QHBoxLayout()
             quarter_layout.setSpacing(30)
-
+            total_quarter_statistics:TotalQuarterStatisticsView = TotalQuarterStatisticsView(QLabel(), QListWidget())
 
             quarter_months_statistics_list:list[QMonthlyStatisticsView] = []
             for statistic_list in range(4):              
@@ -223,6 +223,7 @@ class YearlyStatistics(SubWindow):
 
         self.statistics_window = QWidget()
         self.statistics_window_layout = QVBoxLayout()
+        total_year_statistics:TotalYearStatisticsView = TotalYearStatisticsView(QLabel(), QListWidget())
 
         self.yearly_statistics_parts_list:list[YMonthlyStatisticsView] = []
         for statistics_list in range(13):
@@ -389,7 +390,7 @@ class CustomRangeStatistics(SubWindow):
         self.window_container.setLayout(self.main_layout)
 
 
-
+# pyright: reportIncompatibleMethodOverride=false
 class CustomRangeStatisticsView(SubWindow):
     """Represents Custom range statistics view structure."""
 
@@ -438,6 +439,7 @@ class CustomRangeStatisticsView(SubWindow):
 
         self.window_container.setLayout(self.main_layout)
 
+    
     def closeEvent(self, event:QEvent) -> None:
         event.accept()
         self.parent_window.raise_()

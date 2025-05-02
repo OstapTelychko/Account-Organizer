@@ -2,7 +2,7 @@ from typing import cast
 from PySide6.QtGui import QDoubleValidator, QValidator
 
 
-
+# pyright: reportIncompatibleMethodOverride=false
 class StrictDoubleValidator(QDoubleValidator):
     """A custom QDoubleValidator that validates double values with strict bounds.
     

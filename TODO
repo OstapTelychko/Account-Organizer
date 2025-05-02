@@ -2,8 +2,11 @@
 ☐ remove category_exists method from CategoryQuery and use get_category instead since this method returns None if the category doesn't exist
 ☐ move show_information_message to more appropriate place instead of copy_statistics
 ☐ write tests for changing shortcuts keystrokes
+☐ write tests for update check and process
 
 Archive:
+  ✔ fix bug with 201 status code in update check @started(25-05-02 21:12) @done(25-05-02 21:50) @lasted(38m5s)
+  ✔ fix problems with pyright @started(25-05-02 21:50) @done(25-05-02 23:32) @lasted(1h42m59s)
   ✔ add shortcut change option to settings window @done(25-04-30 00:49)
   ✔ update settings window to make it more scalable for further additional settings @done(25-04-26 00:31)
   ✔ fix all mypy errors with --strict option @started(25-04-23 17:24) @done(25-04-24 01:11) @lasted(7h47m35s)

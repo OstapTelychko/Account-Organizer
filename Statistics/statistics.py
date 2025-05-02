@@ -95,7 +95,6 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
         if Categories_total_values[category] == highest_total_value:
             transactions_statistic = _get_min_and_max_transactions(category, Session.current_year, month)
             Categories_with_highest_total_value[category] = (transactions_statistic[0], transactions_statistic[1])
-    # Categories_with_highest_total_value["Highest total value"] = highest_total_value
 
     #Lowest categories
     for category,total_value in Categories_total_values.copy().items():
@@ -103,6 +102,7 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
             del Categories_total_values[category]
 
     Categories_with_lowest_total_value:CategoriesWithLowestTotalValue = {}
+    lowest_total_value = 0.0
     if len(Categories_total_values) != 0:
         lowest_total_value = min([total_value for total_value in Categories_total_values.values() if total_value])
         
@@ -110,7 +110,6 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
             if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
                 transactions_statistic = _get_min_and_max_transactions(category, Session.current_year, month)
                 Categories_with_lowest_total_value[category] = (transactions_statistic[0], transactions_statistic[1])
-        # Categories_with_lowest_total_value["Lowest total value"] = lowest_total_value
 
     return (Categories_with_highest_total_value, highest_total_value, Categories_with_lowest_total_value, lowest_total_value, Categories_total_values)
 

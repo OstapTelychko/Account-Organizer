@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 QKey = Qt.Key
 QModifier = Qt.KeyboardModifier
 
+# pyright: reportIncompatibleMethodOverride=false
 class ShortcutCaptureEdit(QLineEdit):
     """A line edit that captures keyboard shortcuts."""
         

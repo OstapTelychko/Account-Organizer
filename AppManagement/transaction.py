@@ -157,6 +157,8 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
 def transaction_data_handler() -> int:
     """Handle transaction data. It checks if transaction data is valid and adds or updates transaction data."""
 
+    from AppManagement.category import update_category_total_value
+
     transaction_name = WindowsRegistry.TransactionManagementWindow.transaction_name.text().strip()
     raw_transaction_day = WindowsRegistry.TransactionManagementWindow.transaction_day.text()
     raw_transaction_value = WindowsRegistry.TransactionManagementWindow.transaction_value.text()
@@ -193,10 +195,7 @@ def transaction_data_handler() -> int:
         add_transaction(transaction_name, transaction_day, transaction_value, category_data, category_id)
         logger.debug(f"Transaction added: {transaction_name} | {transaction_day} | {transaction_value} | Category id: {category_id}")
 
-    try:
-        update_category_total_value
-    except UnboundLocalError:
-        from AppManagement.category import update_category_total_value
+
     update_category_total_value(category_id)
     
     update_account_balance()
@@ -214,6 +213,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
         `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to delete selected row data.
         `category_id` : (int) - Category id. It will be used to find category which transaction should be removed from.
     """
+    from AppManagement.category import update_category_total_value
 
     selected_row = category_data.selectedItems()
 
@@ -232,10 +232,6 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
 
         category_data.removeRow(selected_row[0].row())
 
-        try:
-            update_category_total_value
-        except UnboundLocalError:
-            from AppManagement.category import update_category_total_value
         update_category_total_value(category_id)
 
         if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":

@@ -331,31 +331,37 @@ def auto_remove_backups() -> None:
     legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != Session.app_version]
 
     if len(backups) != 0:
+        supported_backups_row = -1
         for row in range(WindowsRegistry.BackupManagementWindow.backups_table.rowCount()):
             backup_id = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()
             if backup_id == backups[0][0]:
                 supported_backups_row = row
 
-        while len(backups) > Session.config.max_backups:
-            backup_id, backup = backups.pop(0)
-            
-            os.remove(backup.db_file_path)
-            logger.debug(f"Backup {backup.timestamp} removed")
-            del Session.backups[backup_id]
+        if supported_backups_row != -1:
+            while len(backups) > Session.config.max_backups:
+                backup_id, backup = backups.pop(0)
+                
+                os.remove(backup.db_file_path)
+                logger.debug(f"Backup {backup.timestamp} removed")
+                del Session.backups[backup_id]
 
-            WindowsRegistry.BackupManagementWindow.backups_table.removeRow(supported_backups_row)
-            columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
-            columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-            supported_backups_row -= 1
-    
+                WindowsRegistry.BackupManagementWindow.backups_table.removeRow(supported_backups_row)
+                columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
+                columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+                supported_backups_row -= 1
 
     if len(legacy_backups) == 0:
         return
     
+    legacy_backups_row = -1
     for row in range(WindowsRegistry.BackupManagementWindow.backups_table.rowCount()):
         backup_id = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()
         if backup_id == legacy_backups[0][0]:
             legacy_backups_row = row
+
+    if legacy_backups_row == -1:
+        logger.error(f"Legacy backups row not found, although found {len(legacy_backups)} legacy backups")
+        return
 
     while len(legacy_backups) > Session.config.max_legacy_backups:
         backup_id, backup = legacy_backups.pop(0)

@@ -5,8 +5,6 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QTimer
 
 from sys import platform
-if platform == "win32":
-    import ctypes
 
 from GUI.gui_constants import DWMWA_USE_IMMERSIVE_DARK_MODE
 from AppObjects.session import Session
@@ -47,6 +45,8 @@ class MessageWindow(QMessageBox):
         It also sets the theme of the message window to match the main window theme on windows OS."""
 
         if platform == "win32":
+            import ctypes
+
             if Session.config.theme == "Dark":
                 value = ctypes.c_int(2)
             else:

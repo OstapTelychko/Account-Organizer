@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from sys import platform
-if platform == "win32":
-    import ctypes
+import ctypes
 
 from PySide6.QtGui import QIcon
 from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped] #I don't want to write a stub for this library

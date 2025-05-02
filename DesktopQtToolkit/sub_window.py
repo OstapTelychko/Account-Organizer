@@ -7,7 +7,7 @@ from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICO
 from DesktopQtToolkit.create_button import create_button
 
 
-
+# pyright: reportIncompatibleMethodOverride=false
 class SubWindow(QDialog):
     """This class is used to create a sub window that can be used to display sub windows."""
 

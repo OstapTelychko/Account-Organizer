@@ -52,14 +52,16 @@ class LanguageCategory:
     def get_translation(self, translation_index:int) -> str:
         """Get the translation for the category. If the translation is not found, return the name of the category."""
         
+        translations_category:ParsedTranslationCategory = dict()
+        
         try:
             translations_category = reduce(getitem, self.path(), LANGUAGES[Session.config.language]) #type: ignore[arg-type]
         except KeyError as exception:
             logger.error(f"{exception} - path: {self.path()} - language: {Session.config.language}")
         
         if not isinstance(translations_category, dict):
-            logger.error(f"Translations category  {translations_category} is not a dictionary - {self.path()}")
-            raise TypeError(f"Translations category  {translations_category} is not a dictionary - {self.path()}")
+            logger.error(f"Translations category is not a dictionary it's {type(translations_category)} - {self.path()}")
+            raise TypeError(f"Translations category is not a dict (found {type(translations_category)}), path: {self.path()}")
         
         translation = translations_category.get(translation_index)
         if translation is None:

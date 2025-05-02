@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from PySide6.QtGui import QKeyEvent, QWheelEvent, QPixmap, QIcon
 
 
-
+# pyright: reportIncompatibleMethodOverride=false
 class CustomTableWidget(QTableWidget):
     """This class is used to create a custom table widget that allows for copying multiple cells to the clipboard and prevents scrolling out of widget when the table widget runs out of rows."""
 

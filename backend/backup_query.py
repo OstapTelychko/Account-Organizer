@@ -30,6 +30,9 @@ class BackupQuery:
 
         if self.engine.url.database is not None:
             db_file_path = self.engine.url.database.replace("sqlite:///", "")
+
+            conn = None
+            backup_conn = None
             try:
                 with sql_connect(db_file_path) as conn:
                     conn.execute("PRAGMA VACUUM")
@@ -37,8 +40,10 @@ class BackupQuery:
                     with sql_connect(backup_file_path) as backup_conn:
                         conn.backup(backup_conn)
             finally:
-                conn.close()
-                backup_conn.close()
+                if conn:
+                    conn.close()
+                if backup_conn:
+                    backup_conn.close()
 
         else:
             logger.error("Database file path is None. Cannot create backup.")
@@ -53,10 +58,14 @@ class BackupQuery:
                 `backup_file_path` : (str) - Path to the backup file.
         """
 
+        conn = None
+        backup_conn = None
         try:
             with sql_connect(external_db_path) as conn:
                 with sql_connect(backup_file_path) as backup_conn:
                     conn.backup(backup_conn)
         finally:
-            conn.close()
-            backup_conn.close()
+            if conn:
+                conn.close()
+            if backup_conn:
+                backup_conn.close()

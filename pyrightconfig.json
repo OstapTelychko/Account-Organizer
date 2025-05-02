@@ -1,0 +1,6 @@
+{
+    "ignore": ["**/QTimer.singleShot"],
+    "reportOverridesMismatch": {
+        "exclude": ["**/QDoubleValidator.validate"]
+    },
+}

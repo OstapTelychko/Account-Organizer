@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 
-
+# pyright: reportIncompatibleMethodOverride=false
 class HorizontalScrollArea(QScrollArea):
     """This class is used to create a horizontal scroll area that can be scrolled using the mouse wheel."""
 
