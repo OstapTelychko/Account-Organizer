@@ -3,6 +3,7 @@
 ☐ move show_information_message to more appropriate place instead of copy_statistics
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
+☐ fix bug when user can write letter after dot (.) in decimal field
 
 Archive:
   ✔ fix bug with 201 status code in update check @started(25-05-02 21:12) @done(25-05-02 21:50) @lasted(38m5s)
