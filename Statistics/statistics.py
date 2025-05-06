@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypeAlias
 from functools import partial
 from datetime import date
-from collections import defaultdict
+from collections import defaultdict, Counter
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
 
 from languages import LanguageStructure
@@ -23,10 +23,11 @@ if TYPE_CHECKING:
 
 
 logger = get_logger(__name__)
-CountedTransactions:TypeAlias = dict[str, int|float]
+CountedTransactionsWithLowestValue:TypeAlias = dict[str, int]
+CountedTransactionsWithHighestValue:TypeAlias = dict[str, int]
 
-CategoriesWithHighestTotalValue:TypeAlias = dict[int, tuple[CountedTransactions, CountedTransactions]]
-CategoriesWithLowestTotalValue:TypeAlias = dict[int, tuple[CountedTransactions, CountedTransactions]]
+CategoriesWithHighestTotalValue:TypeAlias = dict[int, tuple[CountedTransactionsWithHighestValue, float, CountedTransactionsWithLowestValue, float]]
+CategoriesWithLowestTotalValue:TypeAlias = dict[int, tuple[CountedTransactionsWithHighestValue, float, CountedTransactionsWithLowestValue, float]]
 CategoriesTotalValues:TypeAlias = dict[int, float]
 
 
@@ -52,7 +53,7 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
 
     highest_total_value = max(Categories_total_values.values())
 
-    def _get_min_and_max_transactions(category:int, year:int, month:int) -> tuple[CountedTransactions, CountedTransactions]:
+    def _get_min_and_max_transactions(category:int, year:int, month:int) -> tuple[CountedTransactionsWithHighestValue, float, CountedTransactionsWithLowestValue, float]:
         """Get transactions with highest and lowest value in category
 
             Arguments
@@ -64,7 +65,9 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
             -------
                 `tuple`:
                     `transactions_with_highest_value` (dict) - transactions with highest value in category\n
+                    `highest_transaction_value` (float) - highest transaction value in category\n
                     `transactions_with_lowest_value` (dict) - transactions with lowest value in category
+                    `lowest_transaction_value` (float) - lowest transaction value in category
         """
 
         #Highest transactions
@@ -72,29 +75,23 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
         transactions_with_highest_value = Session.db.statistics_query.get_monthly_transactions_by_value(category, year, month, highest_transaction_value)
 
         transactions_names = [str(transaction.name) for transaction in transactions_with_highest_value]
-        counted_transactions_with_highest_value:CountedTransactions = {}
-        for transaction_name in set(transactions_names):
-            counted_transactions_with_highest_value[transaction_name] = transactions_names.count(transaction_name)
-        counted_transactions_with_highest_value["Highest value"] = highest_transaction_value
+        counted_transactions_with_highest_value:CountedTransactionsWithHighestValue = Counter(transactions_names)
         
         #Lowest transactions
         lowest_transaction_value = Session.db.statistics_query.get_monthly_transactions_min_value(category, year, month)
         transactions_with_lowest_value = Session.db.statistics_query.get_monthly_transactions_by_value(category, year, month, lowest_transaction_value)
 
         transactions_names = [str(transaction.name) for transaction in transactions_with_lowest_value]
-        counted_transactions_with_lowest_value:CountedTransactions = {}
-        for transaction_name in set(transactions_names):
-            counted_transactions_with_lowest_value[transaction_name] = transactions_names.count(transaction_name)
-        counted_transactions_with_lowest_value["Lowest value"] = lowest_transaction_value
+        counted_transactions_with_lowest_value:CountedTransactionsWithLowestValue = Counter(transactions_names)
 
-        return (counted_transactions_with_highest_value, counted_transactions_with_lowest_value)
+        return (counted_transactions_with_highest_value, highest_transaction_value, counted_transactions_with_lowest_value, lowest_transaction_value)
 
     #Highest categories
     Categories_with_highest_total_value:CategoriesWithHighestTotalValue = {}
     for category in Categories_total_values:
         if Categories_total_values[category] == highest_total_value:
             transactions_statistic = _get_min_and_max_transactions(category, Session.current_year, month)
-            Categories_with_highest_total_value[category] = (transactions_statistic[0], transactions_statistic[1])
+            Categories_with_highest_total_value[category] = (*transactions_statistic,)
 
     #Lowest categories
     for category,total_value in Categories_total_values.copy().items():
@@ -109,7 +106,7 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
         for category in Categories_total_values:
             if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
                 transactions_statistic = _get_min_and_max_transactions(category, Session.current_year, month)
-                Categories_with_lowest_total_value[category] = (transactions_statistic[0], transactions_statistic[1])
+                Categories_with_lowest_total_value[category] = (*transactions_statistic,)
 
     return (Categories_with_highest_total_value, highest_total_value, Categories_with_lowest_total_value, lowest_total_value, Categories_total_values)
 
@@ -135,22 +132,19 @@ def add_statistic(statistic_list:QListWidget, statistic_data:tuple[CategoriesWit
 
         #Highest transactions
         statistic_list.addItem("\n"+LanguageStructure.Statistics.get_translation(words[4]))
-        for transaction_name, transaction_value in statistic[category][0].items():
-            if transaction_name != "Highest value":
+        for transaction_name, transaction_occurrences in statistic[category][0].items():
+            if transaction_name == "":
+                transaction_name = LanguageStructure.Statistics.get_translation(12)
+            statistic_list.addItem(f"{transaction_name} - {statistic[category][1]}" if transaction_occurrences == 1 else f"{transaction_occurrences}x {transaction_name} - {statistic[category][1]}")
+        
+        #Lowest transactions
+        if statistic[category][3] != statistic[category][1]:
+            statistic_list.addItem("\n"+LanguageStructure.Statistics.get_translation(words[5]))
+            for transaction_name, transaction_occurrences in statistic[category][2].items():
 
                 if transaction_name == "":
                     transaction_name = LanguageStructure.Statistics.get_translation(12)
-                statistic_list.addItem(f"{transaction_name} - {statistic[category][0]['Highest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][0]['Highest value']}")
-        
-        #Lowest transactions
-        if statistic[category][1]["Lowest value"] != statistic[category][0]["Highest value"]:
-            statistic_list.addItem("\n"+LanguageStructure.Statistics.get_translation(words[5]))
-            for transaction_name,transaction_value in statistic[category][1].items():
-
-                if transaction_name != "Lowest value":
-                    if transaction_name == "":
-                        transaction_name = LanguageStructure.Statistics.get_translation(12)
-                    statistic_list.addItem(f"{transaction_name} - {statistic[category][1]['Lowest value']}" if transaction_value == 1 else f"{transaction_value}x {transaction_name} - {statistic[category][1]['Lowest value']}")
+                statistic_list.addItem(f"{transaction_name} - {statistic[category][3]}" if transaction_occurrences == 1 else f"{transaction_occurrences}x {transaction_name} - {statistic[category][3]}")
     
     #Highest category
     if len(statistic_data[0]) == 1:

@@ -1,11 +1,11 @@
-☐ replace same transaction counting in statistics with Counter class from collections
 ☐ remove category_exists method from CategoryQuery and use get_category instead since this method returns None if the category doesn't exist
 ☐ move show_information_message to more appropriate place instead of copy_statistics
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
-✔ fix bug when user can write letter after dot (.) in decimal field @started(25-05-06 23:29) @done(25-05-06 23:39) @lasted(10m30s)
 
 Archive:
+  ✔ replace same transaction counting in statistics with Counter class from collections @started(25-05-06 23:40) @done(25-05-07 00:13) @lasted(33m47s)
+  ✔ fix bug when user can write letter after dot (.) in decimal field @started(25-05-06 23:29) @done(25-05-06 23:39) @lasted(10m30s)
   ✔ add shortcut_widget_to_translations, shortcut_widget_to_default_values, to ShortcutManager @started(25-05-06 19:30) @done(25-05-06 21:31) @lasted(2h1m31s)
   ✔ fix bug with 201 status code in update check @started(25-05-02 21:12) @done(25-05-02 21:50) @lasted(38m5s)
   ✔ fix problems with pyright @started(25-05-02 21:50) @done(25-05-02 23:32) @lasted(1h42m59s)
