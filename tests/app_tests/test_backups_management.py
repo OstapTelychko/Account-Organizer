@@ -67,15 +67,15 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                f"Backup file hasn't been created or more than 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 self.assertEqual(WindowsRegistry.BackupManagementWindow.create_backup.isEnabled(), True, "Create backup button hasn't been enabled")
                 
@@ -122,15 +122,15 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 0, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been removed from the table or more then 0 backups are left {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                f"Backup hasn't been removed from the table or more than 0 backups are left {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 0, len(Session.backups),
-                f"Backup hasn't been removed from the session or more then 0 backups are left {len(Session.backups)}")
+                f"Backup hasn't been removed from the session or more than 0 backups are left {len(Session.backups)}")
 
                 self.assertEqual(
                 0, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been removed or more then 0 backups are left {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                f"Backup file hasn't been removed or more than 0 backups are left {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
                 
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
@@ -351,30 +351,30 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                f"Backup file hasn't been created or more than 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 def _check_no_new_backup() -> None:
                     """Check if no new backup is created since last backup is new"""
 
                     self.assertEqual(
                     1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup have been added even though less then 1 day has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                    f"Backup have been added even though less than 1 day has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     1, len(Session.backups),
-                    f"Backup have been added even though less then 1 day has passed {len(Session.backups)}")
+                    f"Backup have been added even though less than 1 day has passed {len(Session.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file have been created even though less then 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                    f"Backup file have been created even though less than 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
@@ -388,15 +388,15 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     2, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup during daily auto backup hasn't been added to the table or more then 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                    f"Backup during daily auto backup hasn't been added to the table or more than 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     2, len(Session.backups),
-                    f"Backup during daily auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}")
+                    f"Backup during daily auto backup hasn't been added to the session or more than 2 backups are added {len(Session.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file during daily auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                    f"Backup file during daily auto backup hasn't been created or more than 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                     WindowsRegistry.BackupManagementWindow.done(0)
                     WindowsRegistry.SettingsWindow.done(0)
@@ -405,11 +405,11 @@ class TestBackupsManagement(DBTestCase):
                 auto_backup()
                 
             qsleep(1000)
-            QTimer.singleShot(1000, _check_backup_appearance)
+            QTimer.singleShot(1500, _check_backup_appearance)
             WindowsRegistry.BackupManagementWindow.create_backup.click()
         
         QTimer.singleShot(200, _prepare_auto_daily_backup)
-        qsleep(5000)
+        qsleep(6000)
 
 
     def test_6_auto_weekly_backup(self) -> None:
@@ -427,30 +427,30 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                f"Backup file hasn't been created or more than 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 def _check_no_new_backup() -> None:
                     """Check if no new backup is created since last backup is new"""
 
                     self.assertEqual(
                     1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup have been added even though less then 7 days has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                    f"Backup have been added even though less than 7 days has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     1, len(Session.backups),
-                    f"Backup have been added even though less then 7 days has passed {len(Session.backups)}")
+                    f"Backup have been added even though less than 7 days has passed {len(Session.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file have been created even though less then 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                    f"Backup file have been created even though less than 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
@@ -464,15 +464,15 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     2, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup during weekly auto backup hasn't been added to the table or more then 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                    f"Backup during weekly auto backup hasn't been added to the table or more than 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     2, len(Session.backups),
-                    f"Backup during weekly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}")
+                    f"Backup during weekly auto backup hasn't been added to the session or more than 2 backups are added {len(Session.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file during weekly auto backup hasn't been created or more then 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                    f"Backup file during weekly auto backup hasn't been created or more than 2 backups are created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                     WindowsRegistry.BackupManagementWindow.done(0)
                     WindowsRegistry.SettingsWindow.done(0)
@@ -480,11 +480,11 @@ class TestBackupsManagement(DBTestCase):
                 QTimer.singleShot(1000, _check_second_backup_appearance)
                 auto_backup()
 
-            QTimer.singleShot(1200, _check_backup_appearance)
+            QTimer.singleShot(1500, _check_backup_appearance)
             WindowsRegistry.BackupManagementWindow.create_backup.click()
 
         QTimer.singleShot(100, _prepare_auto_weekly_backup)
-        qsleep(5000)
+        qsleep(6000)
     
 
     def test_7_auto_monthly_backup(self) -> None:
@@ -502,30 +502,30 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(
                 1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                f"Backup hasn't been added to the table or more then 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
                 1, len(Session.backups),
-                f"Backup hasn't been added to the session or more then 1 backup is added {len(Session.backups)}")
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                f"Backup file hasn't been created or more then 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                f"Backup file hasn't been created or more than 1 backup is created {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 def _check_no_new_backup() -> None:
                     """Check if no new backup is created since last backup is new"""
 
                     self.assertEqual(
                     1, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup have been added even though less then 30 days has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                    f"Backup have been added even though less than 30 days has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     1, len(Session.backups),
-                    f"Backup have been added even though less then 30 days has passed {len(Session.backups)}")
+                    f"Backup have been added even though less than 30 days has passed {len(Session.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
-                    f"Backup file have been created even though less then 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
+                    f"Backup file have been created even though less than 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
                 QTimer.singleShot(200, _check_no_new_backup)
                 auto_backup()
@@ -539,11 +539,11 @@ class TestBackupsManagement(DBTestCase):
 
                     self.assertEqual(
                     2, WindowsRegistry.BackupManagementWindow.backups_table.rowCount(),
-                    f"Backup during monthly auto backup hasn't been added to the table or more then 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
+                    f"Backup during monthly auto backup hasn't been added to the table or more than 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
                     2, len(Session.backups),
-                    f"Backup during monthly auto backup hasn't been added to the session or more then 2 backups are added {len(Session.backups)}")
+                    f"Backup during monthly auto backup hasn't been added to the session or more than 2 backups are added {len(Session.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -555,11 +555,11 @@ class TestBackupsManagement(DBTestCase):
                 QTimer.singleShot(1000, _check_second_backup_appearance)
                 auto_backup()
 
-            QTimer.singleShot(1000, _check_backup_appearance)
+            QTimer.singleShot(1500, _check_backup_appearance)
             WindowsRegistry.BackupManagementWindow.create_backup.click()
 
         QTimer.singleShot(100, _prepare_auto_monthly_backup)
-        qsleep(5000)
+        qsleep(6000)
 
 
     def test_8_check_max_backups_change(self) -> None:

@@ -227,7 +227,7 @@
             "16": "Name of category can't be empty field",
             "17": "The position must be within 0-max_position",
             "18": "The position can't be the same",
-            "19": "From-date can't be bigger then to-date",
+            "19": "From-date can't be bigger than to-date",
             "20": "You have to select at least one category",
             "21": "Amount of backups will be less than recommended. Continue?",
             "22": "Are you sure you want to delete database? This action is irreversible",

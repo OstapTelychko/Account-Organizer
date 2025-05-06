@@ -125,7 +125,7 @@ class TestShortcuts(DBTestCase):
         QTest.keySequence(
             WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
-        qsleep(100)
+        qsleep(200)
 
         if Session.focused_income_category is None:
             logger.error("Focused category is None")
@@ -154,12 +154,12 @@ class TestShortcuts(DBTestCase):
         QTest.keySequence(
             WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
-        qsleep(100)
+        qsleep(200)
 
         QTest.keySequence(
             WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]))
-        qsleep(100)
+        qsleep(200)
 
         if Session.focused_income_category is None:
             logger.error("Focused category is None")
@@ -185,7 +185,7 @@ class TestShortcuts(DBTestCase):
         QTest.keySequence(
             WindowsRegistry.MainWindow,
             QKeySequence(Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]))
-        qsleep(400)
+        qsleep(600)
 
 
     def test_10_select_next_and_previous_transaction(self) -> None:

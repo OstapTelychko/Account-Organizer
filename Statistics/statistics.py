@@ -40,8 +40,8 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
         Returns
         -------
             `tuple`:
-            `Categories_with_highest_total_value` (dict) - all categories with highest value, if more then one category have the same top value\n
-            `Categories_with_lowest_total_value` (dict) - all categories with lowest value, if more then one category have the same bottom value returns 0 categories if only 1 category exists\n
+            `Categories_with_highest_total_value` (dict) - all categories with highest value, if more than one category have the same top value\n
+            `Categories_with_lowest_total_value` (dict) - all categories with lowest value, if more than one category have the same bottom value returns 0 categories if only 1 category exists\n
             `Categories_total_values` (dict) - all categories with their total value 
     """
 

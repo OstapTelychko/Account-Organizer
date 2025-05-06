@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QMessageBox
 from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.shortcuts_manager import ShortcutsManager
 
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LanguageStructure
@@ -165,25 +166,8 @@ def change_language() -> None:
     WindowsRegistry.UpdateProgressWindow.backups_upgrade_label.setText(LanguageStructure.Update.get_translation(3))
 
     WindowsRegistry.ShortcutsWindow.setWindowTitle(LanguageStructure.ShortcutsManagement.get_translation(0))
-    shortcut_mapping = {
-        WindowsRegistry.ShortcutsWindow.close_current_window_shortcut: 0,
-        WindowsRegistry.ShortcutsWindow.open_settings_shortcut: 1,
-        WindowsRegistry.ShortcutsWindow.open_statistics_shortcut: 2,
-        WindowsRegistry.ShortcutsWindow.switch_account_shortcut: 3,
-        WindowsRegistry.ShortcutsWindow.switch_to_income_shortcut: 4,
-        WindowsRegistry.ShortcutsWindow.switch_to_expense_shortcut: 5,
-        WindowsRegistry.ShortcutsWindow.load_previous_month_shortcut: 6,
-        WindowsRegistry.ShortcutsWindow.load_next_month_shortcut: 7,
-        WindowsRegistry.ShortcutsWindow.focus_on_next_category_shortcut: 8,
-        WindowsRegistry.ShortcutsWindow.focus_on_previous_category_shortcut: 9,
-        WindowsRegistry.ShortcutsWindow.add_transaction_to_focused_category_shortcut: 10,
-        WindowsRegistry.ShortcutsWindow.select_previous_transaction_shortcut: 11,
-        WindowsRegistry.ShortcutsWindow.select_next_transaction_shortcut: 12,
-        WindowsRegistry.ShortcutsWindow.delete_transaction_shortcut: 13,
-        WindowsRegistry.ShortcutsWindow.edit_transaction_shortcut: 14
-    }
 
-    for shortcut, index in shortcut_mapping.items():
+    for shortcut, index in ShortcutsManager.shortcut_widget_to_translations.items():
         shortcut.shortcut_name.setText(LanguageStructure.ShortcutsNames.get_translation(index))
         shortcut.shortcut_description.setText(LanguageStructure.ShortcutsDescriptions.get_translation(index))
         shortcut.reset_shortcut.setText(LanguageStructure.GeneralManagement.get_translation(11))

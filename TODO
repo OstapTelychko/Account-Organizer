@@ -4,9 +4,9 @@
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
 ☐ fix bug when user can write letter after dot (.) in decimal field
-☐ add shortcut_widget_to_translations, shortcut_widget_to_default_values, to ShortcutManager
 
 Archive:
+  ✔ add shortcut_widget_to_translations, shortcut_widget_to_default_values, to ShortcutManager @started(25-05-06 19:30) @done(25-05-06 21:31) @lasted(2h1m31s)
   ✔ fix bug with 201 status code in update check @started(25-05-02 21:12) @done(25-05-02 21:50) @lasted(38m5s)
   ✔ fix problems with pyright @started(25-05-02 21:50) @done(25-05-02 23:32) @lasted(1h42m59s)
   ✔ add shortcut change option to settings window @done(25-04-30 00:49)
