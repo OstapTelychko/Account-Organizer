@@ -19,7 +19,8 @@ class StrictDoubleValidator(QDoubleValidator):
                 return QValidator.State.Intermediate, input_str, pos
             
             if input_str.find(".") != -1:
-                if len(input_str.split(".")[1]) > self.decimals():
+                decimal_part = input_str.split(".")[1]
+                if len(decimal_part) > self.decimals() or not decimal_part.isdigit() and len(decimal_part) > 0:
                     return QValidator.State.Invalid, input_str, pos
                 
                 return QValidator.State.Intermediate, input_str, pos

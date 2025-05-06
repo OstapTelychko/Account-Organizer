@@ -3,7 +3,7 @@
 ☐ move show_information_message to more appropriate place instead of copy_statistics
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
-☐ fix bug when user can write letter after dot (.) in decimal field
+✔ fix bug when user can write letter after dot (.) in decimal field @started(25-05-06 23:29) @done(25-05-06 23:39) @lasted(10m30s)
 
 Archive:
   ✔ add shortcut_widget_to_translations, shortcut_widget_to_default_values, to ShortcutManager @started(25-05-06 19:30) @done(25-05-06 21:31) @lasted(2h1m31s)
