@@ -25,6 +25,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
+import setproctitle
 from sys import exit
 from argparse import ArgumentParser
 from functools import partial
@@ -39,7 +40,7 @@ from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from GUI.gui_constants import app
+from GUI.gui_constants import app, APP_NAME
 from GUI.theme import switch_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list, remove_all_categories_from_statistics_list
@@ -57,8 +58,8 @@ from AppManagement.update_app import check_for_updates
 
 from tests.init_tests import test_main
 
-
-
+max_possible_length = len(setproctitle.getproctitle())
+setproctitle.setproctitle(APP_NAME[:max_possible_length])
 logger = get_logger(__name__)
 
 

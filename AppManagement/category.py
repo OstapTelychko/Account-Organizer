@@ -11,8 +11,9 @@ from languages import LanguageStructure
 from GUI.gui_constants import ALIGNMENT
 from GUI.category import load_category, add_category_to_position_list
 
-from Statistics.copy_statistics import show_information_message
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
+
+from AppManagement.information_message import show_information_message
 from AppManagement.balance import calculate_current_balance
 from AppManagement.transaction import show_add_transaction_window, show_edit_transaction_window, remove_transaction
 

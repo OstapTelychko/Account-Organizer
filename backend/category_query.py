@@ -125,7 +125,7 @@ class CategoryQuery:
         if category:
             return category
         else:
-            logger.error(f"Category with name {name} and type {category_type} not found.")
+            logger.error(f"Category with name {name} and type {category_type} not found. Although it should be there.")
             return None
             
     

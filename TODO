@@ -1,9 +1,13 @@
-☐ remove category_exists method from CategoryQuery and use get_category instead since this method returns None if the category doesn't exist
-☐ move show_information_message to more appropriate place instead of copy_statistics
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
+☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
+☐ move dev environment from global libraries to virtual environment
+☐ create requirements.txt, readme.md and preview images
 
 Archive:
+  ✔ replace app icon with new one @done(25-05-10 00:40)
+  ✔ move show_information_message to more appropriate place instead of copy_statistics @done(25-05-10 00:29)
+  ✔ set custom process name for the application @started(25-05-09 23:14) @done(25-05-09 23:50) @lasted(36m56s)
   ✔ replace same transaction counting in statistics with Counter class from collections @started(25-05-06 23:40) @done(25-05-07 00:13) @lasted(33m47s)
   ✔ fix bug when user can write letter after dot (.) in decimal field @started(25-05-06 23:29) @done(25-05-06 23:39) @lasted(10m30s)
   ✔ add shortcut_widget_to_translations, shortcut_widget_to_default_values, to ShortcutManager @started(25-05-06 19:30) @done(25-05-06 21:31) @lasted(2h1m31s)

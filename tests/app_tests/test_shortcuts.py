@@ -174,6 +174,7 @@ class TestShortcuts(DBTestCase):
         """Test adding transaction to focused category with shortcut."""        
         
         def _add_transaction() -> None:
+            self.assertTrue(WindowsRegistry.TransactionManagementWindow.isVisible(), f"Transaction management window should be opened after {Session.config.shortcuts[Session.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut.")
             WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
             WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
             WindowsRegistry.TransactionManagementWindow.button.click()

@@ -11,9 +11,9 @@ from AppObjects.shortcuts_manager import ShortcutsManager
 
 from AppManagement.shortcuts.shortcuts_actions import move_to_next_category, move_to_previous_category, add_transaction_to_focused_category,\
 select_previous_transaction, select_next_transaction, delete_transaction, edit_transaction
+from AppManagement.information_message import show_information_message
 
 from languages import LanguageStructure
-from Statistics.copy_statistics import show_information_message
 
 if TYPE_CHECKING:
     from GUI.windows.shortcuts import ShortcutsWindow
