@@ -1,10 +1,13 @@
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
-☐ move dev environment from global libraries to virtual environment
-☐ create requirements.txt, readme.md and preview images
+☐ create requirements.txt, readme.md and preview images @started(25-05-11 20:49)
+☐ make all classes that have to be inited once to be singletons
+☐ add html tags to messages in languages.json
+☐ fix bug that failed tests runned by QTimer.singleShot doesn't make the test to fail in the end
 
 Archive:
+  ✔ move dev environment from global libraries to virtual environment @started(25-05-11 20:49) @done(25-05-11 23:00) @lasted(2h11m33s)
   ✔ replace app icon with new one @done(25-05-10 00:40)
   ✔ move show_information_message to more appropriate place instead of copy_statistics @done(25-05-10 00:29)
   ✔ set custom process name for the application @started(25-05-09 23:14) @done(25-05-09 23:50) @lasted(36m56s)

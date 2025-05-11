@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 import os
 import shutil
 from datetime import datetime
-from PySide6.QtWidgets import QHeaderView
 from PySide6.QtCore import QTimer, Qt
 
 from languages import LanguageStructure
@@ -94,7 +93,7 @@ def remove_backup() -> int:
             return 0
     
     row = selected_items[0].row()
-    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()]
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess] #This will never be None, since the row is selected
 
 
     del Session.backups[str(id(backup))]
@@ -102,9 +101,6 @@ def remove_backup() -> int:
     os.remove(backup.db_file_path)
     logger.debug(f"Backup {backup.timestamp} removed")
     
-    columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
-    columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-
     return 1
 
 
@@ -120,7 +116,7 @@ def load_backup() -> int:
         return WindowsRegistry.Messages.only_one_row.exec()
 
     row = selected_items[0].row()
-    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()]
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess] #This will never be None, since the row is selected
 
     if backup.app_version != Session.app_version:
         return WindowsRegistry.Messages.different_app_version.exec()
@@ -161,7 +157,7 @@ def auto_backup() -> None:
         create_backup()
         return
     
-    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()]
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] # type: ignore[reportOptionalMemberAccess] # I already check if amount of backups is 0
     backup_date = datetime.strptime(backup.timestamp, BACKUPS_DATE_FORMAT)
     current_date = datetime.now()
 
@@ -333,7 +329,14 @@ def auto_remove_backups() -> None:
     if len(backups) != 0:
         supported_backups_row = -1
         for row in range(WindowsRegistry.BackupManagementWindow.backups_table.rowCount()):
-            backup_id = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()
+            backup_row = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2)
+
+            if backup_row is not None:
+                backup_id = backup_row.text()
+            else:
+                logger.error(f"Backup row {row} is None although there are {len(backups)} backups")
+                return
+
             if backup_id == backups[0][0]:
                 supported_backups_row = row
 
@@ -346,8 +349,6 @@ def auto_remove_backups() -> None:
                 del Session.backups[backup_id]
 
                 WindowsRegistry.BackupManagementWindow.backups_table.removeRow(supported_backups_row)
-                columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
-                columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
                 supported_backups_row -= 1
 
     if len(legacy_backups) == 0:
@@ -355,7 +356,14 @@ def auto_remove_backups() -> None:
     
     legacy_backups_row = -1
     for row in range(WindowsRegistry.BackupManagementWindow.backups_table.rowCount()):
-        backup_id = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()
+        backup_row = WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2)
+        if backup_row is not None:
+            backup_id = backup_row.text()
+        else:
+            logger.error(f"Backup row {row} is None although there are {len(legacy_backups)} legacy backups")
+            return
+        
+        backup_id = backup_row.text()
         if backup_id == legacy_backups[0][0]:
             legacy_backups_row = row
 
@@ -371,6 +379,4 @@ def auto_remove_backups() -> None:
         del Session.backups[backup_id]
 
         WindowsRegistry.BackupManagementWindow.backups_table.removeRow(legacy_backups_row)
-        columns = WindowsRegistry.BackupManagementWindow.backups_table.verticalHeader()
-        columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         legacy_backups_row -= 1

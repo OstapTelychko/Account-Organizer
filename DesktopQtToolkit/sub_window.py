@@ -1,7 +1,7 @@
 from __future__ import annotations
 from sys import platform
 from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
-from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect
+from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect, QByteArray
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICON, SHADOW_EFFECT_ARGUMENTS
 from DesktopQtToolkit.create_button import create_button
@@ -20,7 +20,7 @@ class SubWindow(QDialog):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        self.opacity_animation = QPropertyAnimation(self, b"windowOpacity", self) 
+        self.opacity_animation = QPropertyAnimation(self, QByteArray(b"windowOpacity"), self) 
         self.opacity_animation.setDuration(100)
         self.opacity_animation.setStartValue(0.0)
         self.opacity_animation.setEndValue(1.0)
@@ -29,7 +29,7 @@ class SubWindow(QDialog):
         self.window_container.setProperty("class", "sub_window")
         self.window_container.setGraphicsEffect(QGraphicsDropShadowEffect(self.window_container, **SHADOW_EFFECT_ARGUMENTS))
 
-        self.size_animation = QPropertyAnimation(self.window_container, b"geometry", self.window_container)
+        self.size_animation = QPropertyAnimation(self.window_container, QByteArray(b"geometry"), self.window_container)
         self.size_animation.setDuration(100)
 
         self.animation_group = QParallelAnimationGroup(self)

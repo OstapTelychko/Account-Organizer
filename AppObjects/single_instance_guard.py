@@ -61,9 +61,14 @@ class SingleInstanceGuard(QObject):
         client_connection:QTcpSocket = cast(QTcpSocket, self.sender())
         
         while client_connection.bytesAvailable() > 0:
-            line = client_connection.readLine().data().decode()
+            line = client_connection.readLine().data()
+            if isinstance(line, (bytes, bytearray)):
+                decoded_line = line.decode()
+            else:
+                logger.error(f"Received data is not bytes or bytearray. Data: {line}")
+                return
 
-            if line.strip() == "RAISE_WINDOW":
+            if decoded_line.strip() == "RAISE_WINDOW":
                 self.main_window.activateWindow()
                 self.main_window.raise_()
         client_connection.disconnectFromHost()

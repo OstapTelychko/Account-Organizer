@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QHeaderView
 from PySide6.QtCore import Qt
 
 from GUI.gui_constants import ALIGNMENT
@@ -48,7 +47,7 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     WindowsRegistry.TransactionManagementWindow.transaction_day.setText(selected_row[1].text())
     WindowsRegistry.TransactionManagementWindow.transaction_value.setText(selected_row[2].text())
 
-    WindowsRegistry.TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(), 3).text())
+    WindowsRegistry.TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(), 3).text()) # type: ignore #This will never be None, because row is selected
     return WindowsRegistry.TransactionManagementWindow.exec()
 
 
@@ -68,11 +67,11 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
     Session.db.transaction_query.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
                 
     for row in range(category_data.rowCount()):
-        if int(category_data.item(row, 3).text()) == transaction_id:
-            category_data.item(row, 0).setText(transaction_name)
-            category_data.item(row, 1).setText(str(transaction_day))
+        if int(category_data.item(row, 3).text()) == transaction_id: # type: ignore[reportOptionalMemberAccess] # We only access amount  of rows that is returned by rowCount()
+            category_data.item(row, 0).setText(transaction_name) # type: ignore[reportOptionalMemberAccess]
+            category_data.item(row, 1).setText(str(transaction_day)) # type: ignore[reportOptionalMemberAccess]
 
-            old_value = float(category_data.item(row,2).text())
+            old_value = float(category_data.item(row,2).text()) # type: ignore[reportOptionalMemberAccess]
             values_difference = transaction_value - old_value
 
             if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
@@ -86,7 +85,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             Session.current_total_income = round(Session.current_total_income, 2)
             Session.current_total_expenses = round(Session.current_total_expenses, 2)
 
-            category_data.item(row,2).setText(str(transaction_value))
+            category_data.item(row, 2).setText(str(transaction_value)) # type: ignore[reportOptionalMemberAccess]
 
 
 def show_add_transaction_window(category_name:str) -> None:
@@ -221,7 +220,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
         return WindowsRegistry.Messages.unselected_row.exec()
     
     if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
-        transaction_id = int(category_data.item(selected_row[0].row(), 3).text())
+        transaction_id = int(category_data.item(selected_row[0].row(), 3).text()) # type: ignore[reportOptionalMemberAccess] #This will never be None, because row is selected
     else:
         return WindowsRegistry.Messages.only_one_row.exec()
 
@@ -246,8 +245,5 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
         Session.current_total_expenses = round(Session.current_total_expenses, 2)
 
         update_account_balance()
-
-        columns = category_data.verticalHeader()
-        columns.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
     
     return 1

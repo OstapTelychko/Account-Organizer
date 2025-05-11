@@ -16,7 +16,7 @@ def create_button(button_text:str, size:tuple[int, int], css_class:str="button")
             `QPushButton` - A button widget with the specified properties.
     """
 
-    button = QPushButton(text=button_text)
+    button = QPushButton(button_text)
     button.setFont(BASIC_FONT)
     button.setMinimumSize(*size)
     button.setMaximumSize(*size)

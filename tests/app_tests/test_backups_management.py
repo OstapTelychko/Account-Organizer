@@ -380,7 +380,7 @@ class TestBackupsManagement(DBTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()]
+                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess] #This item is added above, so it will return it
                 backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -456,7 +456,7 @@ class TestBackupsManagement(DBTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()]
+                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess] #This item is added above, so it will return it
                 backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -531,7 +531,7 @@ class TestBackupsManagement(DBTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()]
+                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess] #This item is added above, so it will return it
                 backup.timestamp = date_minus_30_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:

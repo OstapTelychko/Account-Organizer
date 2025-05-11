@@ -89,6 +89,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
     column = category_data.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+    column.setStretchLastSection(True)
 
     category_data.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(0), LanguageStructure.Transactions.get_translation(1), LanguageStructure.Transactions.get_translation(2)))
 

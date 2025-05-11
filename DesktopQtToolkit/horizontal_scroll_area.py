@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QScrollArea
-from PySide6.QtCore import Qt, QPropertyAnimation
+from PySide6.QtCore import Qt, QPropertyAnimation, QByteArray
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
@@ -19,7 +19,7 @@ class HorizontalScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
         self.default_duration = 200
-        self.animation = QPropertyAnimation(self.horizontalScrollBar(), b"value")
+        self.animation = QPropertyAnimation(self.horizontalScrollBar(), QByteArray(b"value"))
         self.animation.setDuration(self.default_duration)
 
 

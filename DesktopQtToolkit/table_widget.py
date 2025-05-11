@@ -30,7 +30,7 @@ class CustomTableWidget(QTableWidget):
             copy_text = ''
             max_column = copied_cells[-1].column()
             for cell in copied_cells:
-                copy_text += self.item(cell.row(), cell.column()).text()
+                copy_text += self.item(cell.row(), cell.column()).text() #type: ignore[reportOptionalMemberAccess] #We acces only the cells that are selected
                 if cell.column() == max_column:
                     copy_text += '\n'
                 else:

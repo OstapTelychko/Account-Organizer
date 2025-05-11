@@ -4,7 +4,7 @@ from unittest import TestCase, TextTestResult
 import shutil
 from functools import wraps
 
-from colorama import init as colorama_init, Fore, Style
+from colorama import init as colorama_init, Fore
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter

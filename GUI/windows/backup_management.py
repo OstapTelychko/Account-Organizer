@@ -30,6 +30,7 @@ class BackupManagementWindow(SubWindow):
 
         column = self.backups_table.verticalHeader()
         column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        column.setStretchLastSection(True)
 
         row = self.backups_table.horizontalHeader()
         row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -78,8 +79,8 @@ class AutoBackupWindow(SubWindow):
         self.status_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.status_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
         self.status_wrapper.setLayout(QVBoxLayout())
-        self.status_wrapper.layout().addWidget(self.current_status)
-        self.status_wrapper.layout().setContentsMargins(20, 20, 20, 20)
+        self.status_wrapper.layout().addWidget(self.current_status) # type: ignore[reportOptionalMemberAccess] #This layout is added above, so it will return it
+        self.status_wrapper.layout().setContentsMargins(20, 20, 20, 20) # type: ignore[reportOptionalMemberAccess] 
 
         self.monthly = QCheckBox("Monthly")
         self.monthly.setFont(BASIC_FONT)
