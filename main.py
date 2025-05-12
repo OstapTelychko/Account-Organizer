@@ -32,7 +32,7 @@ from functools import partial
 
 from PySide6.QtCore import QTimer
 
-from project_configuration import FORBIDDEN_CALCULATOR_WORDS
+from project_configuration import FORBIDDEN_CALCULATOR_WORDS, APP_NAME
 from languages import LanguageStructure
 from backend.db_controller import DBController
 
@@ -40,7 +40,7 @@ from AppObjects.session import Session
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from GUI.gui_constants import app, APP_NAME
+from GUI.gui_constants import app
 from GUI.theme import switch_theme, load_theme
 
 from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list, remove_all_categories_from_statistics_list

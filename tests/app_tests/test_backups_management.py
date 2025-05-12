@@ -8,7 +8,7 @@ from PySide6.QtCore import QTimer
 
 from languages import LanguageStructure
 from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, BACKUPS_DATE_FORMAT
-from tests.tests_toolkit import DBTestCase, qsleep
+from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from AppObjects.session import Session
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 
-class TestBackupsManagement(DBTestCase):
+class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     """Test backup management in the application."""
 
     def setUp(self) -> None:
@@ -47,10 +47,10 @@ class TestBackupsManagement(DBTestCase):
         """
 
         def _open_backup_management() -> None:
-            QTimer.singleShot(100, func)
+            QTimer.singleShot(100, self.catch_failure(func))
             WindowsRegistry.SettingsWindow.backup_management.click()
 
-        QTimer.singleShot(100, _open_backup_management)
+        QTimer.singleShot(100, self.catch_failure(_open_backup_management))
         WindowsRegistry.MainWindow.settings.click()
 
 
@@ -83,7 +83,7 @@ class TestBackupsManagement(DBTestCase):
                 WindowsRegistry.SettingsWindow.done(0)
 
             self.assertEqual(WindowsRegistry.BackupManagementWindow.create_backup.isEnabled(), False, "Create backup button hasn't been disabled")
-            QTimer.singleShot(1200, _check_backup_appearance)
+            QTimer.singleShot(1200, self.catch_failure(_check_backup_appearance))
 
         self.open_backup_management_window(_create_backup)
 
@@ -103,7 +103,7 @@ class TestBackupsManagement(DBTestCase):
                 
                 self.assertEqual(WindowsRegistry.Messages.unselected_row.isVisible(), True, "Unselected row message hasn't been shown")
                 WindowsRegistry.Messages.unselected_row.ok_button.click()
-            QTimer.singleShot(100, _check_no_selection)
+            QTimer.singleShot(100, self.catch_failure(_check_no_selection))
             WindowsRegistry.BackupManagementWindow.delete_backup.click()
 
             qsleep(5000)
@@ -114,7 +114,7 @@ class TestBackupsManagement(DBTestCase):
 
                 self.assertEqual(WindowsRegistry.Messages.below_recommended_min_backups.isVisible(), True, "Below min backups message hasn't been shown")
                 WindowsRegistry.Messages.below_recommended_min_backups.ok_button.click()
-            QTimer.singleShot(200, _check_below_min_backups)
+            QTimer.singleShot(200, self.catch_failure(_check_below_min_backups))
             WindowsRegistry.BackupManagementWindow.delete_backup.click()
 
             def _check_backup_deletion() -> None:
@@ -135,7 +135,7 @@ class TestBackupsManagement(DBTestCase):
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
             
-            QTimer.singleShot(500, _check_backup_deletion)
+            QTimer.singleShot(500, self.catch_failure(_check_backup_deletion))
     
         self.open_backup_management_window(_remove_backup)
 
@@ -164,7 +164,7 @@ class TestBackupsManagement(DBTestCase):
 
                         self.assertEqual(WindowsRegistry.Messages.unselected_row.isVisible(), True, "Unselected row message hasn't been shown")
                         WindowsRegistry.Messages.unselected_row.ok_button.click()
-                    QTimer.singleShot(100, _check_no_selection)
+                    QTimer.singleShot(100, self.catch_failure(_check_no_selection))
                     WindowsRegistry.BackupManagementWindow.load_backup.click()
 
                     qsleep(1000)
@@ -197,7 +197,7 @@ class TestBackupsManagement(DBTestCase):
 
                                     self.assertEqual(WindowsRegistry.Messages.load_backup_confirmation.isVisible(), True, "Load backup confirmation message hasn't been shown")
                                     WindowsRegistry.Messages.load_backup_confirmation.ok_button.click()
-                                QTimer.singleShot(100, _check_load_confirmation)
+                                QTimer.singleShot(100, self.catch_failure(_check_load_confirmation))
                                 WindowsRegistry.BackupManagementWindow.load_backup.click()
 
                                 def _check_backup_load() -> None:
@@ -213,20 +213,20 @@ class TestBackupsManagement(DBTestCase):
 
                                     self.assertEqual(WindowsRegistry.BackupManagementWindow.isVisible(), False, "Backup management window hasn't been closed")
                                     self.assertEqual(WindowsRegistry.SettingsWindow.isVisible(), False, "Settings window hasn't been closed")
-                                QTimer.singleShot(200, _check_backup_load)
+                                QTimer.singleShot(200, self.catch_failure(_check_backup_load))
 
-                            QTimer.singleShot(1000, partial(self.open_backup_management_window, _load_newest_backup))
+                            QTimer.singleShot(1000, partial(self.open_backup_management_window, self.catch_failure(_load_newest_backup)))
 
-                        QTimer.singleShot(1000, _check_backup_load)
+                        QTimer.singleShot(1000, self.catch_failure(_check_backup_load))
                         WindowsRegistry.Messages.load_backup_confirmation.ok_button.click()
 
-                    QTimer.singleShot(100, _check_load_confirmation)
+                    QTimer.singleShot(100, self.catch_failure(_check_load_confirmation))
                     WindowsRegistry.BackupManagementWindow.load_backup.click()
 
-                QTimer.singleShot(200, partial(self.open_backup_management_window, _load_backup))
+                QTimer.singleShot(200, partial(self.open_backup_management_window, self.catch_failure(_load_backup)))
                 WindowsRegistry.AddCategoryWindow.button.click()
             
-            QTimer.singleShot(100, _add_category)
+            QTimer.singleShot(100, self.catch_failure(_add_category))
             WindowsRegistry.MainWindow.add_incomes_category.click()
 
         self.open_backup_management_window(_prepare_load_backup)
@@ -263,7 +263,7 @@ class TestBackupsManagement(DBTestCase):
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
 
-            QTimer.singleShot(100, _choose_daily_auto_backup)
+            QTimer.singleShot(100, self.catch_failure(_choose_daily_auto_backup))
             WindowsRegistry.SettingsWindow.auto_backup.click()
 
         self.open_backup_management_window(_set_daily_status)
@@ -296,7 +296,7 @@ class TestBackupsManagement(DBTestCase):
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
 
-            QTimer.singleShot(100, _choose_weekly_auto_backup)
+            QTimer.singleShot(100, self.catch_failure(_choose_weekly_auto_backup))
             WindowsRegistry.SettingsWindow.auto_backup.click()
 
         self.open_backup_management_window(_set_weekly_status)
@@ -329,7 +329,7 @@ class TestBackupsManagement(DBTestCase):
                 WindowsRegistry.BackupManagementWindow.done(0)
                 WindowsRegistry.SettingsWindow.done(0)
 
-            QTimer.singleShot(100, _choose_monthly_auto_backup)
+            QTimer.singleShot(100, self.catch_failure(_choose_monthly_auto_backup))
             WindowsRegistry.SettingsWindow.auto_backup.click()
 
         self.open_backup_management_window(_set_monthly_status)
@@ -376,11 +376,11 @@ class TestBackupsManagement(DBTestCase):
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
                     f"Backup file have been created even though less than 1 day has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
-                QTimer.singleShot(200, _check_no_new_backup)
+                QTimer.singleShot(200, self.catch_failure(_check_no_new_backup))
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess] #This item is added above, so it will return it
+                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -401,14 +401,14 @@ class TestBackupsManagement(DBTestCase):
                     WindowsRegistry.BackupManagementWindow.done(0)
                     WindowsRegistry.SettingsWindow.done(0)
 
-                QTimer.singleShot(1000, _check_second_backup_appearance)
+                QTimer.singleShot(1000, self.catch_failure(_check_second_backup_appearance))
                 auto_backup()
                 
             qsleep(1000)
-            QTimer.singleShot(1500, _check_backup_appearance)
+            QTimer.singleShot(1500, self.catch_failure(_check_backup_appearance))
             WindowsRegistry.BackupManagementWindow.create_backup.click()
         
-        QTimer.singleShot(200, _prepare_auto_daily_backup)
+        QTimer.singleShot(200, self.catch_failure(_prepare_auto_daily_backup))
         qsleep(6000)
 
 
@@ -452,11 +452,11 @@ class TestBackupsManagement(DBTestCase):
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
                     f"Backup file have been created even though less than 7 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
-                QTimer.singleShot(200, _check_no_new_backup)
+                QTimer.singleShot(200, self.catch_failure(_check_no_new_backup))
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess] #This item is added above, so it will return it
+                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -477,13 +477,13 @@ class TestBackupsManagement(DBTestCase):
                     WindowsRegistry.BackupManagementWindow.done(0)
                     WindowsRegistry.SettingsWindow.done(0)
 
-                QTimer.singleShot(1000, _check_second_backup_appearance)
+                QTimer.singleShot(1000, self.catch_failure(_check_second_backup_appearance))
                 auto_backup()
 
-            QTimer.singleShot(1500, _check_backup_appearance)
+            QTimer.singleShot(1500, self.catch_failure(_check_backup_appearance))
             WindowsRegistry.BackupManagementWindow.create_backup.click()
 
-        QTimer.singleShot(100, _prepare_auto_weekly_backup)
+        QTimer.singleShot(100, self.catch_failure(_prepare_auto_weekly_backup))
         qsleep(6000)
     
 
@@ -527,11 +527,11 @@ class TestBackupsManagement(DBTestCase):
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
                     f"Backup file have been created even though less than 30 days has passed {len(os.listdir(TEST_BACKUPS_DIRECTORY))}")
 
-                QTimer.singleShot(200, _check_no_new_backup)
+                QTimer.singleShot(200, self.catch_failure(_check_no_new_backup))
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess] #This item is added above, so it will return it
+                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_30_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -552,13 +552,13 @@ class TestBackupsManagement(DBTestCase):
                     WindowsRegistry.BackupManagementWindow.done(0)
                     WindowsRegistry.SettingsWindow.done(0)
 
-                QTimer.singleShot(1000, _check_second_backup_appearance)
+                QTimer.singleShot(1000, self.catch_failure(_check_second_backup_appearance))
                 auto_backup()
 
-            QTimer.singleShot(1500, _check_backup_appearance)
+            QTimer.singleShot(1500, self.catch_failure(_check_backup_appearance))
             WindowsRegistry.BackupManagementWindow.create_backup.click()
 
-        QTimer.singleShot(100, _prepare_auto_monthly_backup)
+        QTimer.singleShot(100, self.catch_failure(_prepare_auto_monthly_backup))
         qsleep(6000)
 
 
@@ -589,7 +589,7 @@ class TestBackupsManagement(DBTestCase):
                     -1, WindowsRegistry.AutoBackupWindow.max_backups_label.text().find(str(init_max_backups)),
                     f"Expected max backups amount in label is {init_max_backups} returned {WindowsRegistry.AutoBackupWindow.max_backups_label.text()}")
 
-                QTimer.singleShot(100, _check_no_change)
+                QTimer.singleShot(100, self.catch_failure(_check_no_change))
                 WindowsRegistry.AutoBackupWindow.save.click()
 
                 def _check_below_min_backups() -> None:
@@ -599,7 +599,7 @@ class TestBackupsManagement(DBTestCase):
                     WindowsRegistry.Messages.below_recommended_min_backups.ok_button.click()
                 
                 if MIN_RECOMMENDED_BACKUPS > 1:
-                    QTimer.singleShot(200, _check_below_min_backups)
+                    QTimer.singleShot(200, self.catch_failure(_check_below_min_backups))
                     WindowsRegistry.AutoBackupWindow.max_backups.setText(str(MIN_RECOMMENDED_BACKUPS - 1))
                     WindowsRegistry.AutoBackupWindow.save.click()
                     qsleep(500)
@@ -610,7 +610,7 @@ class TestBackupsManagement(DBTestCase):
                     self.assertEqual(WindowsRegistry.Messages.above_recommended_max_backups.isVisible(), True, "Above max backups message hasn't been shown")
                     WindowsRegistry.Messages.above_recommended_max_backups.ok_button.click()
                 
-                QTimer.singleShot(200, _check_above_max_backups)
+                QTimer.singleShot(200, self.catch_failure(_check_above_max_backups))
                 WindowsRegistry.AutoBackupWindow.max_backups.setText(str(MAX_RECOMMENDED_BACKUPS + 1))
                 WindowsRegistry.AutoBackupWindow.save.click()
                 qsleep(500)
@@ -635,11 +635,11 @@ class TestBackupsManagement(DBTestCase):
                     WindowsRegistry.BackupManagementWindow.done(0)
                     WindowsRegistry.SettingsWindow.done(0)
 
-                QTimer.singleShot(200, _check_max_backups_change)
+                QTimer.singleShot(200, self.catch_failure(_check_max_backups_change))
                 WindowsRegistry.AutoBackupWindow.max_backups.setText("3")
                 WindowsRegistry.AutoBackupWindow.save.click()
 
-            QTimer.singleShot(100, _set_new_max_backups)
+            QTimer.singleShot(100, self.catch_failure(_set_new_max_backups))
             WindowsRegistry.SettingsWindow.auto_backup.click()
             
         self.open_backup_management_window(_open_auto_backup_settings)

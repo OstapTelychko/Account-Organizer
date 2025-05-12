@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from datetime import date
 from PySide6.QtCore import QTimer, QDate
-from tests.tests_toolkit import DBTestCase, qsleep
+from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from languages import LanguageStructure
 from project_configuration import MONTHS_DAYS
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from typing import Callable
 
 
-class TestStatistics(DBTestCase):
+class TestStatistics(DBTestCase, OutOfScopeTestCase):
     """Test statistics of the application."""
 
     def setUp(self) -> None:
@@ -21,12 +21,13 @@ class TestStatistics(DBTestCase):
 
         self.translated_incomes = LanguageStructure.MainWindow.get_translation(1)
         self.translated_expenses = LanguageStructure.MainWindow.get_translation(2)
+        return super().setUp()
 
 
     def open_statistics_window(self, func:Callable[[], None]) -> None:
         """Open statistics window and call function after some delay."""
 
-        QTimer.singleShot(100, func)
+        QTimer.singleShot(100, self.catch_failure(func))
         WindowsRegistry.MainWindow.statistics.click()
     
 
@@ -81,7 +82,7 @@ class TestStatistics(DBTestCase):
                     
                 WindowsRegistry.MonthlyStatistics.done(1)
             
-            QTimer.singleShot(100, _check_monthly_statistics)
+            QTimer.singleShot(100, self.catch_failure(_check_monthly_statistics))
             WindowsRegistry.StatisticsWindow.monthly_statistics.click()
         self.open_statistics_window(_open_monthly_statics_window)
         qsleep(500)
@@ -161,7 +162,7 @@ class TestStatistics(DBTestCase):
 
                 WindowsRegistry.QuarterlyStatistics.done(1)
             
-            QTimer.singleShot(100, _check_quarterly_statistics)
+            QTimer.singleShot(100, self.catch_failure(_check_quarterly_statistics))
             WindowsRegistry.StatisticsWindow.quarterly_statistics.click()
         
         self.open_statistics_window(_open_quarterly_statistics_window)
@@ -236,7 +237,7 @@ class TestStatistics(DBTestCase):
 
                 WindowsRegistry.YearlyStatistics.done(1)
             
-            QTimer.singleShot(100, _check_yearly_statistics)
+            QTimer.singleShot(100, self.catch_failure(_check_yearly_statistics))
             WindowsRegistry.StatisticsWindow.yearly_statistics.click()
         
         self.open_statistics_window(_open_yearly_statistics_window)
@@ -325,10 +326,10 @@ class TestStatistics(DBTestCase):
                     WindowsRegistry.CustomRangeStatisticsView.done(1)
                     WindowsRegistry.CustomRangeStatistics.done(1)
 
-                QTimer.singleShot(100, _check_custom_range_statistics)
+                QTimer.singleShot(100, self.catch_failure(_check_custom_range_statistics))
                 WindowsRegistry.CustomRangeStatistics.show_statistics.click()
 
-            QTimer.singleShot(100, _select_custom_range)
+            QTimer.singleShot(100, self.catch_failure(_select_custom_range))
             WindowsRegistry.StatisticsWindow.custom_range_statistics.click()
 
         self.open_statistics_window(_open_custom_range_statistics_window)

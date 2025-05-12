@@ -9,7 +9,7 @@ from languages import LanguageStructure
 from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.session import Session
 from AppObjects.windows_registry import WindowsRegistry
-from tests.tests_toolkit import qsleep
+from tests.tests_toolkit import qsleep, OutOfScopeTestCase
 
 from GUI.gui_constants import app
 
@@ -19,10 +19,10 @@ if TYPE_CHECKING:
 
 
 
-class TestMainWindow(TestCase):
+class TestMainWindow(OutOfScopeTestCase):
     """Test main window of the application."""
 
-    def test_1_windows_opening(self:TestCase) -> None:
+    def test_1_windows_opening(self) -> None:
         """Test opening windows from main window."""
 
         test_windows_open:dict[SubWindow, QPushButton | QToolButton] = {WindowsRegistry.SettingsWindow:WindowsRegistry.MainWindow.settings, WindowsRegistry.StatisticsWindow:WindowsRegistry.MainWindow.statistics, WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category}
@@ -34,8 +34,8 @@ class TestMainWindow(TestCase):
 
                 self.assertTrue(window.isVisible(), f"Window {window.__class__.__name__} hasn't showed after click on button {open_window_button.text()}")
                 window.done(1)
-
-            QTimer.singleShot(100, _check_window_appearance)# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
+            
+            QTimer.singleShot(100, self.catch_failure(_check_window_appearance))# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
             open_window_button.click()
         
         qsleep(500)
@@ -107,7 +107,7 @@ class TestMainWindow(TestCase):
             self.assertTrue(WindowsRegistry.Messages.empty_expression.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             WindowsRegistry.Messages.empty_expression.done(1)
 
-        QTimer.singleShot(100, _check_empty_expression_error)
+        QTimer.singleShot(100, self.catch_failure(_check_empty_expression_error))
         WindowsRegistry.MainWindow.calculate.click()
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("quit()")
@@ -119,7 +119,7 @@ class TestMainWindow(TestCase):
             self.assertTrue(WindowsRegistry.Messages.forbidden_calculator_word.isVisible(), f"Mini calculator hasn't showed error {translated_message}. Result expression {result}")
             WindowsRegistry.Messages.forbidden_calculator_word.done(1)
 
-        QTimer.singleShot(100, _check_forbidden_expression)
+        QTimer.singleShot(100, self.catch_failure(_check_forbidden_expression))
         WindowsRegistry.MainWindow.calculate.click()
         qsleep(500)
 
@@ -143,7 +143,7 @@ class TestMainWindow(TestCase):
             WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(previous_language))
             WindowsRegistry.SettingsWindow.done(1)
 
-        QTimer.singleShot(100, _open_settings)
+        QTimer.singleShot(100, self.catch_failure(_open_settings))
         WindowsRegistry.MainWindow.settings.click()
         qsleep(500)
     
@@ -167,6 +167,6 @@ class TestMainWindow(TestCase):
             WindowsRegistry.SettingsWindow.switch_themes_button.click()
             WindowsRegistry.SettingsWindow.done(1)
         
-        QTimer.singleShot(100, _open_settings)
+        QTimer.singleShot(100, self.catch_failure(_open_settings))
         WindowsRegistry.MainWindow.settings.click()
         qsleep(500)

@@ -1,5 +1,5 @@
 from PySide6.QtCore import QTimer
-from tests.tests_toolkit import DBTestCase, qsleep
+from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from project_configuration import CATEGORY_TYPE
 from AppObjects.session import Session
@@ -7,7 +7,7 @@ from AppObjects.windows_registry import WindowsRegistry
 
 
 
-class TestTransaction(DBTestCase):
+class TestTransaction(DBTestCase, OutOfScopeTestCase):
     """Test transaction management in the application."""
 
 
@@ -25,7 +25,7 @@ class TestTransaction(DBTestCase):
                 WindowsRegistry.TransactionManagementWindow.transaction_value.setText("999")
                 WindowsRegistry.TransactionManagementWindow.button.click()
 
-            QTimer.singleShot(100, _add_transaction)
+            QTimer.singleShot(100, self.catch_failure(_add_transaction))
             category.add_transaction.click()
 
         self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 2, "Income transaction hasn't been added")
@@ -50,7 +50,7 @@ class TestTransaction(DBTestCase):
                 WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
                 WindowsRegistry.TransactionManagementWindow.button.click()
 
-            QTimer.singleShot(100, _update_transaction)
+            QTimer.singleShot(100, self.catch_failure(_update_transaction))
             category.edit_transaction.click()
 
         self.assertEqual(Session.db.transaction_query.get_all_transactions(self.income_category.id)[0].name, "Updated transaction name", "Income transaction hasn't been updated")
@@ -70,7 +70,7 @@ class TestTransaction(DBTestCase):
             def _confirm_deletion() -> None:
                 WindowsRegistry.Messages.delete_transaction_confirmation.ok_button.click()
 
-            QTimer.singleShot(100, _confirm_deletion)
+            QTimer.singleShot(100, self.catch_failure(_confirm_deletion))
             category.delete_transaction.click()
 
         self.assertEqual(len(Session.db.transaction_query.get_all_transactions(self.income_category.id)), 0, "Income transaction hasn't been deleted")

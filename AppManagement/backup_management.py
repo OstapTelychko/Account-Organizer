@@ -93,7 +93,7 @@ def remove_backup() -> int:
             return 0
     
     row = selected_items[0].row()
-    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess] #This will never be None, since the row is selected
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, since the row is selected
 
 
     del Session.backups[str(id(backup))]
@@ -116,7 +116,7 @@ def load_backup() -> int:
         return WindowsRegistry.Messages.only_one_row.exec()
 
     row = selected_items[0].row()
-    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess] #This will never be None, since the row is selected
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, since the row is selected
 
     if backup.app_version != Session.app_version:
         return WindowsRegistry.Messages.different_app_version.exec()
@@ -157,7 +157,7 @@ def auto_backup() -> None:
         create_backup()
         return
     
-    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] # type: ignore[reportOptionalMemberAccess] # I already check if amount of backups is 0
+    backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] # I already check if amount of backups is 0
     backup_date = datetime.strptime(backup.timestamp, BACKUPS_DATE_FORMAT)
     current_date = datetime.now()
 

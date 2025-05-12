@@ -79,8 +79,8 @@ class AutoBackupWindow(SubWindow):
         self.status_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.status_wrapper, **SHADOW_EFFECT_ARGUMENTS))
 
         self.status_wrapper.setLayout(QVBoxLayout())
-        self.status_wrapper.layout().addWidget(self.current_status) # type: ignore[reportOptionalMemberAccess] #This layout is added above, so it will return it
-        self.status_wrapper.layout().setContentsMargins(20, 20, 20, 20) # type: ignore[reportOptionalMemberAccess] 
+        self.status_wrapper.layout().addWidget(self.current_status) # type: ignore[reportOptionalMemberAccess, unused-ignore] #This layout is added above, so it will return it
+        self.status_wrapper.layout().setContentsMargins(20, 20, 20, 20) # type: ignore[reportOptionalMemberAccess, unused-ignore] 
 
         self.monthly = QCheckBox("Monthly")
         self.monthly.setFont(BASIC_FONT)

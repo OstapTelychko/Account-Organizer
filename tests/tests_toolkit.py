@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
+from typing_extensions import Never
 from unittest import TestCase, TextTestResult
 import shutil
 from functools import wraps
@@ -143,6 +144,53 @@ class DBTestCase(TestCase):
         
         Session.config.account_name = "Test user"
         Session.db.set_account_id(Session.config.account_name)
+
+
+
+class OutOfScopeTestCase(TestCase):
+    """This class is used to capture the tests assertion errors from functions that are runned using QTimer.singleShot."""
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+
+        for attr in dir(cls):
+            if attr.startswith("test") and callable(getattr(cls, attr)):
+                original_test = getattr(cls, attr)
+                wrapped_test = cls.check_out_of_scope_failure(original_test)
+                setattr(cls, attr, wrapped_test)
+
+
+    def setUp(self) -> None:
+        super().setUp()
+        self._assertion_error:AssertionError | None = None
+
+
+    def catch_failure(self, func:Callable[[], None]) -> Callable[[], None]:
+        """This decorator is used to catch the assertion errors from functions that are runned using QTimer.singleShot."""
+
+        @wraps(func)
+        def wrapper() -> None:
+            try:
+                func()
+            except AssertionError as e:
+                self._assertion_error = e
+                raise e
+        
+        return wrapper
+    
+
+    @staticmethod
+    def check_out_of_scope_failure(func:Callable[[OutOfScopeTestCase], None]) -> Callable[[OutOfScopeTestCase], None]:
+        """This decorator checks if in assertions errors occured out of scope and raises them."""
+
+        @wraps(func)
+        def wrapper(self:OutOfScopeTestCase) -> None:
+            func(self)
+
+            if self._assertion_error is not None:
+                raise self._assertion_error
+        
+        return wrapper
 
 
 
