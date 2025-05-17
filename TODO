@@ -1,11 +1,12 @@
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
-☐ create requirements.txt, readme.md and preview images @started(25-05-11 20:49)
 ☐ make all classes that have to be inited once to be singletons
 ☐ add html tags to messages in languages.json
+☐ remove session dependcies since it's main class and pass objects through start_session in main.py
 
 Archive:
+  ✔ create requirements.txt, readme.md and preview images @started(25-05-11 20:49) @done(25-05-18 00:04) @lasted(6d3h15m30s)
   ✔ fix bug that failed tests runned by QTimer.singleShot doesn't make the test to fail in the end @started(25-05-12 22:07) @done(25-05-13 01:18) @lasted(3h11m35s)
   ✔ move dev environment from global libraries to virtual environment @started(25-05-11 20:49) @done(25-05-11 23:00) @lasted(2h11m33s)
   ✔ replace app icon with new one @done(25-05-10 00:40)
