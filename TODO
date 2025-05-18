@@ -6,6 +6,7 @@
 ☐ remove session dependcies since it's main class and pass objects through start_session in main.py
 
 Archive:
+  ✔ remove excessive --exclude-module @started(25-05-18 17:52) @done(25-05-18 19:47) @lasted(1h55m35s)
   ✔ create requirements.txt, readme.md and preview images @started(25-05-11 20:49) @done(25-05-18 00:04) @lasted(6d3h15m30s)
   ✔ fix bug that failed tests runned by QTimer.singleShot doesn't make the test to fail in the end @started(25-05-12 22:07) @done(25-05-13 01:18) @lasted(3h11m35s)
   ✔ move dev environment from global libraries to virtual environment @started(25-05-11 20:49) @done(25-05-11 23:00) @lasted(2h11m33s)
