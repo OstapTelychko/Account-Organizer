@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt

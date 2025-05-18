@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from PySide6.QtGui import QShortcut
-from functools import partial
 
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.user_config import UserConfig

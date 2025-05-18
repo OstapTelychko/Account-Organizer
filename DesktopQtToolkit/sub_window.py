@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, TypeVar, Generic
 from sys import platform
 from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect, QByteArray
@@ -6,9 +7,34 @@ from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTim
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICON, SHADOW_EFFECT_ARGUMENTS
 from DesktopQtToolkit.create_button import create_button
 
+if TYPE_CHECKING:
+    from typing import Any
+
+
+
+
+QtMeta = type(QDialog)
+SubWindowChild = TypeVar("SubWindowChild", bound="SubWindow")
+
+class SubWindowSingleton(QtMeta, Generic[SubWindowChild]):#type: ignore[valid-type, misc] #Mypy doesn't support dynamic base classes
+    """This is a metaclass that is used to ensure that only one instance of the SubWindow class is created. 
+    It doest't mean that only one sub window can be created, but only one window with same structe can be created.
+    For example, if you will create SettingsWindow and then will try to create another SettingsWindow, it will return an error."""
+
+    _instances:dict[str, SubWindow] = dict()
+
+    def __call__(cls, *args:Any, **kwargs:Any) -> SubWindowChild:
+        if cls.__name__ in cls._instances:
+            raise RuntimeError(f"Only one instance of {cls.__name__} can be created. Use WindowsRegistry to get window")
+
+        instance:SubWindowChild = super().__call__(*args, **kwargs)
+        cls._instances[instance.__class__.__name__] = instance
+        return instance
+
+
 
 # pyright: reportIncompatibleMethodOverride=false
-class SubWindow(QDialog):
+class SubWindow(QDialog, metaclass=SubWindowSingleton):
     """This class is used to create a sub window that can be used to display sub windows."""
 
     def __init__(self, main_window:QWidget, sub_window_container:dict[int, SubWindow]) -> None:

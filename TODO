@@ -1,7 +1,7 @@
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
-☐ make all classes that have to be inited once to be singletons
+☐ make all classes that have to be inited once to be singletons @started(25-05-18 22:09)
 ☐ add html tags to messages in languages.json
 ☐ remove session dependcies since it's main class and pass objects through start_session in main.py
 
