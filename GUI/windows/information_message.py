@@ -2,13 +2,16 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplic
 from PySide6.QtCore import Qt
 from time import sleep
 
+from DesktopQtToolkit.qsingleton import QSingleton
 from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
 
 
 
 
-class InformationMessage(QWidget):
+class InformationMessage(QWidget, metaclass=QSingleton):
     """Represents information message window structure."""
+
+    singleton_message = "Cannot create multiple instances of InformationMessage class. Use WindowsRegistry instead."
 
     def __init__(self, buttons:list[QPushButton]) -> None:
         """Initialize the information message window with buttons.

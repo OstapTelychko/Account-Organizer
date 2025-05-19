@@ -5,6 +5,7 @@ from PySide6.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
 
 from AppObjects.logger import get_logger
 from project_configuration import APP_HOST, APP_PORT
+from DesktopQtToolkit.qsingleton import QSingleton
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
@@ -13,11 +14,11 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-class SingleInstanceGuard(QObject):
+class SingleInstanceGuard(QObject, metaclass=QSingleton):
     """This class is used to ensure that only one instance of the application is running at a time.
     It uses a TCP server to listen for incoming connections from other instances of the application.
     If another instance is started, it will send a message to the existing instance to raise its window."""
-
+    
     def __init__(self) -> None:
         super(SingleInstanceGuard, self).__init__()
         self.is_running = False

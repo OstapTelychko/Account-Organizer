@@ -34,6 +34,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QFont
 
 from project_configuration import GENERAL_ICONS_DIRECTORY
+from DesktopQtToolkit.qsingleton import QSingleton
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
 
 from DesktopQtToolkit.sub_window import SubWindow
@@ -46,7 +47,7 @@ if TYPE_CHECKING:
 
 
 
-class MainWindow(QWidget):
+class MainWindow(QWidget, metaclass=QSingleton):
     """Represents main window structure.
 
         Warning
@@ -56,7 +57,12 @@ class MainWindow(QWidget):
         `sub_windows` - is a dictionary that contains all sub windows.
 
         `message_windows` - is a dictionary that contains all message windows.
+
+        `singleton_message` - is a message that will be displayed when trying to create multiple instances of the class.
     """
+
+    singleton_message = "Main window is already created. Use WindowsRegistry instead."
+
     def __init__(self) -> None:
         super().__init__()
         self.resize(1500, 770)

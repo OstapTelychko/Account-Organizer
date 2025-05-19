@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from DesktopQtToolkit.message_window import MessageWindow
 from project_configuration import APP_NAME
+from DesktopQtToolkit.qsingleton import QSingleton
 
 from GUI.gui_constants import APP_ICON, APP_UPGRADE_ICON, NO_INTERNET_ICON
 
@@ -12,8 +13,10 @@ if TYPE_CHECKING:
 
 
 
-class Messages():
+class Messages(metaclass=QSingleton):
     """Represents all application messages."""
+
+    singleton_message = "Cannot create multiple instances of Messages class. Use WindowsRegistry instead."
 
     def __init__(self, main_window:MainWindow, message_windows:dict[int, MessageWindow]) -> None:
 
