@@ -62,13 +62,13 @@ class DBController():
             command.upgrade(self.alembic_config, "head")
 
         self.account_id:int|None = None
-        self.session = sessionmaker(bind=self.engine)()
+        self.session_factory = sessionmaker(bind=self.engine, expire_on_commit=False)
 
-        self.account_query = AccountQuery(self.session)
-        self.category_query = CategoryQuery(self.session)
-        self.transaction_query = TransactionQuery(self.session)
-        self.backup_query = BackupQuery(self.session, self.engine)
-        self.statistics_query = StatisticsQuery(self.session)
+        self.account_query = AccountQuery(self.session_factory)
+        self.category_query = CategoryQuery(self.session_factory)
+        self.transaction_query = TransactionQuery(self.session_factory)
+        self.backup_query = BackupQuery(self.session_factory, self.engine)
+        self.statistics_query = StatisticsQuery(self.session_factory)
 
         logger.info("Db session created")
 
@@ -77,19 +77,8 @@ class DBController():
         """Close the database connection and commit the session."""
 
         logger.info("Closing db connection")
-        try:
-            self.session.commit()
-            logger.info("Db session commited")
-
-        except:
-            self.session.rollback()
-            logger.error("Rollback")
-
-        finally:
-            self.session.expire_all()
-            self.session.close()
-            self.engine.dispose(close=True)
-            logger.info("Db connection closed")
+        self.engine.dispose(close=True)
+        logger.info("Db connection closed")
 
 
     @staticmethod
@@ -123,17 +112,19 @@ class DBController():
                 `account_name` : (str) - Name of the account to set.
         """
         
-        account = self.session.query(Account).filter(Account.name == account_name).first()
-        if not account:
-            logger.error(f"Account with name {account_name} not found.")
-            raise ValueError(f"Account with name '{account_name}' not found.")
-        
-        self.account_id = account.id
-        self.account_query.account_id = self.account_id
-        self.category_query.account_id = self.account_id
-        self.transaction_query.account_id = self.account_id
-        self.backup_query.account_id = self.account_id
-        self.statistics_query.account_id = self.account_id
+        with self.session_factory() as session:
+            with session.begin():
+                account = session.query(Account).filter(Account.name == account_name).first()
+                if not account:
+                    logger.error(f"Account with name {account_name} not found.")
+                    raise ValueError(f"Account with name '{account_name}' not found.")
+                
+                self.account_id = account.id
+                self.account_query.account_id = self.account_id
+                self.category_query.account_id = self.account_id
+                self.transaction_query.account_id = self.account_id
+                self.backup_query.account_id = self.account_id
+                self.statistics_query.account_id = self.account_id
     
 
     def create_account(self, account_name:str, balance:float|int=0) -> None:

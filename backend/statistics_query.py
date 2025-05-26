@@ -6,15 +6,15 @@ from sqlalchemy import and_
 from backend.models import Transaction
 
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session as sql_Session
+    from sqlalchemy.orm import sessionmaker, Session as sql_Session
 
 
 
 class StatisticsQuery:
     """This class is used to create statistics."""
 
-    def __init__(self, session:sql_Session) -> None:
-        self.session = session
+    def __init__(self, session_factory:sessionmaker[sql_Session]) -> None:
+        self.session_factory = session_factory
         self.account_id:int
     
 
@@ -31,8 +31,10 @@ class StatisticsQuery:
                 `float` - Total sum of transactions for the specified category, month, and year.
         """
 
-        total = self.session.query(sql_func.sum(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
-        return float(total) if total else 0
+        with self.session_factory() as session:
+            with session.begin():
+                total = session.query(sql_func.sum(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+                return float(total) if total else 0
     
 
     def get_monthly_transactions_min_value(self, category_id:int, year:int, month:int) -> float:
@@ -48,8 +50,10 @@ class StatisticsQuery:
                 `float` - Minimum transaction value for the specified category, month, and year.
         """
 
-        min_value = self.session.query(sql_func.min(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
-        return float(min_value) if min_value else 0
+        with self.session_factory() as session:
+            with session.begin():
+                min_value = session.query(sql_func.min(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+                return float(min_value) if min_value else 0
     
 
     def get_monthly_transactions_max_value(self, category_id:int, year:int, month:int) -> float:
@@ -65,8 +69,10 @@ class StatisticsQuery:
                 `float` - Maximum transaction value for the specified category, month, and year.
         """
 
-        max_value = self.session.query(sql_func.max(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
-        return float(max_value) if max_value else 0
+        with self.session_factory() as session:
+            with session.begin():
+                max_value = session.query(sql_func.max(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+                return float(max_value) if max_value else 0
     
 
     def get_monthly_transactions_by_value(self, category_id:int, year:int, month:int, value:float|int) -> list[Transaction]:
@@ -83,7 +89,9 @@ class StatisticsQuery:
                 `list[Transaction]` - List of transactions for the specified category, month, year, and value.
         """
 
-        return self.session.query(Transaction).filter_by(category_id=category_id, year=year, month=month, value=value).all()
+        with self.session_factory() as session:
+            with session.begin():
+                return session.query(Transaction).filter_by(category_id=category_id, year=year, month=month, value=value).all()
     
 
     def get_transactions_by_range(self, category_ids:list[int], from_date:int, to_date:int) -> list[Transaction]:
@@ -99,7 +107,9 @@ class StatisticsQuery:
                 `list[Transaction]` - List of transactions for the specified categories and date range.
         """
 
-        return self.session.query(Transaction).filter(and_(
-            Transaction.category_id.in_(category_ids),
-            Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
-            Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,)).all()
+        with self.session_factory() as session:
+            with session.begin():
+                return session.query(Transaction).filter(and_(
+                    Transaction.category_id.in_(category_ids),
+                    Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
+                    Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,)).all()

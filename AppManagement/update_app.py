@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 
 import requests as req
 from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from alembic import command
 from alembic.config import Config

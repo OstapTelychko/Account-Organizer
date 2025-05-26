@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 from backend.models import Transaction
 
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session as sql_Session
+    from sqlalchemy.orm import sessionmaker, Session as sql_Session
 
 
 
 class TransactionQuery:
     """This class is used to manage transactions and related data in the database."""
 
-    def __init__(self, session:sql_Session) -> None:
-        self.session = session
+    def __init__(self, session_factory:sessionmaker[sql_Session]) -> None:
+        self.session_factory = session_factory
         self.account_id:int
     
 
@@ -23,8 +23,9 @@ class TransactionQuery:
                 `transaction_id` : (int) - ID of the transaction to delete.
         """
 
-        self.session.query(Transaction).filter_by(id=transaction_id).delete(False)
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                session.query(Transaction).filter_by(id=transaction_id).delete(False)
             
 
     def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float) -> None:
@@ -38,11 +39,12 @@ class TransactionQuery:
                 `transaction_value` : (int|float) - New value of the transaction.
         """
 
-        self.session.query(Transaction).filter_by(id=transaction_id).update({
-            Transaction.name:transaction_name,
-            Transaction.day:transaction_day,
-            Transaction.value:transaction_value}, False)
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                session.query(Transaction).filter_by(id=transaction_id).update({
+                    Transaction.name:transaction_name,
+                    Transaction.day:transaction_day,
+                    Transaction.value:transaction_value}, False)
 
 
     def add_transaction(self, category_id:int, year:int, month:int, day:int, value:float, name:str) -> Transaction:
@@ -58,10 +60,11 @@ class TransactionQuery:
                 `name` : (str) - Name of the transaction.
         """
 
-        transaction = Transaction(year=year, month=month, day=day, value=value, name=name, category_id=category_id)
-        self.session.add(transaction)
-        self.session.commit()
-        return transaction
+        with self.session_factory() as session:
+            with session.begin():
+                transaction = Transaction(year=year, month=month, day=day, value=value, name=name, category_id=category_id)
+                session.add(transaction)
+                return transaction
 
 
     def get_transactions_by_month(self, category_id:int, year:int, month:int) -> list[Transaction]:
@@ -76,8 +79,9 @@ class TransactionQuery:
             -------
                 `list[Transaction]` - List of transactions for the specified category, month, and year.
         """
-
-        return self.session.query(Transaction).filter_by(year=year, month=month, category_id=category_id).all()
+        with self.session_factory() as session:
+            with session.begin():
+                return session.query(Transaction).filter_by(year=year, month=month, category_id=category_id).all()
 
 
     def get_all_transactions(self, category_id:int) -> list[Transaction]:
@@ -91,6 +95,8 @@ class TransactionQuery:
                 `list[Transaction]` - List of all transactions for the specified category.
         """
 
-        return self.session.query(Transaction).filter_by(category_id=category_id).all()
+        with self.session_factory() as session:
+            with session.begin():
+                return session.query(Transaction).filter_by(category_id=category_id).all()
     
  

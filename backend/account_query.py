@@ -6,7 +6,7 @@ from backend.models import Account
 from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session as sql_Session
+    from sqlalchemy.orm import sessionmaker, Session as sql_Session
 
 
 
@@ -15,8 +15,8 @@ logger = get_logger(__name__)
 class AccountQuery:
     """This class is used to manage accounts and related to accounts data in the database."""
 
-    def __init__(self, session:sql_Session) -> None:
-        self.session = session
+    def __init__(self, session_factory:sessionmaker[sql_Session]) -> None:
+        self.session_factory = session_factory
         self.account_id:int
     
 
@@ -31,8 +31,10 @@ class AccountQuery:
                 `bool` - True if the account exists, False otherwise.
         """
 
-        result = self.session.query(Account).filter(Account.name == name).first()
-        return bool(result)
+        with self.session_factory() as session:
+            with session.begin():
+                result = session.query(Account).filter(Account.name == name).first()
+                return bool(result)
 
 
     def get_all_accounts(self) -> list[Account]:
@@ -43,8 +45,10 @@ class AccountQuery:
                 `list[Account]` - List of all accounts in the database.
         """
 
-        accounts = self.session.query(Account).all()
-        return accounts
+        with self.session_factory() as session:
+            with session.begin():
+                accounts = session.query(Account).all()
+                return accounts
 
 
     def create_account(self, account_name:str, balance:float|int=0) -> None:
@@ -56,8 +60,9 @@ class AccountQuery:
                 `balance` : (float|int) - Initial balance of the account. Default is 0.
         """
 
-        self.session.add(Account(name=account_name, start_balance=balance))
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                session.add(Account(name=account_name, start_balance=balance))
 
 
     def get_account(self) -> Account:
@@ -68,12 +73,14 @@ class AccountQuery:
                 `Account` - The account object.
         """
 
-        account = self.session.query(Account).filter_by(id=self.account_id).first()
-        if account:
-            return account
-        else:
-            logger.error(f"Account with ID {self.account_id} not found.")
-            raise ValueError(f"Account with ID {self.account_id} not found.")
+        with self.session_factory() as session:
+            with session.begin():
+                account = session.query(Account).filter_by(id=self.account_id).first()
+                if account:
+                    return account
+                else:
+                    logger.error(f"Account with ID {self.account_id} not found.")
+                    raise ValueError(f"Account with ID {self.account_id} not found.")
 
 
     def update_account_balance(self, balance:float|int, total_income:int|float, total_expenses:int|float) -> None:
@@ -86,12 +93,13 @@ class AccountQuery:
                 `total_expenses` : (int|float) - Total expenses of the account.
         """
 
-        self.session.query(Account).filter_by(id=self.account_id).update({
-            Account.current_balance:balance,
-            Account.current_total_income:total_income,
-            Account.current_total_expenses:total_expenses
-        }, False)
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                session.query(Account).filter_by(id=self.account_id).update({
+                    Account.current_balance:balance,
+                    Account.current_total_income:total_income,
+                    Account.current_total_expenses:total_expenses
+                }, False)
 
 
     def rename_account(self, new_account_name:str) -> None:
@@ -102,21 +110,23 @@ class AccountQuery:
                 `new_account_name` : (str) - New name of the account.
         """
 
-        account = self.session.query(Account).filter_by(id=self.account_id).first()
+        with self.session_factory() as session:
+            with session.begin():
+                account = session.query(Account).filter_by(id=self.account_id).first()
 
-        if account:
-            account.name = new_account_name
-            self.session.commit()
-        else:
-            logger.error(f"Account with ID {self.account_id} not found.")
+                if account:
+                    account.name = new_account_name
+                else:
+                    logger.error(f"Account with ID {self.account_id} not found.")
     
 
     def delete_account(self) -> None:
         """Delete the account from the database."""
         
-        account = self.session.query(Account).filter_by(id=self.account_id).first()
-        self.session.delete(account)
-        self.session.commit()
-        self.session.execute(text("VACUUM"))
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                account = session.query(Account).filter_by(id=self.account_id).first()
+                session.delete(account)
+
+            session.execute(text("VACUUM"))
   

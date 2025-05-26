@@ -7,7 +7,7 @@ from backend.models import Category
 from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session as sql_Session
+    from sqlalchemy.orm import sessionmaker, Session as sql_Session
 
 
 
@@ -16,8 +16,8 @@ logger = get_logger(__name__)
 class CategoryQuery:
     """This class is used to manage categories and related data in the database."""
 
-    def __init__(self, session:sql_Session) -> None:
-        self.session = session
+    def __init__(self, session_factory:sessionmaker[sql_Session]) -> None:
+        self.session_factory = session_factory
         self.account_id:int
     
 
@@ -33,8 +33,10 @@ class CategoryQuery:
                 `bool` - True if the category exists, False otherwise.
         """
 
-        result = self.session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
-        return bool(result)
+        with self.session_factory() as session:
+            with session.begin():
+                result = session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
+                return bool(result)
 
 
     def create_category(self, name:str, category_type:str, position:int) -> None:
@@ -47,8 +49,9 @@ class CategoryQuery:
                 `position` : (int) - Position of the category for sorting.
         """
 
-        self.session.add(Category(name=name, category_type=category_type, position=position, account_id=self.account_id))
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                session.add(Category(name=name, category_type=category_type, position=position, account_id=self.account_id))
 
 
     def get_available_position(self, category_type:str) -> int:
@@ -61,12 +64,16 @@ class CategoryQuery:
             -------
                 `int` - Next available position for the category.
         """
-        last_category = self.session.query(Category).filter_by(category_type=category_type, account_id=self.account_id).order_by(desc(Category.position)).first()
 
-        if last_category is None:
-            return 0
-        
-        return last_category.position + 1
+        with self.session_factory() as session:
+            with session.begin():
+                
+                last_category = session.query(Category).filter_by(category_type=category_type, account_id=self.account_id).order_by(desc(Category.position)).first()
+
+                if last_category is None:
+                    return 0
+                
+                return last_category.position + 1
 
 
     def change_category_position(self, new_position:int, old_position:int, category_id:int, category_type:str) -> None:
@@ -80,14 +87,15 @@ class CategoryQuery:
                 `category_type` : (str) - Type of the category (income or expense).
         """
 
-        if new_position < old_position:
-            self.session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
-                {Category.position: Category.position + 1}, synchronize_session=False)
-        else:
-            self.session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
-                {Category.position: Category.position - 1}, synchronize_session=False)
-        self.session.query(Category).filter_by(id=category_id).update({Category.position: new_position}, synchronize_session=False)
-        self.session.commit()
+        with self.session_factory() as session:
+            with session.begin():
+                if new_position < old_position:
+                    session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
+                        {Category.position: Category.position + 1}, synchronize_session=False)
+                else:
+                    session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
+                        {Category.position: Category.position - 1}, synchronize_session=False)
+                session.query(Category).filter_by(id=category_id).update({Category.position: new_position}, synchronize_session=False)
 
 
     def remove_position(self, category_id:int) -> None:
@@ -98,14 +106,15 @@ class CategoryQuery:
                 `category_id` : (int) - ID of the category to remove.
         """
 
-        category = self.session.query(Category).filter_by(id=category_id).first()
+        with self.session_factory() as session:
+            with session.begin():
+                category = session.query(Category).filter_by(id=category_id).first()
 
-        if category:
-            self.session.query(Category).filter(Category.position > category.position).update(
-                {Category.position: Category.position - 1}, synchronize_session=False)
-            self.session.commit()
-        else:
-            logger.error(f"Category with ID {category_id} not found.")
+                if category:
+                    session.query(Category).filter(Category.position > category.position).update(
+                        {Category.position: Category.position - 1}, synchronize_session=False)
+                else:
+                    logger.error(f"Category with ID {category_id} not found.")
 
 
     def get_category(self, name:str, category_type:str) -> Category|None:
@@ -120,13 +129,15 @@ class CategoryQuery:
                 `Category` - The category object if found, None otherwise.
         """
 
-        category = self.session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
+        with self.session_factory() as session:
+            with session.begin():
+                category = session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
 
-        if category:
-            return category
-        else:
-            logger.error(f"Category with name {name} and type {category_type} not found. Although it should be there.")
-            return None
+                if category:
+                    return category
+                else:
+                    logger.error(f"Category with name {name} and type {category_type} not found. Although it should be there.")
+                    return None
             
     
 
@@ -138,7 +149,9 @@ class CategoryQuery:
                 `list[Category]` - List of all categories in the database.
         """
 
-        return self.session.query(Category).filter_by(account_id=self.account_id).order_by(Category.position).all()
+        with self.session_factory() as session:
+            with session.begin():
+                return session.query(Category).filter_by(account_id=self.account_id).order_by(Category.position).all()
 
 
     def rename_category(self, category_id:int, new_name:str) -> None:
@@ -149,8 +162,10 @@ class CategoryQuery:
                 `category_id` : (int) - ID of the category to rename.
                 `new_name` : (str) - New name of the category.
         """
-        self.session.query(Category).filter_by(id=category_id).update({Category.name:new_name}, False)
-        self.session.commit()
+
+        with self.session_factory() as session:
+            with session.begin():
+                session.query(Category).filter_by(id=category_id).update({Category.name:new_name}, False)
 
 
     def delete_category(self, category_id:int) -> None:
@@ -160,8 +175,10 @@ class CategoryQuery:
             ---------
                 `category_id` : (int) - ID of the category to delete.
         """
-        self.remove_position(category_id)
-        self.session.query(Category).filter_by(id=category_id).delete(False)
-        self.session.commit()
-        self.session.execute(text("VACUUM"))
-        self.session.commit()
+
+        with self.session_factory() as session:
+            with session.begin():
+                self.remove_position(category_id)
+                session.query(Category).filter_by(id=category_id).delete(False)
+
+            session.execute(text("VACUUM"))

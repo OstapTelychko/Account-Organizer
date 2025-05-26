@@ -4,7 +4,7 @@ from sqlite3 import connect as sql_connect
 from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session as sql_Session
+    from sqlalchemy.orm import sessionmaker, Session as sql_Session
     from sqlalchemy import Engine
 
 
@@ -14,8 +14,8 @@ class BackupQuery:
     """This class is used to manage the backup logic of the database.
     It contains methods to create a backup of the database and to restore the database from a backup."""
 
-    def __init__(self, session:sql_Session, engine:Engine) -> None:
-        self.session = session
+    def __init__(self, session_factory:sessionmaker[sql_Session], engine:Engine) -> None:
+        self.session_factory = session_factory
         self.engine = engine
         self.account_id:int
     

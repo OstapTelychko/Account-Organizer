@@ -84,8 +84,13 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_open_settings))
             category.settings.click()
 
-        self.assertTrue(Session.db.session.query(Category).filter_by(name=income_category_name+" rename test").first(), "Income category hasn't been renamed")
-        self.assertTrue(Session.db.session.query(Category).filter_by(name=expenses_category_name+" rename test").first(), "Expense category hasn't been renamed")
+        with Session.db.session_factory() as session:
+            with session.begin():
+                income_category_exists = bool(session.query(Category).filter_by(name=income_category_name+" rename test").first())
+                expense_category_exists = bool(session.query(Category).filter_by(name=expenses_category_name+" rename test").first())
+                
+        self.assertTrue(income_category_exists, "Income category hasn't been renamed")
+        self.assertTrue(expense_category_exists, "Expense category hasn't been renamed")
 
         qsleep(500)
     

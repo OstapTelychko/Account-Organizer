@@ -137,10 +137,11 @@ class DBTestCase(TestCase):
 
         remove_categories_from_list()
 
-        Session.db.session.expunge_all()
-        Session.db.session.query(Category).delete()
-        Session.db.session.query(Transaction).delete()
-        Session.db.session.query(Account).filter(Account.id != 1).delete()
+        with Session.db.session_factory() as session:
+            with session.begin():
+                session.query(Category).delete()
+                session.query(Transaction).delete()
+                session.query(Account).filter(Account.id != 1).delete()
         
         Session.config.account_name = "Test user"
         Session.db.set_account_id(Session.config.account_name)
