@@ -6,7 +6,7 @@ from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from languages import LanguageStructure
 from project_configuration import MONTHS_DAYS
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 if TYPE_CHECKING:
@@ -61,7 +61,8 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
     def test_1_show_monthly_statistics(self) -> None:
         """Test showing monthly statistics."""
 
-        days_amount = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)
+        app_core = AppCore.instance()
+        days_amount = MONTHS_DAYS[app_core.current_month-1] + (app_core.current_month == 2 and app_core.current_year % 4 == 0)
 
         def _open_monthly_statics_window() -> None:
             """Click button that show monthly statistics window."""
@@ -91,13 +92,14 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
     def test_2_show_quarterly_statistics(self) -> None:
         """Test showing quarterly statistics."""
 
-        month_without_transactions = 12 if Session.current_month != 12 else 1
-        quarter_without_transaction = 4 if Session.current_month != 12 else 1
+        app_core = AppCore.instance()
+        month_without_transactions = 12 if app_core.current_month != 12 else 1
+        quarter_without_transaction = 4 if app_core.current_month != 12 else 1
 
         for month in range(1, 13):
-            if month not in (Session.current_month, month_without_transactions):
-                Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
-                Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+            if month not in (app_core.current_month, month_without_transactions):
+                app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction")
+                app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction")
         
         def _open_quarterly_statistics_window() -> None:
             """Click button that show quarterly statistics window."""
@@ -107,7 +109,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                 for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
                     quarter_number = quarter.quarter_number
-                    days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and Session.current_year % 4 == 0)
+                    days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and app_core.current_year % 4 == 0)
 
                     if quarter_number != quarter_without_transaction:
                         total_income = 3000.0
@@ -143,7 +145,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         statistics_data = month.data
 
                         current_month = month.month_number
-                        month_days_amount = MONTHS_DAYS[current_month-1] + (current_month == 2 and Session.current_year % 4 == 0)
+                        month_days_amount = MONTHS_DAYS[current_month-1] + (current_month == 2 and app_core.current_year % 4 == 0)
                         expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
 
                         if current_month != month_without_transactions:
@@ -172,12 +174,13 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
     def test_3_show_yearly_statistics(self) -> None:
         """Test showing yearly statistics."""
 
-        month_without_transactions = 12 if Session.current_month != 12 else 1
+        app_core = AppCore.instance()
+        month_without_transactions = 12 if app_core.current_month != 12 else 1
 
         for month in range(1, 13):
-            if month not in (Session.current_month, month_without_transactions):
-                Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
-                Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+            if month not in (app_core.current_month, month_without_transactions):
+                app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction")
+                app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction")
         
         def _open_yearly_statistics_window() -> None:
             """Click button that show yearly statistics window."""
@@ -185,7 +188,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             def _check_yearly_statistics() -> None:
                 """Check if yearly statistics are correct."""
 
-                days_amount = 365 if Session.current_year % 4 != 0 else 366
+                days_amount = 365 if app_core.current_year % 4 != 0 else 366
 
                 total_income = 11000.0
                 total_expense = 11000.0
@@ -218,7 +221,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 for month in WindowsRegistry.YearlyStatistics.statistics.months:
                     statistics_data = month.data
 
-                    month_days_amount = MONTHS_DAYS[month.month_number-1] + (month.month_number == 2 and Session.current_year % 4 == 0)
+                    month_days_amount = MONTHS_DAYS[month.month_number-1] + (month.month_number == 2 and app_core.current_year % 4 == 0)
                     expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
 
                     if month.month_number != month_without_transactions:
@@ -247,10 +250,11 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
     def test_4_show_custom_range_statistics(self) -> None:
         """Test showing custom range statistics."""
 
+        app_core = AppCore.instance()
         for month in range(1, 7):
-            if month != Session.current_month:
-                Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, month, 1, 1000, "Test income transaction")
-                Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, month, 1, 1000, "Test expenses transaction")
+            if month != app_core.current_month:
+                app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction")
+                app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction")
         
         def _open_custom_range_statistics_window() -> None:
             """Click button that show custom range statistics window."""
@@ -261,15 +265,15 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.click()
                 WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.click()
                 
-                WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(Session.current_year, 1, 1))
-                WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(Session.current_year, 6, 1))
+                WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(app_core.current_year, 1, 1))
+                WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(app_core.current_year, 6, 1))
 
                 def _check_custom_range_statistics() -> None:
                     """Check if custom range statistics are correct."""
 
                     total_income = 6000.0
                     total_expense = 6000.0
-                    date_difference = date(Session.current_year, 6, 1) - date(Session.current_year, 1, 1)
+                    date_difference = date(app_core.current_year, 6, 1) - date(app_core.current_year, 1, 1)
                     days_amount = date_difference.days
 
                     expected_custom_range_statistics = [
@@ -288,40 +292,40 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.statistics_list
                     self.assertEqual(
                         len(expected_custom_range_statistics), statistics_data.count(),
-                        f"Custom range statistics (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) have another amount of rows. Expected amount {len(expected_custom_range_statistics)} found {statistics_data.count()} rows")
+                        f"Custom range statistics (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) have another amount of rows. Expected amount {len(expected_custom_range_statistics)} found {statistics_data.count()} rows")
 
                     for index, expected_row in enumerate(expected_custom_range_statistics):
                         self.assertEqual(
                             expected_row, statistics_data.item(index).text(),
-                            f"In Custom range statistics (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                            f"In Custom range statistics (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
                     
                     expected_transactions = [
                         f"{self.translated_incomes}\n\n",
                         f"\n{self.income_category.name}\n",
-                        f"01/01/{Session.current_year}\t1000.0\tTest income transaction",
-                        f"01/02/{Session.current_year}\t1000.0\tTest income transaction",
-                        f"01/03/{Session.current_year}\t1000.0\tTest income transaction",
-                        f"01/04/{Session.current_year}\t1000.0\tTest income transaction",
-                        f"01/05/{Session.current_year}\t1000.0\tTest income transaction",
-                        f"01/06/{Session.current_year}\t1000.0\tTest income transaction",
+                        f"01/01/{app_core.current_year}\t1000.0\tTest income transaction",
+                        f"01/02/{app_core.current_year}\t1000.0\tTest income transaction",
+                        f"01/03/{app_core.current_year}\t1000.0\tTest income transaction",
+                        f"01/04/{app_core.current_year}\t1000.0\tTest income transaction",
+                        f"01/05/{app_core.current_year}\t1000.0\tTest income transaction",
+                        f"01/06/{app_core.current_year}\t1000.0\tTest income transaction",
                         f"\n\n\n{self.translated_expenses}\n\n",
                         f"\n{self.expenses_category.name}\n",
-                        f"01/01/{Session.current_year}\t1000.0\tTest expenses transaction",
-                        f"01/02/{Session.current_year}\t1000.0\tTest expenses transaction",
-                        f"01/03/{Session.current_year}\t1000.0\tTest expenses transaction",
-                        f"01/04/{Session.current_year}\t1000.0\tTest expenses transaction",
-                        f"01/05/{Session.current_year}\t1000.0\tTest expenses transaction",
-                        f"01/06/{Session.current_year}\t1000.0\tTest expenses transaction",]
+                        f"01/01/{app_core.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/02/{app_core.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/03/{app_core.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/04/{app_core.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/05/{app_core.current_year}\t1000.0\tTest expenses transaction",
+                        f"01/06/{app_core.current_year}\t1000.0\tTest expenses transaction",]
 
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.transactions_list
                     self.assertEqual(
                         len(expected_transactions), statistics_data.count(),
-                        f"Custom range transactions list (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) have another amount of rows. Expected amount {len(expected_transactions)} found {statistics_data.count()} rows")
+                        f"Custom range transactions list (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) have another amount of rows. Expected amount {len(expected_transactions)} found {statistics_data.count()} rows")
 
                     for index, expected_row in enumerate(expected_transactions):
                         self.assertEqual(
                             expected_row, statistics_data.item(index).text(),
-                            f"In Custom range transactions list (1, 1, {Session.current_year} - 1, 6, {Session.current_year}) row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                            f"In Custom range transactions list (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
                     
                     WindowsRegistry.CustomRangeStatisticsView.done(1)
                     WindowsRegistry.CustomRangeStatistics.done(1)

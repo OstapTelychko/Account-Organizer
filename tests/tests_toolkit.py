@@ -18,7 +18,7 @@ from backend.models import Category, Transaction, Account
 from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
@@ -94,13 +94,14 @@ class DBTestCase(TestCase):
                 `function` - Decorated function.
         """
 
+        app_core = AppCore.instance()
         @wraps(func)
         def wrapper(self:DBTestCase) -> None:
-            Session.db.category_query.create_category("Test income category", "Incomes", 0)
-            Session.db.category_query.create_category("Test expenses category", "Expenses", 0)
+            app_core.db.category_query.create_category("Test income category", "Incomes", 0)
+            app_core.db.category_query.create_category("Test expenses category", "Expenses", 0)
             
-            new_income_category = Session.db.category_query.get_category("Test income category", "Incomes")
-            new_expenses_category = Session.db.category_query.get_category("Test expenses category", "Expenses")
+            new_income_category = app_core.db.category_query.get_category("Test income category", "Incomes")
+            new_expenses_category = app_core.db.category_query.get_category("Test expenses category", "Expenses")
 
             if new_income_category is None or new_expenses_category is None:
                 logger.error("Just created categories not found in the database")
@@ -109,11 +110,11 @@ class DBTestCase(TestCase):
             self.income_category = new_income_category
             self.expenses_category = new_expenses_category
 
-            Session.db.transaction_query.add_transaction(self.income_category.id, Session.current_year, Session.current_month, 1, 1000, "Test income transaction")
-            Session.db.transaction_query.add_transaction(self.expenses_category.id, Session.current_year, Session.current_month, 1, 1000, "Test expenses transaction")
+            app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, app_core.current_month, 1, 1000, "Test income transaction")
+            app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, app_core.current_month, 1, 1000, "Test expenses transaction")
 
-            Session.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, Session.db, self.income_category.id, 0, Session.current_year, Session.current_month)
-            Session.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, Session.db, self.expenses_category.id, 0, Session.current_year, Session.current_month)
+            app_core.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, app_core.db, self.income_category.id, 0, app_core.current_year, app_core.current_month)
+            app_core.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, app_core.db, self.expenses_category.id, 0, app_core.current_year, app_core.current_month)
             activate_categories()
 
             return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)
@@ -136,15 +137,15 @@ class DBTestCase(TestCase):
         """This method is used to remove the test database after the test is finished."""
 
         remove_categories_from_list()
-
-        with Session.db.session_factory() as session:
+        app_core = AppCore.instance()
+        with app_core.db.session_factory() as session:
             with session.begin():
                 session.query(Category).delete()
                 session.query(Transaction).delete()
                 session.query(Account).filter(Account.id != 1).delete()
         
-        Session.config.account_name = "Test user"
-        Session.db.set_account_id(Session.config.account_name)
+        app_core.config.account_name = "Test user"
+        app_core.db.set_account_id(app_core.config.account_name)
 
 
 

@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt, QTimer
 from sys import platform
 
 from GUI.gui_constants import DWMWA_USE_IMMERSIVE_DARK_MODE
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QIcon
@@ -47,7 +47,7 @@ class MessageWindow(QMessageBox):
         if platform == "win32":
             import ctypes
 
-            if Session.config.theme == "Dark":
+            if AppCore.instance().config.theme == "Dark":
                 value = ctypes.c_int(2)
             else:
                 value = ctypes.c_int(0)

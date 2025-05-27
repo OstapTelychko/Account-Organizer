@@ -9,7 +9,7 @@ from PySide6.QtCore import QTimer
 from languages import LanguageStructure
 from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, BACKUPS_DATE_FORMAT
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.backup_management import auto_backup
@@ -33,7 +33,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
         """Remove test backups directory and clear backups list and table"""
 
         WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(0)
-        Session.backups.clear()
+        AppCore.instance().backups.clear()
         shutil.rmtree(TEST_BACKUPS_DIRECTORY)
         return super().tearDown()
 
@@ -57,6 +57,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_1_create_backup(self) -> None:
         """Test creating backup in the application."""
 
+        app_core = AppCore.instance()
         def _create_backup() -> None:
             """Click create backup button"""
 
@@ -70,8 +71,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
-                1, len(Session.backups),
-                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
+                1, len(app_core.backups),
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(app_core.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -93,6 +94,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_2_remove_backup(self) -> None:
         """Test removing backup in the application."""
 
+        app_core = AppCore.instance()
         def _remove_backup() -> None:
             """Create example backup and remove it"""
 
@@ -125,8 +127,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 f"Backup hasn't been removed from the table or more than 0 backups are left {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
-                0, len(Session.backups),
-                f"Backup hasn't been removed from the session or more than 0 backups are left {len(Session.backups)}")
+                0, len(app_core.backups),
+                f"Backup hasn't been removed from the session or more than 0 backups are left {len(app_core.backups)}")
 
                 self.assertEqual(
                 0, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -145,6 +147,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_3_load_backup(self) -> None:
         """Test loading backup in the application."""
 
+        app_core = AppCore.instance()
         def _prepare_load_backup() -> None:
             """Create new backup that doesn't have new income category and load it"""
 
@@ -180,12 +183,12 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                             """Check if backup is loaded and if new income category doesn't appears"""
 
                             self.assertEqual(
-                            2, len(Session.categories),
-                            f"Expected categories amount after backup load is 2 returned {len(Session.categories)}")
+                            2, len(app_core.categories),
+                            f"Expected categories amount after backup load is 2 returned {len(app_core.categories)}")
 
                             self.assertEqual(
-                            2, len(Session.db.category_query.get_all_categories()),
-                            f"Expected categories amount after backup load is 2 returned {len(Session.db.category_query.get_all_categories())}")
+                            2, len(app_core.db.category_query.get_all_categories()),
+                            f"Expected categories amount after backup load is 2 returned {len(app_core.db.category_query.get_all_categories())}")
 
                             def _load_newest_backup() -> None:
                                 """Load automatically created backup that has new income category"""
@@ -204,12 +207,12 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                                     """Check if backup is loaded and if new income category appears"""
 
                                     self.assertEqual(
-                                    3, len(Session.categories),
-                                    f"Expected categories amount after backup load is 3 returned {len(Session.categories)}")
+                                    3, len(app_core.categories),
+                                    f"Expected categories amount after backup load is 3 returned {len(app_core.categories)}")
 
                                     self.assertEqual(
-                                    3, len(Session.db.category_query.get_all_categories()),
-                                    f"Expected categories amount after backup load is 3 returned {len(Session.db.category_query.get_all_categories())}")
+                                    3, len(app_core.db.category_query.get_all_categories()),
+                                    f"Expected categories amount after backup load is 3 returned {len(app_core.db.category_query.get_all_categories())}")
 
                                     self.assertEqual(WindowsRegistry.BackupManagementWindow.isVisible(), False, "Backup management window hasn't been closed")
                                     self.assertEqual(WindowsRegistry.SettingsWindow.isVisible(), False, "Settings window hasn't been closed")
@@ -236,6 +239,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_4_auto_backup_status_change(self) -> None:
         """Test changing auto backup status in the application."""
 
+        app_core = AppCore.instance()
         def _set_daily_status() -> None:
             """Open auto backup window to set daily status"""
 
@@ -255,7 +259,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 qsleep(200)
 
                 self.assertEqual(WindowsRegistry.AutoBackupWindow.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.config.auto_backup_status, Session.config.AutoBackupStatus.DAILY.value, "Auto backup status hasn't been changed to daily")
+                self.assertEqual(app_core.config.auto_backup_status, app_core.config.AutoBackupStatus.DAILY.value, "Auto backup status hasn't been changed to daily")
 
                 translated_daily_status = LanguageStructure.BackupManagement.get_translation(7)
                 self.assertNotEqual(WindowsRegistry.AutoBackupWindow.current_status.text().find(translated_daily_status), -1, "Auto backup status label hasn't been changed to daily")
@@ -288,7 +292,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 qsleep(200)
 
                 self.assertEqual(WindowsRegistry.AutoBackupWindow.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.config.auto_backup_status, Session.config.AutoBackupStatus.WEEKLY.value, "Auto backup status hasn't been changed to weekly")
+                self.assertEqual(app_core.config.auto_backup_status, app_core.config.AutoBackupStatus.WEEKLY.value, "Auto backup status hasn't been changed to weekly")
 
                 translated_weekly_status = LanguageStructure.BackupManagement.get_translation(6)
                 self.assertNotEqual(WindowsRegistry.AutoBackupWindow.current_status.text().find(translated_weekly_status), -1, "Auto backup status label hasn't been changed to weekly")
@@ -321,7 +325,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 qsleep(200)
 
                 self.assertEqual(WindowsRegistry.AutoBackupWindow.isVisible(), False, "Auto backup window hasn't been closed")
-                self.assertEqual(Session.config.auto_backup_status, Session.config.AutoBackupStatus.MONTHLY.value, "Auto backup status hasn't been changed to monthly")
+                self.assertEqual(app_core.config.auto_backup_status, app_core.config.AutoBackupStatus.MONTHLY.value, "Auto backup status hasn't been changed to monthly")
 
                 translated_monthly_status = LanguageStructure.BackupManagement.get_translation(5)
                 self.assertNotEqual(WindowsRegistry.AutoBackupWindow.current_status.text().find(translated_monthly_status), -1, "Auto backup status label hasn't been changed to monthly")
@@ -339,7 +343,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_5_auto_daily_backup(self) -> None:
         """Test daily auto backup in the application."""
 
-        Session.config.auto_backup_status = Session.config.AutoBackupStatus.DAILY.value
+        app_core = AppCore.instance()
+        app_core.config.auto_backup_status = app_core.config.AutoBackupStatus.DAILY.value
         date_now = datetime.now()
         date_minus_1_day = date_now - timedelta(days=1)
 
@@ -354,8 +359,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
-                1, len(Session.backups),
-                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
+                1, len(app_core.backups),
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(app_core.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -369,8 +374,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     f"Backup have been added even though less than 1 day has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
-                    1, len(Session.backups),
-                    f"Backup have been added even though less than 1 day has passed {len(Session.backups)}")
+                    1, len(app_core.backups),
+                    f"Backup have been added even though less than 1 day has passed {len(app_core.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -380,7 +385,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -391,8 +396,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     f"Backup during daily auto backup hasn't been added to the table or more than 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
-                    2, len(Session.backups),
-                    f"Backup during daily auto backup hasn't been added to the session or more than 2 backups are added {len(Session.backups)}")
+                    2, len(app_core.backups),
+                    f"Backup during daily auto backup hasn't been added to the session or more than 2 backups are added {len(app_core.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -415,7 +420,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_6_auto_weekly_backup(self) -> None:
         """Test weekly auto backup in the application."""
 
-        Session.config.auto_backup_status = Session.config.AutoBackupStatus.WEEKLY.value
+        app_core = AppCore.instance()
+        app_core.config.auto_backup_status = app_core.config.AutoBackupStatus.WEEKLY.value
         date_now = datetime.now()
         date_minus_7_days = date_now - timedelta(days=7)
 
@@ -430,8 +436,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
-                1, len(Session.backups),
-                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
+                1, len(app_core.backups),
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(app_core.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -445,8 +451,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     f"Backup have been added even though less than 7 days has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
-                    1, len(Session.backups),
-                    f"Backup have been added even though less than 7 days has passed {len(Session.backups)}")
+                    1, len(app_core.backups),
+                    f"Backup have been added even though less than 7 days has passed {len(app_core.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -456,7 +462,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -467,8 +473,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     f"Backup during weekly auto backup hasn't been added to the table or more than 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
-                    2, len(Session.backups),
-                    f"Backup during weekly auto backup hasn't been added to the session or more than 2 backups are added {len(Session.backups)}")
+                    2, len(app_core.backups),
+                    f"Backup during weekly auto backup hasn't been added to the session or more than 2 backups are added {len(app_core.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -490,7 +496,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_7_auto_monthly_backup(self) -> None:
         """Test monthly auto backup in the application."""
 
-        Session.config.auto_backup_status = Session.config.AutoBackupStatus.MONTHLY.value
+        app_core = AppCore.instance()
+        app_core.config.auto_backup_status = app_core.config.AutoBackupStatus.MONTHLY.value
         date_now = datetime.now()
         date_minus_30_days = date_now - timedelta(days=30)
 
@@ -505,8 +512,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 f"Backup hasn't been added to the table or more than 1 backup is added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                 self.assertEqual(
-                1, len(Session.backups),
-                f"Backup hasn't been added to the session or more than 1 backup is added {len(Session.backups)}")
+                1, len(app_core.backups),
+                f"Backup hasn't been added to the session or more than 1 backup is added {len(app_core.backups)}")
 
                 self.assertEqual(
                 1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -520,8 +527,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     f"Backup have been added even though less than 30 days has passed {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
-                    1, len(Session.backups),
-                    f"Backup have been added even though less than 30 days has passed {len(Session.backups)}")
+                    1, len(app_core.backups),
+                    f"Backup have been added even though less than 30 days has passed {len(app_core.backups)}")
 
                     self.assertEqual(
                     1, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -531,7 +538,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = Session.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_30_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -542,8 +549,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     f"Backup during monthly auto backup hasn't been added to the table or more than 2 backups are added {WindowsRegistry.BackupManagementWindow.backups_table.rowCount()}")
 
                     self.assertEqual(
-                    2, len(Session.backups),
-                    f"Backup during monthly auto backup hasn't been added to the session or more than 2 backups are added {len(Session.backups)}")
+                    2, len(app_core.backups),
+                    f"Backup during monthly auto backup hasn't been added to the session or more than 2 backups are added {len(app_core.backups)}")
 
                     self.assertEqual(
                     2, len(os.listdir(TEST_BACKUPS_DIRECTORY)),
@@ -565,7 +572,8 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     def test_8_check_max_backups_change(self) -> None:
         """Test changing max backups amount in the application."""
 
-        init_max_backups = Session.config.max_backups
+        app_core = AppCore.instance()
+        init_max_backups = app_core.config.max_backups
 
         def _open_auto_backup_settings() -> None:
             """Open auto backup window to set new max backups amount"""
@@ -577,13 +585,13 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     """Check if no change is made to max backups amount after clicking save without changing anything"""
 
                     self.assertEqual(
-                    init_max_backups, Session.config.max_backups,
-                    f"Expected max backups amount in session is {init_max_backups} returned {Session.config.max_backups}")
+                    init_max_backups, app_core.config.max_backups,
+                    f"Expected max backups amount in session is {init_max_backups} returned {app_core.config.max_backups}")
 
-                    Session.config.load_user_config()
+                    app_core.config.load_user_config()
                     self.assertEqual(
-                    init_max_backups, Session.config.max_backups,
-                    f"Expected max backups amount in user config is {init_max_backups} returned {Session.config.max_backups}")
+                    init_max_backups, app_core.config.max_backups,
+                    f"Expected max backups amount in user config is {init_max_backups} returned {app_core.config.max_backups}")
 
                     self.assertNotEqual(
                     -1, WindowsRegistry.AutoBackupWindow.max_backups_label.text().find(str(init_max_backups)),
@@ -619,13 +627,13 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     """Check if max backups amount is changed correctly"""
 
                     self.assertEqual(
-                    3, Session.config.max_backups,
-                    f"Expected max backups amount in session is 3 returned {Session.config.max_backups}")
+                    3, app_core.config.max_backups,
+                    f"Expected max backups amount in session is 3 returned {app_core.config.max_backups}")
 
-                    Session.config.load_user_config()
+                    app_core.config.load_user_config()
                     self.assertEqual(
-                    3, Session.config.max_backups,
-                    f"Expected max backups amount in user config is 3 returned {Session.config.max_backups}")
+                    3, app_core.config.max_backups,
+                    f"Expected max backups amount in user config is 3 returned {app_core.config.max_backups}")
                     
                     self.assertNotEqual(
                     -1, WindowsRegistry.AutoBackupWindow.max_backups_label.text().find("3"),

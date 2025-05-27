@@ -8,7 +8,7 @@ from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped
 
 from project_configuration import THEME_DIRECTORY
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
@@ -164,32 +164,34 @@ LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","for
 def switch_theme() -> None:
     """Switch theme between dark and light. If current theme is dark, switch to light and vice versa."""
 
-    if Session.config.theme == "Dark":
+    app_core = AppCore.instance()
+    if app_core.config.theme == "Dark":
         app.setStyleSheet(LIGHT_THEME)
         WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
-        Session.config.theme = "Light"
+        app_core.config.theme = "Light"
 
         if platform == "win32":
             set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
         logger.info("Theme switched to Light")
 
-    elif Session.config.theme == "Light":
+    elif app_core.config.theme == "Light":
         app.setStyleSheet(DARK_THEME)
         WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
-        Session.config.theme = "Dark"
+        app_core.config.theme = "Dark"
 
         if platform == "win32":
             set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(2))
         logger.info("Theme switched to Dark")
 
-    Session.config.update_user_config()
+    app_core.config.update_user_config()
 
 
 def load_theme() -> None:
     """Load theme from user config."""
 
     logger.info("Loading theme")
-    if Session.config.theme == "Dark":
+    app_core = AppCore.instance()
+    if app_core.config.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
         WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
 
@@ -197,7 +199,7 @@ def load_theme() -> None:
             set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(2))
         logger.info("Dark theme loaded")
             
-    if Session.config.theme == "Light":
+    if app_core.config.theme == "Light":
         app.setStyleSheet(LIGHT_THEME)
         WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
 

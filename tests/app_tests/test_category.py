@@ -5,7 +5,7 @@ from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
@@ -18,6 +18,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
     def test_1_category_creation(self) -> None:
         """Test adding category to the application."""
 
+        app_core = AppCore.instance()
         def _add_category(name:str) -> None:
             """Set category name and click add button."""
 
@@ -26,12 +27,12 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
 
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test incomes creation category")))
         WindowsRegistry.MainWindow.add_incomes_category.click()
-        self.assertTrue(Session.db.category_query.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
+        self.assertTrue(app_core.db.category_query.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
 
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test expenses creation category")))
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         WindowsRegistry.MainWindow.add_expenses_category.click()
-        self.assertTrue(Session.db.category_query.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
+        self.assertTrue(app_core.db.category_query.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
         
         qsleep(500)
     
@@ -39,10 +40,11 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
     def test_2_category_deletion(self) -> None:
         """Test deleting category from the application."""
 
+        app_core = AppCore.instance()
         income_category_name = self.income_category.name
         expenses_category_name = self.expenses_category.name
 
-        for category in Session.categories.copy().values():
+        for category in app_core.categories.copy().values():
             self.select_correct_tab(category)
 
             def _delete_category() -> None:
@@ -54,8 +56,8 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_delete_category))
             category.settings.click()
 
-        self.assertFalse(Session.db.category_query.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
-        self.assertFalse(Session.db.category_query.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
+        self.assertFalse(app_core.db.category_query.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
+        self.assertFalse(app_core.db.category_query.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
 
         qsleep(500)
     
@@ -63,10 +65,11 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
     def test_3_category_rename(self) -> None:
         """Test renaming category in the application."""
 
+        app_core = AppCore.instance()
         income_category_name = self.income_category.name
         expenses_category_name = self.expenses_category.name
 
-        for category in Session.categories.copy().values():
+        for category in app_core.categories.copy().values():
             self.select_correct_tab(category)
 
             def _open_settings() -> None:
@@ -84,7 +87,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_open_settings))
             category.settings.click()
 
-        with Session.db.session_factory() as session:
+        with app_core.db.session_factory() as session:
             with session.begin():
                 income_category_exists = bool(session.query(Category).filter_by(name=income_category_name+" rename test").first())
                 expense_category_exists = bool(session.query(Category).filter_by(name=expenses_category_name+" rename test").first())
@@ -98,10 +101,11 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
     def test_4_category_position_change(self) -> None:
         """Test changing category position in the application."""
 
-        Session.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
-        Session.db.category_query.create_category("Second "+self.expenses_category.name, "Expenses", 1)
+        app_core = AppCore.instance()
+        app_core.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
+        app_core.db.category_query.create_category("Second "+self.expenses_category.name, "Expenses", 1)
 
-        for category in Session.categories.copy().values():
+        for category in app_core.categories.copy().values():
             self.select_correct_tab(category)
 
             def _open_settings() -> None:
@@ -119,10 +123,10 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_open_settings))
             category.settings.click()
         
-        income_category = Session.db.category_query.get_category(self.income_category.name, "Incomes")
-        second_income_category = Session.db.category_query.get_category("Second "+self.income_category.name, "Incomes")
-        expenses_category = Session.db.category_query.get_category(self.expenses_category.name, "Expenses")
-        second_expenses_category = Session.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses")
+        income_category = app_core.db.category_query.get_category(self.income_category.name, "Incomes")
+        second_income_category = app_core.db.category_query.get_category("Second "+self.income_category.name, "Incomes")
+        expenses_category = app_core.db.category_query.get_category(self.expenses_category.name, "Expenses")
+        second_expenses_category = app_core.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses")
 
         if income_category is None or second_income_category is None or expenses_category is None or second_expenses_category is None:
             logger.error("Just created categories not found in the database")
@@ -139,7 +143,8 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
     def test_5_copy_month_transactions(self) -> None:
         """Test copying monthly transactions to the clipboard."""
 
-        for category in Session.categories.values():
+        app_core = AppCore.instance()
+        for category in app_core.categories.values():
             def _copy_transactions() -> None:
                 """Click copy transactions button and check if transactions are copied to the clipboard."""
 
@@ -151,7 +156,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                     else:
                         transaction_type = "expenses"
 
-                    expected_transactions = f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(Session.current_month)}\t{Session.current_year}\n"
+                    expected_transactions = f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
                     expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
 
                     self.assertEqual(expected_transactions, app.clipboard().text(), f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}")

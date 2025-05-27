@@ -2,11 +2,11 @@
 ☐ write tests for update check and process
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
 ☐ add html tags to messages in languages.json
-☐ remove session dependcies since it's main class and pass objects through start_session in main.py
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
 ☐ test on windows if problem with unclosed db is solved
 
 Archive:
+  ✔ remove session dependcies since it's main class and pass objects through start_session in main.py to follow SOLID principles @started(25-05-27 22:01) @done(25-05-28 01:58) @lasted(3h57m55s)
   ✔ change db controller logic from using one session to new session for each query @started(25-05-26 22:41) @done(25-05-27 00:21) @lasted(1h40m44s)
   ✔ make all classes that have to be inited once to be singletons @started(25-05-18 22:09) @done(25-05-19 13:47) @lasted(15h38m13s)
   ✔ remove excessive --exclude-module @started(25-05-18 17:52) @done(25-05-18 19:47) @lasted(1h55m35s)

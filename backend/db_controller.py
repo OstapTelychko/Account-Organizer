@@ -11,7 +11,6 @@ from alembic import command
 
 from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
 from AppObjects.logger import get_logger
-from AppObjects.session import Session
 
 from backend.models import Account
 from backend.account_query import AccountQuery
@@ -32,7 +31,7 @@ class DBController():
     """This class is used to manage the database connection and queries.
     It handles the creation of the database engine, session, and queries for accounts, categories, transactions, backups, and statistics."""
 
-    def __init__(self) -> None:
+    def __init__(self, test_mode:bool, test_alembic_config:Config|None = None) -> None:
         # Init db connection 
 
         logger.info("Loadin alembic config")
@@ -40,9 +39,14 @@ class DBController():
         self.alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
         self.alembic_config.set_main_option("sqlalchemy.url", DB_PATH)
 
-        if Session.test_mode:
+        if test_mode:
             self.engine = create_engine(TEST_DB_PATH)
-            self.alembic_config = Session.test_alembic_config
+
+            if not test_alembic_config:
+                logger.error("Test mode is enabled, but no test_alembic_config provided.")
+                raise RuntimeError("Test mode is enabled, but no test_alembic_config provided.")
+            
+            self.alembic_config = test_alembic_config
         else:
             self.engine = create_engine(DB_PATH)
             logger.debug("Engine created")

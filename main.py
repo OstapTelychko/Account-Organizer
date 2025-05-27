@@ -36,7 +36,10 @@ from project_configuration import FORBIDDEN_CALCULATOR_WORDS, APP_NAME
 from languages import LanguageStructure
 from backend.db_controller import DBController
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
+from AppObjects.shortcuts_manager import ShortcutsManager
+from AppObjects.single_instance_guard import SingleInstanceGuard
+from AppObjects.user_config import UserConfig
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -91,21 +94,30 @@ def calculate_expression() -> None:
         WindowsRegistry.Messages.empty_expression.exec()
 
 
-def main() -> None:
+def main(test_mode:bool=False) -> None:
     """Main function to start the application"""
+    
+    if test_mode:
+        app_core = AppCore.instance()
+    else:
+        Single_instance_guard = SingleInstanceGuard()
+        db_controller = DBController(False)
+        user_config = UserConfig(False)
+        app_core = AppCore(single_instance_guard=Single_instance_guard, db_controller=db_controller, user_config=user_config, test_mode=False)
 
-    Session.start_session()
+    ShortcutsManager(app_core.config)
+    app_core.start_session()
 
     #Set main window for instance guard
-    Session.instance_guard.main_window = WindowsRegistry.MainWindow
+    app_core.instance_guard.main_window = WindowsRegistry.MainWindow
     # Ensure the safe exit when the application exits
-    app.aboutToQuit.connect(Session.end_session)
+    app.aboutToQuit.connect(AppCore.instance().end_session)
 
     load_theme()
 
     #Set current month and year
-    WindowsRegistry.MainWindow.current_year.setText(str(Session.current_year))
-    WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
+    WindowsRegistry.MainWindow.current_year.setText(str(app_core.current_year))
+    WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
 
     #Connect buttons to functions
     #Settings
@@ -165,16 +177,15 @@ def main() -> None:
     #Connect to db
     logger.info("__BREAK_LINE__")
     logger.info("Connecting to database")
-    if not Session.test_mode:
-        Session.db = DBController()
         
-    if not Session.db.account_query.account_exists(Session.config.account_name):
+    if not app_core.db.account_query.account_exists(app_core.config.account_name):
         logger.info("Account doesn't exist. Showing add account window")
         show_add_user_window()
-        if not Session.db.account_id:
+        if not app_core.db.account_id:
             logger.info("Account wasn't created. Exiting")
             exit() 
-    Session.db.set_account_id(Session.config.account_name)
+
+    app_core.db.set_account_id(app_core.config.account_name)
     logger.info("account_id set")
     logger.info("Connected to database")
     logger.info("__BREAK_LINE__")
@@ -183,11 +194,11 @@ def main() -> None:
     logger.info("Loading backups")
     load_backups()
 
-    if not Session.test_mode and not Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    if not test_mode and not app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         logger.info("Auto backup enabled")
         auto_backup()
     
-    if Session.config.auto_backup_removal_enabled:
+    if app_core.config.auto_backup_removal_enabled:
         logger.info("Auto backup removal enabled")
         auto_remove_backups()
     logger.info("__BREAK_LINE__")
@@ -206,17 +217,17 @@ def main() -> None:
 
     #Load categories if they exists
     logger.info("Loading categories")
-    if len(Session.db.category_query.get_all_categories()) > 0:
+    if len(app_core.db.category_query.get_all_categories()) > 0:
         load_categories()
     activate_categories()
-    logger.info(f"{len(Session.categories)} categories loaded")
+    logger.info(f"{len(app_core.categories)} categories loaded")
     logger.info("__BREAK_LINE__")
 
     #Add accounts to list
     logger.info("Loading accounts")
     clear_accounts_layout()
     load_accounts()
-    logger.info(f"{len(Session.accounts_list)} accounts loaded")
+    logger.info(f"{len(app_core.accounts_list)} accounts loaded")
     logger.info("__BREAK_LINE__")
 
     #Shortcuts
@@ -230,11 +241,11 @@ def main() -> None:
     WindowsRegistry.RenameAccountWindow.button.clicked.connect(rename_account)
 
     load_account_balance()
-    load_language(Session.config.language)
+    load_language(app_core.config.language)
 
     WindowsRegistry.MainWindow.show()
 
-    if not Session.test_mode:
+    if not test_mode:
         QTimer.singleShot(200, check_for_updates)
 
 

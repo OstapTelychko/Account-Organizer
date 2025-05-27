@@ -4,7 +4,7 @@ from PySide6.QtCore import QTimer
 
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
@@ -43,7 +43,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _check_account_existance() -> None:
                     """Check if account exists in the database."""
 
-                    self.assertTrue(Session.db.account_query.account_exists("Second test user"), "Second test user hasn't been created")
+                    self.assertTrue(AppCore.instance().db.account_query.account_exists("Second test user"), "Second test user hasn't been created")
                     WindowsRegistry.SettingsWindow.done(1)
                 QTimer.singleShot(100, self.catch_failure(_check_account_existance))
                 WindowsRegistry.AddAccountWindow.button.click()
@@ -58,6 +58,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
     def test_2_account_rename(self) -> None:
         """Test renaming account."""
 
+        app_core = AppCore.instance()
         def _open_rename_window() -> None:
             """Click button that show rename account window."""
 
@@ -69,7 +70,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _check_account_name() -> None:
                     """Check if account name has been changed."""
 
-                    self.assertEqual(Session.db.account_query.get_account().name, "Test user rename test", "Test user hasn't been renamed")
+                    self.assertEqual(app_core.db.account_query.get_account().name, "Test user rename test", "Test user hasn't been renamed")
                 QTimer.singleShot(100, self.catch_failure(_check_account_name))
                 WindowsRegistry.RenameAccountWindow.button.click()
 
@@ -79,7 +80,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _rename_back() -> None:
                     """Rename account back to original name. So it doesn't affect other tests."""
 
-                    self.assertEqual(Session.db.account_query.get_account().name, "Test user", "Test user hasn't been renamed back")
+                    self.assertEqual(app_core.db.account_query.get_account().name, "Test user", "Test user hasn't been renamed back")
                     WindowsRegistry.SettingsWindow.done(0)
                 QTimer.singleShot(100, self.catch_failure(_rename_back))
                 WindowsRegistry.RenameAccountWindow.button.click()
@@ -95,12 +96,13 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
     def test_3_account_deletion(self) -> None:
         """Test deleting account."""
 
-        Session.config.account_name = "Second test user"
-        Session.db.create_account(Session.config.account_name, 100)
+        app_core = AppCore.instance()
+        app_core.config.account_name = "Second test user"
+        app_core.db.create_account(app_core.config.account_name, 100)
 
         clear_accounts_layout()
         load_accounts()
-        load_account_data(Session.config.account_name)
+        load_account_data(app_core.config.account_name)
 
         def _delete_account() -> None:
             """Click button that show delete account window."""
@@ -112,8 +114,8 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _check_deletion() -> None:
                     """Check if account has been deleted."""
 
-                    self.assertFalse(Session.db.account_query.account_exists("Second test user"), "Account hasn't been removed")
-                    self.assertEqual(Session.config.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
+                    self.assertFalse(app_core.db.account_query.account_exists("Second test user"), "Account hasn't been removed")
+                    self.assertEqual(app_core.config.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
                     WindowsRegistry.SettingsWindow.done(0)
                 QTimer.singleShot(200, self.catch_failure(_check_deletion))
 

@@ -7,7 +7,7 @@ from PySide6.QtCore import QTimer
 
 from languages import LanguageStructure
 from project_configuration import AVAILABLE_LANGUAGES
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from tests.tests_toolkit import qsleep, OutOfScopeTestCase
 
@@ -127,9 +127,10 @@ class TestMainWindow(OutOfScopeTestCase):
     def test_4_language_change(self) -> None:
         """Test changing language in the application."""
 
+        app_core = AppCore.instance()
         all_languages = AVAILABLE_LANGUAGES.copy()
-        all_languages.remove(Session.config.language)
-        previous_language = Session.config.language
+        all_languages.remove(app_core.config.language)
+        previous_language = app_core.config.language
         language_to_change = all_languages[0]
 
         def _open_settings() -> None:
@@ -151,16 +152,17 @@ class TestMainWindow(OutOfScopeTestCase):
     def test_5_theme_change(self) -> None:
         """Test changing theme in the application."""
 
+        app_core = AppCore.instance() 
         def _open_settings() -> None:
             """Change theme in the application."""
 
-            current_theme = Session.config.theme
+            current_theme = app_core.config.theme
             current_style_sheet = app.styleSheet()
             current_theme_icon = WindowsRegistry.SettingsWindow.switch_themes_button.icon()
 
             WindowsRegistry.SettingsWindow.switch_themes_button.click()
 
-            self.assertNotEqual(current_theme, Session.config.theme, f"Session theme hasn't changed. Theme {current_theme}")
+            self.assertNotEqual(current_theme, app_core.config.theme, f"Session theme hasn't changed. Theme {current_theme}")
             self.assertNotEqual(current_style_sheet, app.styleSheet(), f"App style sheet hasn't changed.")
             self.assertNotEqual(current_theme_icon, WindowsRegistry.SettingsWindow.switch_themes_button.icon(), f"Theme icon  hasn't changed.")
 

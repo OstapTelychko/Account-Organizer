@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMessageBox
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.shortcuts_manager import ShortcutsManager
@@ -15,10 +15,11 @@ logger = get_logger(__name__)
 def change_language() -> None:
     """Change language of the application. It changes the text of all widgets in the application."""
 
-    WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.config.language))
+    app_core = AppCore.instance()
+    WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(app_core.config.language))
 
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(round(Session.current_balance, 2)))
-    WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(Session.current_month))
+    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(round(app_core.current_balance, 2)))
+    WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(1, LanguageStructure.MainWindow.get_translation(2))
     WindowsRegistry.MainWindow.add_incomes_category.setText(LanguageStructure.Categories.get_translation(0))
@@ -35,7 +36,7 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(Incomes))
     Expenses = WindowsRegistry.SettingsWindow.total_expense.text().split(":")[1].replace(" ","")
     WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Expenses))
-    WindowsRegistry.SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(Session.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
+    WindowsRegistry.SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
     WindowsRegistry.SettingsWindow.backup_management.setText(LanguageStructure.BackupManagement.get_translation(0))
     WindowsRegistry.SettingsWindow.general_section.section_name.setText(LanguageStructure.Settings.get_translation(3))
     WindowsRegistry.SettingsWindow.account_section.section_name.setText(LanguageStructure.Settings.get_translation(4))
@@ -43,7 +44,7 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.backup_section.section_name.setText(LanguageStructure.Settings.get_translation(6))
     WindowsRegistry.SettingsWindow.shortcuts_management.setText(LanguageStructure.ShortcutsManagement.get_translation(0))
     
-    WindowsRegistry.SettingsWindow.app_version.setText(LanguageStructure.Settings.get_translation(2) + Session.app_version)
+    WindowsRegistry.SettingsWindow.app_version.setText(LanguageStructure.Settings.get_translation(2) + app_core.app_version)
                                        
     WindowsRegistry.RenameAccountWindow.message.setText(LanguageStructure.AccountMessages.get_translation(1))
     WindowsRegistry.RenameAccountWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(5))
@@ -51,7 +52,7 @@ def change_language() -> None:
     WindowsRegistry.RenameAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(2))
 
     WindowsRegistry.SwitchAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(6))
-    for account, account_switch_widget in zip(Session.accounts_list, Session.account_switch_widgets):
+    for account, account_switch_widget in zip(app_core.accounts_list, app_core.account_switch_widgets):
         account_switch_widget.account_balance_label.setText(LanguageStructure.MainWindow.get_translation(0) + str(account.current_balance))
         account_switch_widget.account_creation_date_label.setText(LanguageStructure.Settings.get_translation(1) + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
         account_switch_widget.switch_button.setText(LanguageStructure.GeneralManagement.get_translation(8))
@@ -116,15 +117,15 @@ def change_language() -> None:
         if message.button(QMessageBox.StandardButton.Cancel) != None:
             message.button(QMessageBox.StandardButton.Cancel).setText(LanguageStructure.GeneralManagement.get_translation(4))
     
-    for category in Session.categories:
-        Session.categories[category].delete_transaction.setText(LanguageStructure.GeneralManagement.get_translation(0))
-        Session.categories[category].add_transaction.setText(LanguageStructure.GeneralManagement.get_translation(1))
-        Session.categories[category].edit_transaction.setText(LanguageStructure.GeneralManagement.get_translation(7))
-        Session.categories[category].table_data.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(0), LanguageStructure.Transactions.get_translation(1), LanguageStructure.Transactions.get_translation(2)))
-        total_value = Session.categories[category].total_value_label.text().split(" ")[1]
-        Session.categories[category].total_value_label.setText(LanguageStructure.Categories.get_translation(10) + total_value)
+    for category in app_core.categories:
+        app_core.categories[category].delete_transaction.setText(LanguageStructure.GeneralManagement.get_translation(0))
+        app_core.categories[category].add_transaction.setText(LanguageStructure.GeneralManagement.get_translation(1))
+        app_core.categories[category].edit_transaction.setText(LanguageStructure.GeneralManagement.get_translation(7))
+        app_core.categories[category].table_data.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(0), LanguageStructure.Transactions.get_translation(1), LanguageStructure.Transactions.get_translation(2)))
+        total_value = app_core.categories[category].total_value_label.text().split(" ")[1]
+        app_core.categories[category].total_value_label.setText(LanguageStructure.Categories.get_translation(10) + total_value)
     
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(Session.current_balance))
+    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance))
 
     WindowsRegistry.BackupManagementWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(0))
     WindowsRegistry.BackupManagementWindow.backups_table.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(1), LanguageStructure.Settings.get_translation(2).replace(":", "")))
@@ -135,28 +136,28 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
     WindowsRegistry.AutoBackupWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(4))
-    if Session.config.auto_backup_status == Session.config.AutoBackupStatus.MONTHLY.value:
+    if app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.MONTHLY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
         WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
 
-    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.WEEKLY.value:
+    elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.WEEKLY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
         WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
 
-    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.DAILY.value:
+    elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.DAILY.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
         WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
     
-    elif Session.config.auto_backup_status == Session.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
+    elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
         WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
         WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
     WindowsRegistry.AutoBackupWindow.monthly.setText(LanguageStructure.BackupManagement.get_translation(9))
     WindowsRegistry.AutoBackupWindow.weekly.setText(LanguageStructure.BackupManagement.get_translation(10))
     WindowsRegistry.AutoBackupWindow.daily.setText(LanguageStructure.BackupManagement.get_translation(11))
     WindowsRegistry.AutoBackupWindow.no_auto_backup.setText(LanguageStructure.BackupManagement.get_translation(15))
-    WindowsRegistry.AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(Session.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
+    WindowsRegistry.AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(app_core.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
     WindowsRegistry.AutoBackupWindow.max_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(14))
-    WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(Session.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
+    WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(app_core.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
     WindowsRegistry.AutoBackupWindow.max_legacy_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(19))
     WindowsRegistry.AutoBackupWindow.no_auto_removal.setText(LanguageStructure.BackupManagement.get_translation(16))
     WindowsRegistry.AutoBackupWindow.save.setText(LanguageStructure.GeneralManagement.get_translation(6))
@@ -167,7 +168,7 @@ def change_language() -> None:
 
     WindowsRegistry.ShortcutsWindow.setWindowTitle(LanguageStructure.ShortcutsManagement.get_translation(0))
 
-    for shortcut, index in ShortcutsManager.shortcut_widget_to_translations.items():
+    for shortcut, index in ShortcutsManager.instance().shortcut_widget_to_translations.items():
         shortcut.shortcut_name.setText(LanguageStructure.ShortcutsNames.get_translation(index))
         shortcut.shortcut_description.setText(LanguageStructure.ShortcutsDescriptions.get_translation(index))
         shortcut.reset_shortcut.setText(LanguageStructure.GeneralManagement.get_translation(11))
@@ -177,15 +178,16 @@ def change_language() -> None:
 def change_language_during_add_account(language:int | str) -> None:
     """Change language during adding account. In case db have no account, not all windows are loaded."""
 
+    app_core = AppCore.instance()
     if isinstance(language, int):# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
-        Session.config.language = language
+        app_core.config.language = language
     else:
-        Session.config.language = language
-    logger.info(f"Language {Session.config.language} loaded during adding account")
-    Session.config.update_user_config()
+        app_core.config.language = language
+    logger.info(f"Language {app_core.config.language} loaded during adding account")
+    app_core.config.update_user_config()
 
-    WindowsRegistry.AddAccountWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(Session.config.language))
+    WindowsRegistry.AddAccountWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(app_core.config.language))
     
     WindowsRegistry.AddAccountWindow.message.setText(LanguageStructure.Messages.get_translation(0))
     WindowsRegistry.AddAccountWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
@@ -204,11 +206,12 @@ def load_language(language:str|int) -> None:
     """
 
     logger.info("Loading language")
+    app_core = AppCore.instance()
     if isinstance(language, int):# var language is a string when the language is loaded from the user config
         language = AVAILABLE_LANGUAGES[language]
-        Session.config.language = language
+        app_core.config.language = language
     else:
-        Session.config.language = language
-    Session.config.update_user_config()
+        app_core.config.language = language
+    app_core.config.update_user_config()
     change_language()
-    logger.info(f"Language {Session.config.language} loaded")
+    logger.info(f"Language {app_core.config.language} loaded")

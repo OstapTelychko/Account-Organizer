@@ -4,7 +4,7 @@ from typing import TypeAlias, cast, Union
 from operator import getitem
 from functools import reduce
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.logger import get_logger
 from project_configuration import APP_DIRECTORY
 
@@ -53,11 +53,12 @@ class LanguageCategory:
         """Get the translation for the category. If the translation is not found, return the name of the category."""
         
         translations_category:ParsedTranslationCategory = dict()
+        app_core = AppCore.instance()
         
         try:
-            translations_category = reduce(getitem, self.path(), LANGUAGES[Session.config.language]) #type: ignore[arg-type]
+            translations_category = reduce(getitem, self.path(), LANGUAGES[app_core.config.language]) #type: ignore[arg-type]
         except KeyError as exception:
-            logger.error(f"{exception} - path: {self.path()} - language: {Session.config.language}")
+            logger.error(f"{exception} - path: {self.path()} - language: {app_core.config.language}")
         
         if not isinstance(translations_category, dict):
             logger.error(f"Translations category is not a dictionary it's {type(translations_category)} - {self.path()}")

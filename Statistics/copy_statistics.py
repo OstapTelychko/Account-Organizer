@@ -1,4 +1,4 @@
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -16,19 +16,20 @@ logger = get_logger(__name__)
 def copy_monthly_transactions() -> None:
     """This method is used to copy the transactions of the selected category to the clipboard."""
 
+    app_core = AppCore.instance()
     if WindowsRegistry.CategorySettingsWindow.copy_transactions.isEnabled():
         WindowsRegistry.CategorySettingsWindow.copy_transactions.setEnabled(False)
         category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
-        category = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+        category = app_core.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
         if category is None:
             logger.error(f"Category {category_name} not found monthly transactions haven't been copied")
             return
         category_id = category.id
         
-        transactions = Session.db.transaction_query.get_transactions_by_month(category_id, Session.current_year, Session.current_month)
+        transactions = app_core.db.transaction_query.get_transactions_by_month(category_id, app_core.current_year, app_core.current_month)
         if len(transactions):
             result = ""
-            result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(Session.current_month)}\t{Session.current_year}\n"
+            result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
             
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction.value}\t\t{transaction.day}\t{transaction.name}\n"
@@ -38,13 +39,14 @@ def copy_monthly_transactions() -> None:
         else:
             app.clipboard().setText("")
         
-        logger.info(f"Transactions for {category_name} copied | {Session.current_year}-{Session.current_month}")
+        logger.info(f"Transactions for {category_name} copied | {app_core.current_year}-{app_core.current_month}")
         show_information_message(LanguageStructure.Categories.get_translation(5))
 
 
 def copy_monthly_statistics() -> None:
     """This method is used to copy the monthly statistics to the clipboard."""
 
+    app_core = AppCore.instance()
     if WindowsRegistry.MonthlyStatistics.copy_statistics.isEnabled():
         WindowsRegistry.MonthlyStatistics.copy_statistics.setEnabled(False)
         statistics = WindowsRegistry.MonthlyStatistics.statistics
@@ -54,7 +56,7 @@ def copy_monthly_statistics() -> None:
             result += f"{statistics.item(row).text()}\n"
         
         app.clipboard().setText(result)
-        logger.info(f"Monthly statistics copied | {Session.current_year}-{Session.current_month}")
+        logger.info(f"Monthly statistics copied | {app_core.current_year}-{app_core.current_month}")
         show_information_message(LanguageStructure.Statistics.get_translation(29))
 
 
@@ -83,7 +85,7 @@ def copy_quarterly_statistics() -> None:
             result+= "\n\n\n"
         
         app.clipboard().setText(result)
-        logger.info(f"Quarterly statistics copied | {Session.current_year}")
+        logger.info(f"Quarterly statistics copied | {AppCore.instance().current_year}")
         show_information_message(LanguageStructure.Statistics.get_translation(31))
 
 
@@ -108,7 +110,7 @@ def copy_yearly_statistics() -> None:
             result += "\n\n\n"
 
         app.clipboard().setText(result)
-        logger.info(f"Yearly statistics copied | {Session.current_year}")
+        logger.info(f"Yearly statistics copied | {AppCore.instance().current_year}")
         show_information_message(LanguageStructure.Statistics.get_translation(33))
 
 

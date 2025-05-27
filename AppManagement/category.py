@@ -1,7 +1,7 @@
 from functools import partial
 from PySide6.QtCore import Qt
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -24,26 +24,28 @@ logger = get_logger(__name__)
 def remove_categories_from_list() -> None:
     """Remove all categories from Session.categories. It's used in case you need to update or load all categories."""
 
-    for category in Session.categories.copy():
-        Session.categories[category].window.deleteLater()
-        Session.categories[category].settings.deleteLater()
-        Session.categories[category].add_transaction.deleteLater()
-        Session.categories[category].edit_transaction.deleteLater()
-        Session.categories[category].delete_transaction.deleteLater()
-        del Session.categories[category]
+    app_core = AppCore.instance()
+    for category in app_core.categories.copy():
+        app_core.categories[category].window.deleteLater()
+        app_core.categories[category].settings.deleteLater()
+        app_core.categories[category].add_transaction.deleteLater()
+        app_core.categories[category].edit_transaction.deleteLater()
+        app_core.categories[category].delete_transaction.deleteLater()
+        del app_core.categories[category]
 
 
 def load_categories_data() -> None:
     """Load all categories data from database. It loads all monthly transactions for each category """
 
-    for category in Session.categories:
-        category_data = Session.categories[category].table_data
+    app_core = AppCore.instance()
+    for category in app_core.categories:
+        category_data = app_core.categories[category].table_data
         if category_data.rowCount() != 0:#Remove current category transactions if it exist
             for row in range(1,category_data.rowCount()+1):
                 category_data.removeRow(row)
         category_data.setRowCount(0)
 
-        transactions = Session.db.transaction_query.get_transactions_by_month(category, Session.current_year, Session.current_month)
+        transactions = app_core.db.transaction_query.get_transactions_by_month(category, app_core.current_year, app_core.current_month)
         if len(transactions) != 0:
             category_data.setRowCount(len(transactions))
             for row,transaction in enumerate(transactions):
@@ -71,32 +73,33 @@ def load_categories_data() -> None:
 def create_category() -> int:
     """Create category. It creates a new category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
 
+    app_core = AppCore.instance()
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
     category_name = WindowsRegistry.AddCategoryWindow.category_name.text().strip()
 
     if category_name == "":
         return WindowsRegistry.Messages.no_category_name.exec()
     
-    if Session.db.category_query.category_exists(category_name, category_type):
+    if app_core.db.category_query.category_exists(category_name, category_type):
         return WindowsRegistry.Messages.category_exists.exec()
     
-    position = Session.db.category_query.get_available_position(category_type) 
+    position = app_core.db.category_query.get_available_position(category_type) 
 
-    Session.db.category_query.create_category(category_name, category_type, position)
-    category = Session.db.category_query.get_category(category_name, category_type)
+    app_core.db.category_query.create_category(category_name, category_type, position)
+    category = app_core.db.category_query.get_category(category_name, category_type)
 
     if category is None:
         logger.error(f"Category {category_name} haven't been created.")
         raise RuntimeError(f"Category {category_name} haven't been created.")
     
     category_id = category.id 
-    Session.categories[category_id] = load_category(category_type, category_name, Session.db, category_id, position, Session.current_year, Session.current_month)
+    app_core.categories[category_id] = load_category(category_type, category_name, app_core.db, category_id, position, app_core.current_year, app_core.current_month)
 
     #Activate Category
-    Session.categories[category_id].settings.clicked.connect(partial(show_category_settings, Session.categories[category_id].name))
-    Session.categories[category_id].add_transaction.clicked.connect(partial(show_add_transaction_window, Session.categories[category_id].name))
-    Session.categories[category_id].edit_transaction.clicked.connect(partial(show_edit_transaction_window, Session.categories[category_id].name, Session.categories[category_id].table_data))
-    Session.categories[category_id].delete_transaction.clicked.connect(partial(remove_transaction, Session.categories[category_id].table_data, category_id))
+    app_core.categories[category_id].settings.clicked.connect(partial(show_category_settings, app_core.categories[category_id].name))
+    app_core.categories[category_id].add_transaction.clicked.connect(partial(show_add_transaction_window, app_core.categories[category_id].name))
+    app_core.categories[category_id].edit_transaction.clicked.connect(partial(show_edit_transaction_window, app_core.categories[category_id].name, app_core.categories[category_id].table_data))
+    app_core.categories[category_id].delete_transaction.clicked.connect(partial(remove_transaction, app_core.categories[category_id].table_data, category_id))
     logger.debug(f"Category {category_name} created")
 
     WindowsRegistry.AddCategoryWindow.category_name.setText("")
@@ -110,8 +113,9 @@ def create_category() -> int:
 def load_categories() -> None:
     """Load all categories from database for current account."""
 
-    for category in Session.db.category_query.get_all_categories():
-        Session.categories[category.id] = load_category(category.category_type, category.name, Session.db, category.id, category.position, Session.current_year, Session.current_month)
+    app_core = AppCore.instance()
+    for category in app_core.db.category_query.get_all_categories():
+        app_core.categories[category.id] = load_category(category.category_type, category.name, app_core.db, category.id, category.position, app_core.current_year, app_core.current_month)
         logger.debug(f"Category {category.name} loaded")
     reset_focused_category()
         
@@ -124,7 +128,7 @@ def show_category_settings(category_name:str) -> None:
         `category_name` : (str) Name of the category to show settings for.
     """
 
-    if Session.db.category_query.category_exists(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]):
+    if AppCore.instance().db.category_query.category_exists(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]):
         WindowsRegistry.CategorySettingsWindow.setWindowTitle(category_name)
         WindowsRegistry.CategorySettingsWindow.exec()
 
@@ -132,28 +136,29 @@ def show_category_settings(category_name:str) -> None:
 def remove_category() -> None:
     """Remove category. It removes the category from the database and from the GUI. It also shows a confirmation message before removing the category."""
 
+    app_core = AppCore.instance()
     category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
 
     WindowsRegistry.Messages.delete_category_confirmation.exec()
     if not WindowsRegistry.Messages.delete_category_confirmation.clickedButton() == WindowsRegistry.Messages.delete_category_confirmation.ok_button:
         return
     
-    category = Session.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+    category = app_core.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
     if category is None:
         logger.error(f"Category {category_name} not found. Category can't be removed.")
         raise RuntimeError(f"Category {category_name} not found. Category can't be removed.")
     
     category_id = category.id
-    Session.db.category_query.delete_category(category_id)
+    app_core.db.category_query.delete_category(category_id)
     WindowsRegistry.CategorySettingsWindow.setWindowTitle(" ")
     WindowsRegistry.CategorySettingsWindow.hide()
 
-    Session.categories[category_id].window.deleteLater()
-    Session.categories[category_id].settings.deleteLater()
-    Session.categories[category_id].add_transaction.deleteLater()
-    Session.categories[category_id].edit_transaction.deleteLater()
-    Session.categories[category_id].delete_transaction.deleteLater()
-    del Session.categories[category_id]
+    app_core.categories[category_id].window.deleteLater()
+    app_core.categories[category_id].settings.deleteLater()
+    app_core.categories[category_id].add_transaction.deleteLater()
+    app_core.categories[category_id].edit_transaction.deleteLater()
+    app_core.categories[category_id].delete_transaction.deleteLater()
+    del app_core.categories[category_id]
     logger.debug(f"Category {category_name} removed")
 
     calculate_current_balance()
@@ -169,19 +174,20 @@ def show_rename_category_window() -> None:
 def rename_category() -> int:
     """Rename category. It renames the category in the database and in the GUI. It also checks if the category already exists and if the name is empty."""
 
+    app_core = AppCore.instance()
     new_category_name = WindowsRegistry.RenameCategoryWindow.new_category_name.text().strip()
     current_name = WindowsRegistry.RenameCategoryWindow.windowTitle()
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
 
-    if Session.db.category_query.category_exists(new_category_name, category_type):
+    if app_core.db.category_query.category_exists(new_category_name, category_type):
         return WindowsRegistry.Messages.category_exists.exec()
 
-    db_category = Session.db.category_query.get_category(current_name, category_type)
+    db_category = app_core.db.category_query.get_category(current_name, category_type)
     if db_category is None:
         logger.error(f"Category {current_name} not found. Category can't be renamed.")
         raise RuntimeError(f"Category {current_name} not found. Category can't be renamed.")
     
-    category = Session.categories[db_category.id]
+    category = app_core.categories[db_category.id]
     category.name = new_category_name
 
     #Update connections
@@ -195,7 +201,7 @@ def rename_category() -> int:
     category.name_label.setText(new_category_name)
     logger.debug(f"Category {current_name} renamed to {new_category_name}")
 
-    Session.db.category_query.rename_category(category.id, new_category_name)
+    app_core.db.category_query.rename_category(category.id, new_category_name)
     WindowsRegistry.RenameCategoryWindow.hide()
     WindowsRegistry.CategorySettingsWindow.hide()
     WindowsRegistry.RenameCategoryWindow.new_category_name.setText("")
@@ -207,8 +213,9 @@ def rename_category() -> int:
 def show_change_category_position(category_name:str) -> None:
     """Show change category position window. It shows the current category position and all other categories in the same type."""
 
+    app_core = AppCore.instance()
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
-    selected_category = Session.db.category_query.get_category(category_name, category_type)
+    selected_category = app_core.db.category_query.get_category(category_name, category_type)
     if selected_category is None:
         logger.error(f"Category {category_name} not found. Category position can't be changed.")
         raise RuntimeError(f"Category {category_name} not found. Category position can't be changed.")
@@ -224,7 +231,7 @@ def show_change_category_position(category_name:str) -> None:
             widget.setParent(None) #type: ignore[call-overload] #Mypy doesn't know that None just means that the widget will be deleted
     
 
-    for category_id, category in Session.categories.items():
+    for category_id, category in app_core.categories.items():
         if category_id != selected_category.id and category.type == selected_category.category_type:
             add_category_to_position_list(category)
     
@@ -234,9 +241,10 @@ def show_change_category_position(category_name:str) -> None:
 def change_category_position() -> int:
     """Change category position. It changes the category position in the database and in the GUI. It also checks if the new position is valid"""
 
+    app_core = AppCore.instance()
     category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
     category_name = WindowsRegistry.ChangeCategoryPositionWindow.preview_category_name.text()
-    category = Session.db.category_query.get_category(category_name, category_type)
+    category = app_core.db.category_query.get_category(category_name, category_type)
 
     if category is None:
         logger.error(f"Category {category_name} not found. Category position can't be changed.")
@@ -244,7 +252,7 @@ def change_category_position() -> int:
 
     raw_new_position = WindowsRegistry.ChangeCategoryPositionWindow.new_position.text()
     old_position = category.position
-    max_position = Session.db.category_query.get_available_position(category_type)-1
+    max_position = app_core.db.category_query.get_available_position(category_type)-1
 
     if raw_new_position == "":
         return WindowsRegistry.Messages.empty_fields.exec()
@@ -260,7 +268,7 @@ def change_category_position() -> int:
     if new_position == old_position:
         return WindowsRegistry.Messages.same_position.exec()
 
-    Session.db.category_query.change_category_position(new_position, old_position, category.id, category_type)
+    app_core.db.category_query.change_category_position(new_position, old_position, category.id, category_type)
     logger.debug(f"Category {category_name} position ({old_position}) changed to {new_position}")
     
     remove_categories_from_list()
@@ -275,15 +283,16 @@ def change_category_position() -> int:
 def update_category_total_value(category_id:int) -> None:
     """Update category total value. It updates the total value label for the category in the GUI."""
 
-    Session.categories[category_id].total_value_label.setText(
+    app_core = AppCore.instance()
+    app_core.categories[category_id].total_value_label.setText(
         LanguageStructure.Categories.get_translation(10) +
-        str(round(Session.db.statistics_query.get_monthly_transactions_sum(category_id, Session.current_year, Session.current_month), 2)))
+        str(round(app_core.db.statistics_query.get_monthly_transactions_sum(category_id, app_core.current_year, app_core.current_month), 2)))
 
 
 def activate_categories() -> None:
     """Activate all categories. It connects all category buttons to their respective functions."""
 
-    for category_id, category in Session.categories.items():
+    for category_id, category in AppCore.instance().categories.items():
         category.settings.clicked.connect(partial(show_category_settings, category.name))
         category.add_transaction.clicked.connect(partial(show_add_transaction_window, category.name))
         category.edit_transaction.clicked.connect(partial(show_edit_transaction_window, category.name, category.table_data))
@@ -294,15 +303,16 @@ def activate_categories() -> None:
 def reset_focused_category() -> None:
     """Reset focused category. It sets the focused income and expense categories to the first category of their type."""
 
-    income_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[0]])
-    expense_categories = list([category for category in Session.categories.values() if category.type == CATEGORY_TYPE[1]])
+    app_core = AppCore.instance()
+    income_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[0]])
+    expense_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[1]])
 
     if len(income_categories) != 0:
-        Session.focused_income_category = income_categories[0]
+        app_core.focused_income_category = income_categories[0]
     else:
-        Session.focused_income_category = None
+        app_core.focused_income_category = None
     
     if len(expense_categories) != 0:
-        Session.focused_expense_category = expense_categories[0]
+        app_core.focused_expense_category = expense_categories[0]
     else:
-        Session.focused_expense_category = None
+        app_core.focused_expense_category = None

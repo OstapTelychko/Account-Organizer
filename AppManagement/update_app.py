@@ -25,7 +25,7 @@ MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, BACKUPS_DIRECTORY_
 
 from languages import LanguageStructure
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
@@ -222,6 +222,7 @@ def prepare_update() -> None:
     """Prepare the update by copying the GUI library and creating backups of the database files."""
 
     logger.info("Preparing update")
+    app_core = AppCore.instance()
 
     if os.path.exists(PREVIOUS_VERSION_COPY_DIRECTORY):
         shutil.rmtree(PREVIOUS_VERSION_COPY_DIRECTORY)
@@ -259,7 +260,7 @@ def prepare_update() -> None:
     with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as version_file:
         update_version = version_file.read()
 
-    WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(Session.backups))
+    WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(app_core.backups))
     upgraded_backups = 0
 
     logger.info("Creating and migrating backups")
@@ -267,12 +268,12 @@ def prepare_update() -> None:
         """Create a copy of the backup and upgrade it version but doesn't upgrade the database schema."""
 
         updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
-        Session.db.backup_query.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
+        app_core.db.backup_query.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
         logger.debug(f"Created backup: {updated_backup_file_path}")
         return updated_backup_file_path
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        backup_futures = {executor.submit(_create_single_backup, backup): backup for backup in Session.backups.values()}
+        backup_futures = {executor.submit(_create_single_backup, backup): backup for backup in app_core.backups.values()}
         updated_backups_paths = [future.result() for future in backup_futures]
 
     def _migrate_single_backup(backup_path:str) -> str:
@@ -286,7 +287,7 @@ def prepare_update() -> None:
 
         engine = create_engine(f"sqlite:///{backup_path}")
         try:
-            if not Session.db.db_up_to_date(alembic_config, engine):
+            if not app_core.db.db_up_to_date(alembic_config, engine):
                 command.upgrade(alembic_config, "head")
         finally:
             engine.dispose()
@@ -303,7 +304,7 @@ def prepare_update() -> None:
     logger.info("Backups created and migrated")
     
     logger.info("Move legacy backups to update directory")
-    for backup in Session.backups.values():
+    for backup in app_core.backups.values():
         if not os.path.exists(os.path.join(UPDATE_BACKUPS_DIRECTORY, Path(backup.db_file_path).name)):
             if DEVELOPMENT_MODE:# I don't want to delete backups in development
                 shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
@@ -318,7 +319,8 @@ def apply_update() -> None:
     """Apply the update by moving files and."""
 
     logger.info("Applying update")
-    Session.db.close_connection()
+    app_core = AppCore.instance()
+    app_core.db.close_connection()
 
     if DEVELOPMENT_MODE:#if app in development
         logger.debug("Move old _internal directory to previous version copy directory")
@@ -374,7 +376,7 @@ def apply_update() -> None:
     logger.info("Update applied")
 
     WindowsRegistry.Messages.update_finished.exec()
-    Session.restart_app()
+    app_core.restart_app()
 
 
 def check_for_updates() -> None:
@@ -382,15 +384,16 @@ def check_for_updates() -> None:
 
     logger.info("__BREAK_LINE__")
     logger.info("Checking for updates")
+    app_core = AppCore.instance()
     latest_version = get_latest_version()
 
     if latest_version:
-        if latest_version == Session.app_version:
+        if latest_version == app_core.app_version:
             logger.info("No updates available")
             logger.info("__BREAK_LINE__")
             return
         
-        logger.info(f"Latest version: {latest_version} | Current version: {Session.app_version}")
+        logger.info(f"Latest version: {latest_version} | Current version: {app_core.app_version}")
         WindowsRegistry.Messages.update_available.exec()
         if WindowsRegistry.Messages.update_available.clickedButton() == WindowsRegistry.Messages.update_available.ok_button:
             

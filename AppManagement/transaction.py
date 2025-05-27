@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 
 from GUI.gui_constants import ALIGNMENT
 
-from AppObjects.session import Session
+from AppObjects.session import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
@@ -64,7 +64,8 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
         `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to update selected row data.
     """
 
-    Session.db.transaction_query.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
+    app_core = AppCore.instance()
+    app_core.db.transaction_query.update_transaction(transaction_id, transaction_name, transaction_day, transaction_value)
                 
     for row in range(category_data.rowCount()):
         if int(category_data.item(row, 3).text()) == transaction_id: # type: ignore[reportOptionalMemberAccess, unused-ignore] # We only access amount  of rows that is returned by rowCount()
@@ -75,15 +76,15 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             values_difference = transaction_value - old_value
 
             if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
-                Session.current_total_income += values_difference
-                Session.current_balance += values_difference
+                app_core.current_total_income += values_difference
+                app_core.current_balance += values_difference
             else:
-                Session.current_total_expenses += values_difference
-                Session.current_balance -=  values_difference
+                app_core.current_total_expenses += values_difference
+                app_core.current_balance -=  values_difference
             
-            Session.current_balance = round(Session.current_balance, 2)
-            Session.current_total_income = round(Session.current_total_income, 2)
-            Session.current_total_expenses = round(Session.current_total_expenses, 2)
+            app_core.current_balance = round(app_core.current_balance, 2)
+            app_core.current_total_income = round(app_core.current_total_income, 2)
+            app_core.current_total_expenses = round(app_core.current_total_expenses, 2)
 
             category_data.item(row, 2).setText(str(transaction_value)) # type: ignore[reportOptionalMemberAccess, unused-ignore]
 
@@ -120,14 +121,15 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
         `category_id` : (int) - Category id. It will be used to find category which transaction should be added to.
     """
 
-    transaction = Session.db.transaction_query.add_transaction(category_id, Session.current_year, Session.current_month, transaction_day, transaction_value, transaction_name)
+    app_core = AppCore.instance()
+    transaction = app_core.db.transaction_query.add_transaction(category_id, app_core.current_year, app_core.current_month, transaction_day, transaction_value, transaction_name)
 
     if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
-        Session.current_total_income = round(Session.current_total_income + transaction_value, 2)
-        Session.current_balance = round(Session.current_balance + transaction_value, 2)
+        app_core.current_total_income = round(app_core.current_total_income + transaction_value, 2)
+        app_core.current_balance = round(app_core.current_balance + transaction_value, 2)
     else:
-        Session.current_total_expenses = round(Session.current_total_expenses + transaction_value, 2)
-        Session.current_balance = round(Session.current_balance - transaction_value, 2)
+        app_core.current_total_expenses = round(app_core.current_total_expenses + transaction_value, 2)
+        app_core.current_balance = round(app_core.current_balance - transaction_value, 2)
 
     row = category_data.rowCount()
     category_data.setRowCount(row+1)
@@ -162,15 +164,16 @@ def transaction_data_handler() -> int:
     raw_transaction_day = WindowsRegistry.TransactionManagementWindow.transaction_day.text()
     raw_transaction_value = WindowsRegistry.TransactionManagementWindow.transaction_value.text()
 
-    category = Session.db.category_query.get_category(WindowsRegistry.TransactionManagementWindow.windowTitle(), CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+    app_core = AppCore.instance()
+    category = app_core.db.category_query.get_category(WindowsRegistry.TransactionManagementWindow.windowTitle(), CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
     if category is None:
         logger.error(f"Category {WindowsRegistry.TransactionManagementWindow.windowTitle()} not found. Transaction haven't been handled.")
         raise RuntimeError(f"Category {WindowsRegistry.TransactionManagementWindow.windowTitle()} not found. Transaction haven't been handled.")
     
     category_id = category.id
-    category_data = Session.categories[category_id].table_data
+    category_data = app_core.categories[category_id].table_data
 
-    max_month_day = MONTHS_DAYS[Session.current_month-1] + (Session.current_month == 2 and Session.current_year % 4 == 0)#Add one day to February (29) if year is leap
+    max_month_day = MONTHS_DAYS[app_core.current_month-1] + (app_core.current_month == 2 and app_core.current_year % 4 == 0)#Add one day to February (29) if year is leap
 
     if raw_transaction_day == "" or raw_transaction_value == "":
         return WindowsRegistry.Messages.empty_fields.exec()
@@ -214,6 +217,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
     """
     from AppManagement.category import update_category_total_value
 
+    app_core = AppCore.instance()
     selected_row = category_data.selectedItems()
 
     if len(selected_row) == 0 or len(selected_row) < 3:
@@ -227,22 +231,22 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
     WindowsRegistry.Messages.delete_transaction_confirmation.exec()
     if WindowsRegistry.Messages.delete_transaction_confirmation.clickedButton() == WindowsRegistry.Messages.delete_transaction_confirmation.ok_button:
         transaction_value = float(selected_row[2].text())
-        Session.db.transaction_query.delete_transaction(transaction_id)
+        app_core.db.transaction_query.delete_transaction(transaction_id)
 
         category_data.removeRow(selected_row[0].row())
 
         update_category_total_value(category_id)
 
         if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
-            Session.current_total_income -= transaction_value
-            Session.current_balance -= transaction_value
+            app_core.current_total_income -= transaction_value
+            app_core.current_balance -= transaction_value
         else:
-            Session.current_total_expenses -= transaction_value
-            Session.current_balance += transaction_value
+            app_core.current_total_expenses -= transaction_value
+            app_core.current_balance += transaction_value
         
-        Session.current_balance = round(Session.current_balance, 2)
-        Session.current_total_income = round(Session.current_total_income, 2)
-        Session.current_total_expenses = round(Session.current_total_expenses, 2)
+        app_core.current_balance = round(app_core.current_balance, 2)
+        app_core.current_total_income = round(app_core.current_total_income, 2)
+        app_core.current_total_expenses = round(app_core.current_total_expenses, 2)
 
         update_account_balance()
     
