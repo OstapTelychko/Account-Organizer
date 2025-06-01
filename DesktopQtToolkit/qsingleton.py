@@ -15,18 +15,18 @@ class QSingleton(QtMeta, Generic[ClassInstance]):#type: ignore[valid-type, misc]
     Attribute `singleton_message` can be used to set a message that will be displayed when trying to create multiple instances of the class.
     """
 
-    _instances: dict[str, ClassInstance] = {}
+    __instances: dict[str, ClassInstance] = {}
     singleton_message: str|None = None
 
     def __call__(cls, *args:Any, **kwargs:Any) -> ClassInstance:
-        if cls.__name__ in cls._instances:
+        if cls.__name__ in cls.__instances:
             if cls.singleton_message:
                 raise RuntimeError(cls.singleton_message)
             
             raise RuntimeError(f"Cannot create multiple instances of class {cls.__name__}. It's singleton.")
 
         instance:ClassInstance = super().__call__(*args, **kwargs)
-        cls._instances[cls.__name__] = instance
+        cls.__instances[cls.__name__] = instance
         return instance
 
 

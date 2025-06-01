@@ -1,5 +1,5 @@
 ☐ write tests for changing shortcuts keystrokes
-☐ write tests for update check and process
+☐ write tests for update check and process @started(25-05-31 21:10)
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category

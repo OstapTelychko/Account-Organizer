@@ -61,18 +61,20 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     from tests.app_tests.test_statistics import TestStatistics
     from tests.app_tests.test_backups_management import TestBackupsManagement
     from tests.app_tests.test_shortcuts import TestShortcuts
+    from tests.app_tests.test_update_app import TestUpdateApp
 
     try:
         suite = TestSuite()
         loader = TestLoader()
         suite.addTests((
-        loader.loadTestsFromTestCase(TestMainWindow),
-        loader.loadTestsFromTestCase(TestCategory),
-        loader.loadTestsFromTestCase(TestAccount),
-        loader.loadTestsFromTestCase(TestTransaction),
-        loader.loadTestsFromTestCase(TestStatistics),
-        loader.loadTestsFromTestCase(TestBackupsManagement),
-        loader.loadTestsFromTestCase(TestShortcuts),
+        # loader.loadTestsFromTestCase(TestMainWindow),
+        # loader.loadTestsFromTestCase(TestCategory),
+        # loader.loadTestsFromTestCase(TestAccount),
+        # loader.loadTestsFromTestCase(TestTransaction),
+        # loader.loadTestsFromTestCase(TestStatistics),
+        # loader.loadTestsFromTestCase(TestBackupsManagement),
+        # loader.loadTestsFromTestCase(TestShortcuts),
+        loader.loadTestsFromTestCase(TestUpdateApp),
         ))
         
         print(f"Tests found: {suite.countTestCases()}")

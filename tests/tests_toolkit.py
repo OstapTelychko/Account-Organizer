@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
-from typing_extensions import Never
 from unittest import TestCase, TextTestResult
+from unittest.mock import patch
 import shutil
 from functools import wraps
 
@@ -27,7 +27,7 @@ from GUI.category import load_category
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
     from unittest.runner import _WritelnDecorator
-    from typing import Type, Optional, Tuple, Iterable
+    from typing import Type, Tuple, Iterable
     from types import TracebackType
 
     OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
@@ -61,6 +61,27 @@ def qsleep(miliseconds:int) -> None:
     loop = QEventLoop()
     QTimer.singleShot(miliseconds, loop.quit)
     loop.exec()
+
+
+def typed_patch(func:Callable) -> Callable:
+    """This decorator is used to make patch function type-safe.
+        
+        Arguments
+        ---------
+            `func` : (function) - Function to decorate.
+        Returns
+        -------
+            `function` - Decorated function.
+    """
+
+    @wraps(func)
+    def wrapper() -> Callable:
+        """Wrapper function to apply the patch."""
+
+        target = f"{func.__module__}.{func.__qualname__}"
+        return patch(target)
+    return wrapper
+
 
 
 class DBTestCase(TestCase):

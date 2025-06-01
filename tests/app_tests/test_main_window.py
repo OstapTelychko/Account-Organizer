@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from unittest import TestCase
 from datetime import datetime
 
 from PySide6.QtCore import QTimer
