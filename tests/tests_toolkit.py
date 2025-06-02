@@ -1,36 +1,38 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
-from unittest import TestCase, TextTestResult
-from unittest.mock import patch
+from typing import TYPE_CHECKING, Callable, Any
+import pkgutil
 import shutil
-from functools import wraps
+from functools import wraps, partial
+from traceback import format_exception
+
+from unittest import TestCase, TextTestResult
+from unittest.mock import patch, create_autospec, DEFAULT as MOCK_DEFAULT, MagicMock
 
 from colorama import init as colorama_init, Fore
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
 
-from traceback import format_exception
-
 from PySide6.QtCore import QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
 from project_configuration import CATEGORY_TYPE
 from AppManagement.category import activate_categories, remove_categories_from_list
+from GUI.category import load_category
 
 from AppObjects.session import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
-from GUI.category import load_category
 
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
     from unittest.runner import _WritelnDecorator
-    from typing import Type, Tuple, Iterable
+    from typing import Type, Tuple, Iterable, Any
     from types import TracebackType
 
     OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
+    UnpatchedFunction = Callable[..., Any]
 
 
 
@@ -63,24 +65,44 @@ def qsleep(miliseconds:int) -> None:
     loop.exec()
 
 
-def typed_patch(func:Callable) -> Callable:
-    """This decorator is used to make patch function type-safe.
-        
-        Arguments
-        ---------
-            `func` : (function) - Function to decorate.
-        Returns
-        -------
-            `function` - Decorated function.
-    """
+def safe_patch(target:str, spec:Any|None=None) -> Callable[[UnpatchedFunction], Callable[[UnpatchedFunction], Any]]:
+    """Patch with create_autospec(spec, spec_set=True) and inject as argument."""
 
-    @wraps(func)
-    def wrapper() -> Callable:
-        """Wrapper function to apply the patch."""
+    def decorator(func):
 
-        target = f"{func.__module__}.{func.__qualname__}"
-        return patch(target)
-    return wrapper
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+
+            original = MOCK_DEFAULT
+            if not spec:
+                try:
+                    target_module, attribute = target.rsplit('.', 1)
+                except (TypeError, ValueError, AttributeError):
+                    raise TypeError(
+                        f"Need a valid target to patch. You supplied: {target!r}")
+                
+                getter, name = partial(pkgutil.resolve_name, target_module), attribute
+
+                getter = getter()
+                try:
+                    original = getter.__dict__[name]
+                except (AttributeError, KeyError):
+                    original = getattr(getter, name, MOCK_DEFAULT)
+
+                mock_obj = create_autospec(original, spec_set=True)
+            else:
+                mock_obj = create_autospec(spec, spec_set=True)
+
+            if callable(spec) or original is not MOCK_DEFAULT and callable(original):                    
+                mock_obj = MagicMock(spec=mock_obj, spec_set=True)#For some reason spec_set=True is not working with functions in create_autospec, but it works if created MagickMock manually
+
+            with patch(target, new=mock_obj):
+                args = list(args)
+                args.append(mock_obj)
+                return func(*args, **kwargs)
+            
+        return wrapper
+    return decorator
 
 
 

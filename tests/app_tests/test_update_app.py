@@ -1,17 +1,15 @@
-from unittest.mock import patch, MagicMock, create_autospec
-from tests.tests_toolkit import OutOfScopeTestCase
+from unittest.mock import MagicMock, create_autospec
+from tests.tests_toolkit import OutOfScopeTestCase, safe_patch
 from AppManagement.update_app import check_internet_connection
-from requests import Response, head
+from requests import Response
 
-
-mocked_head = MagicMock(spec=head)
 
 
 
 class TestUpdateApp(OutOfScopeTestCase):
     """Test update application functionality."""
 
-    @patch('AppManagement.update_app.req.head', autospec=True)
+    @safe_patch('AppManagement.update_app.req.head')
     def test_1_internet_connection_check(self, mock_head:MagicMock) -> None:
         """Test internet connection check functionality."""
 
