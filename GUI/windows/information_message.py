@@ -3,6 +3,7 @@ from PySide6.QtCore import Qt, QTimer
 
 from DesktopQtToolkit.qsingleton import QSingleton
 from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
+from project_configuration import INFORMATION_MESSAGE_DURATION
 
 
 
@@ -68,11 +69,11 @@ class InformationMessage(QWidget, metaclass=QSingleton):
 
         self.opacity += 0.2
         self.setWindowOpacity(self.opacity)
+        self.update()
         
         if self.opacity >= 1.0:
             self.fade_in_timer.stop()
-            # Show for 600ms before fading out
-            self.display_timer.start(600)
+            self.display_timer.start(INFORMATION_MESSAGE_DURATION)
     
 
     def start_fade_out(self) -> None:
@@ -87,6 +88,7 @@ class InformationMessage(QWidget, metaclass=QSingleton):
 
         self.opacity -= 0.2
         self.setWindowOpacity(self.opacity)
+        self.update()
         
         if self.opacity <= 0:
             self.fade_out_timer.stop()

@@ -14,8 +14,14 @@ rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6QmlModels.so.6' && \
 (cd "./dist/main" && zip -r "../Account_Organizer_linux_setup.zip" .)
 mkdir -p "./dist/update" && \
 cp -r ./dist/main/* ./dist/update/ && \
+
+(Without updated GUI library)
 rm -rf "./dist/update/_internal/PySide6" && \
 (cd "./dist/update" && zip -r "../linux_update.zip" .)
+
+(With updated GUI library)
+(cd "./dist/update" && zip -r "../linux_update.zip" .)
+
 
 Windows (PowerShell)
 Remove-Item -Recurse -Force ".\dist\main" -ErrorAction SilentlyContinue; `
@@ -32,6 +38,13 @@ Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6Pdf.dll" -E
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6QmlModels.dll" -ErrorAction SilentlyContinue; `
 New-Item -ItemType Directory -Path ".\dist\update" -ErrorAction SilentlyContinue; `
 Copy-Item -Path ".\dist\main\*" -Destination ".\dist\update\" -Recurse; `
+
+(Without updated GUI library)
 Remove-Item -Recurse -Force ".\dist\update\_internal\PySide6" -ErrorAction SilentlyContinue; `
 $compress = @{Path = ".\dist\update\*"; CompressionLevel = "Optimal"; DestinationPath = ".\dist\windows_update.zip"}; `
 Compress-Archive @compress -Force
+
+(With updated GUI Library)
+$compress = @{Path = ".\dist\update\*"; CompressionLevel = "Optimal"; DestinationPath = ".\dist\windows_update.zip"}; `
+Compress-Archive @compress -Force
+

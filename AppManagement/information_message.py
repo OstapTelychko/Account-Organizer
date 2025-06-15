@@ -24,6 +24,6 @@ def show_information_message(text:str) -> None:
 
     try:
         QTimer.singleShot(100, _center_message)
-        WindowsRegistry.InformationMessage.run()
+        QTimer.singleShot(50, WindowsRegistry.InformationMessage.run)
     except RuntimeError:
         pass # When the program exits, this prevents a widget deletion error
