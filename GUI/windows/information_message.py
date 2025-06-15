@@ -1,6 +1,5 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QPushButton
-from PySide6.QtCore import Qt
-from time import sleep
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel , QPushButton
+from PySide6.QtCore import Qt, QTimer
 
 from DesktopQtToolkit.qsingleton import QSingleton
 from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
@@ -45,33 +44,57 @@ class InformationMessage(QWidget, metaclass=QSingleton):
         self.main_layout.addWidget(self.message)
         self.setLayout(self.main_layout)
 
+        self.fade_in_timer = QTimer()
+        self.fade_in_timer.timeout.connect(self.fade_in_step)
+        self.fade_out_timer = QTimer()
+        self.fade_out_timer.timeout.connect(self.fade_out_step)
+        self.display_timer = QTimer()
+        self.display_timer.timeout.connect(self.start_fade_out)
+
 
     def run(self) -> None:
-        """This method is used to show the information message window and center it on the main window."""
+        """Show the information message with fade in/out animation."""
 
-        opacity = 0.0
+        # Reset opacity
+        self.opacity = 0.0
         self.setWindowOpacity(0)
         self.show()
-
-        for _ in range(5):
-            opacity += 0.2
-            self.setWindowOpacity(opacity)
-            self.update()
-            QApplication.processEvents()
-            sleep(0.05)
-
-        sleep(0.6)
         
-        for _ in range(5):
-            opacity -= 0.2
-            self.setWindowOpacity(opacity)
-            self.update()
-            QApplication.processEvents()
-            sleep(0.05)
+        self.fade_in_timer.start(50)  # 50ms interval between steps
 
-        self.hide()
-        for button in self.buttons:
-            button.setEnabled(True)
+
+    def fade_in_step(self) -> None:
+        """Increase opacity for fade-in effect."""
+
+        self.opacity += 0.2
+        self.setWindowOpacity(self.opacity)
+        
+        if self.opacity >= 1.0:
+            self.fade_in_timer.stop()
+            # Show for 600ms before fading out
+            self.display_timer.start(600)
+    
+
+    def start_fade_out(self) -> None:
+        """Start the fade-out animation after display time."""
+
+        self.display_timer.stop()
+        self.fade_out_timer.start(50)
+
+
+    def fade_out_step(self) -> None:
+        """Decrease opacity for fade-out effect."""
+
+        self.opacity -= 0.2
+        self.setWindowOpacity(self.opacity)
+        
+        if self.opacity <= 0:
+            self.fade_out_timer.stop()
+            self.hide()
+
+            # Enable buttons after animation is complete
+            for button in self.buttons:
+                button.setEnabled(True)
 
 
 

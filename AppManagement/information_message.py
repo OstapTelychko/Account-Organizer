@@ -1,4 +1,3 @@
-from threading import Thread
 from PySide6.QtCore import QTimer
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -19,16 +18,12 @@ def show_information_message(text:str) -> None:
 
         main_window_center = WindowsRegistry.MainWindow.geometry().center()
         information_message_geometry = WindowsRegistry.InformationMessage.geometry()
-
         main_window_center.setX(int(main_window_center.x()-information_message_geometry.width()/2))
         main_window_center.setY(int(main_window_center.y()-information_message_geometry.height()/2))
-
         WindowsRegistry.InformationMessage.move(main_window_center)
 
-
     try:
-        message_worker = Thread(target=WindowsRegistry.InformationMessage.run)
-        message_worker.start()
-        QTimer.singleShot(50, _center_message)
+        QTimer.singleShot(100, _center_message)
+        WindowsRegistry.InformationMessage.run()
     except RuntimeError:
         pass # When the program exits, this prevents a widget deletion error

@@ -72,10 +72,10 @@ class UserConfig:
         """Load user configuration. It reads the configuration from the file and sets it to the session variables."""
 
         if self.test_mode:
-            with open(TEST_USER_CONF_PATH) as file:
+            with open(TEST_USER_CONF_PATH, encoding="utf-8") as file:
                 User_conf = toml.load(file)
         else:
-            with open(USER_CONF_PATH) as file:
+            with open(USER_CONF_PATH, encoding="utf-8") as file:
                 User_conf = toml.load(file)
 
         if "General" in User_conf: 

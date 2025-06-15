@@ -21,7 +21,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         app_core = AppCore.instance()
         def _add_category(name:str) -> None:
             """Set category name and click add button."""
-
+            
             WindowsRegistry.AddCategoryWindow.category_name.setText(name)
             WindowsRegistry.AddCategoryWindow.button.click()
 
