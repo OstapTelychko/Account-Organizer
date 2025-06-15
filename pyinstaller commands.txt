@@ -5,7 +5,7 @@ rm -f "./dist/linux_update.zip" && \
 rm -f "./dist/Account_Organizer_linux_setup.zip" && \
 pyinstaller main.py --exclude-module PyQt5 --exclude-module PyQt6 --exclude-module numpy --exclude-module mysql --exclude-module MySQLdb \
  --add-data "Images:Images" --add-data "alembic:alembic" --add-data "alembic.ini:." --add-data "app version.txt:." --add-data "languages.json:." \
- --hidden-import logging.config --strip && \
+ --hidden-import logging.config --collect-all requests --strip && \
 rm -r './dist/main/_internal/PySide6/Qt/translations' && \
 rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Quick.so.6' && \
 rm -r './dist/main/_internal/PySide6/Qt/lib/libQt6Qml.so.6' && \
@@ -23,7 +23,7 @@ Remove-Item -Recurse -Force ".\dist\update" -ErrorAction SilentlyContinue; `
 Remove-Item -Force ".\dist\windows_update.zip" -ErrorAction SilentlyContinue; `
 pyinstaller main.py --windowed --exclude-module PyQt5 --exclude-module PyQt6 --exclude-module numpy --exclude-module mysql --exclude-module MySQLdb `
  --add-data "Images;Images" --add-data "alembic;alembic" --add-data "alembic.ini;." --add-data "app version.txt;." --add-data "languages.json;." `
- --hidden-import logging.config `
+ --hidden-import logging.config --collect-all requests `
  --upx-dir 'c:\Program Files\UPX'; `
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\translations" -ErrorAction SilentlyContinue; `
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6Quick.dll" -ErrorAction SilentlyContinue; `

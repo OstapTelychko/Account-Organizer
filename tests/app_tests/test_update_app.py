@@ -13,6 +13,7 @@ class TestUpdateApp(OutOfScopeTestCase):
     def test_1_internet_connection_check(self, mock_head:MagicMock) -> None:
         """Test internet connection check functionality."""
 
+        # mock_head(1,2,4,2,3,2,1,2,3,5,5,6,8,6)
         mock_head_response = create_autospec(Response, spec_set=True)
         mock_head_response.raise_for_status = MagicMock(return_value=None)
         mock_head.return_value = mock_head_response

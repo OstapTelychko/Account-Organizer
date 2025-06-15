@@ -67,13 +67,13 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         suite = TestSuite()
         loader = TestLoader()
         suite.addTests((
-        # loader.loadTestsFromTestCase(TestMainWindow),
-        # loader.loadTestsFromTestCase(TestCategory),
-        # loader.loadTestsFromTestCase(TestAccount),
-        # loader.loadTestsFromTestCase(TestTransaction),
-        # loader.loadTestsFromTestCase(TestStatistics),
-        # loader.loadTestsFromTestCase(TestBackupsManagement),
-        # loader.loadTestsFromTestCase(TestShortcuts),
+        loader.loadTestsFromTestCase(TestMainWindow),
+        loader.loadTestsFromTestCase(TestCategory),
+        loader.loadTestsFromTestCase(TestAccount),
+        loader.loadTestsFromTestCase(TestTransaction),
+        loader.loadTestsFromTestCase(TestStatistics),
+        loader.loadTestsFromTestCase(TestBackupsManagement),
+        loader.loadTestsFromTestCase(TestShortcuts),
         loader.loadTestsFromTestCase(TestUpdateApp),
         ))
         
