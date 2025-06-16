@@ -3,9 +3,9 @@
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
-☐ check if information message window works on windows
 
 Archive:
+  ✔ check if information message window works on windows @done(25-06-16 01:59)
   ✔ check how new information message window works on linux @started(25-06-16 00:00) @done(25-06-16 01:55) @lasted(1h55m6s)
   ✔ test on windows if problem with unclosed db is solved @started(25-06-15 12:18) @done(25-06-15 23:28) @lasted(11h10m27s)
   ✔ remove session dependcies since it's main class and pass objects through start_session in main.py to follow SOLID principles @started(25-05-27 22:01) @done(25-05-28 01:58) @lasted(3h57m55s)
