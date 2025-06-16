@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 class AppCore:
-    """Global application state and services". It stores all session variables and methods. Used to load user configuration, app version, and backups."""
+    """Global application state and services. It stores all session variables and methods. Used to load user configuration, app version, and backups."""
 
     __instance: AppCore|None = None
 

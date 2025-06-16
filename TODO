@@ -3,6 +3,7 @@
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified.
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
+☐ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38)
 
 Archive:
   ✔ check if information message window works on windows @done(25-06-16 01:59)

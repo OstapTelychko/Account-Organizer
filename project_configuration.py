@@ -32,11 +32,13 @@ TEST_DB_FILE_PATH = TEST_DB_PATH.replace("sqlite:///","")
 UPDATE_DIRECTORY = f"{ROOT_DIRECTORY}Temp Update"
 PREVIOUS_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Previous Version"
 GUI_LIBRARY = "PySide6"
+LINUX_GUI_LIBRARY_ZIP = f"Linux_{GUI_LIBRARY}.zip"
+WINDOWS_GUI_LIBRARY_ZIP = f"Windows_{GUI_LIBRARY}.zip"
 LINUX_UPDATE_ZIP = "linux_update.zip"
 WINDOWS_UPDATE_ZIP = "windows_update.zip"
 VERSION_FILE_NAME = "app version.txt"
 ALEMBIC_CONFIG_FILE = "alembic.ini"
-MOVE_FILES_TO_UPDATE = (DB_FILE_PATH, USER_CONF_PATH)
+MOVE_FILES_TO_UPDATE = (DB_FILE_PATH, USER_CONF_PATH)#Those files are stored in _internal directory, so they have to be moved separately into new _internal directory
 
 LOGS_DIRECTORY = f"{ROOT_DIRECTORY}Logs/"
 APP_LOG_FILE = f"{LOGS_DIRECTORY}App.log"
