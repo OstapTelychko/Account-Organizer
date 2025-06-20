@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, create_autospec
 from tests.tests_toolkit import OutOfScopeTestCase, safe_patch
-from AppManagement.update_app import check_internet_connection
+from AppManagement.AppUpdate.download_update import check_internet_connection
 from requests import Response
 
 
@@ -9,7 +9,7 @@ from requests import Response
 class TestUpdateApp(OutOfScopeTestCase):
     """Test update application functionality."""
 
-    @safe_patch('AppManagement.update_app.req.head')
+    @safe_patch('AppManagement.AppUpdate.download_update.req.head')
     def test_1_internet_connection_check(self, mock_head:MagicMock) -> None:
         """Test internet connection check functionality."""
 

@@ -35,7 +35,6 @@ Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6Pdf.dll" -E
 Remove-Item -Recurse -Force ".\dist\main\_internal\PySide6\Qt\bin\Qt6QmlModels.dll" -ErrorAction SilentlyContinue; `
 New-Item -ItemType Directory -Path ".\dist\update" -ErrorAction SilentlyContinue; `
 Copy-Item -Path ".\dist\main\*" -Destination ".\dist\update\" -Recurse; `
-
 Move-Item -Path ".\dist\update\_internal\PySide6" -Destination ".\dist\"; `
 $compressGUI = @{Path = ".\dist\PySide6"; CompressionLevel = "Optimal"; DestinationPath = ".\dist\Windows_PySide6.zip"}; `
 Compress-Archive @compressGUI -Force; `
