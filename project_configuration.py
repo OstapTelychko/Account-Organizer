@@ -41,6 +41,8 @@ VERSION_FILE_NAME = "app version.txt"
 ALEMBIC_CONFIG_FILE = "alembic.ini"
 MOVE_FILES_TO_UPDATE = (DB_FILE_PATH, USER_CONF_PATH)#Those files are stored in _internal directory, so they have to be moved separately into new _internal directory
 
+CHUNK_SIZE_FOR_FILE_HASHER = 1024*1024*1#1 MB
+
 LOGS_DIRECTORY = f"{ROOT_DIRECTORY}Logs/"
 APP_LOG_FILE = f"{LOGS_DIRECTORY}App.log"
 ERROR_LOG_FILE = f"{LOGS_DIRECTORY}Error.log"

@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 import shutil
 from sys import platform
 from zipfile import ZipFile
@@ -9,7 +10,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
-from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY
+from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER
 
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
@@ -22,6 +23,40 @@ except ImportError:
 
 
 logger = get_logger(__name__)
+
+
+def generate_file_256hash(file_path: str) -> str:
+    """Generate a SHA-256 hash of the file at the given path.
+
+        Arguments
+        ---------
+        `file_path`: (str) - The path to the file to hash.
+
+        Returns
+        -------
+        `str`: The SHA-256 hash of the file.
+
+        Raises
+        ------
+        `FileNotFoundError`: If the file does not exist.
+
+        Notes
+        -----
+        If you want to get hash for directory, you have to compress it into one file first.
+    """
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}. Hash cannot be generated.")
+
+    if not os.path.isfile(file_path):
+        raise ValueError(f"Path is not a file: {file_path}. Hash cannot be generated.")
+    
+    hasher = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        while chunk := f.read(CHUNK_SIZE_FOR_FILE_HASHER):
+            hasher.update(chunk)
+
+    return hasher.hexdigest()
 
 
 def requests_retry_session(retries:int = 3, backoff_factor:float = 0.3, status_forcelist:tuple[int, ...] = (429, 500, 502, 503, 504)) -> req.Session:

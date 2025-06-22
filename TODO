@@ -4,6 +4,7 @@
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
 ☐ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38)
+☐ fix app icon size on linux
 
 Archive:
   ✔ check if information message window works on windows @done(25-06-16 01:59)
