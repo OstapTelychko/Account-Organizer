@@ -36,7 +36,7 @@ from project_configuration import FORBIDDEN_CALCULATOR_WORDS, APP_NAME
 from languages import LanguageStructure
 from backend.db_controller import DBController
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.shortcuts_manager import ShortcutsManager
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.user_config import UserConfig
@@ -58,7 +58,7 @@ from AppManagement.account import show_add_user_window, add_account, remove_acco
 from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
 from AppManagement.AppUpdate.check_for_update import check_for_updates
-from AppManagement.AppUpdate.download_update import generate_file_256hash
+from AppManagement.AppUpdate.download_update import generate_file_256hash, get_prerelease_version
 
 from tests.init_tests import test_main
 
@@ -245,7 +245,7 @@ def main(test_mode:bool=False) -> None:
     load_language(app_core.config.language)
 
     WindowsRegistry.MainWindow.show()
-
+    
     if not test_mode:
         QTimer.singleShot(200, check_for_updates)
 

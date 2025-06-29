@@ -11,7 +11,7 @@ from alembic import command
 from alembic.config import Config
 
 from AppObjects.logger import get_logger
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME, GUI_LIBRARY, \

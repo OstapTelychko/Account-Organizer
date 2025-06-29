@@ -6,7 +6,7 @@ from PySide6.QtCore import QTimer
 
 from languages import LanguageStructure
 from project_configuration import AVAILABLE_LANGUAGES
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from tests.tests_toolkit import qsleep, OutOfScopeTestCase
 

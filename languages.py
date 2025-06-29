@@ -4,7 +4,7 @@ from typing import TypeAlias, cast, Union
 from operator import getitem
 from functools import reduce
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from project_configuration import APP_DIRECTORY
 

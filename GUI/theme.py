@@ -8,7 +8,7 @@ from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped
 
 from project_configuration import THEME_DIRECTORY
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 

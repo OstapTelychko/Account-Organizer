@@ -5,7 +5,7 @@ from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 

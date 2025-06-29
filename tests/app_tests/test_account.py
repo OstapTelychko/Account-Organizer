@@ -4,7 +4,7 @@ from PySide6.QtCore import QTimer
 
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 

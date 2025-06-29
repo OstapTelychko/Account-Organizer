@@ -9,7 +9,7 @@ from PySide6.QtCore import QTimer
 from languages import LanguageStructure
 from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, BACKUPS_DATE_FORMAT
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.backup_management import auto_backup

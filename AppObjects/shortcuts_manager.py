@@ -4,7 +4,7 @@ from PySide6.QtGui import QShortcut
 
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.user_config import UserConfig
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 
 if TYPE_CHECKING:
     from typing import Callable, Any

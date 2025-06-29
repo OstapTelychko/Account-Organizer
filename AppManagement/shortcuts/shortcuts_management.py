@@ -6,7 +6,7 @@ from collections import Counter
 from PySide6.QtGui import QKeySequence
 
 from AppObjects.windows_registry import WindowsRegistry
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.shortcuts_manager import ShortcutsManager
 
 from AppManagement.shortcuts.shortcuts_actions import move_to_next_category, move_to_previous_category, add_transaction_to_focused_category,\

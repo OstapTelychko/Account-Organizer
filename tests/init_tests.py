@@ -8,7 +8,7 @@ from alembic.config import Config
 from alembic import command
 
 from AppObjects.user_config import UserConfig
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from backend.db_controller import DBController
 from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY, TEST_USER_CONF_PATH

@@ -1,8 +1,14 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 import toml
 from enum import Enum
 
 from project_configuration import USER_CONF_PATH, TEST_USER_CONF_PATH, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
+
+if TYPE_CHECKING:
+    UserConfCategory = dict[str, str | int | bool]
+    UserConfType = dict[str, UserConfCategory]
+    LegacyUserConfType = dict[str, str | int | bool]
 
 
 
@@ -16,6 +22,13 @@ class UserConfig:
         WEEKLY = "weekly"
         DAILY = "daily"
         NO_AUTO_BACKUP = "no auto backup"
+
+
+    class UpdateChannel(Enum):
+        """Update channel class. It stores all update channels."""
+
+        RELEASE = "release"
+        PRE_RELEASE = "prerelease"
 
 
     class ShortcutId:
@@ -48,6 +61,7 @@ class UserConfig:
         self.max_backups:int = MAX_RECOMMENDED_BACKUPS
         self.max_legacy_backups:int = MAX_RECOMMENDED_LEGACY_BACKUPS
         self.auto_backup_removal_enabled:bool = True
+        self.update_channel:str = UserConfig.UpdateChannel.RELEASE.value
 
         self.shortcuts = {
             UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW:"X",
@@ -73,37 +87,39 @@ class UserConfig:
 
         if self.test_mode:
             with open(TEST_USER_CONF_PATH, encoding="utf-8") as file:
-                User_conf = toml.load(file)
+                User_conf:UserConfType = toml.load(file)
         else:
             with open(USER_CONF_PATH, encoding="utf-8") as file:
-                User_conf = toml.load(file)
+                User_conf:UserConfType = toml.load(file)
 
         if "General" in User_conf: 
-            self.theme = User_conf["General"].get("Theme", "Dark")
-            self.language = User_conf["General"].get("Language", "English")
-            self.account_name = User_conf["General"].get("Account_name", "")
+            self.theme = str(User_conf["General"].get("Theme", "Dark"))
+            self.language = str(User_conf["General"].get("Language", "English"))
+            self.account_name = str(User_conf["General"].get("Account_name", ""))
+            self.update_channel = str(User_conf["General"].get("Update_channel", UserConfig.UpdateChannel.RELEASE.value))
 
-            self.auto_backup_status = User_conf["Backup"].get("Auto_backup_status", UserConfig.AutoBackupStatus.MONTHLY.value)
-            self.max_backups = User_conf["Backup"].get("Max_backups", self.max_backups)
-            self.max_legacy_backups = User_conf["Backup"].get("Max_legacy_backups", self.max_legacy_backups)
-            self.auto_backup_removal_enabled = User_conf["Backup"].get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled)
+            self.auto_backup_status = str(User_conf["Backup"].get("Auto_backup_status", UserConfig.AutoBackupStatus.MONTHLY.value))
+            self.max_backups = int(User_conf["Backup"].get("Max_backups", self.max_backups))
+            self.max_legacy_backups = int(User_conf["Backup"].get("Max_legacy_backups", self.max_legacy_backups))
+            self.auto_backup_removal_enabled = bool(User_conf["Backup"].get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled))
 
             for shortcut_id, shortcut_value in self.shortcuts.items():
                 if shortcut_id in User_conf["Shortcuts"]:
-                    self.shortcuts[shortcut_id] = User_conf["Shortcuts"].get(shortcut_id, shortcut_value)
+                    self.shortcuts[shortcut_id] = str(User_conf["Shortcuts"].get(shortcut_id, shortcut_value))
                 else:
                     self.shortcuts[shortcut_id] = shortcut_value
 
         else:
             # If the file is not in the new format, load it as a legacy configuration (1.1.1)
-            self.theme = User_conf.get("Theme", self.theme)
-            self.language = User_conf.get("Language", self.language)
-            self.account_name = User_conf.get("Account_name", self.account_name)
-            self.auto_backup_status = User_conf.get("Auto_backup_status", self.auto_backup_status)
-            self.max_backups = User_conf.get("Max_backups", self.max_backups)
-            self.max_legacy_backups = User_conf.get("Max_legacy_backups", self.max_legacy_backups)
-            self.auto_backup_removal_enabled = User_conf.get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled)
-    
+            Legacy_user_conf:LegacyUserConfType = User_conf # type: ignore #Conficts with new UserConfType
+            self.theme = str(Legacy_user_conf.get("Theme", self.theme))
+            self.language = str(Legacy_user_conf.get("Language", self.language))
+            self.account_name = str(Legacy_user_conf.get("Account_name", self.account_name))
+            self.auto_backup_status = str(Legacy_user_conf.get("Auto_backup_status", self.auto_backup_status))
+            self.max_backups = int(Legacy_user_conf.get("Max_backups", self.max_backups))
+            self.max_legacy_backups = int(Legacy_user_conf.get("Max_legacy_backups", self.max_legacy_backups))
+            self.auto_backup_removal_enabled = bool(Legacy_user_conf.get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled))
+
 
     def create_user_config(self) -> None:
         """Create user configuration file. It creates a new file with default values if the file doesn't exist."""
@@ -113,6 +129,7 @@ class UserConfig:
                 "Theme":"Dark",
                 "Language":"English",
                 "Account_name":"",
+                "Update_channel":UserConfig.UpdateChannel.RELEASE.value
             },
             "Backup":{
                 "Auto_backup_status":UserConfig.AutoBackupStatus.MONTHLY.value,
@@ -140,7 +157,8 @@ class UserConfig:
             "General":{
                 "Theme":self.theme,
                 "Language":self.language,
-                "Account_name":self.account_name
+                "Account_name":self.account_name,
+                "Update_channel":self.update_channel
             },
             "Backup":{
                 "Auto_backup_status":self.auto_backup_status,

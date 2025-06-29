@@ -7,7 +7,8 @@ APP_PORT = 6957
 
 REPOSITORY = "Account-Organizer"
 REPOSITORY_OWNER = "OstapTelychko"
-LATEST_RELEASE_URL = f"https://api.github.com/repos/{REPOSITORY_OWNER}/{REPOSITORY}/releases/latest"
+RELEASES_URL = f"https://api.github.com/repos/{REPOSITORY_OWNER}/{REPOSITORY}/releases"
+LATEST_RELEASE_URL = f"{RELEASES_URL}/latest"
 
 APP_DIRECTORY = __file__.replace("\\","/").replace(Path(__file__).name,"")#The first replace change windows \ to / second replace remove name of file to get path to directory
 if APP_DIRECTORY.find("_internal")  == -1:

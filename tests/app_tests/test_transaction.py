@@ -2,7 +2,7 @@ from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from project_configuration import CATEGORY_TYPE
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 

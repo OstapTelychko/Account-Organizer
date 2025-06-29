@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import cast
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 

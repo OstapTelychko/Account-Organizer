@@ -1,7 +1,7 @@
 from PySide6.QtCore import QTimer
 
 from AppObjects.windows_registry import WindowsRegistry
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 
 from AppManagement.AppUpdate.download_update import get_latest_version, download_latest_update

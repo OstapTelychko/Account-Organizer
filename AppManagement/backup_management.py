@@ -11,7 +11,7 @@ from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN
 from backend.db_controller import DBController
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.backup import Backup
 from AppObjects.logger import get_logger

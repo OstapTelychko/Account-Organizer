@@ -2,7 +2,7 @@ import shutil
 import os
 from sys import platform
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 

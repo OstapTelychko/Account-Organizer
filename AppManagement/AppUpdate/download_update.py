@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import json
 import os
 import hashlib
@@ -10,9 +12,10 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
-from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER
+from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL
 
 from AppObjects.logger import get_logger
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 try:
@@ -20,6 +23,8 @@ try:
 except ImportError:
     UPDATE_API_TOKEN:str|None = None#type: ignore[no-redef]
 
+if TYPE_CHECKING:
+    from typing import Any
 
 
 logger = get_logger(__name__)
@@ -108,6 +113,40 @@ def check_internet_connection() -> bool:
         return False
 
 
+def get_prerelease_version() -> dict[str, Any] | None:
+    """Get the latest pre-release version of the app from GitHub releases.
+
+        Returns
+        -------
+        `dict[str, Any] | None`: The latest pre-release version of the app or None if not found.
+    """
+    
+    try:
+        request_session = requests_retry_session()
+        if UPDATE_API_TOKEN:
+            response = request_session.get(RELEASES_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+        else:
+            response = request_session.get(RELEASES_URL, timeout=15)
+        response.raise_for_status()
+
+        if response.status_code != 200:
+            logger.error(f"Failed to get releases: {response.status_code}")
+            return None
+
+        releases = response.json()
+        for release in releases:
+            if release.get("prerelease", False):
+                return release
+        
+        return None
+    
+    
+    except req.exceptions.HTTPError as e:
+        logger.error(f"HTTP error: {e}")
+
+        return None
+    
+
 def get_latest_version() -> str:
     """Get the latest version of the app from GitHub releases.
 
@@ -116,21 +155,40 @@ def get_latest_version() -> str:
         `str`: The latest version of the app.
     """
 
+    app_core = AppCore.instance()
+
     logger.info("Checking for internet connection")
     if not check_internet_connection():
         return ""
     
     try:
-        request_session = requests_retry_session()
-        if UPDATE_API_TOKEN:
-            response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+        if app_core.config.update_channel == app_core.config.UpdateChannel.PRE_RELEASE.value:
+            release = get_prerelease_version()
+            if not release:
+                logger.error("No pre-release version found.")
+                raise RuntimeError("No pre-release version found.")    
         else:
-            response = request_session.get(LATEST_RELEASE_URL, timeout=15)
-        response.raise_for_status()
 
-        latest_version:str = response.json()["tag_name"]
+            request_session = requests_retry_session()
+            if UPDATE_API_TOKEN:
+                response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+            else:
+                response = request_session.get(LATEST_RELEASE_URL, timeout=15)
+            response.raise_for_status()
+
+            if response.status_code != 200:
+                logger.error(f"Failed to get latest release: {response.status_code}")
+                raise RuntimeError(f"Failed to get latest release: {response.status_code}")
+
+            release = response.json()
+
+        latest_version:str = release["tag_name"]
         return latest_version
     
+    except json.JSONDecodeError:
+        logger.error("Failed to decode release JSON response.")
+        return ""
+
     except req.exceptions.HTTPError as e:
         logger.error(f"HTTP error: {e}")
         return ""

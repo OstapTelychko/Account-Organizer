@@ -8,7 +8,7 @@ from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from AppManagement.category import reset_focused_category, activate_categories
 from GUI.category import load_category
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 

@@ -1,7 +1,7 @@
 from functools import partial
 from PySide6.QtCore import Qt
 
-from AppObjects.session import AppCore
+from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
