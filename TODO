@@ -4,9 +4,9 @@
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
 ☐ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38)
-☐ fix app icon size on linux
 
 Archive:
+  ✔ fix app icon size on linux @started(25-06-30 20:37) @done(25-06-30 20:57) @lasted(20m34s)
   ✔ add option to load update from pre-release for testing new releases before updates will be publicly available @started(25-06-29 23:38) @done(25-06-30 01:41) @lasted(2h3m13s)
   ✔ check if information message window works on windows @done(25-06-16 01:59)
   ✔ check how new information message window works on linux @started(25-06-16 00:00) @done(25-06-16 01:55) @lasted(1h55m6s)
