@@ -12,7 +12,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
-from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL
+from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL,\
+WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP
 
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
@@ -25,6 +26,11 @@ except ImportError:
 
 if TYPE_CHECKING:
     from typing import Any
+
+    RELEASE = dict[str, Any]
+    ASSETS = list[dict[str, Any]]
+    UPDATE_ASSET = tuple[str, str, int, str]
+    GUI_LIBRARY_ASSET = tuple[str, str, int, str]
 
 
 logger = get_logger(__name__)
@@ -113,12 +119,12 @@ def check_internet_connection() -> bool:
         return False
 
 
-def get_prerelease_version() -> dict[str, Any] | None:
+def get_prerelease() -> RELEASE | None:
     """Get the latest pre-release version of the app from GitHub releases.
 
         Returns
         -------
-        `dict[str, Any] | None`: The latest pre-release version of the app or None if not found.
+        `RELEASE_TYPE | None`: The latest pre-release version of the app or None if not found.
     """
     
     try:
@@ -140,66 +146,17 @@ def get_prerelease_version() -> dict[str, Any] | None:
         
         return None
     
-    
-    except req.exceptions.HTTPError as e:
-        logger.error(f"HTTP error: {e}")
-
+    except Exception as e:
+        logger.error(f"Unexpected exception: {e}")
         return None
-    
-
-def get_latest_version() -> str:
-    """Get the latest version of the app from GitHub releases.
-
-        Returns
-        -------
-        `str`: The latest version of the app.
-    """
-
-    app_core = AppCore.instance()
-
-    logger.info("Checking for internet connection")
-    if not check_internet_connection():
-        return ""
-    
-    try:
-        if app_core.config.update_channel == app_core.config.UpdateChannel.PRE_RELEASE.value:
-            release = get_prerelease_version()
-            if not release:
-                logger.error("No pre-release version found.")
-                raise RuntimeError("No pre-release version found.")    
-        else:
-
-            request_session = requests_retry_session()
-            if UPDATE_API_TOKEN:
-                response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
-            else:
-                response = request_session.get(LATEST_RELEASE_URL, timeout=15)
-            response.raise_for_status()
-
-            if response.status_code != 200:
-                logger.error(f"Failed to get latest release: {response.status_code}")
-                raise RuntimeError(f"Failed to get latest release: {response.status_code}")
-
-            release = response.json()
-
-        latest_version:str = release["tag_name"]
-        return latest_version
-    
-    except json.JSONDecodeError:
-        logger.error("Failed to decode release JSON response.")
-        return ""
-
-    except req.exceptions.HTTPError as e:
-        logger.error(f"HTTP error: {e}")
-        return ""
 
 
-def download_latest_update() -> bool:
-    """Download the latest update from GitHub releases.
+def get_release() -> RELEASE | None:
+    """Get the latest release version of the app from GitHub releases.
 
         Returns
         -------
-        `bool`: True if the download was successful, False otherwise.
+        `RELEASE_TYPE | None`: The latest release version of the app or None if not found.
     """
 
     try:
@@ -212,10 +169,138 @@ def download_latest_update() -> bool:
 
         if response.status_code != 200:
             logger.error(f"Failed to get latest release: {response.status_code}")
-            return False
+            raise RuntimeError(f"Failed to get latest release: {response.status_code}")
+
+        return response.json()
+    
+    except Exception as e:
+        logger.error(f"Unexpected exception: {e}")
+        return None
+
+
+def get_latest_version() -> tuple[str, RELEASE] | None:
+    """Get the latest version of the app from GitHub releases.
+
+        Returns
+        -------
+        `str`: The latest version of the app.
+    """
+
+    app_core = AppCore.instance()
+
+    logger.info("Checking for internet connection")
+    if not check_internet_connection():
+        return None
+    
+    try:
+        if app_core.config.update_channel == app_core.config.UpdateChannel.PRE_RELEASE.value:
+            release = get_prerelease()
+        else:
+            release = get_release()
+
+        if not release:
+            logger.error("No release version found.")
+            raise RuntimeError("No release version found.")
+
+        latest_version:str = release["tag_name"]
+        return latest_version, release
+    
+    except json.JSONDecodeError:
+        logger.error("Failed to decode release JSON response.")
+        return None
+
+    except req.exceptions.HTTPError as e:
+        logger.error(f"HTTP error: {e}")
+        return None
+    
+    except Exception as e:
+        logger.error(f"Unexpected exception: {e}")
+        raise RuntimeError(f"Unexpected exception: {e}") from e
+
+
+def get_platform_assets(assets: ASSETS) -> tuple[UPDATE_ASSET, GUI_LIBRARY_ASSET]:
+    """Get the platform update asset and GUI library asset if it was updated.
+
+        Arguments
+        ---------
+        `assets`: (ASSETS) - The list of assets from the release.
+
+        Returns
+        -------
+        `tuple[UPDATE_ASSET, GUI_LIBRARY_ASSET|None]`: A tuple containing the update asset and the GUI library asset if it was updated.
+    """
+
+    if platform == "win32":
+        update_zip_name = WINDOWS_UPDATE_ZIP
+        gui_library_zip_name = WINDOWS_GUI_LIBRARY_ZIP
+    else:
+        update_zip_name = LINUX_UPDATE_ZIP
+        gui_library_zip_name = LINUX_GUI_LIBRARY_ZIP
+
+    update_asset:UPDATE_ASSET | None = None
+    gui_library_asset:GUI_LIBRARY_ASSET | None = None
+
+    for asset in assets:
+        if asset["name"] == update_zip_name:
+            update_asset = (asset["name"], asset["browser_download_url"], asset["size"], asset["digest"])
+            logger.info(f"Found update asset: {asset['name']} | Size: {asset['size']} | Hash: {asset['digest']}")
+        elif asset["name"] == gui_library_zip_name:
+            gui_library_asset = (asset["name"], asset["browser_download_url"], asset["size"], asset["digest"])
+            logger.info(f"Found GUI library asset: {asset['name']} | Size: {asset['size']} | Hash: {asset['digest']}")
+
+    if not update_asset:
+        logger.error(f"No update asset found for {platform} platform.")
+        raise RuntimeError(f"No update asset found for {platform} platform.")
+
+    if not gui_library_asset:
+        logger.error(f"No GUI library asset found for {platform} platform. Update can't be performed.")
+        raise RuntimeError(f"No GUI library asset found for {platform} platform. Update can't be performed.")
+
+    return update_asset, gui_library_asset
+
+
+def download_update_zip(update_zip_download_url: str, update_zip_download_name: str, update_zip_size: int, attempt:int = 1) -> None:
+    WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(update_zip_size/1024/1024, 2))))
         
+    download_response = req.get(update_zip_download_url, stream=True, timeout=15)
+    download_response.raise_for_status()
+
+    download_size = 0
+
+    if os.path.exists(UPDATE_DIRECTORY):
+        logger.debug("Deleting previous update directory")
+        shutil.rmtree(UPDATE_DIRECTORY)
+    os.makedirs(UPDATE_DIRECTORY)
+    logger.debug("Created update directory")
+
+    logger.info(f"Saving update on disk. Attempt {attempt}")
+    with open(f"{UPDATE_DIRECTORY}/{update_zip_download_name}", "wb") as file:
+        for chunk in download_response.iter_content(chunk_size=CHUNK_SIZE_FOR_DOWNLOADING):
+            download_size += len(chunk)
+            file.write(chunk)
+            WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/update_zip_size)*100))
+    logger.info(f"Update saved on disk. Attempt {attempt}")
+
+    with ZipFile(f"{UPDATE_DIRECTORY}/{update_zip_download_name}", "r") as zip_ref:
+        zip_ref.extractall(UPDATE_DIRECTORY)
+    logger.info(f"Update extracted. Attempt {attempt}")
+
+
+def download_latest_update(release: RELEASE) -> bool:
+    """Download the latest update from GitHub releases.
+
+        Arguments
+        ---------
+        `release`: (RELEASE) - The release object containing information about the latest release.
+
+        Returns
+        -------
+        `bool`: True if the download was successful, False otherwise.
+    """
+
+    try:
         try:
-            assets = response.json()["assets"]
+            assets = release["assets"]
         except KeyError:
             logger.error("No assets found in the latest release.")
             return False
@@ -224,70 +309,39 @@ def download_latest_update() -> bool:
             logger.error("Failed to decode JSON response.")
             return False
 
-        total_size = 0
-        download_name = ""
-        download_url = ""
+        update_asset, gui_library_asset = get_platform_assets(assets)
 
-        for asset in assets:
-            if platform == "win32":
-                if asset["name"] == WINDOWS_UPDATE_ZIP:
-                    download_url = asset["browser_download_url"]
-                    download_name = asset["name"]
-                    total_size = int(asset["size"])
-
-                    logger.info(f"Starting download of {WINDOWS_UPDATE_ZIP}")
-                    logger.debug(f"Download url: {download_url} | Size: {total_size}")
-                    break
-            else:
-                if asset["name"] == LINUX_UPDATE_ZIP:
-                    download_url = asset["browser_download_url"]
-                    download_name = asset["name"]
-                    total_size = int(asset["size"])
-
-                    logger.info(f"Starting download of {LINUX_UPDATE_ZIP}")
-                    logger.debug(f"Download url: {download_url} | Size: {total_size}")
-                    break
+        update_zip_download_name, update_zip_download_url, update_zip_size, update_zip_hash = update_asset
+        gui_zip_download_name, gui_zip_download_url, gui_zip_size, gui_zip_hash = gui_library_asset
         
-        if not (total_size > 0 and isinstance(download_url, str) and download_url.strip() and isinstance(download_name, str) and download_name.strip()):
-            logger.error("No update found or update is not available for this platform.")
+        if not (isinstance(update_zip_size, int) and isinstance(update_zip_download_url, str) and isinstance(update_zip_download_name, str) and isinstance(update_zip_hash, str)):
+            logger.error(f"""No update found or update is not available for this platform.
+                         Update zip size: {update_zip_size},
+                         Update zip download URL: {update_zip_download_url},
+                         Update zip download name: {update_zip_download_name},
+                         Update zip hash: {update_zip_hash}""")
             return False
 
-        WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(total_size/1024/1024, 2))))
-        
-        download_response = req.get(download_url, stream=True, timeout=15)
-        download_response.raise_for_status()
+        if not (isinstance(gui_zip_size, int) and isinstance(gui_zip_download_url, str) and isinstance(gui_zip_download_name, str) and isinstance(gui_zip_hash, str)):
+            logger.error(f"""No GUI library found or GUI library is not available for this platform.
+                         GUI zip size: {gui_zip_size},
+                         GUI zip download URL: {gui_zip_download_url},
+                         GUI zip download name: {gui_zip_download_name},
+                         GUI zip hash: {gui_zip_hash}""")
+            return False
 
-        chunk_size = 1024 * 256 #256KB
-        download_size = 0
+        for attempt in range(ATTEMPTS_TO_DOWNLOAD_ZIP+1):
+            download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
 
-        if os.path.exists(UPDATE_DIRECTORY):
-            logger.debug("Deleting previous update directory")
-            shutil.rmtree(UPDATE_DIRECTORY)
-        os.makedirs(UPDATE_DIRECTORY)
-        logger.debug("Created update directory")
-
-        logger.info("Saving update on disk")
-        with open(f"{UPDATE_DIRECTORY}/{download_name}", "wb") as file:
-            for chunk in download_response.iter_content(chunk_size=chunk_size):
-                download_size += len(chunk)
-                file.write(chunk)
-                WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/total_size)*100))
-        logger.info("Update saved on disk")
-
-        with ZipFile(f"{UPDATE_DIRECTORY}/{download_name}", "r") as zip_ref:
-            zip_ref.extractall(UPDATE_DIRECTORY)
-        logger.info("Update extracted")
+            if generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}") == update_zip_hash:
+                logger.info(f"Update zip hash matches: {update_zip_hash}")
+                break
+            else:
+                logger.warning(f"Update zip hash does not match: {update_zip_hash}. Retrying download...")
+                if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
+                    logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+                    return False
         return True
-
-    except req.exceptions.HTTPError as e:
-        logger.error(f"HTTP error: {e}")
-        return False
-    
-    except (req.exceptions.ConnectionError, req.exceptions.Timeout):
-        logger.error("Internet connection was lost during download.")
-        WindowsRegistry.Messages.no_internet.exec()
-        WindowsRegistry.UpdateProgressWindow.done(1)
-        return False
     
     except Exception as e:
         logger.error(f"Unexpected exception: {e}")

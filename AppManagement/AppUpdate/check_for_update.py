@@ -21,18 +21,19 @@ def check_for_updates() -> None:
     latest_version = get_latest_version()
 
     if latest_version:
-        if latest_version == app_core.app_version:
+        version, release = latest_version
+        if version == app_core.app_version:
             logger.info("No updates available")
             logger.info("__BREAK_LINE__")
             return
-        
-        logger.info(f"Latest version: {latest_version} | Current version: {app_core.app_version}")
+
+        logger.info(f"Latest version: {version} | Current version: {app_core.app_version}")
         WindowsRegistry.Messages.update_available.exec()
         if WindowsRegistry.Messages.update_available.clickedButton() == WindowsRegistry.Messages.update_available.ok_button:
             
             def _run_update() -> None:
                 logger.info("Running update")
-                if download_latest_update():
+                if download_latest_update(release):
                     logger.info("Downloaded latest update")
                     prepare_update()
                     apply_update()

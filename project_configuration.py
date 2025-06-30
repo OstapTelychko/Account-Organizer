@@ -41,7 +41,9 @@ WINDOWS_UPDATE_ZIP = "windows_update.zip"
 VERSION_FILE_NAME = "app version.txt"
 ALEMBIC_CONFIG_FILE = "alembic.ini"
 MOVE_FILES_TO_UPDATE = (DB_FILE_PATH, USER_CONF_PATH)#Those files are stored in _internal directory, so they have to be moved separately into new _internal directory
+ATTEMPTS_TO_DOWNLOAD_ZIP = 3
 
+CHUNK_SIZE_FOR_DOWNLOADING = 1024*256#256 KB
 CHUNK_SIZE_FOR_FILE_HASHER = 1024*1024*1#1 MB
 
 LOGS_DIRECTORY = f"{ROOT_DIRECTORY}Logs/"
