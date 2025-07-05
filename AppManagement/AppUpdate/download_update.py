@@ -5,7 +5,7 @@ import os
 import hashlib
 import shutil
 from sys import platform
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
 
 import requests as req
 from requests.adapters import HTTPAdapter
@@ -13,7 +13,8 @@ from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
 from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL,\
-WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP
+WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_DIRECTORY_ZIP,\
+GUI_LIBRARY
 
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
@@ -70,6 +71,30 @@ def generate_file_256hash(file_path: str) -> str:
     return hasher.hexdigest()
 
 
+def compress_directory(directory_path: str, output_zip_path: str) -> None:
+    """Compress a directory into a zip file.
+
+        Arguments
+        ---------
+        `directory_path`: (str) - The path to the directory to compress.
+
+        `output_zip_path`: (str) - The path to the output zip file.
+    """
+
+    if not os.path.exists(directory_path):
+        raise FileNotFoundError(f"Directory not found: {directory_path}. Cannot compress.")
+
+    if not os.path.isdir(directory_path):
+        raise ValueError(f"Path is not a directory: {directory_path}. Cannot compress.")
+
+    with ZipFile(output_zip_path, "w", ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(directory_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                rel_path = os.path.relpath(file_path, directory_path)
+                zipf.write(file_path, rel_path)
+
+
 def requests_retry_session(retries:int = 3, backoff_factor:float = 0.3, status_forcelist:tuple[int, ...] = (429, 500, 502, 503, 504)) -> req.Session:
     """Create a requests session with retry logic.
 
@@ -120,11 +145,11 @@ def check_internet_connection() -> bool:
 
 
 def get_prerelease() -> RELEASE | None:
-    """Get the latest pre-release version of the app from GitHub releases.
+    """Get the latest prerelease version of the app from GitHub releases.
 
         Returns
         -------
-        `RELEASE_TYPE | None`: The latest pre-release version of the app or None if not found.
+        `RELEASE_TYPE | None`: The latest prerelease version of the app or None if not found.
     """
     
     try:
@@ -139,7 +164,7 @@ def get_prerelease() -> RELEASE | None:
             logger.error(f"Failed to get releases: {response.status_code}")
             return None
 
-        releases = response.json()
+        releases:list[RELEASE] = response.json()
         for release in releases:
             if release.get("prerelease", False):
                 return release
@@ -171,7 +196,8 @@ def get_release() -> RELEASE | None:
             logger.error(f"Failed to get latest release: {response.status_code}")
             raise RuntimeError(f"Failed to get latest release: {response.status_code}")
 
-        return response.json()
+        release:RELEASE = response.json()
+        return release
     
     except Exception as e:
         logger.error(f"Unexpected exception: {e}")
@@ -260,6 +286,19 @@ def get_platform_assets(assets: ASSETS) -> tuple[UPDATE_ASSET, GUI_LIBRARY_ASSET
 
 
 def download_update_zip(update_zip_download_url: str, update_zip_download_name: str, update_zip_size: int, attempt:int = 1) -> None:
+    """Download the update zip file from the given URL.
+
+        Arguments
+        ---------
+        `update_zip_download_url`: (str) - The URL to download the update zip file from.
+
+        `update_zip_download_name`: (str) - The name of the update zip file to save.
+
+        `update_zip_size`: (int) - The size of the update zip file in bytes.
+
+        `attempt`: (int) - The current attempt number for downloading the update.
+    """
+
     WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(update_zip_size/1024/1024, 2))))
         
     download_response = req.get(update_zip_download_url, stream=True, timeout=15)
@@ -284,6 +323,38 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
     with ZipFile(f"{UPDATE_DIRECTORY}/{update_zip_download_name}", "r") as zip_ref:
         zip_ref.extractall(UPDATE_DIRECTORY)
     logger.info(f"Update extracted. Attempt {attempt}")
+
+
+def download_gui_library_zip(gui_zip_download_url: str, gui_zip_download_name: str, gui_zip_size: int, attempt:int = 1) -> None:
+    """Download the GUI library zip file from the given URL.
+
+        Arguments
+        ---------
+        `gui_zip_download_url`: (str) - The URL to download the GUI library zip file from.
+
+        `gui_zip_download_name`: (str) - The name of the GUI library zip file to save.
+
+        `gui_zip_size`: (int) - The size of the GUI library zip file in bytes.
+
+        `attempt`: (int) - The current attempt number for downloading the GUI library.
+    """
+    
+    download_response = req.get(gui_zip_download_url, stream=True, timeout=15)
+    download_response.raise_for_status()
+
+    download_size = 0
+
+    logger.info(f"Saving GUI library on disk. Attempt {attempt}")
+    with open(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name), "wb") as file:
+        for chunk in download_response.iter_content(chunk_size=CHUNK_SIZE_FOR_DOWNLOADING):
+            download_size += len(chunk)
+            file.write(chunk)
+            WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/gui_zip_size)*100))
+    logger.info(f"GUI library saved on disk. Attempt {attempt}")
+
+    with ZipFile(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name), "r") as zip_ref:
+        zip_ref.extractall(os.path.join(UPDATE_DIRECTORY, "_internal"))
+    logger.info(f"GUI library extracted. Attempt {attempt}")
 
 
 def download_latest_update(release: RELEASE) -> bool:
@@ -330,7 +401,7 @@ def download_latest_update(release: RELEASE) -> bool:
                          GUI zip hash: {gui_zip_hash}""")
             return False
 
-        for attempt in range(ATTEMPTS_TO_DOWNLOAD_ZIP+1):
+        for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
             download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
 
             if generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}") == update_zip_hash:
@@ -341,6 +412,26 @@ def download_latest_update(release: RELEASE) -> bool:
                 if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
                     logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
                     return False
+        
+        if not os.path.exists(GUI_LIBRARY_DIRECTORY_ZIP):
+            logger.debug("GUI library directory zip does not exist. Creating it.")
+            compress_directory(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_DIRECTORY_ZIP)
+        
+        if generate_file_256hash(GUI_LIBRARY_DIRECTORY_ZIP) != gui_zip_hash:
+            logger.warning(f"GUI library zip hash does not match: {gui_zip_hash}. Downloading GUI library zip...")
+
+        for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
+            download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
+
+            if generate_file_256hash(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name)) == gui_zip_hash:
+                logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
+                break
+            else:
+                logger.warning(f"GUI library zip hash does not match: {gui_zip_hash}. Retrying download...")
+                if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
+                    logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+                    return False
+
         return True
     
     except Exception as e:

@@ -4,6 +4,9 @@
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
 ☐ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38)
+☐ replace os.path.join(UPDATE_DIRECTORY, 'internal') with creating new constant UPDATE_APP_DIRECTORY
+☐ add progress bar for downloading gui library zip file
+☐ remove old way of downloading gui library zip file from update prepare
 
 Archive:
   ✔ fix app icon size on linux @started(25-06-30 20:37) @done(25-06-30 20:57) @lasted(20m34s)

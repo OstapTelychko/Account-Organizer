@@ -90,7 +90,7 @@ class UserConfig:
                 User_conf:UserConfType = toml.load(file)
         else:
             with open(USER_CONF_PATH, encoding="utf-8") as file:
-                User_conf:UserConfType = toml.load(file)
+                User_conf:UserConfType = toml.load(file)#type: ignore[no-redef] #Since type is specified twice, mypy thinks that it is redefined
 
         if "General" in User_conf: 
             self.theme = str(User_conf["General"].get("Theme", "Dark"))
