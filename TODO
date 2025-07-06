@@ -6,9 +6,9 @@
 ☐ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38)
 ☐ replace os.path.join(UPDATE_DIRECTORY, 'internal') with creating new constant UPDATE_APP_DIRECTORY
 ☐ add progress bar for downloading gui library zip file
-☐ remove old way of downloading gui library zip file from update prepare
 
 Archive:
+  ✔ remove old way of downloading gui library zip file from update prepare @started(25-07-06 18:18) @done(25-07-06 18:32) @lasted(14m35s)
   ✔ fix app icon size on linux @started(25-06-30 20:37) @done(25-06-30 20:57) @lasted(20m34s)
   ✔ add option to load update from pre-release for testing new releases before updates will be publicly available @started(25-06-29 23:38) @done(25-06-30 01:41) @lasted(2h3m13s)
   ✔ check if information message window works on windows @done(25-06-16 01:59)

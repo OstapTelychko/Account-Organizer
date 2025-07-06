@@ -431,6 +431,8 @@ def download_latest_update(release: RELEASE) -> bool:
                 if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
                     logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
                     return False
+            
+            os.rename(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name), GUI_LIBRARY_DIRECTORY_ZIP)
 
         return True
     
