@@ -37,6 +37,10 @@ def check_for_updates() -> None:
                     logger.info("Downloaded latest update")
                     prepare_update()
                     apply_update()
+                else:
+                    logger.error("Failed to download latest update")
+                    WindowsRegistry.UpdateProgressWindow.done(1)
+                    
 
             QTimer.singleShot(150, _run_update)
             WindowsRegistry.UpdateProgressWindow.exec()

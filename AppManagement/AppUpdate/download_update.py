@@ -384,6 +384,9 @@ def download_latest_update(release: RELEASE) -> bool:
 
         update_zip_download_name, update_zip_download_url, update_zip_size, update_zip_hash = update_asset
         gui_zip_download_name, gui_zip_download_url, gui_zip_size, gui_zip_hash = gui_library_asset
+
+        update_zip_hash = update_zip_hash.replace("sha256:", "")
+        gui_zip_hash = gui_zip_hash.replace("sha256:", "")
         
         if not (isinstance(update_zip_size, int) and isinstance(update_zip_download_url, str) and isinstance(update_zip_download_name, str) and isinstance(update_zip_hash, str)):
             logger.error(f"""No update found or update is not available for this platform.
@@ -404,11 +407,12 @@ def download_latest_update(release: RELEASE) -> bool:
         for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
             download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
 
-            if generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}") == update_zip_hash:
+            current_update_zip_hash = generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}")
+            if current_update_zip_hash == update_zip_hash:
                 logger.info(f"Update zip hash matches: {update_zip_hash}")
                 break
             else:
-                logger.warning(f"Update zip hash does not match: {update_zip_hash}. Retrying download...")
+                logger.warning(f"Update zip hash does not match: Remote: {update_zip_hash} | Current: {current_update_zip_hash}. Retrying download...")
                 if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
                     logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
                     return False
@@ -417,17 +421,19 @@ def download_latest_update(release: RELEASE) -> bool:
             logger.debug("GUI library directory zip does not exist. Creating it.")
             compress_directory(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_DIRECTORY_ZIP)
         
-        if generate_file_256hash(GUI_LIBRARY_DIRECTORY_ZIP) != gui_zip_hash:
-            logger.warning(f"GUI library zip hash does not match: {gui_zip_hash}. Downloading GUI library zip...")
+        current_gui_zip_hash = generate_file_256hash(GUI_LIBRARY_DIRECTORY_ZIP)
+        if current_gui_zip_hash != gui_zip_hash:
+            logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_zip_hash}. Downloading GUI library zip...")
 
         for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
             download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
 
-            if generate_file_256hash(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name)) == gui_zip_hash:
+            current_gui_zip_hash = generate_file_256hash(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name))
+            if current_gui_zip_hash == gui_zip_hash:
                 logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
                 break
             else:
-                logger.warning(f"GUI library zip hash does not match: {gui_zip_hash}. Retrying download...")
+                logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_zip_hash}. Retrying download...")
                 if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
                     logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
                     return False
