@@ -7,7 +7,8 @@ from datetime import datetime
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE,\
+APP_HASHES_DIRECTORY
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.backup import Backup
@@ -103,6 +104,10 @@ class AppCore:
         else:
             os.makedirs(BACKUPS_DIRECTORY, exist_ok=True)
         logger.info("Backups directory created")
+
+        if not os.path.exists(APP_HASHES_DIRECTORY):
+            os.makedirs(APP_HASHES_DIRECTORY)
+            logger.info("App hashes directory created")
 
         self.load_backups()
         logger.info("Backups loaded")

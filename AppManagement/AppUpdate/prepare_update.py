@@ -15,7 +15,7 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME, GUI_LIBRARY, \
-UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, UPDATE_BACKUPS_DIRECTORY
+UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL
 
 if TYPE_CHECKING:
     from AppObjects.backup import Backup
@@ -79,9 +79,13 @@ def prepare_update() -> None:
         shutil.copytree(gui_library_current_path, GUI_LIBRARY_UPDATE_PATH)
         logger.info("Copied GUI library to update directory")
     
-    for file in MOVE_FILES_TO_UPDATE:
+    for file in MOVE_FILES_TO_UPDATE_INTERNAL:
         shutil.copy2(file, os.path.join(UPDATE_DIRECTORY, "_internal"))
-        logger.debug(f"Copied {file} to update directory")
+        logger.debug(f"Copied file {file} to update directory")
+    
+    for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
+        shutil.copytree(directory, os.path.join(UPDATE_DIRECTORY, "_internal", Path(directory).name))
+        logger.debug(f"Copied directory {directory} to update directory")
     
     os.makedirs(UPDATE_BACKUPS_DIRECTORY)
     logger.debug("Created update backups directory")

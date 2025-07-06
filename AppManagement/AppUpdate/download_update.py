@@ -13,8 +13,7 @@ from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
 from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL,\
-WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_DIRECTORY_ZIP,\
-GUI_LIBRARY
+WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP, GUI_LIBRARY_HASH_FILE_PATH
 
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
@@ -72,7 +71,8 @@ def generate_file_256hash(file_path: str) -> str:
 
 
 def compress_directory(directory_path: str, output_zip_path: str) -> None:
-    """Compress a directory into a zip file.
+    """This method is not used anymore in project, but it is kept for future use.
+    Compress a directory into a zip file.
 
         Arguments
         ---------
@@ -416,29 +416,35 @@ def download_latest_update(release: RELEASE) -> bool:
                 if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
                     logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
                     return False
-        
-        if not os.path.exists(GUI_LIBRARY_DIRECTORY_ZIP):
-            logger.debug("GUI library directory zip does not exist. Creating it.")
-            compress_directory(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_DIRECTORY_ZIP)
-        
-        current_gui_zip_hash = generate_file_256hash(GUI_LIBRARY_DIRECTORY_ZIP)
-        if current_gui_zip_hash != gui_zip_hash:
-            logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_zip_hash}. Downloading GUI library zip...")
 
-        for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
-            download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
-
-            current_gui_zip_hash = generate_file_256hash(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name))
-            if current_gui_zip_hash == gui_zip_hash:
-                logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
-                break
-            else:
-                logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_zip_hash}. Retrying download...")
-                if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
-                    logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
-                    return False
+        if os.path.exists(GUI_LIBRARY_HASH_FILE_PATH):
+            logger.debug("Retrieving GUI library hash...")
+            with open(GUI_LIBRARY_HASH_FILE_PATH, "r") as hash_file:
+                current_gui_library_hash = hash_file.read().strip()
+        else:
+            logger.debug("GUI library hash file does not exist. GUI library will be downloaded.")
+            current_gui_library_hash = ""
             
-            os.rename(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name), GUI_LIBRARY_DIRECTORY_ZIP)
+        if current_gui_library_hash != gui_zip_hash:
+            logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Downloading GUI library zip...")
+
+            for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
+                download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
+
+                current_gui_library_hash = generate_file_256hash(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name))
+                if current_gui_library_hash == gui_zip_hash:
+                    logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
+                    os.remove(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name))
+                    # Save the hash to the GUI library hash file
+                    with open(GUI_LIBRARY_HASH_FILE_PATH, "w") as hash_file:
+                        hash_file.write(current_gui_library_hash)
+
+                    break
+                else:
+                    logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Retrying download...")
+                    if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
+                        logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+                        return False
 
         return True
     
