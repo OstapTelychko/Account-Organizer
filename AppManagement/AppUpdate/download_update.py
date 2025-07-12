@@ -13,7 +13,7 @@ from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
 from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL,\
-WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP, GUI_LIBRARY_HASH_FILE_PATH
+WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP, GUI_LIBRARY_HASH_FILE_PATH, UPDATE_APP_DIRECTORY
 
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
@@ -345,15 +345,15 @@ def download_gui_library_zip(gui_zip_download_url: str, gui_zip_download_name: s
     download_size = 0
 
     logger.info(f"Saving GUI library on disk. Attempt {attempt}")
-    with open(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name), "wb") as file:
+    with open(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name), "wb") as file:
         for chunk in download_response.iter_content(chunk_size=CHUNK_SIZE_FOR_DOWNLOADING):
             download_size += len(chunk)
             file.write(chunk)
             WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/gui_zip_size)*100))
     logger.info(f"GUI library saved on disk. Attempt {attempt}")
 
-    with ZipFile(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name), "r") as zip_ref:
-        zip_ref.extractall(os.path.join(UPDATE_DIRECTORY, "_internal"))
+    with ZipFile(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name), "r") as zip_ref:
+        zip_ref.extractall(UPDATE_APP_DIRECTORY)
     logger.info(f"GUI library extracted. Attempt {attempt}")
 
 
@@ -431,10 +431,10 @@ def download_latest_update(release: RELEASE) -> bool:
             for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
                 download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
 
-                current_gui_library_hash = generate_file_256hash(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name))
+                current_gui_library_hash = generate_file_256hash(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
                 if current_gui_library_hash == gui_zip_hash:
                     logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
-                    os.remove(os.path.join(UPDATE_DIRECTORY, "_internal", gui_zip_download_name))
+                    os.remove(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
                     # Save the hash to the GUI library hash file
                     with open(GUI_LIBRARY_HASH_FILE_PATH, "w") as hash_file:
                         hash_file.write(current_gui_library_hash)

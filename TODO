@@ -3,15 +3,16 @@
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time.
 ☐ add html tags to messages in languages.json
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
-☐ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38)
-☐ replace os.path.join(UPDATE_DIRECTORY, 'internal') with creating new constant UPDATE_APP_DIRECTORY
 ☐ add progress bar for downloading gui library zip file
 ☐ add message window for failed update download
 ☐ block closing update progress window if update in progress
 ☐ set correct default focus widget for such windows like creating account, category and changing category position
 ☐ show attempts of downloading zip files in update progress window
+☐ replace unsafe path compositions in project with os.path.joinShort cut like for file search in vscode
 
 Archive:
+  ✔ replace os.path.join(UPDATE_DIRECTORY, 'internal') with creating new constant UPDATE_APP_DIRECTORY @started(25-07-12 19:56) @done(25-07-12 20:30) @lasted(34m36s)
+  ✔ add hash256 check for downloaded update file and GUI library @started(25-06-16 21:38) @done(25-07-12 19:55) @lasted(3w4d22h17m55s)
   ✔ remove old way of downloading gui library zip file from update prepare @started(25-07-06 18:18) @done(25-07-06 18:32) @lasted(14m35s)
   ✔ fix app icon size on linux @started(25-06-30 20:37) @done(25-06-30 20:57) @lasted(20m34s)
   ✔ add option to load update from pre-release for testing new releases before updates will be publicly available @started(25-06-29 23:38) @done(25-06-30 01:41) @lasted(2h3m13s)

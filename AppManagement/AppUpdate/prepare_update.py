@@ -15,7 +15,8 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME, GUI_LIBRARY, \
-UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL
+UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL,\
+UPDATE_APP_DIRECTORY
 
 if TYPE_CHECKING:
     from AppObjects.backup import Backup
@@ -37,9 +38,9 @@ def create_single_backup(backup:Backup, app_core:AppCore, update_version:str) ->
 def migrate_single_backup(backup_path:str, app_core:AppCore) -> str:
         """Upgrade the copied backup database schema to the latest version."""
 
-        alembic_config = Config(os.path.join(UPDATE_DIRECTORY, "_internal", ALEMBIC_CONFIG_FILE))
+        alembic_config = Config(os.path.join(UPDATE_APP_DIRECTORY, ALEMBIC_CONFIG_FILE))
         alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
-        alembic_config.set_main_option("script_location", os.path.join(UPDATE_DIRECTORY, "_internal", "alembic"))
+        alembic_config.set_main_option("script_location", os.path.join(UPDATE_APP_DIRECTORY, "alembic"))
 
         engine = create_engine(f"sqlite:///{backup_path}")
         try:
@@ -74,17 +75,17 @@ def prepare_update() -> None:
     else:
         gui_library_current_path = os.path.join(ROOT_DIRECTORY, "_internal", GUI_LIBRARY)
 
-    GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_DIRECTORY, "_internal", GUI_LIBRARY)
+    GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_APP_DIRECTORY, GUI_LIBRARY)
     if not os.path.exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
         shutil.copytree(gui_library_current_path, GUI_LIBRARY_UPDATE_PATH)
         logger.info("Copied GUI library to update directory")
     
     for file in MOVE_FILES_TO_UPDATE_INTERNAL:
-        shutil.copy2(file, os.path.join(UPDATE_DIRECTORY, "_internal"))
+        shutil.copy2(file, UPDATE_APP_DIRECTORY)
         logger.debug(f"Copied file {file} to update directory")
     
     for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
-        shutil.copytree(directory, os.path.join(UPDATE_DIRECTORY, "_internal", Path(directory).name))
+        shutil.copytree(directory, os.path.join(UPDATE_APP_DIRECTORY, Path(directory).name))
         logger.debug(f"Copied directory {directory} to update directory")
     
     os.makedirs(UPDATE_BACKUPS_DIRECTORY)
@@ -94,7 +95,7 @@ def prepare_update() -> None:
         os.chmod(os.path.join(UPDATE_DIRECTORY, "main"), 0o755)#The octal value 0o755 sets these file permissions: • Owner: Read/write/execute • Group: Read/execute • Others: Read/execute
         logger.debug("Changed main file permissions")
 
-    with open(os.path.join(UPDATE_DIRECTORY, "_internal", VERSION_FILE_NAME)) as version_file:
+    with open(os.path.join(UPDATE_APP_DIRECTORY, VERSION_FILE_NAME)) as version_file:
         update_version = version_file.read()
 
     WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(app_core.backups))

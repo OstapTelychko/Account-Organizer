@@ -6,7 +6,8 @@ from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from project_configuration import DEVELOPMENT_MODE, ROOT_DIRECTORY, UPDATE_DIRECTORY, PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME
+from project_configuration import DEVELOPMENT_MODE, ROOT_DIRECTORY, UPDATE_DIRECTORY, PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME,\
+UPDATE_APP_DIRECTORY
 
 logger = get_logger(__name__)
 
@@ -24,7 +25,7 @@ def apply_update() -> None:
         logger.debug("Move old _internal directory to previous version copy directory")
         shutil.move(os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
         logger.debug("Move new _internal directory to root directory")
-        shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), os.path.join(ROOT_DIRECTORY, "dist", "main"))
+        shutil.move(UPDATE_APP_DIRECTORY, os.path.join(ROOT_DIRECTORY, "dist", "main"))
         WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(1)
 
         logger.debug("Deleting backups directory")
@@ -46,7 +47,7 @@ def apply_update() -> None:
         logger.debug("Move old _internal directory to previous version copy directory")
         shutil.move(os.path.join(ROOT_DIRECTORY, "_internal"), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
         logger.debug("Move new _internal directory to root directory")
-        shutil.move(os.path.join(UPDATE_DIRECTORY, "_internal"), ROOT_DIRECTORY)
+        shutil.move(UPDATE_APP_DIRECTORY, ROOT_DIRECTORY)
         WindowsRegistry.UpdateProgressWindow.apply_update_progress.setValue(1)
 
         logger.debug("Deleting backups directory")
