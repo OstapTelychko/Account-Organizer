@@ -57,6 +57,7 @@ class AddCategoryWindow(SubWindow):
         self.main_layout.setContentsMargins(30, 10, 30, 30)
 
         self.window_container.setLayout(self.main_layout)
+        self.category_name.setFocus()
 
 
 
@@ -107,7 +108,6 @@ class ChangeCategoryPositionWindow(SubWindow):
         self.categories_list_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
         self.categories_list_scroll.setProperty("class", "wrapper")
         self.categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
-        
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)
@@ -119,6 +119,7 @@ class ChangeCategoryPositionWindow(SubWindow):
         self.main_layout.setContentsMargins(30, 10, 30, 20)
 
         self.window_container.setLayout(self.main_layout)
+        self.new_position.setFocus()
 
 
 class RenameCategoryWindow(SubWindow):
@@ -142,3 +143,4 @@ class RenameCategoryWindow(SubWindow):
         self.main_layout.setContentsMargins(40, 10, 40, 20)
 
         self.window_container.setLayout(self.main_layout)
+        self.new_category_name.setFocus()

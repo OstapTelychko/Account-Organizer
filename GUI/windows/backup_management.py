@@ -169,3 +169,4 @@ class AutoBackupWindow(SubWindow):
         self.main_layout.setContentsMargins(20, 10, 20, 20)
 
         self.window_container.setLayout(self.main_layout)
+        self.max_backups.setFocus()

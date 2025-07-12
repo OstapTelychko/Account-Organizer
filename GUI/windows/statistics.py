@@ -388,6 +388,7 @@ class CustomRangeStatistics(SubWindow):
         self.main_layout.setContentsMargins(30, 10, 30, 20)
 
         self.window_container.setLayout(self.main_layout)
+        self.from_date.setFocus()
 
 
 # pyright: reportIncompatibleMethodOverride=false

@@ -68,6 +68,7 @@ class AddAccountWindow(SubWindow):
         self.main_layout.setContentsMargins(50, 10, 50, 30)
 
         self.window_container.setLayout(self.main_layout)
+        self.account_name.setFocus()
 
 
 
@@ -100,6 +101,7 @@ class RenameAccountWindow(SubWindow):
         self.main_layout.setContentsMargins(50, 10, 50, 30)
 
         self.window_container.setLayout(self.main_layout)
+        self.new_account_name.setFocus()
 
 
 

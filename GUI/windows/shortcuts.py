@@ -7,7 +7,6 @@ from PySide6.QtCore import Qt
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.shortcut_edit import ShortcutCaptureEdit
-from AppObjects.user_config import UserConfig
 from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS, ALIGN_H_CENTER
 
 if TYPE_CHECKING:

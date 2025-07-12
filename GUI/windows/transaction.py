@@ -68,3 +68,4 @@ class TransactionManagementWindow(SubWindow):
         self.main_layout.setContentsMargins(30, 10, 30, 30)
 
         self.window_container.setLayout(self.main_layout)
+        self.transaction_name.setFocus()
