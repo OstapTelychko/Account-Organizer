@@ -1,13 +1,14 @@
 ☐ write tests for changing shortcuts keystrokes
 ☐ write tests for update check and process @started(25-05-31 21:10)
 ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time.
-☐ add html tags to messages in languages.json
+☐ add html tags to messages in languages.json @started(25-07-12 21:14)
 ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
 ☐ add progress bar for downloading gui library zip file
 ☐ add message window for failed update download
 ☐ block closing update progress window if update in progress
 ☐ show attempts of downloading zip files in update progress window
 ☐ replace unsafe path compositions in project with os.path.join
+☐ test if subwindows animation works on windows
 
 Archive:
   ✔ set correct default focus widget for such windows like creating account, category and changing category position @started(25-07-12 20:36) @done(25-07-12 21:09) @lasted(33m44s)

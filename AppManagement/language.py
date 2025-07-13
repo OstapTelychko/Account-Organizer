@@ -189,7 +189,7 @@ def change_language_during_add_account(language:int | str) -> None:
 
     WindowsRegistry.AddAccountWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(app_core.config.language))
     
-    WindowsRegistry.AddAccountWindow.message.setText(LanguageStructure.Messages.get_translation(0))
+    WindowsRegistry.AddAccountWindow.message.setText(LanguageStructure.AccountMessages.get_translation(0))
     WindowsRegistry.AddAccountWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
     WindowsRegistry.AddAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(1))
     WindowsRegistry.AddAccountWindow.current_balance.setPlaceholderText(LanguageStructure.Account.get_translation(4))
