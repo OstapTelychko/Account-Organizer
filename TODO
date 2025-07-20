@@ -10,9 +10,9 @@
 ☐ add % sign before and after variables in languages.json
 ☐ add recommended backups and legacy backups amount to messages
 ☐ add animation steps and interval constant for InformationMessageWindow
-☐ create 1.2.1 release @started(25-07-20 17:43)
 
 Archive:
+  ✔ create 1.2.1 release @started(25-07-20 17:43) @done(25-07-20 23:24) @lasted(5h41m4s)
   ✔ test if subwindows animation works on windows @started(25-07-20 19:03) @done(25-07-20 20:44) @lasted(1h41m52s)
   ✔ add html tags to messages in languages.json @started(25-07-12 21:14) @done(25-07-15 23:38) @lasted(3d2h24m23s)
   ✔ set correct default focus widget for such windows like creating account, category and changing category position @started(25-07-12 20:36) @done(25-07-12 21:09) @lasted(33m44s)
