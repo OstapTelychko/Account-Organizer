@@ -10,6 +10,7 @@
 ☐ test if subwindows animation works on windows
 ☐ add % sign before and after variables in languages.json
 ☐ add recommended backups and legacy backups amount to messages
+☐ create 1.2.1 release @started(25-07-20 17:43)
 
 Archive:
   ✔ add html tags to messages in languages.json @started(25-07-12 21:14) @done(25-07-15 23:38) @lasted(3d2h24m23s)
