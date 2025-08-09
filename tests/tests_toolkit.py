@@ -32,7 +32,6 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
-    UnpatchedFunction = Callable[..., Any]
 
 
 
@@ -63,46 +62,6 @@ def qsleep(miliseconds:int) -> None:
     loop = QEventLoop()
     QTimer.singleShot(miliseconds, loop.quit)
     loop.exec()
-
-
-def safe_patch(target:str, spec:Any|None=None) -> Callable[[UnpatchedFunction], Callable[[UnpatchedFunction], Any]]:
-    """Patch with create_autospec(spec, spec_set=True) and inject as argument."""
-
-    def decorator(func):
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-
-            original = MOCK_DEFAULT
-            if not spec:
-                try:
-                    target_module, attribute = target.rsplit('.', 1)
-                except (TypeError, ValueError, AttributeError):
-                    raise TypeError(
-                        f"Need a valid target to patch. You supplied: {target!r}")
-                
-                getter, name = partial(pkgutil.resolve_name, target_module), attribute
-
-                getter = getter()
-                try:
-                    original = getter.__dict__[name]
-                except (AttributeError, KeyError):
-                    original = getattr(getter, name, MOCK_DEFAULT)
-
-                mock_obj = create_autospec(original, spec_set=True)
-            else:
-                mock_obj = create_autospec(spec, spec_set=True)
-
-            if callable(spec) or original is not MOCK_DEFAULT and callable(original):                    
-                mock_obj = MagicMock(spec=mock_obj, spec_set=True)#For some reason spec_set=True is not working with functions in create_autospec, but it works if created MagickMock manually
-
-            with patch(target, new=mock_obj):
-                args = list(args)
-                args.append(mock_obj)
-                return func(*args, **kwargs)
-            
-        return wrapper
-    return decorator
 
 
 
