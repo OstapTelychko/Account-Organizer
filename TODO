@@ -11,6 +11,7 @@
 ☐ add recommended backups and legacy backups amount to messages
 ☐ add animation steps and interval constant for InformationMessageWindow
 ☐ fix issue with long categories for custom range statistics
+☐ fix issue with html tags in statistics when there is no transactions
 
 Archive:
   ✔ create 1.2.1 release @started(25-07-20 17:43) @done(25-07-20 23:24) @lasted(5h41m4s)
@@ -25,9 +26,9 @@ Archive:
   ✔ check if information message window works on windows @done(25-06-16 01:59)
   ✔ check how new information message window works on linux @started(25-06-16 00:00) @done(25-06-16 01:55) @lasted(1h55m6s)
   ✔ test on windows if problem with unclosed db is solved @started(25-06-15 12:18) @done(25-06-15 23:28) @lasted(11h10m27s)
-  ✔ remove session dependcies since it's main class and pass objects through start_session in main.py to follow SOLID principles @started(25-05-27 22:01) @done(25-05-28 01:58) @lasted(3h57m55s)
+  ✔ remove session dependencies since it's main class and pass objects through start_session in main.py to follow SOLID principles @started(25-05-27 22:01) @done(25-05-28 01:58) @lasted(3h57m55s)
   ✔ change db controller logic from using one session to new session for each query @started(25-05-26 22:41) @done(25-05-27 00:21) @lasted(1h40m44s)
-  ✔ make all classes that have to be inited once to be singletons @started(25-05-18 22:09) @done(25-05-19 13:47) @lasted(15h38m13s)
+  ✔ make all classes that have to be initiated once to be singletons @started(25-05-18 22:09) @done(25-05-19 13:47) @lasted(15h38m13s)
   ✔ remove excessive --exclude-module @started(25-05-18 17:52) @done(25-05-18 19:47) @lasted(1h55m35s)
   ✔ create requirements.txt, readme.md and preview images @started(25-05-11 20:49) @done(25-05-18 00:04) @lasted(6d3h15m30s)
   ✔ fix bug that failed tests runned by QTimer.singleShot doesn't make the test to fail in the end @started(25-05-12 22:07) @done(25-05-13 01:18) @lasted(3h11m35s)

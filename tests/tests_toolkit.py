@@ -51,16 +51,16 @@ SEPARATOR2 = "-"
 
 logger = get_logger(__name__)
 
-def qsleep(miliseconds:int) -> None:
+def qsleep(milliseconds:int) -> None:
     """Sleep for a given number of milliseconds. time.sleep() is not used because it blocks the main event loop.
 
         Arguments
         ---------
-            `miliseconds` : (int) - Number of milliseconds to sleep.
+            `milliseconds` : (int) - Number of milliseconds to sleep.
     """
 
     loop = QEventLoop()
-    QTimer.singleShot(miliseconds, loop.quit)
+    QTimer.singleShot(milliseconds, loop.quit)
     loop.exec()
 
 
@@ -185,7 +185,7 @@ class OutOfScopeTestCase(TestCase):
 
     @staticmethod
     def check_out_of_scope_failure(func:Callable[[OutOfScopeTestCase], None]) -> Callable[[OutOfScopeTestCase], None]:
-        """This decorator checks if in assertions errors occured out of scope and raises them."""
+        """This decorator checks if in assertions errors occurred out of scope and raises them."""
 
         @wraps(func)
         def wrapper(self:OutOfScopeTestCase) -> None:
