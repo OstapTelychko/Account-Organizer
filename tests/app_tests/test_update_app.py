@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, PropertyMock, create_autospec, patch
-
-from tests.tests_toolkit import OutOfScopeTestCase
-from AppManagement.AppUpdate.download_update import check_internet_connection, get_release
 from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
+
+from tests.tests_toolkit import OutOfScopeTestCase
+from AppObjects.app_exceptions import PrereleaseNotFoundError
+from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -71,3 +72,35 @@ class TestUpdateApp(OutOfScopeTestCase):
         mock_get.return_value = mock_wrong_status_code_get_response
         with self.assertRaises(HTTPError, msg="Get release didn't raised HTTPError as expected for status code other then 200"):
             get_release()
+
+
+    @patch('AppManagement.AppUpdate.download_update.req.Session.get', autospec=True)
+    def test_3_get_prerelease(self, mock_get:MockedFunction) -> None:
+        """Test get prerelease functionality based on different response scenarios."""
+
+        mock_successful_get_response:MockedResponse = create_autospec(Response)
+        type(mock_successful_get_response).status_code = PropertyMock(return_value=200)
+        mock_successful_get_response.raise_for_status = MagicMock(return_value=None)
+        mock_successful_get_response.json = MagicMock(return_value=[{"prerelease": "Hello"}, {"release": "World"}])
+        mock_get.return_value = mock_successful_get_response
+
+        expected_result = {"prerelease": "Hello"}
+        result = get_prerelease()
+        self.assertEqual(result, expected_result, f"Failed to get expected prerelease data. Expected: {expected_result}, Got: {result}")
+
+        mock_wrong_status_code_get_response:MockedResponse = create_autospec(Response)
+        type(mock_wrong_status_code_get_response).status_code = PropertyMock(return_value=404)
+        mock_wrong_status_code_get_response.raise_for_status = MagicMock(return_value=None, side_effect=None)
+        mock_get.return_value = mock_wrong_status_code_get_response
+        with self.assertRaises(HTTPError, msg="Get prerelease didn't raised HTTPError as expected for status code other then 200"):
+            get_prerelease()
+
+        mock_get_response_without_prerelease:MockedResponse = create_autospec(Response)
+        type(mock_get_response_without_prerelease).status_code = PropertyMock(return_value=200)
+        mock_get_response_without_prerelease.raise_for_status = MagicMock(return_value=None)
+        mock_get_response_without_prerelease.json = MagicMock(return_value=[{"release": "Hello"}, {"release": "World"}])
+        mock_get.return_value = mock_get_response_without_prerelease
+
+        with self.assertRaises(PrereleaseNotFoundError,
+            msg="Get prerelease didn't raised PrereleaseNotFoundError as expected for response without prerelease data"):
+            get_prerelease()
