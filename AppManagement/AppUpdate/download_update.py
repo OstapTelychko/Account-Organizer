@@ -8,6 +8,7 @@ from sys import platform
 from zipfile import ZipFile, ZIP_DEFLATED
 
 import requests as req
+from requests.exceptions import HTTPError
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
@@ -18,6 +19,7 @@ WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTE
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.app_exceptions import PrereleaseNotFoundError
 
 try:
     from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
@@ -144,64 +146,54 @@ def check_internet_connection() -> bool:
         return False
 
 
-def get_prerelease() -> RELEASE | None:
+def get_prerelease() -> RELEASE:
     """Get the latest prerelease version of the app from GitHub releases.
 
         Returns
         -------
-        `RELEASE_TYPE | None`: The latest prerelease version of the app or None if not found.
-    """
-    
-    try:
-        request_session = requests_retry_session()
-        if UPDATE_API_TOKEN:
-            response = request_session.get(RELEASES_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
-        else:
-            response = request_session.get(RELEASES_URL, timeout=15)
-        response.raise_for_status()
+        `RELEASE_TYPE`: The latest prerelease version of the app.
+    """    
 
-        if response.status_code != 200:
-            logger.error(f"Failed to get releases: {response.status_code}")
-            return None
+    request_session = requests_retry_session()
+    if UPDATE_API_TOKEN:
+        response = request_session.get(RELEASES_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+    else:
+        response = request_session.get(RELEASES_URL, timeout=15)
+    response.raise_for_status()
 
-        releases:list[RELEASE] = response.json()
-        for release in releases:
-            if release.get("prerelease", False):
-                return release
-        
-        return None
-    
-    except Exception as e:
-        logger.error(f"Unexpected exception: {e}")
-        return None
+    if response.status_code != 200:
+        logger.error(f"Failed to get releases: {response.status_code}")
+        raise HTTPError(f"Failed to get releases: {response.status_code}")
+
+    releases:list[RELEASE] = response.json()
+    for release in releases:
+        if release.get("prerelease", False):
+            return release
+
+    raise PrereleaseNotFoundError(f"No prerelease version found. Releases list: {releases}")
 
 
-def get_release() -> RELEASE | None:
+def get_release() -> RELEASE:
     """Get the latest release version of the app from GitHub releases.
 
         Returns
         -------
-        `RELEASE_TYPE | None`: The latest release version of the app or None if not found.
+        `RELEASE_TYPE`: The latest release version of the app.
     """
 
-    try:
-        request_session = requests_retry_session()
-        if UPDATE_API_TOKEN:
-            response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
-        else:
-            response = request_session.get(LATEST_RELEASE_URL, timeout=15)
-        response.raise_for_status()
+    request_session = requests_retry_session()
+    if UPDATE_API_TOKEN:
+        response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+    else:
+        response = request_session.get(LATEST_RELEASE_URL, timeout=15)
+    response.raise_for_status()
 
-        if response.status_code != 200:
-            logger.error(f"Failed to get latest release: {response.status_code}")
-            raise RuntimeError(f"Failed to get latest release: {response.status_code}")
+    if response.status_code != 200:
+        logger.error(f"Failed to get latest release: {response.status_code}")
+        raise HTTPError(f"Failed to get latest release: {response.status_code}")
 
-        release:RELEASE = response.json()
-        return release
-    
-    except Exception as e:
-        logger.error(f"Unexpected exception: {e}")
-        return None
+    release:RELEASE = response.json()
+    return release
 
 
 def get_latest_version() -> tuple[str, RELEASE] | None:

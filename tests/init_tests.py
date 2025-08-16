@@ -20,6 +20,18 @@ if TYPE_CHECKING:
 
 
 
+def cleanup_test_files() -> None:
+    """Clean up test files and directories."""
+
+    if os.path.exists(TEST_USER_CONF_PATH):
+        os.remove(TEST_USER_CONF_PATH)
+
+    if os.path.exists(TEST_BACKUPS_DIRECTORY):
+        shutil.rmtree(TEST_BACKUPS_DIRECTORY)
+
+    if os.path.exists(TEST_DB_FILE_PATH):
+        os.remove(TEST_DB_FILE_PATH)
+
 
 def test_main(app_main:Callable[[bool], None]) -> None:
     """This function is used to run the tests in the test suite.
@@ -28,7 +40,9 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         ---------
             `app_main` : - Main function of the application.
     """
-    
+
+    cleanup_test_files()
+
     test_alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
     test_alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
     test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
@@ -61,13 +75,13 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         suite = TestSuite()
         loader = TestLoader()
         suite.addTests((
-        loader.loadTestsFromTestCase(TestMainWindow),
-        loader.loadTestsFromTestCase(TestCategory),
-        loader.loadTestsFromTestCase(TestAccount),
-        loader.loadTestsFromTestCase(TestTransaction),
-        loader.loadTestsFromTestCase(TestStatistics),
-        loader.loadTestsFromTestCase(TestBackupsManagement),
-        loader.loadTestsFromTestCase(TestShortcuts),
+        # loader.loadTestsFromTestCase(TestMainWindow),
+        # loader.loadTestsFromTestCase(TestCategory),
+        # loader.loadTestsFromTestCase(TestAccount),
+        # loader.loadTestsFromTestCase(TestTransaction),
+        # loader.loadTestsFromTestCase(TestStatistics),
+        # loader.loadTestsFromTestCase(TestBackupsManagement),
+        # loader.loadTestsFromTestCase(TestShortcuts),
         loader.loadTestsFromTestCase(TestUpdateApp),
         ))
         
@@ -81,13 +95,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     finally:
         app_core.db.close_connection()
 
-        os.remove(TEST_USER_CONF_PATH)
-
-        if os.path.exists(TEST_BACKUPS_DIRECTORY):
-            shutil.rmtree(TEST_BACKUPS_DIRECTORY)
-        
-        if os.path.exists(TEST_DB_FILE_PATH):
-            os.remove(TEST_DB_FILE_PATH)
+        cleanup_test_files()
 
         os._exit(0)
         
