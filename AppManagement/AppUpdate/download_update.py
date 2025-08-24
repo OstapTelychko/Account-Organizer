@@ -19,7 +19,7 @@ WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTE
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
-from AppObjects.app_exceptions import PrereleaseNotFoundError
+from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError
 
 try:
     from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
@@ -268,11 +268,11 @@ def get_platform_assets(assets: ASSETS) -> tuple[UPDATE_ASSET, GUI_LIBRARY_ASSET
 
     if not update_asset:
         logger.error(f"No update asset found for {platform} platform.")
-        raise RuntimeError(f"No update asset found for {platform} platform.")
+        raise UpdateAssetNotFoundError(f"No update asset found for {platform} platform.")
 
     if not gui_library_asset:
         logger.error(f"No GUI library asset found for {platform} platform. Update can't be performed.")
-        raise RuntimeError(f"No GUI library asset found for {platform} platform. Update can't be performed.")
+        raise GUILibraryAssetNotFoundError(f"No GUI library asset found for {platform} platform. Update can't be performed.")
 
     return update_asset, gui_library_asset
 
@@ -295,6 +295,9 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
         
     download_response = req.get(update_zip_download_url, stream=True, timeout=15)
     download_response.raise_for_status()
+
+    if download_response.status_code != 200:
+        raise HTTPError(f"Failed to download update zip: status code {download_response.status_code} expected 200")
 
     download_size = 0
 
@@ -368,10 +371,6 @@ def download_latest_update(release: RELEASE) -> bool:
             logger.error("No assets found in the latest release.")
             return False
 
-        except json.JSONDecodeError:
-            logger.error("Failed to decode JSON response.")
-            return False
-
         update_asset, gui_library_asset = get_platform_assets(assets)
 
         update_zip_download_name, update_zip_download_url, update_zip_size, update_zip_hash = update_asset
@@ -379,8 +378,8 @@ def download_latest_update(release: RELEASE) -> bool:
 
         update_zip_hash = update_zip_hash.replace("sha256:", "")
         gui_zip_hash = gui_zip_hash.replace("sha256:", "")
-        
-        if not (isinstance(update_zip_size, int) and isinstance(update_zip_download_url, str) and isinstance(update_zip_download_name, str) and isinstance(update_zip_hash, str)):
+
+        if not all((isinstance(update_zip_size, int), isinstance(update_zip_download_url, str), isinstance(update_zip_download_name, str), isinstance(update_zip_hash, str))):
             logger.error(f"""No update found or update is not available for this platform.
                          Update zip size: {update_zip_size},
                          Update zip download URL: {update_zip_download_url},
@@ -388,7 +387,7 @@ def download_latest_update(release: RELEASE) -> bool:
                          Update zip hash: {update_zip_hash}""")
             return False
 
-        if not (isinstance(gui_zip_size, int) and isinstance(gui_zip_download_url, str) and isinstance(gui_zip_download_name, str) and isinstance(gui_zip_hash, str)):
+        if not all((isinstance(gui_zip_size, int), isinstance(gui_zip_download_url, str), isinstance(gui_zip_download_name, str), isinstance(gui_zip_hash, str))):
             logger.error(f"""No GUI library found or GUI library is not available for this platform.
                          GUI zip size: {gui_zip_size},
                          GUI zip download URL: {gui_zip_download_url},
