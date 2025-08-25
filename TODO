@@ -12,6 +12,8 @@
 ☐ add animation steps and interval constant for InformationMessageWindow
 ☐ fix issue with long categories for custom range statistics
 ☐ fix issue with html tags in statistics when there is no transactions
+☐ add check for every click in tests whether button or widget is actually visible
+
 
 Archive:
   ✔ create 1.2.1 release @started(25-07-20 17:43) @done(25-07-20 23:24) @lasted(5h41m4s)

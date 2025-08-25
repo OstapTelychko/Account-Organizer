@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import itertools
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch
 from io import BytesIO
@@ -8,9 +9,11 @@ from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
 
 from tests.tests_toolkit import OutOfScopeTestCase
-from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError
-from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease, get_platform_assets, download_update_zip
-from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, TEST_UPDATE_DIRECTORY
+from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError, FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
+from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease, get_platform_assets,\
+    download_update_zip, download_gui_library_zip, download_latest_update
+from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
+    TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, ERROR_LOG_FILE, TEST_GUI_LIBRARY_HASH_FILE_PATH
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -329,3 +332,117 @@ class TestUpdateApp(OutOfScopeTestCase):
 
         mock_zipfile.assert_called_once_with(os.path.join(TEST_UPDATE_DIRECTORY, update_zip_download_name), 'r')
         mock_zip_file_instance.extractall.assert_called_once_with(TEST_UPDATE_DIRECTORY)
+
+        mock_response_with_wrong_status_code:MockedResponse = create_autospec(Response)
+        mock_response_with_wrong_status_code.status_code = 204
+        mock_response_with_wrong_status_code.raise_for_status = MagicMock(return_value=None)
+        mock_get.return_value = mock_response_with_wrong_status_code
+
+        with self.assertRaises(HTTPError, msg="Failed to download update zip: status code 204 expected 200"):
+            download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, 0)
+
+
+    @patch("AppManagement.AppUpdate.download_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
+    @patch('AppManagement.AppUpdate.download_update.ZipFile', autospec=True)
+    @patch('AppManagement.AppUpdate.download_update.req.get', autospec=True)
+    @patch('builtins.open', new_callable=mock_open)
+    def test_7_download_gui_library_zip(self, mock_open:MockedFunction, mock_get:MockedFunction, mock_zipfile:MockedZipFile) -> None:
+        """Test download GUI library zip is downloaded and saved correctly"""
+
+        os.makedirs(TEST_UPDATE_APP_DIRECTORY, exist_ok=True)
+
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, "w") as zip_file:
+            zip_file.writestr("test_gui.txt", "test gui content")
+        test_zip_content = zip_buffer.getvalue()
+
+        mock_successful_response:MockedResponse = create_autospec(Response)
+        mock_successful_response.status_code = 200
+        mock_successful_response.iter_content = MagicMock(return_value=iter([test_zip_content]))
+        mock_successful_response.raise_for_status = MagicMock(return_value=None)
+        mock_get.return_value = mock_successful_response
+
+        gui_library_zip_download_name = ""
+        gui_library_zip_download_url = ""
+        gui_library_zip_size = 0
+        for asset in self.test_assets:
+            if asset["name"] == LINUX_GUI_LIBRARY_ZIP:
+                gui_library_zip_download_name:str = asset["name"]
+                gui_library_zip_download_url:str = asset["browser_download_url"]
+                gui_library_zip_size:int = asset["size"]
+        self.assertNotEqual("", gui_library_zip_download_name, f"Test GUI library asset {LINUX_GUI_LIBRARY_ZIP} not found in test assets.")
+
+        mock_zip_file_instance = MagicMock()
+        mock_zipfile.return_value.__enter__.return_value = mock_zip_file_instance
+
+        download_gui_library_zip(gui_library_zip_download_url, gui_library_zip_download_name, gui_library_zip_size, 0)
+
+        mock_get.assert_called_once_with(gui_library_zip_download_url, stream=True, timeout=15)
+        mock_open.assert_called_once_with(os.path.join(TEST_UPDATE_APP_DIRECTORY, gui_library_zip_download_name), 'wb')
+
+        handle:MockedFunction = mock_open()
+        handle.write.assert_called_once_with(test_zip_content)
+
+        mock_zipfile.assert_called_once_with(os.path.join(TEST_UPDATE_APP_DIRECTORY, gui_library_zip_download_name), 'r')
+        mock_zip_file_instance.extractall.assert_called_once_with(TEST_UPDATE_APP_DIRECTORY)
+
+        mock_response_with_wrong_status_code:MockedResponse = create_autospec(Response)
+        mock_response_with_wrong_status_code.status_code = 204
+        mock_response_with_wrong_status_code.raise_for_status = MagicMock(return_value=None)
+        mock_get.return_value = mock_response_with_wrong_status_code
+
+        with self.assertRaises(HTTPError, msg="Failed to download gui library zip: status code 204 expected 200"):
+            download_gui_library_zip(gui_library_zip_download_url, gui_library_zip_download_name, gui_library_zip_size, 0)
+
+
+    @patch("AppManagement.AppUpdate.download_update.os.remove", autospec=True)
+    @patch("AppManagement.AppUpdate.download_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
+    @patch('AppManagement.AppUpdate.download_update.GUI_LIBRARY_HASH_FILE_PATH', new=TEST_GUI_LIBRARY_HASH_FILE_PATH)
+    @patch('AppManagement.AppUpdate.download_update.get_platform_assets', autospec=True)
+    @patch('AppManagement.AppUpdate.download_update.generate_file_256hash', autospec=True)
+    @patch('AppManagement.AppUpdate.download_update.download_gui_library_zip', autospec=True)
+    @patch('AppManagement.AppUpdate.download_update.download_update_zip', autospec=True)
+    def test_8_download_latest_update_hash_check(self, 
+        mock_update_zip_load:MockedFunction,
+        mock_gui_zip_load:MockedFunction,
+        mock_generate_hash:MockedFunction,
+        mock_get_platform_assets:MockedFunction,
+        mock_os_remove:MockedFunction) -> None:
+        """Test downloading latest update hash check to ensure that valid files were downloaded."""
+
+        mock_gui_zip_load.return_value = None
+        mock_update_zip_load.return_value = None
+        mock_os_remove.return_value = None
+        os.makedirs(TEST_APP_HASHES_DIRECTORY, exist_ok=True)
+        os.makedirs(TEST_UPDATE_APP_DIRECTORY, exist_ok=True)
+
+        update_zip_asset = None
+        gui_library_asset = None
+        for asset in self.test_assets:
+            if asset["name"] == LINUX_UPDATE_ZIP:
+                update_zip_asset = (asset["name"], asset["browser_download_url"], asset["size"], asset["digest"])
+            elif asset["name"] == LINUX_GUI_LIBRARY_ZIP:
+                gui_library_asset = (asset["name"], asset["browser_download_url"], asset["size"], asset["digest"])
+        if not update_zip_asset:
+            raise AssertionError(f"Test update asset {LINUX_UPDATE_ZIP} not found in test assets.")
+        if not gui_library_asset:
+            raise AssertionError(f"Test GUI library asset {LINUX_GUI_LIBRARY_ZIP} not found in test assets.")
+
+        mock_get_platform_assets.return_value = (update_zip_asset, gui_library_asset)
+        mock_generate_hash.side_effect = [update_zip_asset[3].replace("sha256:", ""), gui_library_asset[3].replace("sha256:", "")]
+
+        self.assertTrue(download_latest_update(self.test_release), f"Failed to download latest update.")
+        mock_os_remove.assert_called_once_with(os.path.join(TEST_UPDATE_APP_DIRECTORY, gui_library_asset[0]))
+        self.assertTrue(os.path.exists(TEST_GUI_LIBRARY_HASH_FILE_PATH), "GUI library hash file not found after downloading latest update.")
+        os.unlink(TEST_GUI_LIBRARY_HASH_FILE_PATH)
+
+        wrong_update_zip_hash = itertools.cycle(["wrong_hash"])
+        mock_generate_hash.side_effect = wrong_update_zip_hash
+        with self.assertRaises(FailedToDownloadUpdateZipError, msg="Latest update download passed although failure was expected caused by wrong update zip hash."):
+            download_latest_update(self.test_release)
+
+        wrong_gui_library_hash = "wrong_hash"
+        mock_generate_hash.side_effect = itertools.chain([update_zip_asset[3].replace("sha256:", "")], itertools.repeat(wrong_gui_library_hash))
+        with self.assertRaises(FailedToDownloadGUILibraryZipError, msg="Latest update download passed although failure was expected caused by wrong GUI library hash."):
+            download_latest_update(self.test_release)
+        
