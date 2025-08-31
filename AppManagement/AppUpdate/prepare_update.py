@@ -14,9 +14,9 @@ from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
-from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME, GUI_LIBRARY, \
-UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL,\
-UPDATE_APP_DIRECTORY
+from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME,\
+GUI_LIBRARY, UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, \
+UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, UPDATE_APP_DIRECTORY, APP_DIRECTORY
 
 if TYPE_CHECKING:
     from AppObjects.backup import Backup
@@ -65,15 +65,17 @@ def prepare_update() -> None:
     
     logger.debug("Creating previous version copy directory")
     if DEVELOPMENT_MODE:#if app in development
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME),
+                        os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
     else:
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME), os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+        shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME),
+                        os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
     logger.debug("Created previous version copy directory")
 
     if DEVELOPMENT_MODE:
         gui_library_current_path = os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal", GUI_LIBRARY)
     else:
-        gui_library_current_path = os.path.join(ROOT_DIRECTORY, "_internal", GUI_LIBRARY)
+        gui_library_current_path = os.path.join(APP_DIRECTORY, GUI_LIBRARY)
 
     GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_APP_DIRECTORY, GUI_LIBRARY)
     if not os.path.exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
@@ -104,11 +106,13 @@ def prepare_update() -> None:
     logger.info("Creating and migrating backups")
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        backup_futures = {executor.submit(create_single_backup, backup, app_core, update_version): backup for backup in app_core.backups.values()}
+        backup_futures = {
+        executor.submit(create_single_backup, backup, app_core, update_version): backup for backup in app_core.backups.values()}
         updated_backups_paths = [future.result() for future in backup_futures]
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        path_futures = {executor.submit(migrate_single_backup, backup_path, app_core): backup_path for backup_path in updated_backups_paths}
+        path_futures = {
+        executor.submit(migrate_single_backup, backup_path, app_core): backup_path for backup_path in updated_backups_paths}
         for future in concurrent.futures.as_completed(path_futures):
             future.result()
             upgraded_backups += 1

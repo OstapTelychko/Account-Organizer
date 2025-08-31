@@ -9,18 +9,22 @@ from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
 
 from tests.tests_toolkit import OutOfScopeTestCase
-from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError, FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
+from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
+FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease, get_platform_assets,\
     download_update_zip, download_gui_library_zip, download_latest_update
 from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
-    TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, ERROR_LOG_FILE, TEST_GUI_LIBRARY_HASH_FILE_PATH
+    TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
+    TEST_PREVIOUS_VERSION_COPY_DIRECTORY
 
 if TYPE_CHECKING:
     from types import FunctionType
-    MockedResponse = type("MockedResponse", (MagicMock, Response), {})
-    MockedFunction = type("MockedFunction", (MagicMock, FunctionType), {})
-    MockedVariable = type("MockedVariable", (MagicMock, bool, str, int, float, dict, set, list, tuple), {})
-    MockedZipFile = type("MockedZipFile", (MagicMock, ZipFile), {})
+    from typing import NewType
+
+    MockedResponse = NewType("MockedResponse", type("MockedResponse2", (MagicMock, Response), {}))#type: ignore[misc]
+    MockedFunction = NewType("MockedFunction", type("MockedFunction2", (MagicMock, FunctionType), {}))#type: ignore[misc]
+    MockedVariable = NewType("MockedVariable", type("MockedVariable2", (MagicMock, bool, str, int, float, dict, set, list, tuple), {}))#type: ignore[misc]
+    MockedZipFile = NewType("MockedZipFile", type("MockedZipFile2", (MagicMock, ZipFile), {}))#type: ignore[misc]
 
 
 class TestUpdateApp(OutOfScopeTestCase):
@@ -139,9 +143,8 @@ class TestUpdateApp(OutOfScopeTestCase):
         super().setUp()
 
 
-
     @patch('AppManagement.AppUpdate.download_update.req.head', autospec=True)
-    def test_1_internet_connection_check(self, mock_head:MockedFunction) -> None:
+    def test_01_internet_connection_check(self, mock_head:MockedFunction) -> None:
         """Test internet connection check functionality based on different response scenarios."""
         
         mock_successful_head_response:MockedResponse = create_autospec(Response, spec_set=True)
@@ -176,7 +179,7 @@ class TestUpdateApp(OutOfScopeTestCase):
     
 
     @patch('AppManagement.AppUpdate.download_update.req.Session.get', autospec=True)
-    def test_2_get_release(self, mock_get:MockedFunction) -> None:
+    def test_02_get_release(self, mock_get:MockedFunction) -> None:
         """Test get release functionality based on different response scenarios."""
 
         mock_successful_get_response:MockedResponse = create_autospec(Response)
@@ -198,7 +201,7 @@ class TestUpdateApp(OutOfScopeTestCase):
 
 
     @patch('AppManagement.AppUpdate.download_update.req.Session.get', autospec=True)
-    def test_3_get_prerelease(self, mock_get:MockedFunction) -> None:
+    def test_03_get_prerelease(self, mock_get:MockedFunction) -> None:
         """Test get prerelease functionality based on different response scenarios."""
 
         mock_successful_get_response:MockedResponse = create_autospec(Response)
@@ -230,7 +233,7 @@ class TestUpdateApp(OutOfScopeTestCase):
 
 
     @patch("AppManagement.AppUpdate.download_update.platform", new="win32")
-    def test_4_get_platform_assets_windows(self) -> None:
+    def test_04_get_platform_assets_windows(self) -> None:
         """Test get platform assets from release for Windows platform."""
 
         #Remove linux assets
@@ -261,7 +264,7 @@ class TestUpdateApp(OutOfScopeTestCase):
     
 
     @patch("AppManagement.AppUpdate.download_update.platform", new="linux")
-    def test_5_get_platform_assets_linux(self) -> None:
+    def test_05_get_platform_assets_linux(self) -> None:
         """Test get platform assets from release for Linux platform."""
 
         # Remove windows assets
@@ -291,11 +294,20 @@ class TestUpdateApp(OutOfScopeTestCase):
             get_platform_assets(self.test_assets)
     
     
+    @patch("AppManagement.AppUpdate.download_update.shutil.rmtree", autospec=True)
+    @patch("AppManagement.AppUpdate.download_update.os.path.exists", autospec=True)
+    @patch("AppManagement.AppUpdate.download_update.os.makedirs", autospec=True)
     @patch("AppManagement.AppUpdate.download_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY)
     @patch('AppManagement.AppUpdate.download_update.ZipFile', autospec=True)
     @patch('AppManagement.AppUpdate.download_update.req.get', autospec=True)
     @patch('builtins.open', new_callable=mock_open)
-    def test_6_download_update_zip(self, mock_open:MockedFunction, mock_get:MockedFunction, mock_zipfile:MockedZipFile):
+    def test_06_download_update_zip(self, 
+        mock_open:MockedFunction,
+        mock_get:MockedFunction,
+        mock_zipfile:MockedZipFile,
+        mock_makedirs:MockedFunction,
+        mock_path_exists:MockedFunction,
+        mock_rmtree:MockedFunction) -> None:
         """Test download update zip is downloaded and saved correctly"""
 
         zip_buffer = BytesIO()
@@ -308,6 +320,8 @@ class TestUpdateApp(OutOfScopeTestCase):
         mock_successful_response.iter_content = MagicMock(return_value=iter([test_zip_content]))
         mock_successful_response.raise_for_status = MagicMock(return_value=None)
         mock_get.return_value = mock_successful_response
+
+        mock_path_exists.return_value = True
 
         update_zip_download_name = ""
         update_zip_download_url = ""
@@ -324,6 +338,8 @@ class TestUpdateApp(OutOfScopeTestCase):
 
         download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, 0)
 
+        mock_rmtree.assert_called_once_with(TEST_UPDATE_DIRECTORY)
+        mock_makedirs.assert_called_once_with(TEST_UPDATE_DIRECTORY)
         mock_get.assert_called_once_with(update_zip_download_url, stream=True, timeout=15)
         mock_open.assert_called_once_with(os.path.join(TEST_UPDATE_DIRECTORY, update_zip_download_name), 'wb')
 
@@ -346,7 +362,10 @@ class TestUpdateApp(OutOfScopeTestCase):
     @patch('AppManagement.AppUpdate.download_update.ZipFile', autospec=True)
     @patch('AppManagement.AppUpdate.download_update.req.get', autospec=True)
     @patch('builtins.open', new_callable=mock_open)
-    def test_7_download_gui_library_zip(self, mock_open:MockedFunction, mock_get:MockedFunction, mock_zipfile:MockedZipFile) -> None:
+    def test_07_download_gui_library_zip(self,
+        mock_open:MockedFunction,
+        mock_get:MockedFunction,
+        mock_zipfile:MockedZipFile) -> None:
         """Test download GUI library zip is downloaded and saved correctly"""
 
         os.makedirs(TEST_UPDATE_APP_DIRECTORY, exist_ok=True)
@@ -402,7 +421,7 @@ class TestUpdateApp(OutOfScopeTestCase):
     @patch('AppManagement.AppUpdate.download_update.generate_file_256hash', autospec=True)
     @patch('AppManagement.AppUpdate.download_update.download_gui_library_zip', autospec=True)
     @patch('AppManagement.AppUpdate.download_update.download_update_zip', autospec=True)
-    def test_8_download_latest_update_hash_check(self, 
+    def test_08_download_latest_update_hash_check(self, 
         mock_update_zip_load:MockedFunction,
         mock_gui_zip_load:MockedFunction,
         mock_generate_hash:MockedFunction,
@@ -446,3 +465,11 @@ class TestUpdateApp(OutOfScopeTestCase):
         with self.assertRaises(FailedToDownloadGUILibraryZipError, msg="Latest update download passed although failure was expected caused by wrong GUI library hash."):
             download_latest_update(self.test_release)
         
+    @patch('AppManagement.AppUpdate.download_update.os.path.exists', autospec=True)
+    @patch('AppManagement.AppUpdate.download_update.shutil.copytree', autospec=True)
+    def test_09_prepare_update(self, mock_copytree:MockedFunction, mock_path_exists:MockedFunction) -> None:
+        """Test prepare update functionality."""
+
+        def path_exists(path: str) -> bool:
+            return True
+
