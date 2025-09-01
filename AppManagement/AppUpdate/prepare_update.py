@@ -16,14 +16,15 @@ from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME,\
 GUI_LIBRARY, UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, \
-UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, UPDATE_APP_DIRECTORY, APP_DIRECTORY
+UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, UPDATE_APP_DIRECTORY, APP_DIRECTORY, BACKUPS_DIRECTORY,\
+PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH
 
 if TYPE_CHECKING:
     from AppObjects.backup import Backup
 
 
 logger = get_logger(__name__)
-
+path_exists = os.path.exists
 
 
 def create_single_backup(backup:Backup, app_core:AppCore, update_version:str) -> str:
@@ -59,26 +60,24 @@ def prepare_update() -> None:
     logger.info("Preparing update")
     app_core = AppCore.instance()
 
-    if os.path.exists(PREVIOUS_VERSION_COPY_DIRECTORY):
+    if path_exists(PREVIOUS_VERSION_COPY_DIRECTORY):
         shutil.rmtree(PREVIOUS_VERSION_COPY_DIRECTORY)
         logger.info("Deleted previous version copy directory")
     
     logger.debug("Creating previous version copy directory")
     if DEVELOPMENT_MODE:#if app in development
         shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME),
-                        os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+                        PREVIOUS_VERSION_BACKUPS_DIRECTORY)
     else:
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME),
-                        os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, BACKUPS_DIRECTORY_NAME))
+        shutil.copytree(BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
     logger.debug("Created previous version copy directory")
 
     if DEVELOPMENT_MODE:
         gui_library_current_path = os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal", GUI_LIBRARY)
     else:
-        gui_library_current_path = os.path.join(APP_DIRECTORY, GUI_LIBRARY)
+        gui_library_current_path = GUI_LIBRARY_DIRECTORY
 
-    GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_APP_DIRECTORY, GUI_LIBRARY)
-    if not os.path.exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
+    if not path_exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
         shutil.copytree(gui_library_current_path, GUI_LIBRARY_UPDATE_PATH)
         logger.info("Copied GUI library to update directory")
     
@@ -121,7 +120,7 @@ def prepare_update() -> None:
     
     logger.info("Move legacy backups to update directory")
     for backup in app_core.backups.values():
-        if not os.path.exists(os.path.join(UPDATE_BACKUPS_DIRECTORY, Path(backup.db_file_path).name)):
+        if not path_exists(os.path.join(UPDATE_BACKUPS_DIRECTORY, Path(backup.db_file_path).name)):
             if DEVELOPMENT_MODE:# I don't want to delete backups in development
                 shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
             else:

@@ -76,7 +76,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     from tests.app_tests.test_statistics import TestStatistics
     from tests.app_tests.test_backups_management import TestBackupsManagement
     from tests.app_tests.test_shortcuts import TestShortcuts
-    from tests.app_tests.test_update_app import TestUpdateApp
+    from tests.app_tests.test_update_app import TestDownloadUpdate, TestPrepareUpdate
 
     try:
         suite = TestSuite()
@@ -89,7 +89,8 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         # loader.loadTestsFromTestCase(TestStatistics),
         # loader.loadTestsFromTestCase(TestBackupsManagement),
         # loader.loadTestsFromTestCase(TestShortcuts),
-        loader.loadTestsFromTestCase(TestUpdateApp),
+        loader.loadTestsFromTestCase(TestDownloadUpdate),
+        loader.loadTestsFromTestCase(TestPrepareUpdate),
         ))
         
         print(f"Tests found: {suite.countTestCases()}")

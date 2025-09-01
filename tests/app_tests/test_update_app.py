@@ -2,20 +2,28 @@ from __future__ import annotations
 import os
 import itertools
 from typing import TYPE_CHECKING
+from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch
 from io import BytesIO
+from pathlib import Path
 from zipfile import ZipFile
 from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
 
-from tests.tests_toolkit import OutOfScopeTestCase
+from tests.tests_toolkit import DBTestCase
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
-from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease, get_platform_assets,\
-    download_update_zip, download_gui_library_zip, download_latest_update
+from AppObjects.app_core import AppCore
+
+from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
+    get_platform_assets, download_update_zip, download_gui_library_zip, download_latest_update
+from AppManagement.AppUpdate.prepare_update import prepare_update
+
 from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
-    TEST_PREVIOUS_VERSION_COPY_DIRECTORY
+    TEST_PREVIOUS_VERSION_COPY_DIRECTORY, GUI_LIBRARY, TEST_UPDATE_BACKUPS_DIRECTORY, BACKUPS_DIRECTORY, \
+    PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, MOVE_FILES_TO_UPDATE_INTERNAL,\
+    MOVE_DIRECTORIES_TO_UPDATE_INTERNAL
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -27,7 +35,7 @@ if TYPE_CHECKING:
     MockedZipFile = NewType("MockedZipFile", type("MockedZipFile2", (MagicMock, ZipFile), {}))#type: ignore[misc]
 
 
-class TestUpdateApp(OutOfScopeTestCase):
+class TestDownloadUpdate(TestCase):
     """Test update application functionality."""
 
     def setUp(self) -> None:
@@ -465,11 +473,96 @@ class TestUpdateApp(OutOfScopeTestCase):
         with self.assertRaises(FailedToDownloadGUILibraryZipError, msg="Latest update download passed although failure was expected caused by wrong GUI library hash."):
             download_latest_update(self.test_release)
         
-    @patch('AppManagement.AppUpdate.download_update.os.path.exists', autospec=True)
-    @patch('AppManagement.AppUpdate.download_update.shutil.copytree', autospec=True)
-    def test_09_prepare_update(self, mock_copytree:MockedFunction, mock_path_exists:MockedFunction) -> None:
-        """Test prepare update functionality."""
+
+class TestPrepareUpdate(DBTestCase):
+
+    def setUp(self) -> None:
+        self.patched_rmtree = patch("AppManagement.AppUpdate.prepare_update.shutil.rmtree", autospec=True)
+        self.patched_copytree = patch("AppManagement.AppUpdate.prepare_update.shutil.copytree", autospec=True)
+        self.patched_path_exists = patch("AppManagement.AppUpdate.prepare_update.path_exists", autospec=True)
+        self.patched_copy2 = patch("AppManagement.AppUpdate.prepare_update.shutil.copy2", autospec=True)
+        self.patched_makedirs = patch("AppManagement.AppUpdate.prepare_update.os.makedirs", autospec=True)
+        self.patched_create_single_backup = patch("AppManagement.AppUpdate.prepare_update.create_single_backup", autospec=True)
+        self.patched_migrate_single_backup = patch("AppManagement.AppUpdate.prepare_update.migrate_single_backup", autospec=True)
+        self.patched_makedirs = patch("AppManagement.AppUpdate.prepare_update.os.makedirs", autospec=True)
+        self.patched_chmod = patch("AppManagement.AppUpdate.prepare_update.os.chmod", autospec=True)
+        self.patched_open = patch("AppManagement.AppUpdate.prepare_update.open", new_callable=mock_open, read_data=AppCore.instance().app_version+".1")
+        self.patched_update_app_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
+        self.patched_previous_version_copy_directory = patch("AppManagement.AppUpdate.prepare_update.PREVIOUS_VERSION_COPY_DIRECTORY", new=TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+        self.patched_update_backups_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
+        self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=False)
+        self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=True)
+
+        self.mock_rmtree:MockedFunction = self.patched_rmtree.start()
+        self.mock_copytree:MockedFunction = self.patched_copytree.start()
+        self.mock_path_exists:MockedFunction = self.patched_path_exists.start()
+        self.mock_copy2:MockedFunction = self.patched_copy2.start()
+        self.mock_makedirs:MockedFunction = self.patched_makedirs.start()
+        self.mock_open:MockedFunction = self.patched_open.start()
+        self.mock_create_single_backup:MockedFunction = self.patched_create_single_backup.start()
+        self.mock_migrate_single_backup:MockedFunction = self.patched_migrate_single_backup.start()
+        self.mock_chmod:MockedFunction = self.patched_chmod.start()
+        self.patched_update_app_directory.start()
+        self.patched_previous_version_copy_directory.start()
+        self.patched_update_backups_directory.start()
+
+        super().setUp()
+
+
+    def tearDown(self) -> None:
+        self.patched_rmtree.stop()
+        self.patched_copytree.stop()
+        self.patched_path_exists.stop()
+        self.patched_copy2.stop()
+        self.patched_makedirs.stop()
+        self.patched_open.stop()
+        self.patched_create_single_backup.stop()
+        self.patched_migrate_single_backup.stop()
+        self.patched_chmod.stop()
+        self.patched_update_app_directory.stop()
+        self.patched_previous_version_copy_directory.stop()
+        self.patched_update_backups_directory.stop()
+        self.patched_disabled_development_mode.stop()
+        self.patched_enabled_development_mode.stop()
+
+        super().tearDown()
+
+
+    def test_01_prepare_update_development_false_without_gui_library(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library."""
+
+        self.patched_disabled_development_mode.start()
+        self.mock_chmod.return_value = None
 
         def path_exists(path: str) -> bool:
-            return True
+            if path in [TEST_PREVIOUS_VERSION_COPY_DIRECTORY]:
+                return True
+            elif TEST_UPDATE_BACKUPS_DIRECTORY in path or GUI_LIBRARY_UPDATE_PATH in path:
+                return False
+            raise ValueError(f"Unexpected path: {path}")
 
+        self.mock_path_exists.side_effect = path_exists
+
+        prepare_update()
+
+        self.mock_path_exists.assert_any_call(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+        self.mock_rmtree.assert_called_once_with(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+
+        self.mock_copytree.assert_any_call(BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
+
+        self.mock_path_exists.assert_any_call(GUI_LIBRARY_UPDATE_PATH)
+        self.mock_copytree.assert_any_call(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
+
+        for file in MOVE_FILES_TO_UPDATE_INTERNAL:
+            self.mock_copy2.assert_any_call(file, TEST_UPDATE_APP_DIRECTORY)
+        
+        for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
+            self.mock_copytree.assert_any_call(directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
+
+        self.mock_makedirs.assert_any_call(TEST_UPDATE_BACKUPS_DIRECTORY)
+
+        self.mock_create_single_backup.return_value = None
+        self.mock_migrate_single_backup.return_value = None
+        #TODO: finish prepare_update test by checking create and migrate single backup, add check to chmod  on linux platform
+        # and check legacy backups transfer
+        #TODO: create wrapper for assert_any_call to add call_args_list to Assertion error message

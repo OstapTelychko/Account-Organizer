@@ -1,18 +1,15 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Any
-import pkgutil
+from typing import TYPE_CHECKING, Callable
 import shutil
-from functools import wraps, partial
+from functools import wraps
 from traceback import format_exception
-
-from unittest import TestCase, TextTestResult
-from unittest.mock import patch, create_autospec, DEFAULT as MOCK_DEFAULT, MagicMock
 
 from colorama import init as colorama_init, Fore
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
 
+from unittest import TestCase, TextTestResult
 from PySide6.QtCore import QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
@@ -28,7 +25,7 @@ from AppObjects.logger import get_logger
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
     from unittest.runner import _WritelnDecorator
-    from typing import Type, Tuple, Iterable, Any
+    from typing import Type, Tuple, Iterable
     from types import TracebackType
 
     OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
