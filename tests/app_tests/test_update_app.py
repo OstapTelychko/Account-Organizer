@@ -10,7 +10,7 @@ from zipfile import ZipFile
 from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
 
-from tests.tests_toolkit import DBTestCase
+from tests.tests_toolkit import DBTestCase, assert_any_call_with_details
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppObjects.app_core import AppCore
@@ -545,24 +545,23 @@ class TestPrepareUpdate(DBTestCase):
 
         prepare_update()
 
-        self.mock_path_exists.assert_any_call(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+        assert_any_call_with_details(self.mock_path_exists, TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
         self.mock_rmtree.assert_called_once_with(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
 
-        self.mock_copytree.assert_any_call(BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
+        assert_any_call_with_details(self.mock_copytree, BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
 
-        self.mock_path_exists.assert_any_call(GUI_LIBRARY_UPDATE_PATH)
-        self.mock_copytree.assert_any_call(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
+        assert_any_call_with_details(self.mock_path_exists, GUI_LIBRARY_UPDATE_PATH)
+        assert_any_call_with_details(self.mock_copytree, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
 
         for file in MOVE_FILES_TO_UPDATE_INTERNAL:
-            self.mock_copy2.assert_any_call(file, TEST_UPDATE_APP_DIRECTORY)
+            assert_any_call_with_details(self.mock_copy2, file, TEST_UPDATE_APP_DIRECTORY)
         
         for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
-            self.mock_copytree.assert_any_call(directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
+            assert_any_call_with_details(self.mock_copytree, directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
 
-        self.mock_makedirs.assert_any_call(TEST_UPDATE_BACKUPS_DIRECTORY)
+        assert_any_call_with_details(self.mock_makedirs, TEST_UPDATE_BACKUPS_DIRECTORY)
 
         self.mock_create_single_backup.return_value = None
         self.mock_migrate_single_backup.return_value = None
         #TODO: finish prepare_update test by checking create and migrate single backup, add check to chmod  on linux platform
         # and check legacy backups transfer
-        #TODO: create wrapper for assert_any_call to add call_args_list to Assertion error message

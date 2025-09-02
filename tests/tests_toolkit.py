@@ -10,6 +10,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
 
 from unittest import TestCase, TextTestResult
+from unittest.mock import Mock
 from PySide6.QtCore import QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
@@ -60,6 +61,24 @@ def qsleep(milliseconds:int) -> None:
     QTimer.singleShot(milliseconds, loop.quit)
     loop.exec()
 
+
+def assert_any_call_with_details(mock: Mock, *args, msg: str | None = None, **kwargs) -> None:
+    """
+    Like mock.assert_any_call but if it fails raises AssertionError that
+    includes mock.call_args_list for easier debugging.
+    """
+
+    if not hasattr(mock, "assert_any_call"):
+        raise TypeError(f"First argument must be a Mock instance not {type(mock).__name__}")
+
+    try:
+        mock.assert_any_call(*args, **kwargs)
+    except AssertionError as exc:
+        calls = getattr(mock, "call_args_list", [])
+        prefix = f"{msg}\n" if msg else ""
+        calls_string = "\n".join(f"Call {call_number}: {call}" for call_number, call in enumerate(calls, start=1))
+        detailed = f"{prefix}{exc}\n\nCalls list:\n{calls_string}"
+        raise AssertionError(detailed) from None
 
 
 class DBTestCase(TestCase):

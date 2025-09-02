@@ -28,7 +28,7 @@ path_exists = os.path.exists
 
 
 def create_single_backup(backup:Backup, app_core:AppCore, update_version:str) -> str:
-    """Create a copy of the backup and upgrade it version but doesn't upgrade the database schema."""
+    """Creates a copy of the backup and upgrades it version but doesn't upgrade the database schema."""
 
     updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
     app_core.db.backup_query.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
