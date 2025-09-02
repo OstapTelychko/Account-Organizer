@@ -21,7 +21,7 @@ from AppManagement.AppUpdate.prepare_update import prepare_update
 
 from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
-    TEST_PREVIOUS_VERSION_COPY_DIRECTORY, GUI_LIBRARY, TEST_UPDATE_BACKUPS_DIRECTORY, BACKUPS_DIRECTORY, \
+    TEST_PREVIOUS_VERSION_COPY_DIRECTORY, TEST_BACKUPS_DIRECTORY, TEST_UPDATE_BACKUPS_DIRECTORY, \
     PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, MOVE_FILES_TO_UPDATE_INTERNAL,\
     MOVE_DIRECTORIES_TO_UPDATE_INTERNAL
 
@@ -490,6 +490,7 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_update_app_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
         self.patched_previous_version_copy_directory = patch("AppManagement.AppUpdate.prepare_update.PREVIOUS_VERSION_COPY_DIRECTORY", new=TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
         self.patched_update_backups_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
+        self.patched_backups_directory = patch("AppManagement.AppUpdate.prepare_update.BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
         self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=False)
         self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=True)
 
@@ -503,6 +504,7 @@ class TestPrepareUpdate(DBTestCase):
         self.mock_migrate_single_backup:MockedFunction = self.patched_migrate_single_backup.start()
         self.mock_chmod:MockedFunction = self.patched_chmod.start()
         self.patched_update_app_directory.start()
+        self.patched_backups_directory.start()
         self.patched_previous_version_copy_directory.start()
         self.patched_update_backups_directory.start()
 
@@ -519,6 +521,7 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_create_single_backup.stop()
         self.patched_migrate_single_backup.stop()
         self.patched_chmod.stop()
+        self.patched_backups_directory.stop()
         self.patched_update_app_directory.stop()
         self.patched_previous_version_copy_directory.stop()
         self.patched_update_backups_directory.stop()
@@ -528,7 +531,15 @@ class TestPrepareUpdate(DBTestCase):
         super().tearDown()
 
 
-    def test_01_prepare_update_development_false_without_gui_library(self) -> None:
+    def test_01_create_single_backup(self) -> None:
+        """Test create_single_backup function."""
+
+        self.patched_makedirs.stop()
+        os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
+
+        
+
+    def test_03_prepare_update_development_false_without_gui_library(self) -> None:
         """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library."""
 
         self.patched_disabled_development_mode.start()
@@ -548,7 +559,7 @@ class TestPrepareUpdate(DBTestCase):
         assert_any_call_with_details(self.mock_path_exists, TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
         self.mock_rmtree.assert_called_once_with(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
 
-        assert_any_call_with_details(self.mock_copytree, BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
+        assert_any_call_with_details(self.mock_copytree, TEST_BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
 
         assert_any_call_with_details(self.mock_path_exists, GUI_LIBRARY_UPDATE_PATH)
         assert_any_call_with_details(self.mock_copytree, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
