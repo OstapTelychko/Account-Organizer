@@ -91,8 +91,8 @@ def remove_backup() -> int:
             return 0
     
     else:
-        WindowsRegistry.Messages.delete_buckup_confirmation.exec()
-        if WindowsRegistry.Messages.delete_buckup_confirmation.clickedButton() != WindowsRegistry.Messages.delete_buckup_confirmation.ok_button:
+        WindowsRegistry.Messages.delete_backup_confirmation.exec()
+        if WindowsRegistry.Messages.delete_backup_confirmation.clickedButton() != WindowsRegistry.Messages.delete_backup_confirmation.ok_button:
             return 0
     
     row = selected_items[0].row()

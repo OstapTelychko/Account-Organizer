@@ -12,7 +12,7 @@ from AppObjects.app_core import AppCore
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from backend.db_controller import DBController
 from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY,\
-    TEST_USER_CONF_PATH, TEST_UPDATE_DIRECTORY, TEST_APP_HASHES_DIRECTORY
+    TEST_USER_CONF_PATH, TEST_UPDATE_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_UPDATE_APP_DIRECTORY
 
 from tests.tests_toolkit import ColoredTextTestResult
 
@@ -38,6 +38,9 @@ def cleanup_test_files() -> None:
 
     if os.path.exists(TEST_APP_HASHES_DIRECTORY):
         shutil.rmtree(TEST_APP_HASHES_DIRECTORY)
+
+    if os.path.exists(TEST_UPDATE_APP_DIRECTORY):
+        shutil.rmtree(TEST_UPDATE_APP_DIRECTORY)
 
 
 def test_main(app_main:Callable[[bool], None]) -> None:

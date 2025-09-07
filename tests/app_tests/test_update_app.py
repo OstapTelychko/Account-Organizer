@@ -1,7 +1,12 @@
 from __future__ import annotations
 import os
+import shutil
 import itertools
+import time
+
 from typing import TYPE_CHECKING
+from sqlalchemy import create_engine
+from alembic.config import Config
 from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch
 from io import BytesIO
@@ -17,13 +22,14 @@ from AppObjects.app_core import AppCore
 
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
     get_platform_assets, download_update_zip, download_gui_library_zip, download_latest_update
-from AppManagement.AppUpdate.prepare_update import prepare_update
+from AppManagement.AppUpdate.prepare_update import prepare_update, create_single_backup, migrate_single_backup
+from AppManagement.backup_management import create_backup
 
 from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
     TEST_PREVIOUS_VERSION_COPY_DIRECTORY, TEST_BACKUPS_DIRECTORY, TEST_UPDATE_BACKUPS_DIRECTORY, \
     PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, MOVE_FILES_TO_UPDATE_INTERNAL,\
-    MOVE_DIRECTORIES_TO_UPDATE_INTERNAL
+    MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, APP_DIRECTORY, ALEMBIC_CONFIG_FILE
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -477,6 +483,8 @@ class TestDownloadUpdate(TestCase):
 class TestPrepareUpdate(DBTestCase):
 
     def setUp(self) -> None:
+        self.test_app_version = AppCore.instance().app_version
+        self.test_update_version = self.test_app_version+".1"
         self.patched_rmtree = patch("AppManagement.AppUpdate.prepare_update.shutil.rmtree", autospec=True)
         self.patched_copytree = patch("AppManagement.AppUpdate.prepare_update.shutil.copytree", autospec=True)
         self.patched_path_exists = patch("AppManagement.AppUpdate.prepare_update.path_exists", autospec=True)
@@ -486,7 +494,7 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_migrate_single_backup = patch("AppManagement.AppUpdate.prepare_update.migrate_single_backup", autospec=True)
         self.patched_makedirs = patch("AppManagement.AppUpdate.prepare_update.os.makedirs", autospec=True)
         self.patched_chmod = patch("AppManagement.AppUpdate.prepare_update.os.chmod", autospec=True)
-        self.patched_open = patch("AppManagement.AppUpdate.prepare_update.open", new_callable=mock_open, read_data=AppCore.instance().app_version+".1")
+        self.patched_open = patch("AppManagement.AppUpdate.prepare_update.open", new_callable=mock_open, read_data=self.test_update_version)
         self.patched_update_app_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
         self.patched_previous_version_copy_directory = patch("AppManagement.AppUpdate.prepare_update.PREVIOUS_VERSION_COPY_DIRECTORY", new=TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
         self.patched_update_backups_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
@@ -531,15 +539,53 @@ class TestPrepareUpdate(DBTestCase):
         super().tearDown()
 
 
-    def test_01_create_single_backup(self) -> None:
-        """Test create_single_backup function."""
+    def test_01_create_single_backup_and_migrate(self) -> None:
+        """Test create and migrate backups functions."""
 
         self.patched_makedirs.stop()
         os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
+        os.makedirs(TEST_UPDATE_BACKUPS_DIRECTORY, exist_ok=True)
+        os.makedirs(TEST_UPDATE_APP_DIRECTORY, exist_ok=True)
 
+        self.assertEqual(len(AppCore.instance().backups), 0,
+                        f"Backups list is not empty at the beginning of the test. Backups list: {AppCore.instance().backups}")
+        for _ in range(3):
+            create_backup()
+            time.sleep(1)
         
+        updated_paths = []
+        for backup in AppCore.instance().backups.values():
+            expected_updated_backup_file_path = os.path.join(TEST_UPDATE_BACKUPS_DIRECTORY,
+                                                            f"Accounts_{backup.timestamp}_{self.test_update_version}.sqlite")
+            result_path = create_single_backup(backup, AppCore.instance(), self.test_update_version)
 
-    def test_03_prepare_update_development_false_without_gui_library(self) -> None:
+            self.assertEqual(result_path, expected_updated_backup_file_path,
+            f"The created backup path for update directory is incorrect. Expected {expected_updated_backup_file_path}, but got {result_path}")
+            self.assertTrue(os.path.exists(expected_updated_backup_file_path),
+                            f"The expected backup file does not exist: {expected_updated_backup_file_path}")
+            updated_paths.append(result_path)
+        
+        self.patched_copy2.stop()
+        self.patched_copytree.stop()
+        shutil.copy2(os.path.join(APP_DIRECTORY, ALEMBIC_CONFIG_FILE),
+                     os.path.join(TEST_UPDATE_APP_DIRECTORY, ALEMBIC_CONFIG_FILE))
+        shutil.copytree(os.path.join(APP_DIRECTORY, "alembic"),
+                        os.path.join(TEST_UPDATE_APP_DIRECTORY, "alembic"), dirs_exist_ok=True)
+
+        for backup, updated_path in zip(AppCore.instance().backups.values(), updated_paths):
+            migrate_single_backup(updated_path, AppCore.instance())
+
+            alembic_config = Config(os.path.join(TEST_UPDATE_APP_DIRECTORY, ALEMBIC_CONFIG_FILE))
+            alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{updated_path}")
+            alembic_config.set_main_option("script_location", os.path.join(TEST_UPDATE_APP_DIRECTORY, "alembic"))
+
+            engine = create_engine(f"sqlite:///{updated_path}")
+            self.assertTrue(AppCore.instance().db.db_up_to_date(alembic_config, engine),
+                            f"Database schema is not up to date for backup: {backup.timestamp}")
+            engine.dispose()
+
+
+    def test_02_prepare_update_development_false_without_gui_library(self) -> None:
         """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library."""
 
         self.patched_disabled_development_mode.start()
