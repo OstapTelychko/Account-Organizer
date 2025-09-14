@@ -17,7 +17,8 @@ from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE, ROOT_DIRECTORY, BACKUPS_DIRECTORY_NAME,\
 GUI_LIBRARY, UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, \
 UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, UPDATE_APP_DIRECTORY, APP_DIRECTORY, BACKUPS_DIRECTORY,\
-PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH
+PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, DEVELOPMENT_BACKUPS_DIRECTORY,\
+DEVELOPMENT_GUI_LIBRARY_DIRECTORY
 
 if TYPE_CHECKING:
     from AppObjects.backup import Backup
@@ -66,16 +67,12 @@ def prepare_update() -> None:
     
     logger.debug("Creating previous version copy directory")
     if DEVELOPMENT_MODE:#if app in development
-        shutil.copytree(os.path.join(ROOT_DIRECTORY, "dist", "main", BACKUPS_DIRECTORY_NAME),
-                        PREVIOUS_VERSION_BACKUPS_DIRECTORY)
+        shutil.copytree(DEVELOPMENT_BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
     else:
         shutil.copytree(BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
     logger.debug("Created previous version copy directory")
 
-    if DEVELOPMENT_MODE:
-        gui_library_current_path = os.path.join(ROOT_DIRECTORY, "dist", "main", "_internal", GUI_LIBRARY)
-    else:
-        gui_library_current_path = GUI_LIBRARY_DIRECTORY
+    gui_library_current_path = GUI_LIBRARY_DIRECTORY if not DEVELOPMENT_MODE else DEVELOPMENT_GUI_LIBRARY_DIRECTORY
 
     if not path_exists(GUI_LIBRARY_UPDATE_PATH):#GUI library is removed from update to reduce size of update. If it already exists it means GUI library was updated
         shutil.copytree(gui_library_current_path, GUI_LIBRARY_UPDATE_PATH)
@@ -121,10 +118,7 @@ def prepare_update() -> None:
     logger.info("Move legacy backups to update directory")
     for backup in app_core.backups.values():
         if not path_exists(os.path.join(UPDATE_BACKUPS_DIRECTORY, Path(backup.db_file_path).name)):
-            if DEVELOPMENT_MODE:# I don't want to delete backups in development
-                shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
-            else:
-                shutil.move(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
-            logger.debug(f"Moved backup: {backup.db_file_path}")
+            shutil.copy2(backup.db_file_path, UPDATE_BACKUPS_DIRECTORY)
+            logger.debug(f"Copied backup: {backup.db_file_path} to update directory {UPDATE_BACKUPS_DIRECTORY}")
     
     logger.info("Update preparation finished")

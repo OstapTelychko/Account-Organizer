@@ -8,22 +8,25 @@ from typing import TYPE_CHECKING
 from sqlalchemy import create_engine
 from alembic.config import Config
 from unittest import TestCase
-from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch
+from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch, call
 from io import BytesIO
 from pathlib import Path
 from zipfile import ZipFile
 from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
+from PySide6.QtCore import QTimer
 
 from tests.tests_toolkit import DBTestCase, assert_any_call_with_details
+
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppObjects.app_core import AppCore
+from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
     get_platform_assets, download_update_zip, download_gui_library_zip, download_latest_update
 from AppManagement.AppUpdate.prepare_update import prepare_update, create_single_backup, migrate_single_backup
-from AppManagement.backup_management import create_backup
+from AppManagement.backup_management import create_backup, remove_backup
 
 from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
@@ -483,7 +486,8 @@ class TestDownloadUpdate(TestCase):
 class TestPrepareUpdate(DBTestCase):
 
     def setUp(self) -> None:
-        self.test_app_version = AppCore.instance().app_version
+        app_core = AppCore.instance()
+        self.test_app_version = app_core.app_version
         self.test_update_version = self.test_app_version+".1"
         self.patched_rmtree = patch("AppManagement.AppUpdate.prepare_update.shutil.rmtree", autospec=True)
         self.patched_copytree = patch("AppManagement.AppUpdate.prepare_update.shutil.copytree", autospec=True)
@@ -495,12 +499,19 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_makedirs = patch("AppManagement.AppUpdate.prepare_update.os.makedirs", autospec=True)
         self.patched_chmod = patch("AppManagement.AppUpdate.prepare_update.os.chmod", autospec=True)
         self.patched_open = patch("AppManagement.AppUpdate.prepare_update.open", new_callable=mock_open, read_data=self.test_update_version)
+
+        self.patched_update_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY)
         self.patched_update_app_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
         self.patched_previous_version_copy_directory = patch("AppManagement.AppUpdate.prepare_update.PREVIOUS_VERSION_COPY_DIRECTORY", new=TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
         self.patched_update_backups_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
         self.patched_backups_directory = patch("AppManagement.AppUpdate.prepare_update.BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
+        self.patched_development_backups_directory = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
+        self.patched_development_gui_library_directory = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_GUI_LIBRARY_DIRECTORY", new=GUI_LIBRARY_DIRECTORY)
+
         self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=False)
         self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=True)
+        self.patched_windows_platform = patch("AppManagement.AppUpdate.prepare_update.platform", new="win32")
+        self.patched_linux_platform = patch("AppManagement.AppUpdate.prepare_update.platform", new="linux")
 
         self.mock_rmtree:MockedFunction = self.patched_rmtree.start()
         self.mock_copytree:MockedFunction = self.patched_copytree.start()
@@ -511,10 +522,20 @@ class TestPrepareUpdate(DBTestCase):
         self.mock_create_single_backup:MockedFunction = self.patched_create_single_backup.start()
         self.mock_migrate_single_backup:MockedFunction = self.patched_migrate_single_backup.start()
         self.mock_chmod:MockedFunction = self.patched_chmod.start()
+
+        self.patched_update_directory.start()
         self.patched_update_app_directory.start()
         self.patched_backups_directory.start()
         self.patched_previous_version_copy_directory.start()
         self.patched_update_backups_directory.start()
+        self.patched_development_backups_directory.start()
+        self.patched_development_gui_library_directory.start()
+
+        self.assertEqual(len(app_core.backups), 0,
+                        f"Backups list is not empty at the beginning of the test. Backups list: {app_core.backups}")
+        for _ in range(3):
+            create_backup()
+            time.sleep(1)
 
         super().setUp()
 
@@ -529,14 +550,78 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_create_single_backup.stop()
         self.patched_migrate_single_backup.stop()
         self.patched_chmod.stop()
+
         self.patched_backups_directory.stop()
+        self.patched_update_directory.stop()
         self.patched_update_app_directory.stop()
         self.patched_previous_version_copy_directory.stop()
         self.patched_update_backups_directory.stop()
+        self.patched_development_backups_directory.stop()
+        self.patched_development_gui_library_directory.stop()
+
         self.patched_disabled_development_mode.stop()
         self.patched_enabled_development_mode.stop()
+        self.patched_windows_platform.stop()
+        self.patched_linux_platform.stop()
+
+        while AppCore.instance().backups:
+            WindowsRegistry.BackupManagementWindow.backups_table.selectRow(0)
+            QTimer.singleShot(100, WindowsRegistry.Messages.below_recommended_min_backups.ok_button.click)
+            QTimer.singleShot(150, WindowsRegistry.Messages.delete_backup_confirmation.ok_button.click)
+            remove_backup()
+
 
         super().tearDown()
+
+
+    def check_prepare_update(self, gui_library_included:bool) -> None:
+        """
+        Performs checks on prepare_update function based on attributes
+            Args:
+            -----
+            `gui_library_included` (bool): Indicates whether the GUI library is included in the update package        
+        """
+
+        def path_exists(path: str) -> bool:
+            if path in [TEST_PREVIOUS_VERSION_COPY_DIRECTORY]:
+                return True
+            elif TEST_UPDATE_BACKUPS_DIRECTORY in path:
+                return False
+            elif GUI_LIBRARY_UPDATE_PATH in path:
+                return gui_library_included
+            raise ValueError(f"Unexpected path: {path}")
+
+        self.mock_path_exists.side_effect = path_exists
+        self.mock_create_single_backup.return_value = None
+        self.mock_migrate_single_backup.return_value = None
+
+        prepare_update()
+
+        assert_any_call_with_details(self.mock_path_exists, TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+        self.mock_rmtree.assert_called_once_with(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+
+        assert_any_call_with_details(self.mock_copytree, TEST_BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
+
+        assert_any_call_with_details(self.mock_path_exists, GUI_LIBRARY_UPDATE_PATH)
+        if not gui_library_included:
+            assert_any_call_with_details(self.mock_copytree, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
+        else:
+            self.assertNotIn(call(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH), self.mock_copytree.mock_calls,
+                            "GUI library directory was copied although it was expected that the update includes the GUI library.")
+
+        for file in MOVE_FILES_TO_UPDATE_INTERNAL:
+            assert_any_call_with_details(self.mock_copy2, file, TEST_UPDATE_APP_DIRECTORY)
+        
+        for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
+            assert_any_call_with_details(self.mock_copytree, directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
+
+        if getattr(self.patched_linux_platform, "is_local", False):
+            assert_any_call_with_details(self.mock_chmod, os.path.join(TEST_UPDATE_DIRECTORY, "main"), 0o755)
+        else:
+            self.assertNotIn(call(os.path.join(TEST_UPDATE_DIRECTORY, "main"), 0o755), self.mock_chmod.mock_calls,
+                            "File permissions were changed although the platform is not linux.")
+
+        assert_any_call_with_details(self.mock_makedirs, TEST_UPDATE_BACKUPS_DIRECTORY)
 
 
     def test_01_create_single_backup_and_migrate(self) -> None:
@@ -546,12 +631,6 @@ class TestPrepareUpdate(DBTestCase):
         os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
         os.makedirs(TEST_UPDATE_BACKUPS_DIRECTORY, exist_ok=True)
         os.makedirs(TEST_UPDATE_APP_DIRECTORY, exist_ok=True)
-
-        self.assertEqual(len(AppCore.instance().backups), 0,
-                        f"Backups list is not empty at the beginning of the test. Backups list: {AppCore.instance().backups}")
-        for _ in range(3):
-            create_backup()
-            time.sleep(1)
         
         updated_paths = []
         for backup in AppCore.instance().backups.values():
@@ -585,40 +664,67 @@ class TestPrepareUpdate(DBTestCase):
             engine.dispose()
 
 
-    def test_02_prepare_update_development_false_without_gui_library(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library."""
+    def test_02_prepare_update_development_false_without_gui_library_linux(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library and os is linux."""
 
         self.patched_disabled_development_mode.start()
-        self.mock_chmod.return_value = None
+        self.patched_linux_platform.start()
+        self.check_prepare_update(False)
 
-        def path_exists(path: str) -> bool:
-            if path in [TEST_PREVIOUS_VERSION_COPY_DIRECTORY]:
-                return True
-            elif TEST_UPDATE_BACKUPS_DIRECTORY in path or GUI_LIBRARY_UPDATE_PATH in path:
-                return False
-            raise ValueError(f"Unexpected path: {path}")
 
-        self.mock_path_exists.side_effect = path_exists
+    def test_03_prepare_update_development_true_without_gui_library_linux(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is True and update doesn't include GUI library and os is linux."""
 
-        prepare_update()
+        self.patched_enabled_development_mode.start()
+        self.patched_linux_platform.start()
+        self.check_prepare_update(False)
+    
 
-        assert_any_call_with_details(self.mock_path_exists, TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
-        self.mock_rmtree.assert_called_once_with(TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
+    def test_04_prepare_update_development_false_with_gui_library_linux(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is False and update includes GUI library and os is linux."""
 
-        assert_any_call_with_details(self.mock_copytree, TEST_BACKUPS_DIRECTORY, PREVIOUS_VERSION_BACKUPS_DIRECTORY)
+        self.patched_disabled_development_mode.start()
+        self.patched_linux_platform.start()
+        self.check_prepare_update(True)
+    
 
-        assert_any_call_with_details(self.mock_path_exists, GUI_LIBRARY_UPDATE_PATH)
-        assert_any_call_with_details(self.mock_copytree, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
+    def test_05_prepare_update_development_true_with_gui_library_linux(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is True and update includes GUI library and os is linux."""
 
-        for file in MOVE_FILES_TO_UPDATE_INTERNAL:
-            assert_any_call_with_details(self.mock_copy2, file, TEST_UPDATE_APP_DIRECTORY)
+        self.patched_enabled_development_mode.start()
+        self.patched_linux_platform.start()
+        self.check_prepare_update(True)
+    
+    def test_06_prepare_update_development_false_without_gui_library_windows(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library and os is windows."""
+
+        self.patched_disabled_development_mode.start()
+        self.patched_windows_platform.start()
+        self.check_prepare_update(False)
+    
+
+    def test_07_prepare_update_development_true_without_gui_library_windows(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is True and update doesn't include GUI library and os is windows."""
+
+        self.patched_enabled_development_mode.start()
+        self.patched_windows_platform.start()
+        self.check_prepare_update(False)
+    
+
+    def test_08_prepare_update_development_false_with_gui_library_windows(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is False and update includes GUI library and os is windows."""
+
+        self.patched_disabled_development_mode.start()
+        self.patched_windows_platform.start()
+        self.check_prepare_update(True)
+    
+
+    def test_09_prepare_update_development_true_with_gui_library_windows(self) -> None:
+        """Test prepare update functionality. DEVELOPMENT_MODE is True and update includes GUI library and os is windows."""
+
+        self.patched_enabled_development_mode.start()
+        self.patched_windows_platform.start()
+        self.check_prepare_update(True)
+    
+    
         
-        for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
-            assert_any_call_with_details(self.mock_copytree, directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
-
-        assert_any_call_with_details(self.mock_makedirs, TEST_UPDATE_BACKUPS_DIRECTORY)
-
-        self.mock_create_single_backup.return_value = None
-        self.mock_migrate_single_backup.return_value = None
-        #TODO: finish prepare_update test by checking create and migrate single backup, add check to chmod  on linux platform
-        # and check legacy backups transfer
