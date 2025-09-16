@@ -10,7 +10,7 @@
 ☐ add % sign before and after variables in languages.json
 ☐ add recommended backups and legacy backups amount to messages
 ☐ add animation steps and interval constant for InformationMessageWindow
-☐ fix issue with long categories for custom range statistics
+☐ fix issue with long categories for custom range statistics and make items in ListWidget to be able to wrap text
 ☐ fix issue with html tags in statistics when there is no transactions
 ☐ add check for every click in tests whether button or widget is actually visible
 
