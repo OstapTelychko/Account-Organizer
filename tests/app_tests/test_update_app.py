@@ -14,19 +14,17 @@ from pathlib import Path
 from zipfile import ZipFile
 from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
-from PySide6.QtCore import QTimer
 
 from tests.tests_toolkit import DBTestCase, assert_any_call_with_details
 
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppObjects.app_core import AppCore
-from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
     get_platform_assets, download_update_zip, download_gui_library_zip, download_latest_update
 from AppManagement.AppUpdate.prepare_update import prepare_update, create_single_backup, migrate_single_backup
-from AppManagement.backup_management import create_backup, remove_backup
+from AppManagement.backup_management import create_backup
 
 from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
@@ -481,7 +479,8 @@ class TestDownloadUpdate(TestCase):
         mock_generate_hash.side_effect = itertools.chain([update_zip_asset[3].replace("sha256:", "")], itertools.repeat(wrong_gui_library_hash))
         with self.assertRaises(FailedToDownloadGUILibraryZipError, msg="Latest update download passed although failure was expected caused by wrong GUI library hash."):
             download_latest_update(self.test_release)
-        
+
+
 
 class TestPrepareUpdate(DBTestCase):
 
@@ -563,13 +562,6 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_enabled_development_mode.stop()
         self.patched_windows_platform.stop()
         self.patched_linux_platform.stop()
-
-        while AppCore.instance().backups:
-            WindowsRegistry.BackupManagementWindow.backups_table.selectRow(0)
-            QTimer.singleShot(100, WindowsRegistry.Messages.below_recommended_min_backups.ok_button.click)
-            QTimer.singleShot(150, WindowsRegistry.Messages.delete_backup_confirmation.ok_button.click)
-            remove_backup()
-
 
         super().tearDown()
 
@@ -694,7 +686,8 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_enabled_development_mode.start()
         self.patched_linux_platform.start()
         self.check_prepare_update(True)
-    
+
+
     def test_06_prepare_update_development_false_without_gui_library_windows(self) -> None:
         """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library and os is windows."""
 
@@ -727,4 +720,6 @@ class TestPrepareUpdate(DBTestCase):
         self.check_prepare_update(True)
     
     
-        
+
+class TestApplyUpdate(TestCase):
+    pass

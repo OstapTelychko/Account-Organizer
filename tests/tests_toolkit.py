@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
 import shutil
+import os
+from typing import TYPE_CHECKING, Callable
 from functools import wraps
 from traceback import format_exception
 
@@ -14,8 +15,9 @@ from unittest.mock import Mock
 from PySide6.QtCore import QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CATEGORY_TYPE, TEST_BACKUPS_DIRECTORY
 from AppManagement.category import activate_categories, remove_categories_from_list
+from AppManagement.backup_management import remove_backup
 from GUI.category import load_category
 
 from AppObjects.app_core import AppCore
@@ -102,7 +104,7 @@ class DBTestCase(TestCase):
     
     @staticmethod
     def set_up_decorator(func:Callable[[DBTestCase], None]) -> Callable[[DBTestCase], None]:
-        """This decorator is used to set up the test case. It creates first objects so you don't have to create them in every test case.
+        """This decorator is used to set up the test case. It creates first objects so we don't have to create them in every test case.
 
             Arguments
             ---------
@@ -115,6 +117,8 @@ class DBTestCase(TestCase):
         app_core = AppCore.instance()
         @wraps(func)
         def wrapper(self:DBTestCase) -> None:
+            os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
+
             app_core.db.category_query.create_category("Test income category", "Incomes", 0)
             app_core.db.category_query.create_category("Test expenses category", "Expenses", 0)
             
@@ -151,6 +155,16 @@ class DBTestCase(TestCase):
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
     
 
+    def remove_all_backups(self) -> None:
+        """This method is used to remove all backups in application memory created during the test."""
+        
+        while AppCore.instance().backups:
+            WindowsRegistry.BackupManagementWindow.backups_table.selectRow(0)
+            QTimer.singleShot(100, WindowsRegistry.Messages.below_recommended_min_backups.ok_button.click)
+            QTimer.singleShot(150, WindowsRegistry.Messages.delete_backup_confirmation.ok_button.click)
+            remove_backup()
+
+
     def tearDown(self) -> None:
         """This method is used to remove the test database after the test is finished."""
 
@@ -164,6 +178,10 @@ class DBTestCase(TestCase):
         
         app_core.config.account_name = "Test user"
         app_core.db.set_account_id(app_core.config.account_name)
+        
+        self.remove_all_backups()
+        if os.path.exists(TEST_BACKUPS_DIRECTORY):
+            shutil.rmtree(TEST_BACKUPS_DIRECTORY)
 
 
 

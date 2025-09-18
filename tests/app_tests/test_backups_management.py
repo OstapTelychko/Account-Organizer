@@ -22,22 +22,6 @@ if TYPE_CHECKING:
 class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     """Test backup management in the application."""
 
-    def setUp(self) -> None:
-        """Create test backups directory"""
-
-        os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
-        return super().setUp()
-
-
-    def tearDown(self) -> None:
-        """Remove test backups directory and clear backups list and table"""
-
-        WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(0)
-        AppCore.instance().backups.clear()
-        shutil.rmtree(TEST_BACKUPS_DIRECTORY)
-        return super().tearDown()
-
-
     def open_backup_management_window(self, func:Callable[[], None]) -> None:
         """Open backup management window and call function after some delay.
 

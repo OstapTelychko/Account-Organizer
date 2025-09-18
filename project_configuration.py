@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from sys import platform
 
 APP_NAME = "Account Organizer"
 APP_HOST = "127.0.0.1"
@@ -17,6 +18,11 @@ if APP_DIRECTORY.find("_internal")  == -1:
 else:
     ROOT_DIRECTORY = APP_DIRECTORY.replace("/_internal","")
     DEVELOPMENT_MODE = False
+
+if platform == "win32":
+    MAIN_EXECUTABLE = "main.exe"
+else:
+    MAIN_EXECUTABLE = "main"
 
 IMAGES_DIRECTORY = f"{APP_DIRECTORY}Images/"
 FLAGS_DIRECTORY = f"{IMAGES_DIRECTORY}Flags/"
