@@ -21,6 +21,7 @@ from tests.tests_toolkit import DBTestCase, assert_any_call_with_details, is_act
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppObjects.app_core import AppCore
+from AppObjects import app_core as app_core_module
 from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
@@ -38,19 +39,22 @@ from project_configuration import DEVELOPMENT_ROOT_DIRECTORY, WINDOWS_GUI_LIBRAR
 
 if TYPE_CHECKING:
     from types import FunctionType
-    from typing import NewType
+    from typing import NewType, Any
 
     MockedResponse = NewType("MockedResponse", type("MockedResponse2", (MagicMock, Response), {}))#type: ignore[misc]
     MockedFunction = NewType("MockedFunction", type("MockedFunction2", (MagicMock, FunctionType), {}))#type: ignore[misc]
     MockedVariable = NewType("MockedVariable", type("MockedVariable2", (MagicMock, bool, str, int, float, dict, set, list, tuple), {}))#type: ignore[misc]
     MockedZipFile = NewType("MockedZipFile", type("MockedZipFile2", (MagicMock, ZipFile), {}))#type: ignore[misc]
+    MockedAppCore = NewType("MockedAppCore", type("MockedAppCore2", (MagicMock, AppCore), {}))#type: ignore[misc]
+
+    ASSET = dict[str, Any]
 
 
 class TestDownloadUpdate(TestCase):
     """Test update application functionality."""
 
     def setUp(self) -> None:
-        self.test_assets = [
+        self.test_assets: list[ASSET] = [
             {
                 "url": "https://api.github.com/repos/OstapTelychko/Account-Organizer/releases/assets/274696711",
                 "id": 274696711,
@@ -342,14 +346,14 @@ class TestDownloadUpdate(TestCase):
 
         mock_path_exists.return_value = True
 
-        update_zip_download_name = ""
-        update_zip_download_url = ""
-        update_zip_size = 0
+        update_zip_download_name:str = ""
+        update_zip_download_url:str = ""
+        update_zip_size:int = 0
         for asset in self.test_assets:
             if asset["name"] == LINUX_UPDATE_ZIP:
-                update_zip_download_name:str = asset["name"]
-                update_zip_download_url:str = asset["browser_download_url"]
-                update_zip_size:int = asset["size"]
+                update_zip_download_name = asset["name"]
+                update_zip_download_url = asset["browser_download_url"]
+                update_zip_size = asset["size"]
         self.assertNotEqual("", update_zip_download_name, f"Test update asset {LINUX_UPDATE_ZIP} not found in test assets.")
 
         mock_zip_file_instance = MagicMock()
@@ -400,14 +404,14 @@ class TestDownloadUpdate(TestCase):
         mock_successful_response.raise_for_status = MagicMock(return_value=None)
         mock_get.return_value = mock_successful_response
 
-        gui_library_zip_download_name = ""
-        gui_library_zip_download_url = ""
-        gui_library_zip_size = 0
+        gui_library_zip_download_name:str = ""
+        gui_library_zip_download_url:str = ""
+        gui_library_zip_size:int = 0
         for asset in self.test_assets:
             if asset["name"] == LINUX_GUI_LIBRARY_ZIP:
-                gui_library_zip_download_name:str = asset["name"]
-                gui_library_zip_download_url:str = asset["browser_download_url"]
-                gui_library_zip_size:int = asset["size"]
+                gui_library_zip_download_name = asset["name"]
+                gui_library_zip_download_url = asset["browser_download_url"]
+                gui_library_zip_size = asset["size"]
         self.assertNotEqual("", gui_library_zip_download_name, f"Test GUI library asset {LINUX_GUI_LIBRARY_ZIP} not found in test assets.")
 
         mock_zip_file_instance = MagicMock()
@@ -730,11 +734,8 @@ class TestApplyUpdate(TestCase):
     def setUp(self) -> None:
         """Setup for apply update tests."""
 
-        patched_AppCore_instance = AppCore.instance()
-        patched_AppCore_instance.restart_app = MagicMock(return_value=None)
-        self.patched_appcore = patch.object(AppCore, "instance", return_value=patched_AppCore_instance)
+        self.patched_appcore = patch.object(AppCore, "_AppCore__instance")
 
-        self.patched_close_connection = patch.object(AppCore.instance().db, "close_connection", new=MagicMock())
         self.patched_rmtree = patch("AppManagement.AppUpdate.apply_update.shutil.rmtree", autospec=True)
         self.patched_move = patch("AppManagement.AppUpdate.apply_update.shutil.move", autospec=True)
 
@@ -747,11 +748,14 @@ class TestApplyUpdate(TestCase):
         self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=False)
         self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=True)
 
-        self.mock_close_connection:MockedFunction = self.patched_close_connection.start()
+        self.mock_appcore:MockedAppCore = self.patched_appcore.start()
+        self.mock_appcore.restart_app = MagicMock(return_value=None)
+        self.mock_close_connection = MagicMock(return_value=None)
+        self.mock_appcore.db.close_connection = self.mock_close_connection
+
         self.mock_rmtree:MockedFunction = self.patched_rmtree.start()
         self.mock_move:MockedFunction = self.patched_move.start()
 
-        self.patched_appcore.start()
         self.patched_update_directory.start()
         self.patched_update_app_directory.start()
         self.patched_update_backups_directory.start()
@@ -763,7 +767,6 @@ class TestApplyUpdate(TestCase):
     def tearDown(self) -> None:
 
         self.patched_appcore.stop()
-        self.patched_close_connection.stop()
         self.patched_rmtree.stop()
         self.patched_move.stop()
 

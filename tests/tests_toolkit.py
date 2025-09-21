@@ -65,7 +65,7 @@ def qsleep(milliseconds:int) -> None:
     loop.exec()
 
 
-def assert_any_call_with_details(mock: Mock, *args, msg: str | None = None, **kwargs) -> None:
+def assert_any_call_with_details(mock: Mock, *args:Any, msg: str | None = None, **kwargs:dict[str, Any]) -> None:
     """
     Like mock.assert_any_call but if it fails raises AssertionError that
     includes mock.call_args_list for easier debugging.
