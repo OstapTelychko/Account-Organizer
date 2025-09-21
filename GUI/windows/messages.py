@@ -49,7 +49,7 @@ class Messages(metaclass=QSingleton):
         self.no_selected_category = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Information, APP_NAME, APP_ICON)
 
         self.below_recommended_min_backups = MessageWindow(main_window, message_windows, True, QMessageBox.Icon.Critical, APP_NAME, APP_ICON)
-        self.delete_buckup_confirmation = MessageWindow(main_window, message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
+        self.delete_backup_confirmation = MessageWindow(main_window, message_windows, True, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
         self.different_app_version = MessageWindow(main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME, APP_ICON)
 
         self.load_backup_confirmation = MessageWindow(main_window, message_windows, True, QMessageBox.Icon.Question, APP_NAME, APP_ICON)

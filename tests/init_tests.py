@@ -11,7 +11,8 @@ from AppObjects.user_config import UserConfig
 from AppObjects.app_core import AppCore
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from backend.db_controller import DBController
-from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY, TEST_USER_CONF_PATH
+from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY,\
+    TEST_USER_CONF_PATH, TEST_UPDATE_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_UPDATE_APP_DIRECTORY
 
 from tests.tests_toolkit import ColoredTextTestResult
 
@@ -19,6 +20,27 @@ if TYPE_CHECKING:
     from typing import Callable
 
 
+
+def cleanup_test_files() -> None:
+    """Clean up test files and directories."""
+
+    if os.path.exists(TEST_USER_CONF_PATH):
+        os.remove(TEST_USER_CONF_PATH)
+
+    if os.path.exists(TEST_BACKUPS_DIRECTORY):
+        shutil.rmtree(TEST_BACKUPS_DIRECTORY)
+
+    if os.path.exists(TEST_DB_FILE_PATH):
+        os.remove(TEST_DB_FILE_PATH)
+
+    if os.path.exists(TEST_UPDATE_DIRECTORY):
+        shutil.rmtree(TEST_UPDATE_DIRECTORY)
+
+    if os.path.exists(TEST_APP_HASHES_DIRECTORY):
+        shutil.rmtree(TEST_APP_HASHES_DIRECTORY)
+
+    if os.path.exists(TEST_UPDATE_APP_DIRECTORY):
+        shutil.rmtree(TEST_UPDATE_APP_DIRECTORY)
 
 
 def test_main(app_main:Callable[[bool], None]) -> None:
@@ -28,7 +50,9 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         ---------
             `app_main` : - Main function of the application.
     """
-    
+
+    cleanup_test_files()
+
     test_alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
     test_alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
     test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
@@ -55,7 +79,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     from tests.app_tests.test_statistics import TestStatistics
     from tests.app_tests.test_backups_management import TestBackupsManagement
     from tests.app_tests.test_shortcuts import TestShortcuts
-    from tests.app_tests.test_update_app import TestUpdateApp
+    from tests.app_tests.test_update_app import TestDownloadUpdate, TestPrepareUpdate, TestApplyUpdate
 
     try:
         suite = TestSuite()
@@ -68,7 +92,9 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         loader.loadTestsFromTestCase(TestStatistics),
         loader.loadTestsFromTestCase(TestBackupsManagement),
         loader.loadTestsFromTestCase(TestShortcuts),
-        loader.loadTestsFromTestCase(TestUpdateApp),
+        loader.loadTestsFromTestCase(TestDownloadUpdate),
+        loader.loadTestsFromTestCase(TestPrepareUpdate),
+        loader.loadTestsFromTestCase(TestApplyUpdate)
         ))
         
         print(f"Tests found: {suite.countTestCases()}")
@@ -81,13 +107,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     finally:
         app_core.db.close_connection()
 
-        os.remove(TEST_USER_CONF_PATH)
-
-        if os.path.exists(TEST_BACKUPS_DIRECTORY):
-            shutil.rmtree(TEST_BACKUPS_DIRECTORY)
-        
-        if os.path.exists(TEST_DB_FILE_PATH):
-            os.remove(TEST_DB_FILE_PATH)
+        cleanup_test_files()
 
         os._exit(0)
         

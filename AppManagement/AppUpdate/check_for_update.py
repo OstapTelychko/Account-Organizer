@@ -3,6 +3,7 @@ from PySide6.QtCore import QTimer
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
+from AppObjects.app_exceptions import FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 
 from AppManagement.AppUpdate.download_update import get_latest_version, download_latest_update
 from AppManagement.AppUpdate.prepare_update import prepare_update
@@ -33,14 +34,20 @@ def check_for_updates() -> None:
             
             def _run_update() -> None:
                 logger.info("Running update")
-                if download_latest_update(release):
-                    logger.info("Downloaded latest update")
-                    prepare_update()
-                    apply_update()
-                else:
-                    logger.error("Failed to download latest update")
+                try:
+                    if download_latest_update(release):
+                        logger.info("Downloaded latest update")
+                        prepare_update()
+                        apply_update()
+                    else:
+                        logger.error("Failed to download latest update")
+                        WindowsRegistry.UpdateProgressWindow.done(1)
+                except FailedToDownloadUpdateZipError:
+                    logger.error("Failed to download latest update zip. Closing update window")
                     WindowsRegistry.UpdateProgressWindow.done(1)
-                    
+                except FailedToDownloadGUILibraryZipError:
+                    logger.error("Failed to download latest GUI library zip. Closing update window")
+                    WindowsRegistry.UpdateProgressWindow.done(1)       
 
             QTimer.singleShot(150, _run_update)
             WindowsRegistry.UpdateProgressWindow.exec()

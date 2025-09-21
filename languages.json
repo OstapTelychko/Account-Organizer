@@ -41,7 +41,7 @@
                     "1":"Date",
                     "2":"Value",
                     "Messages":{
-                        "0": "Enter the values you want to chanange",
+                        "0": "Enter the values you want to change",
                         "1": "\nEnter the name (optional) day and value of transaction for example:\n\tHarry Potter\t28\t13850\n\tSalary\t20\t25000"
                     }
                 },
@@ -171,8 +171,8 @@
                 "10": "The most lucrative categories ",
                 "11": "The most lucrative transactions:",
                 "12": "No name",
-                "13": "The least lecrative category ",
-                "14": "The least lecrative categories ",
+                "13": "The least lucrative category ",
+                "14": "The least lucrative categories ",
                 "15": "The least lucrative transactions:",
                 "16": "Category ",
                 "17": "The most expensive category ",
@@ -240,7 +240,7 @@
             "29": "Update is available. Would you like to update?",
             "30": "<span style='color:red'>No internet connection.</span> Check connection and try again",
             "31": "Failed to check for updates. <span style='color:dodgerblue'>Check connection</span> and try again",
-            "32": "Update is successfuly <span style='color:dodgerblue'>applied</span>. App will restart now",
+            "32": "Update is successfully <span style='color:dodgerblue'>applied</span>. App will restart now",
             "33": "Keystroke <span style='color:dodgerblue'>`keystroke_value`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key"
         }
             
@@ -460,7 +460,7 @@
         "Messages":{
             "0": "Ви ввели неправильний <span style='color:red'>тип даних</span>, перевірте введені поля ще раз",
             "1": "Акаунт з такою <span style='color:red'>назвою</span> вже існує",
-            "2": "Ви не ввели <span style='color:dodgerblue'>поточного балансу</span>, поточний баланс буде зарахований як <span style='color:dodgerblue'>0</span> (якщо це не є правдим значенням, можуть виникнути розбіжності між реальним і поточним балансом). <span style='color:dodgerblue'>Продовжити?</span>",
+            "2": "Ви не ввели <span style='color:dodgerblue'>поточного балансу</span>, поточний баланс буде зарахований як <span style='color:dodgerblue'>0</span> (якщо це не є правдивим значенням, можуть виникнути розбіжності між реальним і поточним балансом). <span style='color:dodgerblue'>Продовжити?</span>",
             "3": "Ця категорія <span style='color:red'>вже існує</span>",
             "4": "Ви впевнені, що хочете <span style='color:red'>видалити</span> категорію? Ви втратите <span style='color:red'>ВСІ транзакції</span>, додані до цієї категорії, і ваш поточний баланс буде <span style='color:dodgerblue'>перераховано</span>",
             "5": "Виберіть запис. (Щоб вибрати запис натисніть на його номер)",
@@ -512,7 +512,7 @@
         },
 
         "General management":{
-            "0": "Usunąnć",
+            "0": "Usunąć",
             "1": "Dodać",
             "2": "Zmienić nazwę",
             "3": "Ok",
@@ -620,7 +620,7 @@
                         "0":"<b>Zamknąć aktualne okno</b>",
                         "1":"<b>Otworzyć okno ustawień</b>",
                         "2":"<b>Otworzyć okno statystyk</b>",
-                        "3":"<b>Źmienić konto</b>",
+                        "3":"<b>Zmienić konto</b>",
                         "4":"<b>Przełącz na dochody</b>",
                         "5":"<b>Przełącz na wydatki</b>",
                         "6":"<b>Załaduj poprzedni miesiąc</b>",
@@ -638,7 +638,7 @@
                         "0":"Zamknie aktualne okno, ale nie zamknie aplikacji",
                         "1":"Otworzy okno ustawień",
                         "2":"Otworzy okno statystyk",
-                        "3":"Otworzy okno zmiany konta, zmiast otwierać okno ustawień po sto razy",
+                        "3":"Otworzy okno zmiany konta, zamiast otwierać okno ustawień po sto razy",
                         "4":"Przełączy pokazywane kategorie na dochody",
                         "5":"Przełączy pokazywane kategorie na wydatki",
                         "6":"Załaduje kategorie i ich transakcje z poprzedniego miesiąca",
@@ -705,7 +705,7 @@
         },
 
         "Messages":{
-            "0": "Wpisaliscie nie korektny <span style='color:red'>typ danych</span>, sprawdź wpisane dane znow",
+            "0": "Wpisaliscie nie poprawny <span style='color:red'>typ danych</span>, sprawdź wpisane dane znow",
             "1": "Konto z takim <span style='color:red'>imieniem</span> już istnieje",
             "2": "Nie podałeś <span style='color:dodgerblue'>aktualnego salda</span>, saldo będzie równe <span style='color:dodgerblue'>0</span> (jeśli to nieprawdziwe znaczenie, wystąpi rozbieżność między rzeczywistym saldem a saldem w programie). <span style='color:dodgerblue'>Kontynuować?</span>",
             "3": "Ta kategoria <span style='color:red'>już istnieje</span>",

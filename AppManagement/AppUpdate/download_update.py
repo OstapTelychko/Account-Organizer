@@ -8,6 +8,7 @@ from sys import platform
 from zipfile import ZipFile, ZIP_DEFLATED
 
 import requests as req
+from requests.exceptions import HTTPError
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
@@ -18,6 +19,7 @@ WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTE
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError, FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 
 try:
     from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
@@ -144,64 +146,54 @@ def check_internet_connection() -> bool:
         return False
 
 
-def get_prerelease() -> RELEASE | None:
+def get_prerelease() -> RELEASE:
     """Get the latest prerelease version of the app from GitHub releases.
 
         Returns
         -------
-        `RELEASE_TYPE | None`: The latest prerelease version of the app or None if not found.
-    """
-    
-    try:
-        request_session = requests_retry_session()
-        if UPDATE_API_TOKEN:
-            response = request_session.get(RELEASES_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
-        else:
-            response = request_session.get(RELEASES_URL, timeout=15)
-        response.raise_for_status()
+        `RELEASE_TYPE`: The latest prerelease version of the app.
+    """    
 
-        if response.status_code != 200:
-            logger.error(f"Failed to get releases: {response.status_code}")
-            return None
+    request_session = requests_retry_session()
+    if UPDATE_API_TOKEN:
+        response = request_session.get(RELEASES_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+    else:
+        response = request_session.get(RELEASES_URL, timeout=15)
+    response.raise_for_status()
 
-        releases:list[RELEASE] = response.json()
-        for release in releases:
-            if release.get("prerelease", False):
-                return release
-        
-        return None
-    
-    except Exception as e:
-        logger.error(f"Unexpected exception: {e}")
-        return None
+    if response.status_code != 200:
+        logger.error(f"Failed to get releases: {response.status_code}")
+        raise HTTPError(f"Failed to get releases: {response.status_code}")
+
+    releases:list[RELEASE] = response.json()
+    for release in releases:
+        if release.get("prerelease", False):
+            return release
+
+    raise PrereleaseNotFoundError(f"No prerelease version found. Releases list: {releases}")
 
 
-def get_release() -> RELEASE | None:
+def get_release() -> RELEASE:
     """Get the latest release version of the app from GitHub releases.
 
         Returns
         -------
-        `RELEASE_TYPE | None`: The latest release version of the app or None if not found.
+        `RELEASE_TYPE`: The latest release version of the app.
     """
 
-    try:
-        request_session = requests_retry_session()
-        if UPDATE_API_TOKEN:
-            response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
-        else:
-            response = request_session.get(LATEST_RELEASE_URL, timeout=15)
-        response.raise_for_status()
+    request_session = requests_retry_session()
+    if UPDATE_API_TOKEN:
+        response = request_session.get(LATEST_RELEASE_URL, headers={"Authorization": f"token {UPDATE_API_TOKEN}"}, timeout=15)
+    else:
+        response = request_session.get(LATEST_RELEASE_URL, timeout=15)
+    response.raise_for_status()
 
-        if response.status_code != 200:
-            logger.error(f"Failed to get latest release: {response.status_code}")
-            raise RuntimeError(f"Failed to get latest release: {response.status_code}")
+    if response.status_code != 200:
+        logger.error(f"Failed to get latest release: {response.status_code}")
+        raise HTTPError(f"Failed to get latest release: {response.status_code}")
 
-        release:RELEASE = response.json()
-        return release
-    
-    except Exception as e:
-        logger.error(f"Unexpected exception: {e}")
-        return None
+    release:RELEASE = response.json()
+    return release
 
 
 def get_latest_version() -> tuple[str, RELEASE] | None:
@@ -276,11 +268,11 @@ def get_platform_assets(assets: ASSETS) -> tuple[UPDATE_ASSET, GUI_LIBRARY_ASSET
 
     if not update_asset:
         logger.error(f"No update asset found for {platform} platform.")
-        raise RuntimeError(f"No update asset found for {platform} platform.")
+        raise UpdateAssetNotFoundError(f"No update asset found for {platform} platform.")
 
     if not gui_library_asset:
         logger.error(f"No GUI library asset found for {platform} platform. Update can't be performed.")
-        raise RuntimeError(f"No GUI library asset found for {platform} platform. Update can't be performed.")
+        raise GUILibraryAssetNotFoundError(f"No GUI library asset found for {platform} platform. Update can't be performed.")
 
     return update_asset, gui_library_asset
 
@@ -303,6 +295,9 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
         
     download_response = req.get(update_zip_download_url, stream=True, timeout=15)
     download_response.raise_for_status()
+
+    if download_response.status_code != 200:
+        raise HTTPError(f"Failed to download update zip: status code {download_response.status_code} expected 200")
 
     download_size = 0
 
@@ -342,6 +337,9 @@ def download_gui_library_zip(gui_zip_download_url: str, gui_zip_download_name: s
     download_response = req.get(gui_zip_download_url, stream=True, timeout=15)
     download_response.raise_for_status()
 
+    if download_response.status_code != 200:
+        raise HTTPError(f"Failed to download gui library zip: status code {download_response.status_code} expected 200")
+
     download_size = 0
 
     logger.info(f"Saving GUI library on disk. Attempt {attempt}")
@@ -370,84 +368,75 @@ def download_latest_update(release: RELEASE) -> bool:
     """
 
     try:
-        try:
-            assets = release["assets"]
-        except KeyError:
-            logger.error("No assets found in the latest release.")
-            return False
+        assets = release["assets"]
+    except KeyError:
+        logger.error("No assets found in the latest release.")
+        return False
 
-        except json.JSONDecodeError:
-            logger.error("Failed to decode JSON response.")
-            return False
+    update_asset, gui_library_asset = get_platform_assets(assets)
 
-        update_asset, gui_library_asset = get_platform_assets(assets)
+    update_zip_download_name, update_zip_download_url, update_zip_size, update_zip_hash = update_asset
+    gui_zip_download_name, gui_zip_download_url, gui_zip_size, gui_zip_hash = gui_library_asset
 
-        update_zip_download_name, update_zip_download_url, update_zip_size, update_zip_hash = update_asset
-        gui_zip_download_name, gui_zip_download_url, gui_zip_size, gui_zip_hash = gui_library_asset
+    update_zip_hash = update_zip_hash.replace("sha256:", "")
+    gui_zip_hash = gui_zip_hash.replace("sha256:", "")
 
-        update_zip_hash = update_zip_hash.replace("sha256:", "")
-        gui_zip_hash = gui_zip_hash.replace("sha256:", "")
+    if not all((isinstance(update_zip_size, int), isinstance(update_zip_download_url, str), isinstance(update_zip_download_name, str), isinstance(update_zip_hash, str))):
+        logger.error(f"""No update found or update is not available for this platform.
+                        Update zip size: {update_zip_size},
+                        Update zip download URL: {update_zip_download_url},
+                        Update zip download name: {update_zip_download_name},
+                        Update zip hash: {update_zip_hash}""")
+        return False
+
+    if not all((isinstance(gui_zip_size, int), isinstance(gui_zip_download_url, str), isinstance(gui_zip_download_name, str), isinstance(gui_zip_hash, str))):
+        logger.error(f"""No GUI library found or GUI library is not available for this platform.
+                        GUI zip size: {gui_zip_size},
+                        GUI zip download URL: {gui_zip_download_url},
+                        GUI zip download name: {gui_zip_download_name},
+                        GUI zip hash: {gui_zip_hash}""")
+        return False
+
+    for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
+        download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
+
+        current_update_zip_hash = generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}")
+        if current_update_zip_hash == update_zip_hash:
+            logger.info(f"Update zip hash matches: {update_zip_hash}")
+            break
+        else:
+            logger.warning(f"Update zip hash does not match: Remote: {update_zip_hash} | Current: {current_update_zip_hash}. Retrying download...")
+            if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
+                logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+                raise FailedToDownloadUpdateZipError(f"Failed to download update zip. After {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+
+    if os.path.exists(GUI_LIBRARY_HASH_FILE_PATH):
+        logger.debug("Retrieving GUI library hash...")
+        with open(GUI_LIBRARY_HASH_FILE_PATH, "r") as hash_file:
+            current_gui_library_hash = hash_file.read().strip()
+    else:
+        logger.debug("GUI library hash file does not exist. GUI library will be downloaded.")
+        current_gui_library_hash = ""
         
-        if not (isinstance(update_zip_size, int) and isinstance(update_zip_download_url, str) and isinstance(update_zip_download_name, str) and isinstance(update_zip_hash, str)):
-            logger.error(f"""No update found or update is not available for this platform.
-                         Update zip size: {update_zip_size},
-                         Update zip download URL: {update_zip_download_url},
-                         Update zip download name: {update_zip_download_name},
-                         Update zip hash: {update_zip_hash}""")
-            return False
-
-        if not (isinstance(gui_zip_size, int) and isinstance(gui_zip_download_url, str) and isinstance(gui_zip_download_name, str) and isinstance(gui_zip_hash, str)):
-            logger.error(f"""No GUI library found or GUI library is not available for this platform.
-                         GUI zip size: {gui_zip_size},
-                         GUI zip download URL: {gui_zip_download_url},
-                         GUI zip download name: {gui_zip_download_name},
-                         GUI zip hash: {gui_zip_hash}""")
-            return False
+    if current_gui_library_hash != gui_zip_hash:
+        logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Downloading GUI library zip...")
 
         for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
-            download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
+            download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
 
-            current_update_zip_hash = generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}")
-            if current_update_zip_hash == update_zip_hash:
-                logger.info(f"Update zip hash matches: {update_zip_hash}")
+            current_gui_library_hash = generate_file_256hash(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
+            if current_gui_library_hash == gui_zip_hash:
+                logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
+                os.remove(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
+                # Save the hash to the GUI library hash file
+                with open(GUI_LIBRARY_HASH_FILE_PATH, "w") as hash_file:
+                    hash_file.write(current_gui_library_hash)
+
                 break
             else:
-                logger.warning(f"Update zip hash does not match: Remote: {update_zip_hash} | Current: {current_update_zip_hash}. Retrying download...")
+                logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Retrying download...")
                 if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
-                    logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
-                    return False
+                    logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+                    raise FailedToDownloadGUILibraryZipError(f"Failed to download GUI library zip. After {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
 
-        if os.path.exists(GUI_LIBRARY_HASH_FILE_PATH):
-            logger.debug("Retrieving GUI library hash...")
-            with open(GUI_LIBRARY_HASH_FILE_PATH, "r") as hash_file:
-                current_gui_library_hash = hash_file.read().strip()
-        else:
-            logger.debug("GUI library hash file does not exist. GUI library will be downloaded.")
-            current_gui_library_hash = ""
-            
-        if current_gui_library_hash != gui_zip_hash:
-            logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Downloading GUI library zip...")
-
-            for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
-                download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
-
-                current_gui_library_hash = generate_file_256hash(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
-                if current_gui_library_hash == gui_zip_hash:
-                    logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
-                    os.remove(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
-                    # Save the hash to the GUI library hash file
-                    with open(GUI_LIBRARY_HASH_FILE_PATH, "w") as hash_file:
-                        hash_file.write(current_gui_library_hash)
-
-                    break
-                else:
-                    logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Retrying download...")
-                    if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
-                        logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
-                        return False
-
-        return True
-    
-    except Exception as e:
-        logger.error(f"Unexpected exception: {e}")
-        return False
+    return True

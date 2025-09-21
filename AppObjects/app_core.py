@@ -116,7 +116,7 @@ class AppCore:
 
     @staticmethod
     def load_app_version() -> str:
-        """Load app version from file. It reads the version from the file and sets it to the app_version variable."""
+        """Load app version from file and returns as string."""
 
         with open(f"{APP_DIRECTORY}/app version.txt") as file:
             app_version = file.read().strip()

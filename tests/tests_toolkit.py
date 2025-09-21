@@ -1,23 +1,23 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Any
-import pkgutil
 import shutil
-from functools import wraps, partial
+import os
+from typing import TYPE_CHECKING, Callable
+from functools import wraps
 from traceback import format_exception
-
-from unittest import TestCase, TextTestResult
-from unittest.mock import patch, create_autospec, DEFAULT as MOCK_DEFAULT, MagicMock
 
 from colorama import init as colorama_init, Fore
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
 
+from unittest import TestCase, TextTestResult
+from unittest.mock import Mock
 from PySide6.QtCore import QEventLoop, QTimer
 
 from backend.models import Category, Transaction, Account
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CATEGORY_TYPE, TEST_BACKUPS_DIRECTORY
 from AppManagement.category import activate_categories, remove_categories_from_list
+from AppManagement.backup_management import remove_backup
 from GUI.category import load_category
 
 from AppObjects.app_core import AppCore
@@ -28,11 +28,11 @@ from AppObjects.logger import get_logger
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
     from unittest.runner import _WritelnDecorator
+    from unittest.mock import _patch
     from typing import Type, Tuple, Iterable, Any
     from types import TracebackType
 
     OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
-    UnpatchedFunction = Callable[..., Any]
 
 
 
@@ -52,58 +52,49 @@ SEPARATOR2 = "-"
 
 logger = get_logger(__name__)
 
-def qsleep(miliseconds:int) -> None:
+def qsleep(milliseconds:int) -> None:
     """Sleep for a given number of milliseconds. time.sleep() is not used because it blocks the main event loop.
 
         Arguments
         ---------
-            `miliseconds` : (int) - Number of milliseconds to sleep.
+            `milliseconds` : (int) - Number of milliseconds to sleep.
     """
 
     loop = QEventLoop()
-    QTimer.singleShot(miliseconds, loop.quit)
+    QTimer.singleShot(milliseconds, loop.quit)
     loop.exec()
 
 
-def safe_patch(target:str, spec:Any|None=None) -> Callable[[UnpatchedFunction], Callable[[UnpatchedFunction], Any]]:
-    """Patch with create_autospec(spec, spec_set=True) and inject as argument."""
+def assert_any_call_with_details(mock: Mock, *args:Any, msg: str | None = None, **kwargs:dict[str, Any]) -> None:
+    """
+    Like mock.assert_any_call but if it fails raises AssertionError that
+    includes mock.call_args_list for easier debugging.
+    """
 
-    def decorator(func):
+    if not hasattr(mock, "assert_any_call"):
+        raise TypeError(f"First argument must be a Mock instance not {type(mock).__name__}")
 
-        @wraps(func)
-        def wrapper(*args, **kwargs):
+    try:
+        mock.assert_any_call(*args, **kwargs)
+    except AssertionError as exc:
+        calls = getattr(mock, "call_args_list", [])
+        prefix = f"{msg}\n" if msg else ""
+        calls_string = "\n".join(f"Call {call_number}: {call}" for call_number, call in enumerate(calls, start=1))
+        detailed = f"{prefix}{exc}\n\nCalls list:\n{calls_string}"
+        raise AssertionError(detailed) from None
 
-            original = MOCK_DEFAULT
-            if not spec:
-                try:
-                    target_module, attribute = target.rsplit('.', 1)
-                except (TypeError, ValueError, AttributeError):
-                    raise TypeError(
-                        f"Need a valid target to patch. You supplied: {target!r}")
-                
-                getter, name = partial(pkgutil.resolve_name, target_module), attribute
 
-                getter = getter()
-                try:
-                    original = getter.__dict__[name]
-                except (AttributeError, KeyError):
-                    original = getattr(getter, name, MOCK_DEFAULT)
+def is_active_patch(patch:_patch[Any]) -> bool:
+    """Check if a patch is active.
 
-                mock_obj = create_autospec(original, spec_set=True)
-            else:
-                mock_obj = create_autospec(spec, spec_set=True)
-
-            if callable(spec) or original is not MOCK_DEFAULT and callable(original):                    
-                mock_obj = MagicMock(spec=mock_obj, spec_set=True)#For some reason spec_set=True is not working with functions in create_autospec, but it works if created MagickMock manually
-
-            with patch(target, new=mock_obj):
-                args = list(args)
-                args.append(mock_obj)
-                return func(*args, **kwargs)
-            
-        return wrapper
-    return decorator
-
+        Arguments
+        ---------
+            `patch` : (_patch) - Patch to check.
+        Returns
+        -------
+            `bool` - True if the patch is active, False otherwise.
+    """
+    return getattr(patch, "is_local", False)
 
 
 class DBTestCase(TestCase):
@@ -127,7 +118,7 @@ class DBTestCase(TestCase):
     
     @staticmethod
     def set_up_decorator(func:Callable[[DBTestCase], None]) -> Callable[[DBTestCase], None]:
-        """This decorator is used to set up the test case. It creates first objects so you don't have to create them in every test case.
+        """This decorator is used to set up the test case. It creates first objects so we don't have to create them in every test case.
 
             Arguments
             ---------
@@ -140,6 +131,8 @@ class DBTestCase(TestCase):
         app_core = AppCore.instance()
         @wraps(func)
         def wrapper(self:DBTestCase) -> None:
+            os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
+
             app_core.db.category_query.create_category("Test income category", "Incomes", 0)
             app_core.db.category_query.create_category("Test expenses category", "Expenses", 0)
             
@@ -176,6 +169,16 @@ class DBTestCase(TestCase):
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
     
 
+    def remove_all_backups(self) -> None:
+        """This method is used to remove all backups in application memory created during the test."""
+        
+        while AppCore.instance().backups:
+            WindowsRegistry.BackupManagementWindow.backups_table.selectRow(0)
+            QTimer.singleShot(100, WindowsRegistry.Messages.below_recommended_min_backups.ok_button.click)
+            QTimer.singleShot(150, WindowsRegistry.Messages.delete_backup_confirmation.ok_button.click)
+            remove_backup()
+
+
     def tearDown(self) -> None:
         """This method is used to remove the test database after the test is finished."""
 
@@ -189,6 +192,10 @@ class DBTestCase(TestCase):
         
         app_core.config.account_name = "Test user"
         app_core.db.set_account_id(app_core.config.account_name)
+        
+        self.remove_all_backups()
+        if os.path.exists(TEST_BACKUPS_DIRECTORY):
+            shutil.rmtree(TEST_BACKUPS_DIRECTORY)
 
 
 
@@ -226,7 +233,7 @@ class OutOfScopeTestCase(TestCase):
 
     @staticmethod
     def check_out_of_scope_failure(func:Callable[[OutOfScopeTestCase], None]) -> Callable[[OutOfScopeTestCase], None]:
-        """This decorator checks if in assertions errors occured out of scope and raises them."""
+        """This decorator checks if in assertions errors occurred out of scope and raises them."""
 
         @wraps(func)
         def wrapper(self:OutOfScopeTestCase) -> None:
