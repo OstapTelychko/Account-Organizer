@@ -28,7 +28,8 @@ from AppObjects.logger import get_logger
 if TYPE_CHECKING:
     from AppObjects.category import Category as GUICategory
     from unittest.runner import _WritelnDecorator
-    from typing import Type, Tuple, Iterable
+    from unittest.mock import _patch
+    from typing import Type, Tuple, Iterable, Any
     from types import TracebackType
 
     OptExcInfo = Tuple[Type[BaseException], BaseException, TracebackType] | Tuple[None, None, None]
@@ -81,6 +82,19 @@ def assert_any_call_with_details(mock: Mock, *args, msg: str | None = None, **kw
         calls_string = "\n".join(f"Call {call_number}: {call}" for call_number, call in enumerate(calls, start=1))
         detailed = f"{prefix}{exc}\n\nCalls list:\n{calls_string}"
         raise AssertionError(detailed) from None
+
+
+def is_active_patch(patch:_patch[Any]) -> bool:
+    """Check if a patch is active.
+
+        Arguments
+        ---------
+            `patch` : (_patch) - Patch to check.
+        Returns
+        -------
+            `bool` - True if the patch is active, False otherwise.
+    """
+    return getattr(patch, "is_local", False)
 
 
 class DBTestCase(TestCase):

@@ -34,7 +34,7 @@ class DBController():
     def __init__(self, test_mode:bool, test_alembic_config:Config|None = None) -> None:
         # Init db connection 
 
-        logger.info("Loadin alembic config")
+        logger.info("Loading alembic config")
         self.alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
         self.alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
         self.alembic_config.set_main_option("sqlalchemy.url", DB_PATH)
@@ -78,7 +78,7 @@ class DBController():
 
 
     def close_connection(self) -> None:
-        """Close the database connection and commit the session."""
+        """Close the database connection."""
 
         logger.info("Closing db connection")
         self.engine.dispose(close=True)

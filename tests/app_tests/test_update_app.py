@@ -14,23 +14,27 @@ from pathlib import Path
 from zipfile import ZipFile
 from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
+from PySide6.QtCore import QTimer
 
-from tests.tests_toolkit import DBTestCase, assert_any_call_with_details
+from tests.tests_toolkit import DBTestCase, assert_any_call_with_details, is_active_patch
 
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppObjects.app_core import AppCore
+from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
     get_platform_assets, download_update_zip, download_gui_library_zip, download_latest_update
 from AppManagement.AppUpdate.prepare_update import prepare_update, create_single_backup, migrate_single_backup
+from AppManagement.AppUpdate.apply_update import apply_update
 from AppManagement.backup_management import create_backup
 
-from project_configuration import WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
+from project_configuration import DEVELOPMENT_ROOT_DIRECTORY, WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
     TEST_PREVIOUS_VERSION_COPY_DIRECTORY, TEST_BACKUPS_DIRECTORY, TEST_UPDATE_BACKUPS_DIRECTORY, \
     PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, MOVE_FILES_TO_UPDATE_INTERNAL,\
-    MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, APP_DIRECTORY, ALEMBIC_CONFIG_FILE
+    MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, APP_DIRECTORY, ALEMBIC_CONFIG_FILE, PREVIOUS_VERSION_COPY_DIRECTORY,\
+    ROOT_DIRECTORY, MAIN_EXECUTABLE, DEVELOPMENT_BACKUPS_DIRECTORY
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -607,7 +611,7 @@ class TestPrepareUpdate(DBTestCase):
         for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
             assert_any_call_with_details(self.mock_copytree, directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
 
-        if getattr(self.patched_linux_platform, "is_local", False):
+        if is_active_patch(self.patched_linux_platform):
             assert_any_call_with_details(self.mock_chmod, os.path.join(TEST_UPDATE_DIRECTORY, "main"), 0o755)
         else:
             self.assertNotIn(call(os.path.join(TEST_UPDATE_DIRECTORY, "main"), 0o755), self.mock_chmod.mock_calls,
@@ -722,4 +726,111 @@ class TestPrepareUpdate(DBTestCase):
     
 
 class TestApplyUpdate(TestCase):
-    pass
+
+    def setUp(self) -> None:
+        """Setup for apply update tests."""
+
+        patched_AppCore_instance = AppCore.instance()
+        patched_AppCore_instance.restart_app = MagicMock(return_value=None)
+        self.patched_appcore = patch.object(AppCore, "instance", return_value=patched_AppCore_instance)
+
+        self.patched_close_connection = patch.object(AppCore.instance().db, "close_connection", new=MagicMock())
+        self.patched_rmtree = patch("AppManagement.AppUpdate.apply_update.shutil.rmtree", autospec=True)
+        self.patched_move = patch("AppManagement.AppUpdate.apply_update.shutil.move", autospec=True)
+
+        self.patched_update_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY)
+        self.patched_update_app_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
+        self.patched_update_backups_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
+        self.patched_backups_directory = patch("AppManagement.AppUpdate.apply_update.BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
+        self.patched_update_backups_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
+
+        self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=False)
+        self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=True)
+
+        self.mock_close_connection:MockedFunction = self.patched_close_connection.start()
+        self.mock_rmtree:MockedFunction = self.patched_rmtree.start()
+        self.mock_move:MockedFunction = self.patched_move.start()
+
+        self.patched_appcore.start()
+        self.patched_update_directory.start()
+        self.patched_update_app_directory.start()
+        self.patched_update_backups_directory.start()
+        self.patched_backups_directory.start()
+
+        return super().setUp()
+    
+
+    def tearDown(self) -> None:
+
+        self.patched_appcore.stop()
+        self.patched_close_connection.stop()
+        self.patched_rmtree.stop()
+        self.patched_move.stop()
+
+        self.patched_update_directory.stop()
+        self.patched_update_app_directory.stop()
+        self.patched_update_backups_directory.stop()
+        self.patched_backups_directory.stop()
+        self.patched_update_backups_directory.stop()
+
+        self.patched_disabled_development_mode.stop()
+        self.patched_enabled_development_mode.stop()
+
+        return super().tearDown()
+
+
+    def check_apply_update(self, old_internal:str, new_internal_destination:str, backups_directory:str) -> None:
+        """
+        Performs checks on apply_update function based on attributes
+            Args:
+            -----
+            `old_internal` (str): Path to the old _internal directory
+            `new_internal_destination` (str): Path where the new _internal directory should be moved to
+            `backups_directory` (str): Path where the backups directory are stored
+        """
+
+        if is_active_patch(self.patched_enabled_development_mode):
+            root_directory = DEVELOPMENT_ROOT_DIRECTORY
+        else:
+            root_directory = ROOT_DIRECTORY
+
+
+        QTimer.singleShot(150, WindowsRegistry.Messages.update_finished.ok_button.click)
+        apply_update()
+        self.mock_close_connection.assert_called_once()
+        assert_any_call_with_details(self.mock_move, old_internal,
+                                     os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
+        assert_any_call_with_details(self.mock_move, TEST_UPDATE_APP_DIRECTORY, new_internal_destination)
+
+        assert_any_call_with_details(self.mock_rmtree, backups_directory)
+        assert_any_call_with_details(self.mock_move, TEST_UPDATE_BACKUPS_DIRECTORY, root_directory)
+
+        assert_any_call_with_details(self.mock_move, os.path.join(root_directory, MAIN_EXECUTABLE),
+                                     os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, MAIN_EXECUTABLE))
+        assert_any_call_with_details(self.mock_move, os.path.join(TEST_UPDATE_DIRECTORY, MAIN_EXECUTABLE),
+                                     os.path.join(root_directory, MAIN_EXECUTABLE))
+        
+        assert_any_call_with_details(self.mock_rmtree, TEST_UPDATE_DIRECTORY)
+        self.assertFalse(WindowsRegistry.UpdateProgressWindow.isVisible(), "Update progress window is still visible after update apply")
+        self.assertTrue(WindowsRegistry.MainWindow.isVisible(), "Main windows is not visible after update apply")
+
+
+    def test_01_test_apply_update_development_false(self) -> None:
+        """Test apply update functionality. DEVELOPMENT_MODE is False."""
+
+        self.patched_disabled_development_mode.start()
+        self.check_apply_update(APP_DIRECTORY, ROOT_DIRECTORY, TEST_BACKUPS_DIRECTORY)
+    
+
+    def test_02_test_apply_update_development_true(self) -> None:
+        """Test apply update functionality. DEVELOPMENT_MODE is True."""
+
+        self.patched_enabled_development_mode.start()
+        self.check_apply_update(os.path.join(DEVELOPMENT_ROOT_DIRECTORY, "_internal"),
+                                DEVELOPMENT_ROOT_DIRECTORY,
+                                DEVELOPMENT_BACKUPS_DIRECTORY)
+        
+        
+
+
+
