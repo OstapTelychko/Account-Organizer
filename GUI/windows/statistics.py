@@ -283,6 +283,33 @@ class CustomRangeStatistics(SubWindow):
         This class contains non-GUI related objects, like `selected_categories_data`.\n
         `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
     """
+    
+    class CategoryItem(QWidget):
+        """Represents a category item in the categories list."""
+    
+        def __init__(self, category_name:str, remove_category_label:str, add_category_label:str) -> None:
+            super().__init__()
+
+            self.category_name = QLabel(category_name)
+            self.category_name.setProperty("class", "light-text")
+            self.category_name.setWordWrap(True)
+            self.category_name.setMinimumWidth(200)
+
+            self.remove_category_button = create_button(remove_category_label, (100, 40))
+            self.remove_category_button.setDisabled(True)
+
+            self.add_category_button = create_button(add_category_label, (100, 40))
+
+            self.category_layout = QHBoxLayout()
+            self.category_layout.addWidget(self.category_name, alignment=ALIGN_H_CENTER)
+            self.category_layout.addWidget(self.add_category_button, alignment=ALIGNMENT.AlignRight)
+            self.category_layout.addWidget(self.remove_category_button, alignment=ALIGNMENT.AlignRight)
+
+            self.category_wrapper = QWidget()
+            self.category_wrapper.setLayout(self.category_layout)
+            self.category_wrapper.setProperty("class", "category_list_item")
+            self.category_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.category_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
 
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
@@ -320,7 +347,7 @@ class CustomRangeStatistics(SubWindow):
         self.incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.incomes_categories_list_scroll.setMinimumHeight(350)
         self.incomes_categories_list_scroll.setMaximumHeight(350)
-        self.incomes_categories_list_scroll.setMinimumWidth(430)
+        self.incomes_categories_list_scroll.setMinimumWidth(530)
         self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.incomes_categories_list_scroll.setProperty("class", "wrapper")
         self.incomes_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
@@ -349,14 +376,14 @@ class CustomRangeStatistics(SubWindow):
         self.expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.expenses_categories_list_scroll.setMinimumHeight(350)
         self.expenses_categories_list_scroll.setMaximumHeight(350)
-        self.expenses_categories_list_scroll.setMinimumWidth(430)
+        self.expenses_categories_list_scroll.setMinimumWidth(530)
         self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.expenses_categories_list_scroll.setProperty("class", "wrapper")
         self.expenses_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
 
-        self.categoriels_lists_layout = QHBoxLayout()
-        self.categoriels_lists_layout.addWidget(self.incomes_categories_list_scroll)
-        self.categoriels_lists_layout.addWidget(self.expenses_categories_list_scroll)
+        self.categories_lists_layout = QHBoxLayout()
+        self.categories_lists_layout.addWidget(self.incomes_categories_list_scroll)
+        self.categories_lists_layout.addWidget(self.expenses_categories_list_scroll)
 
         self.from_date = QDateEdit()
         self.from_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
@@ -382,7 +409,7 @@ class CustomRangeStatistics(SubWindow):
         self.main_layout.setSpacing(30)
         self.main_layout.addLayout(self.window_menu_layout)
         self.main_layout.addWidget(self.selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-        self.main_layout.addLayout(self.categoriels_lists_layout)
+        self.main_layout.addLayout(self.categories_lists_layout)
         self.main_layout.addLayout(self.date_inputs_layout)
         self.main_layout.addWidget(self.show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
         self.main_layout.setContentsMargins(30, 10, 30, 20)

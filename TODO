@@ -16,7 +16,7 @@ Project life improvements:
   ☐ add animation steps and interval constant for InformationMessageWindow
 
 Bugs:
-  ☐ fix issue with long categories for custom range statistics and make items in ListWidget to be able to wrap text
+  ☐ fix issue with long categories for custom range statistics and make items in ListWidget to be able to wrap text @started(25-09-22 23:56)
   ☐ fix issue with html tags in statistics when there is no transactions
   ☐ fix issue with checking for updates if no internet connection so that it doesn't freeze the app for some time
 
