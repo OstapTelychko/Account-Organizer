@@ -21,7 +21,6 @@ from tests.tests_toolkit import DBTestCase, assert_any_call_with_details, is_act
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 from AppObjects.app_core import AppCore
-from AppObjects import app_core as app_core_module
 from AppObjects.windows_registry import WindowsRegistry
 
 from AppManagement.AppUpdate.download_update import check_internet_connection, get_release, get_prerelease,\
