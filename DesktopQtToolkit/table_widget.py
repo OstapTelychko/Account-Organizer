@@ -30,7 +30,7 @@ class CustomTableWidget(QTableWidget):
             copy_text = ''
             max_column = copied_cells[-1].column()
             for cell in copied_cells:
-                copy_text += self.item(cell.row(), cell.column()).text() #type: ignore[reportOptionalMemberAccess, unused-ignore] #We acces only the cells that are selected
+                copy_text += self.item(cell.row(), cell.column()).text() #type: ignore[reportOptionalMemberAccess, unused-ignore] #We access only the cells that are selected
                 if cell.column() == max_column:
                     copy_text += '\n'
                 else:
@@ -40,10 +40,10 @@ class CustomTableWidget(QTableWidget):
     
 
     def wheelEvent(self, event:QWheelEvent) -> None:
-        "Prevents scrolling out of widget when TableWidget run out of rows and is neseted into a ScrollArea"
+        "Prevents scrolling out of widget when TableWidget run out of rows and is nested into a ScrollArea"
 
-        verticall_scrollbar = self.verticalScrollBar()
-        if verticall_scrollbar.isVisible() and verticall_scrollbar.minimum() < verticall_scrollbar.maximum():
+        vertical_scrollbar = self.verticalScrollBar()
+        if vertical_scrollbar.isVisible() and vertical_scrollbar.minimum() < vertical_scrollbar.maximum():
             super().wheelEvent(event)
             event.accept()
         else:

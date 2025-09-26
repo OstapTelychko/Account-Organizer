@@ -8,6 +8,7 @@ Updates to existing features:
   ☐ block closing update progress window if update in progress
   ☐ show attempts of downloading zip files in update progress window
   ☐ add recommended backups and legacy backups amount to messages
+  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative 
   
 Project life improvements:
   ☐ add % sign before and after variables in languages.json
@@ -16,12 +17,11 @@ Project life improvements:
   ☐ add animation steps and interval constant for InformationMessageWindow
 
 Bugs:
-  ☐ fix issue with long categories for custom range statistics and make items in ListWidget to be able to wrap text
   ☐ fix issue with html tags in statistics when there is no transactions
   ☐ fix issue with checking for updates if no internet connection so that it doesn't freeze the app for some time
 
-
 Archive:
+  ✔ fix issue with long categories for custom range statistics and make items in ListWidget to be able to wrap text @started(25-09-22 23:56) @done(25-09-26 21:12) @lasted(3d21h16m30s) @project(Bugs)
   ✔ write tests for update check and process @started(25-05-31 21:10) @done(25-09-22 23:38) @lasted(16w2d2h28m53s)
   ✔ create 1.2.1 release @started(25-07-20 17:43) @done(25-07-20 23:24) @lasted(5h41m4s)
   ✔ test if subwindows animation works on windows @started(25-07-20 19:03) @done(25-07-20 20:44) @lasted(1h41m52s)

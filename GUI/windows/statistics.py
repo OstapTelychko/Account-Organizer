@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt, QDate
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.create_list_widget import create_list_widget
 
 from project_configuration import QCALENDAR_DATE_FORMAT
 
@@ -74,10 +75,9 @@ class MonthlyStatistic(SubWindow):
         QListWidget::item:focus
         {background: transparent}""")#Disable background color change on mouseover
         
-        self.statistics = QListWidget()
+        self.statistics = create_list_widget()
         self.statistics.setMinimumWidth(500)
         self.statistics.setMinimumHeight(450)
-        self.statistics.setFont(BASIC_FONT)
 
         self.copy_statistics = create_button("Copy month statistics", (275,40))
         self.copy_statistics_layout = QHBoxLayout()
@@ -142,9 +142,7 @@ class QuarterlyStatistics(SubWindow):
                 statistic_label_layout = QHBoxLayout()
                 statistic_label_layout.addWidget(statistic_label, alignment=ALIGN_H_CENTER)
 
-                statistic_data = QListWidget()
-                statistic_data.setFont(BASIC_FONT)
-                statistic_data.setWordWrap(True)
+                statistic_data = create_list_widget()
                 statistic_data.setMinimumHeight(250)
                 statistic_data.setMinimumWidth(500)
 
@@ -233,11 +231,9 @@ class YearlyStatistics(SubWindow):
             statistics_label_layout = QHBoxLayout()
             statistics_label_layout.addWidget(statistics_label, alignment=ALIGN_H_CENTER)
 
-            statistics_data = QListWidget()
-            statistics_data.setFont(BASIC_FONT)
+            statistics_data = create_list_widget()
             statistics_data.setMinimumHeight(400)
             statistics_data.setMinimumWidth(500)
-            statistics_data.setWordWrap(True)
 
             statistics_layout = QVBoxLayout()
             statistics_layout.addLayout(statistics_label_layout)
@@ -283,18 +279,42 @@ class CustomRangeStatistics(SubWindow):
         This class contains non-GUI related objects, like `selected_categories_data`.\n
         `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
     """
+    
+    class CategoryItem(QWidget):
+        """Represents a category item in the categories list."""
+    
+        def __init__(self, category_name:str, remove_category_label:str, add_category_label:str) -> None:
+            super().__init__()
+
+            self.category_name = QLabel(category_name)
+            self.category_name.setProperty("class", "light-text")
+            self.category_name.setWordWrap(True)
+            self.category_name.setMinimumWidth(200)
+
+            self.remove_category_button = create_button(remove_category_label, (100, 40))
+            self.remove_category_button.setDisabled(True)
+
+            self.add_category_button = create_button(add_category_label, (100, 40))
+
+            self.category_layout = QHBoxLayout()
+            self.category_layout.addWidget(self.category_name, alignment=ALIGN_H_CENTER)
+            self.category_layout.addWidget(self.add_category_button, alignment=ALIGNMENT.AlignRight)
+            self.category_layout.addWidget(self.remove_category_button, alignment=ALIGNMENT.AlignRight)
+
+            self.category_wrapper = QWidget()
+            self.category_wrapper.setLayout(self.category_layout)
+            self.category_wrapper.setProperty("class", "category_list_item")
+            self.category_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.category_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+
 
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
         self.selected_categories_data:dict[int, tuple[Category, str]] = {}
 
-        self.selected_categories_list = QListWidget()
-        self.selected_categories_list.setFont(BASIC_FONT)
+        self.selected_categories_list = create_list_widget()
         self.selected_categories_list.setMinimumWidth(400)
         self.selected_categories_list.setMinimumHeight(225)
-        self.selected_categories_list.setGraphicsEffect(QGraphicsDropShadowEffect(self.selected_categories_list, **SHADOW_EFFECT_ARGUMENTS))
-        self.selected_categories_list.setWordWrap(True)
 
         self.add_all_incomes_categories = create_button("Add all", (150, 40))
         self.remove_all_incomes_categories = create_button("Remove all", (150, 40))
@@ -320,7 +340,7 @@ class CustomRangeStatistics(SubWindow):
         self.incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.incomes_categories_list_scroll.setMinimumHeight(350)
         self.incomes_categories_list_scroll.setMaximumHeight(350)
-        self.incomes_categories_list_scroll.setMinimumWidth(430)
+        self.incomes_categories_list_scroll.setMinimumWidth(530)
         self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.incomes_categories_list_scroll.setProperty("class", "wrapper")
         self.incomes_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
@@ -349,14 +369,14 @@ class CustomRangeStatistics(SubWindow):
         self.expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.expenses_categories_list_scroll.setMinimumHeight(350)
         self.expenses_categories_list_scroll.setMaximumHeight(350)
-        self.expenses_categories_list_scroll.setMinimumWidth(430)
+        self.expenses_categories_list_scroll.setMinimumWidth(530)
         self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.expenses_categories_list_scroll.setProperty("class", "wrapper")
         self.expenses_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
 
-        self.categoriels_lists_layout = QHBoxLayout()
-        self.categoriels_lists_layout.addWidget(self.incomes_categories_list_scroll)
-        self.categoriels_lists_layout.addWidget(self.expenses_categories_list_scroll)
+        self.categories_lists_layout = QHBoxLayout()
+        self.categories_lists_layout.addWidget(self.incomes_categories_list_scroll)
+        self.categories_lists_layout.addWidget(self.expenses_categories_list_scroll)
 
         self.from_date = QDateEdit()
         self.from_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
@@ -382,7 +402,7 @@ class CustomRangeStatistics(SubWindow):
         self.main_layout.setSpacing(30)
         self.main_layout.addLayout(self.window_menu_layout)
         self.main_layout.addWidget(self.selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-        self.main_layout.addLayout(self.categoriels_lists_layout)
+        self.main_layout.addLayout(self.categories_lists_layout)
         self.main_layout.addLayout(self.date_inputs_layout)
         self.main_layout.addWidget(self.show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
         self.main_layout.setContentsMargins(30, 10, 30, 20)
@@ -400,11 +420,9 @@ class CustomRangeStatisticsView(SubWindow):
 
         self.parent_window = parent_window
 
-        self.statistics_list = QListWidget()
-        self.statistics_list.setFont(BASIC_FONT)
+        self.statistics_list = create_list_widget()
         self.statistics_list.setMinimumWidth(500)
         self.statistics_list.setMinimumHeight(350)
-        self.statistics_list.setGraphicsEffect(QGraphicsDropShadowEffect(self.statistics_list, **SHADOW_EFFECT_ARGUMENTS))
 
         self.copy_statistics = create_button("Copy statistics", (200, 40))
 
@@ -412,11 +430,9 @@ class CustomRangeStatisticsView(SubWindow):
         self.statistics_layout.addWidget(self.statistics_list)
         self.statistics_layout.addWidget(self.copy_statistics, alignment=ALIGN_H_CENTER)
 
-        self.transactions_list = QListWidget()
-        self.transactions_list.setFont(BASIC_FONT)
+        self.transactions_list = create_list_widget()
         self.transactions_list.setMinimumWidth(650)
         self.transactions_list.setMinimumHeight(350)
-        self.transactions_list.setGraphicsEffect(QGraphicsDropShadowEffect(self.transactions_list, **SHADOW_EFFECT_ARGUMENTS))
 
         self.copy_transactions = create_button("Copy transactions", (200, 40))
 

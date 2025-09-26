@@ -3,22 +3,22 @@ from typing import TYPE_CHECKING, TypeAlias
 from functools import partial
 from datetime import date
 from collections import defaultdict, Counter
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QGraphicsDropShadowEffect, QPushButton
+from PySide6.QtWidgets import QPushButton
 
 from languages import LanguageStructure
 from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
-from DesktopQtToolkit.create_button import create_button
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGN_V_CENTER
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QListWidget
     from backend.models import Transaction
     from AppObjects.category import Category
+
 
 
 
@@ -424,35 +424,27 @@ def show_custom_range_statistics_window() -> None:
     categories = sorted(AppCore.instance().categories.values(), key=lambda category: category.type)
 
     for category in categories:
-        category_name = QLabel(category.name)
-        category_name.setProperty("class", "light-text")
-
-        remove_category_statistics_list = create_button("Remove", (100, 40))
-        remove_category_statistics_list.setText(LanguageStructure.GeneralManagement.get_translation(0))
-        remove_category_statistics_list.setDisabled(True)
-
-        add_category_statistics_list = create_button("Add", (100, 40))
-        add_category_statistics_list.setText(LanguageStructure.GeneralManagement.get_translation(1))
-
-        category_layout = QHBoxLayout()
-        category_layout.addWidget(category_name, alignment=ALIGN_H_CENTER)
-        category_layout.addWidget(add_category_statistics_list, alignment=ALIGNMENT.AlignRight)
-        category_layout.addWidget(remove_category_statistics_list, alignment=ALIGNMENT.AlignRight)
-
-        category_wrapper = QWidget()
-        category_wrapper.setLayout(category_layout)
-        category_wrapper.setProperty("class", "category_list_item")
-        category_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(category_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        category_item = WindowsRegistry.CustomRangeStatistics.CategoryItem(
+            category.name,
+            LanguageStructure.GeneralManagement.get_translation(0),
+            LanguageStructure.GeneralManagement.get_translation(1)
+        )
 
         if category.type == CATEGORY_TYPE[0]:#Income
             category_type_translate = LanguageStructure.MainWindow.get_translation(1)
-            WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+            WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.addWidget(category_item.category_wrapper,
+                                                                                           alignment=ALIGN_V_CENTER)
         else:
             category_type_translate = LanguageStructure.MainWindow.get_translation(2)
-            WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.addWidget(category_wrapper, alignment=ALIGN_V_CENTER)
+            WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.addWidget(category_item.category_wrapper,
+                                                                                           alignment=ALIGN_V_CENTER)
 
-        remove_category_statistics_list.clicked.connect(partial(remove_category_from_statistics_list, category, add_category_statistics_list, remove_category_statistics_list))
-        add_category_statistics_list.clicked.connect(partial(add_category_to_statistics_list, category, category_type_translate, remove_category_statistics_list, add_category_statistics_list))
+        category_item.remove_category_button.clicked.connect(partial(
+            remove_category_from_statistics_list,
+            category, category_item.add_category_button, category_item.remove_category_button))
+        category_item.add_category_button.clicked.connect(partial(
+            add_category_to_statistics_list,
+            category, category_type_translate, category_item.remove_category_button, category_item.add_category_button))
     
     WindowsRegistry.StatisticsWindow.done(1)
     WindowsRegistry.CustomRangeStatistics.exec()
@@ -594,12 +586,12 @@ def show_custom_range_statistics_view() -> int:
     Incomes_categories_transactions:dict[Category, list[Transaction]] = {}
     Expenses_categories_transactions:dict[Category, list[Transaction]] = {}
 
-    for income_cateogry in Incomes_categories:
-        category_transactions = categorized_transactions[income_cateogry.id]
+    for income_category in Incomes_categories:
+        category_transactions = categorized_transactions[income_category.id]
         total_value = round(sum([transaction.value for transaction in category_transactions]), 2)
 
-        Incomes_categories_transactions[income_cateogry] = sorted(category_transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
-        Incomes_categories_total_values[income_cateogry.id] = total_value
+        Incomes_categories_transactions[income_category] = sorted(category_transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day))
+        Incomes_categories_total_values[income_category.id] = total_value
         
     for expense_category in Expenses_categories:
         category_transactions = categorized_transactions[expense_category.id]
