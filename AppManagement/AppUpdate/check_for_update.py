@@ -16,7 +16,6 @@ logger = get_logger(__name__)
 
 def update_check_failed(exception: Exception) -> None:
     """Logs error occurred during update check."""
-    # update_worker_cleanup()
     logger.error(f"Update check failed: {exception}")
     WindowsRegistry.Messages.failed_update_check.exec()
 
@@ -24,7 +23,6 @@ def update_check_failed(exception: Exception) -> None:
 def handle_latest_version(latest_version: tuple[str, RELEASE] | None) -> None:
     """Handle the latest version received from update check."""
 
-    # update_worker_cleanup()
     app_core = AppCore.instance()
     if latest_version:
         version, release = latest_version
