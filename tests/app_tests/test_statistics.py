@@ -44,17 +44,17 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
         return [
             f"{LanguageStructure.Statistics.get_translation(4)}1000.0",
-            f"{LanguageStructure.Statistics.get_translation(5)}{round(1000/days_amount, 2)}\n",
+            f"{LanguageStructure.Statistics.get_translation(5)}{round(1000/days_amount, 2)}<br/>",
             f"{LanguageStructure.Statistics.get_translation(6)}1000.0",
-            f"{LanguageStructure.Statistics.get_translation(7)}{round(1000/days_amount, 2)}\n",
+            f"{LanguageStructure.Statistics.get_translation(7)}{round(1000/days_amount, 2)}<br/>",
             f"{LanguageStructure.Statistics.get_translation(8)}0.0",
-            f"\n\n{self.translated_incomes}",
+            f"<br/><br/>{self.translated_incomes}",
             f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name}  (1000.0)",
-            f"\n{LanguageStructure.Statistics.get_translation(11)}",
+            f"<br/>{LanguageStructure.Statistics.get_translation(11)}",
             f"Test income transaction - 1000.0",
-            f"\n\n{self.translated_expenses}",
+            f"<br/><br/>{self.translated_expenses}",
             f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name}  (1000.0)",
-            f"\n{LanguageStructure.Statistics.get_translation(19)}",
+            f"<br/>{LanguageStructure.Statistics.get_translation(19)}",
             f"Test expenses transaction - 1000.0",]
 
 
@@ -120,15 +120,15 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     expected_total_quarterly_statistics = [
                         f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
-                        f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
-                        f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(8)}0.0",
-                        f"\n\n{self.translated_incomes}",
-                        f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) \n",
+                        f"<br/><br/>{self.translated_incomes}",
+                        f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
                         f"{self.income_category.name} - {total_income}",
-                        f"\n\n{self.translated_expenses}",
-                        f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
+                        f"<br/><br/>{self.translated_expenses}",
+                        f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) <br/>",
                         f"{self.expenses_category.name} - {total_expense}",]
 
                     statistics_data = quarter.total_quarter_statistics.data
@@ -196,16 +196,16 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 expected_yearly_statistics = [
                     f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
                     f"{LanguageStructure.Statistics.get_translation(25)}{round(total_income/12, 2)}",
-                    f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}\n",
+                    f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}<br/>",
                     f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
                     f"{LanguageStructure.Statistics.get_translation(27)}{round(total_expense/12, 2)}",
-                    f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}\n",
+                    f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}<br/>",
                     f"{LanguageStructure.Statistics.get_translation(8)}0.0",
-                    f"\n\n{self.translated_incomes}",
-                    f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) \n",
+                    f"<br/><br/>{self.translated_incomes}",
+                    f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
                     f"{self.income_category.name} - {total_income}",
-                    f"\n\n{self.translated_expenses}",
-                    f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
+                    f"<br/><br/>{self.translated_expenses}",
+                    f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) <br/>",
                     f"{self.expenses_category.name} - {total_expense}"]
 
                 statistics_data = WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data
@@ -278,15 +278,15 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     expected_custom_range_statistics = [
                         f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
-                        f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
-                        f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}\n",
+                        f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(8)}0.0",
-                        f"\n\n{self.translated_incomes}",
-                        f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) \n",
+                        f"<br/><br/>{self.translated_incomes}",
+                        f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
                         f"{self.income_category.name} - {total_income}",
-                        f"\n\n{self.translated_expenses}",
-                        f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) \n",
+                        f"<br/><br/>{self.translated_expenses}",
+                        f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) <br/>",
                         f"{self.expenses_category.name} - {total_expense}"]
 
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.statistics_list
@@ -300,16 +300,16 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                             f"In Custom range statistics (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
                     
                     expected_transactions = [
-                        f"{self.translated_incomes}\n\n",
-                        f"\n{self.income_category.name}\n",
+                        f"{self.translated_incomes}<br/><br/>",
+                        f"<br/>{self.income_category.name}<br/>",
                         f"01/01/{app_core.current_year}\t1000.0\tTest income transaction",
                         f"01/02/{app_core.current_year}\t1000.0\tTest income transaction",
                         f"01/03/{app_core.current_year}\t1000.0\tTest income transaction",
                         f"01/04/{app_core.current_year}\t1000.0\tTest income transaction",
                         f"01/05/{app_core.current_year}\t1000.0\tTest income transaction",
                         f"01/06/{app_core.current_year}\t1000.0\tTest income transaction",
-                        f"\n\n\n{self.translated_expenses}\n\n",
-                        f"\n{self.expenses_category.name}\n",
+                        f"<br/><br/><br/>{self.translated_expenses}<br/><br/>",
+                        f"<br/>{self.expenses_category.name}<br/>",
                         f"01/01/{app_core.current_year}\t1000.0\tTest expenses transaction",
                         f"01/02/{app_core.current_year}\t1000.0\tTest expenses transaction",
                         f"01/03/{app_core.current_year}\t1000.0\tTest expenses transaction",

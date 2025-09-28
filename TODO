@@ -15,9 +15,10 @@ Project life improvements:
   ☐ add check for every click in tests whether button or widget is actually visible
   ☐ replace unsafe path compositions in project with os.path.join
   ☐ add animation steps and interval constant for InformationMessageWindow
+  ☐ close all windows after each test to prevent tests execution blocking if some test will fail
 
 Bugs:
-  ☐ fix issue with html tags in statistics when there is no transactions
+  ☐ fix issue with html tags in statistics when there is no transactions @started(25-09-27 21:52)
   ☐ fix issue with checking for updates if no internet connection so that it doesn't freeze the app for some time
 
 Archive:

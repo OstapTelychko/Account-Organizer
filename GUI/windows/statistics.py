@@ -5,7 +5,8 @@ from PySide6.QtCore import Qt, QDate
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
-from DesktopQtToolkit.create_list_widget import create_list_widget
+from DesktopQtToolkit.list_widget import CustomListWidget
+from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
 from project_configuration import QCALENDAR_DATE_FORMAT
 
@@ -75,7 +76,7 @@ class MonthlyStatistic(SubWindow):
         QListWidget::item:focus
         {background: transparent}""")#Disable background color change on mouseover
         
-        self.statistics = create_list_widget()
+        self.statistics = CustomListWidget()
         self.statistics.setMinimumWidth(500)
         self.statistics.setMinimumHeight(450)
 
@@ -117,8 +118,8 @@ class QuarterlyStatistics(SubWindow):
         self.statistics_layout = QVBoxLayout()
         self.statistics_window = QWidget()
 
-        TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", QListWidget)])
-        QMonthlyStatisticsView = NamedTuple("QMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+        TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", CustomListWidget)])
+        QMonthlyStatisticsView = NamedTuple("QMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", CustomListWidget)])
         QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[QMonthlyStatisticsView])])
         StatisticsView = NamedTuple("StatisticsView", [("quarters", list[QuarterStatisticsView])])
 
@@ -133,7 +134,7 @@ class QuarterlyStatistics(SubWindow):
             self.quarter_window = QWidget()
             quarter_layout = QHBoxLayout()
             quarter_layout.setSpacing(30)
-            total_quarter_statistics:TotalQuarterStatisticsView = TotalQuarterStatisticsView(QLabel(), QListWidget())
+            total_quarter_statistics:TotalQuarterStatisticsView = TotalQuarterStatisticsView(QLabel(), CustomListWidget())
 
             quarter_months_statistics_list:list[QMonthlyStatisticsView] = []
             for statistic_list in range(4):              
@@ -142,7 +143,7 @@ class QuarterlyStatistics(SubWindow):
                 statistic_label_layout = QHBoxLayout()
                 statistic_label_layout.addWidget(statistic_label, alignment=ALIGN_H_CENTER)
 
-                statistic_data = create_list_widget()
+                statistic_data = CustomListWidget()
                 statistic_data.setMinimumHeight(250)
                 statistic_data.setMinimumWidth(500)
 
@@ -163,11 +164,9 @@ class QuarterlyStatistics(SubWindow):
 
             self.quarter_window.setLayout(quarter_layout)
 
-            self.quarter_scroll = QScrollArea()
+            self.quarter_scroll = HorizontalScrollArea()
             self.quarter_scroll.setWidget(self.quarter_window)
             self.quarter_scroll.setWidgetResizable(True)
-            self.quarter_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-            self.quarter_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
             self.quarter_scroll.setMinimumHeight(350)
             self.quarter_scroll.setStyleSheet("QScrollArea{border:none}")
             self.statistics_layout.addWidget(self.quarter_scroll)
@@ -214,14 +213,14 @@ class YearlyStatistics(SubWindow):
         QListWidget::item:hover:!active,
         QListWidget::item:focus
         {background: transparent}""")#Disable background color change on mouseover
-        
-        TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", QListWidget)])
-        YMonthlyStatisticsView = NamedTuple("YMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", QListWidget)])
+
+        TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", CustomListWidget)])
+        YMonthlyStatisticsView = NamedTuple("YMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", CustomListWidget)])
         StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[YMonthlyStatisticsView])])
 
         self.statistics_window = QWidget()
         self.statistics_window_layout = QVBoxLayout()
-        total_year_statistics:TotalYearStatisticsView = TotalYearStatisticsView(QLabel(), QListWidget())
+        total_year_statistics:TotalYearStatisticsView = TotalYearStatisticsView(QLabel(), CustomListWidget())
 
         self.yearly_statistics_parts_list:list[YMonthlyStatisticsView] = []
         for statistics_list in range(13):
@@ -231,7 +230,7 @@ class YearlyStatistics(SubWindow):
             statistics_label_layout = QHBoxLayout()
             statistics_label_layout.addWidget(statistics_label, alignment=ALIGN_H_CENTER)
 
-            statistics_data = create_list_widget()
+            statistics_data = CustomListWidget()
             statistics_data.setMinimumHeight(400)
             statistics_data.setMinimumWidth(500)
 
@@ -312,7 +311,7 @@ class CustomRangeStatistics(SubWindow):
 
         self.selected_categories_data:dict[int, tuple[Category, str]] = {}
 
-        self.selected_categories_list = create_list_widget()
+        self.selected_categories_list = CustomListWidget()
         self.selected_categories_list.setMinimumWidth(400)
         self.selected_categories_list.setMinimumHeight(225)
 
@@ -420,7 +419,7 @@ class CustomRangeStatisticsView(SubWindow):
 
         self.parent_window = parent_window
 
-        self.statistics_list = create_list_widget()
+        self.statistics_list = CustomListWidget()
         self.statistics_list.setMinimumWidth(500)
         self.statistics_list.setMinimumHeight(350)
 
@@ -430,7 +429,7 @@ class CustomRangeStatisticsView(SubWindow):
         self.statistics_layout.addWidget(self.statistics_list)
         self.statistics_layout.addWidget(self.copy_statistics, alignment=ALIGN_H_CENTER)
 
-        self.transactions_list = create_list_widget()
+        self.transactions_list = CustomListWidget()
         self.transactions_list.setMinimumWidth(650)
         self.transactions_list.setMinimumHeight(350)
 

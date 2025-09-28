@@ -82,6 +82,25 @@ class TransactionQuery:
         with self.session_factory() as session:
             with session.begin():
                 return session.query(Transaction).filter_by(year=year, month=month, category_id=category_id).all()
+    
+    
+    def check_categories_have_transactions(self, categories_id:list[int], year:int, month:int) -> bool:
+        """Check if any of the specified categories have transactions in a given month and year.
+
+            Arguments
+            ---------
+                `categories_id` : (list[int]) - List of category IDs to check.
+                `year` : (int) - Year to filter transactions.
+                `month` : (int) - Month to filter transactions."""
+        
+        with self.session_factory() as session:
+            with session.begin():
+                row = session.query(Transaction).filter(
+                    Transaction.year == year,
+                    Transaction.month == month,
+                    Transaction.category_id.in_(categories_id)
+                ).limit(1).first()
+                return row is not None
 
 
     def get_all_transactions(self, category_id:int) -> list[Transaction]:
