@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import NamedTuple, TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QListWidget, QGraphicsDropShadowEffect, QDateEdit
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QGraphicsDropShadowEffect, QDateEdit
 from PySide6.QtCore import Qt, QDate
 
 from DesktopQtToolkit.sub_window import SubWindow

@@ -7,8 +7,8 @@ from datetime import datetime
 from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
-from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE,\
-APP_HASHES_DIRECTORY
+from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY,\
+DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE, APP_HASHES_DIRECTORY
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.backup import Backup

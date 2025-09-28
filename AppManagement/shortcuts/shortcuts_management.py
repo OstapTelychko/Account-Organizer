@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 def show_user_shortcuts() -> None:
-    """Show user shortcuts in Shorcuts window"""
+    """Show user shortcuts in Shortcuts window"""
 
     app_core = AppCore.instance()
     user_shortcuts = {

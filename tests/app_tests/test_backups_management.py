@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import shutil
 import os
 from functools import partial
 from datetime import datetime, timedelta
