@@ -18,10 +18,10 @@ Project life improvements:
   ☐ close all windows after each test to prevent tests execution blocking if some test will fail
 
 Bugs:
-  ☐ fix issue with html tags in statistics when there is no transactions @started(25-09-27 21:52)
   ☐ fix issue with checking for updates if no internet connection so that it doesn't freeze the app for some time
 
 Archive:
+  ✔ fix issue with html tags in statistics when there is no transactions @started(25-09-27 21:52) @done(25-09-28 17:22) @lasted(19h30m8s) @project(Bugs)
   ✔ fix issue with long categories for custom range statistics and make items in ListWidget to be able to wrap text @started(25-09-22 23:56) @done(25-09-26 21:12) @lasted(3d21h16m30s) @project(Bugs)
   ✔ write tests for update check and process @started(25-05-31 21:10) @done(25-09-22 23:38) @lasted(16w2d2h28m53s)
   ✔ create 1.2.1 release @started(25-07-20 17:43) @done(25-07-20 23:24) @lasted(5h41m4s)
