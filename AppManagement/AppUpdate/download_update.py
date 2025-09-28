@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 import json
 import os
 import hashlib
@@ -21,18 +20,13 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError, FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
 
+from AppAnnotations.update_annotations import RELEASE, ASSETS, UPDATE_ASSET, GUI_LIBRARY_ASSET
 try:
     from tokens_ssh_gdp_secrets import UPDATE_API_TOKEN#This file is not included in repository. Token have to be provided by user to exceed rate limit of github api
 except ImportError:
     UPDATE_API_TOKEN:str|None = None#type: ignore[no-redef]
 
-if TYPE_CHECKING:
-    from typing import Any
-
-    RELEASE = dict[str, Any]
-    ASSETS = list[dict[str, Any]]
-    UPDATE_ASSET = tuple[str, str, int, str]
-    GUI_LIBRARY_ASSET = tuple[str, str, int, str]
+    
 
 
 logger = get_logger(__name__)
