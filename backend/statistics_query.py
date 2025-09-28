@@ -37,6 +37,65 @@ class StatisticsQuery:
                 return float(total) if total else 0
     
 
+    def get_categories_monthly_transactions_sum(self, categories_id: list[int], year:int, month:int) -> list[float]:
+        """Get the sum of transactions for multiple categories in a given month and year.
+        
+            Arguments
+            ---------
+                `categories` : (list[int]) - List of category IDs to filter transactions.
+                `year` : (int) - Year to filter transactions.
+                `month` : (int) - Month to filter transactions.
+            Returns
+            -------
+                `list[float]` - List of total sums of transactions for each specified category, month, and year.
+        """
+
+        with self.session_factory() as session:
+            with session.begin():
+                sums = session.query(Transaction.category_id, Transaction.month, sql_func.sum(Transaction.value)).filter(
+                    Transaction.year == year,
+                    Transaction.month == month,
+                    Transaction.category_id.in_(categories_id)
+                ).group_by(Transaction.category_id).all()
+
+                result = [0.0] * len(categories_id)
+                for index, category_id in enumerate(categories_id):
+                    for s in sums:
+                        if s[0] == category_id:
+                            result[index] = float(s[2]) if s[2] else 0.0
+                return result
+
+    def get_categories_monthly_transactions_sum_by_months(self, categories_id: list[int], year:int, months: list[int]) -> dict[int, list[float]]:
+        """Get the sum of transactions for multiple categories over multiple months in a given year.
+        
+            Arguments
+            ---------
+                `categories` : (list[int]) - List of category IDs to filter transactions.
+                `year` : (int) - Year to filter transactions.
+                `months` : (list[int]) - List of months to filter transactions.
+            Returns
+            -------
+                `dict[int, list[float]]` - Dictionary where keys are categories id and values are lists of total sums of transactions for each month.
+        """
+
+        with self.session_factory() as session:
+            with session.begin():
+                sums = session.query(Transaction.category_id, Transaction.month, sql_func.sum(Transaction.value)).filter(
+                    Transaction.year == year,
+                    Transaction.month.in_(months),
+                    Transaction.category_id.in_(categories_id)
+                ).group_by(Transaction.category_id, Transaction.month).all()
+
+                result = {}
+                for category_id in categories_id:
+                    result[category_id] = [0.0]
+                    for s in sums:
+                        if s[0] == category_id:
+                            result[category_id].append(float(s[2]) if s[2] else 0)
+
+                return result
+
+
     def get_monthly_transactions_min_value(self, category_id:int, year:int, month:int) -> float:
         """Get the minimum transaction value for a specific category in a given month and year.
         

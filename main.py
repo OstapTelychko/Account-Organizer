@@ -37,7 +37,6 @@ from languages import LanguageStructure
 from backend.db_controller import DBController
 
 from AppObjects.app_core import AppCore
-from AppObjects.shortcuts_manager import ShortcutsManager
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.user_config import UserConfig
 from AppObjects.logger import get_logger
@@ -96,6 +95,59 @@ def calculate_expression() -> None:
 
 def main(test_mode:bool=False) -> None:
     """Main function to start the application"""
+
+    def post_show_setup() -> None:
+        """Setup that needs to be done after the main window is shown"""
+
+        from AppObjects.shortcuts_manager import ShortcutsManager
+        
+        ShortcutsManager(app_core.config)
+
+        #Load backups if they exists
+        logger.info("Loading backups")
+        load_backups()
+
+        if not test_mode and not app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
+            logger.info("Auto backup enabled")
+            auto_backup()
+        
+        if app_core.config.auto_backup_removal_enabled:
+            logger.info("Auto backup removal enabled")
+            auto_remove_backups()
+        logger.info("__BREAK_LINE__")
+
+        #Load categories if they exists
+        logger.info("Loading categories")
+        if len(app_core.db.category_query.get_all_categories()) > 0:
+            load_categories()
+        activate_categories()
+        logger.info(f"{len(app_core.categories)} categories loaded")
+        logger.info("__BREAK_LINE__")
+
+        #Add accounts to list
+        logger.info("Loading accounts")
+        clear_accounts_layout()
+        load_accounts()
+        logger.info(f"{len(app_core.accounts_list)} accounts loaded")
+        logger.info("__BREAK_LINE__")
+
+        #Shortcuts
+        WindowsRegistry.ShortcutsWindow.save_shortcuts.clicked.connect(save_shortcuts)
+        load_shortcuts()
+        logger.info("Shortcuts loaded")
+        logger.info("__BREAK_LINE__")
+
+        #Account management
+        WindowsRegistry.SettingsWindow.delete_account.clicked.connect(remove_account)
+        WindowsRegistry.RenameAccountWindow.button.clicked.connect(rename_account)
+
+        load_account_balance()
+        load_language(app_core.config.language)
+
+        
+        if not test_mode:
+            QTimer.singleShot(200, check_for_updates)
+
     
     if test_mode:
         app_core = AppCore.instance()
@@ -105,7 +157,7 @@ def main(test_mode:bool=False) -> None:
         user_config = UserConfig(False)
         app_core = AppCore(single_instance_guard=Single_instance_guard, db_controller=db_controller, user_config=user_config, test_mode=False)
 
-    ShortcutsManager(app_core.config)
+
     app_core.start_session()
 
     #Set main window for instance guard
@@ -190,18 +242,7 @@ def main(test_mode:bool=False) -> None:
     logger.info("Connected to database")
     logger.info("__BREAK_LINE__")
     
-    #Load backups if they exists
-    logger.info("Loading backups")
-    load_backups()
-
-    if not test_mode and not app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
-        logger.info("Auto backup enabled")
-        auto_backup()
-    
-    if app_core.config.auto_backup_removal_enabled:
-        logger.info("Auto backup removal enabled")
-        auto_remove_backups()
-    logger.info("__BREAK_LINE__")
+    WindowsRegistry.MainWindow.show()
 
     #Backup management
     WindowsRegistry.BackupManagementWindow.create_backup.clicked.connect(create_backup)
@@ -215,38 +256,7 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.AutoBackupWindow.no_auto_backup.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.no_auto_backup))
     WindowsRegistry.AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
-    #Load categories if they exists
-    logger.info("Loading categories")
-    if len(app_core.db.category_query.get_all_categories()) > 0:
-        load_categories()
-    activate_categories()
-    logger.info(f"{len(app_core.categories)} categories loaded")
-    logger.info("__BREAK_LINE__")
-
-    #Add accounts to list
-    logger.info("Loading accounts")
-    clear_accounts_layout()
-    load_accounts()
-    logger.info(f"{len(app_core.accounts_list)} accounts loaded")
-    logger.info("__BREAK_LINE__")
-
-    #Shortcuts
-    WindowsRegistry.ShortcutsWindow.save_shortcuts.clicked.connect(save_shortcuts)
-    load_shortcuts()
-    logger.info("Shortcuts loaded")
-    logger.info("__BREAK_LINE__")
-
-    #Account management
-    WindowsRegistry.SettingsWindow.delete_account.clicked.connect(remove_account)
-    WindowsRegistry.RenameAccountWindow.button.clicked.connect(rename_account)
-
-    load_account_balance()
-    load_language(app_core.config.language)
-
-    WindowsRegistry.MainWindow.show()
-    
-    if not test_mode:
-        QTimer.singleShot(200, check_for_updates)
+    QTimer.singleShot(50, post_show_setup)
 
 
 if __name__ == "__main__":

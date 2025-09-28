@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout
+from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout, QGridLayout
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
