@@ -14,6 +14,7 @@ Updates to existing features:
   
 Project life improvements:
   ☐ empty
+  ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF
   ☐ add % sign before and after variables in languages.json
   ☐ add check for every click in tests whether button or widget is actually visible
   ☐ replace unsafe path compositions in project with os.path.join
