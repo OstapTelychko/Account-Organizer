@@ -4,6 +4,8 @@ import os
 from typing import TYPE_CHECKING, Callable
 from functools import wraps
 from traceback import format_exception
+from threading import Thread
+from time import sleep
 
 from colorama import init as colorama_init, Fore
 from pygments import highlight
@@ -12,13 +14,14 @@ from pygments.formatters import TerminalFormatter
 
 from unittest import TestCase, TextTestResult
 from unittest.mock import Mock
-from PySide6.QtCore import QEventLoop, QTimer
+from PySide6.QtCore import QEventLoop, QTimer, QObject, Signal
 
 from backend.models import Category, Transaction, Account
 from project_configuration import CATEGORY_TYPE, TEST_BACKUPS_DIRECTORY
 from AppManagement.category import activate_categories, remove_categories_from_list
 from AppManagement.backup_management import remove_backup
 from GUI.category import load_category
+from DesktopQtToolkit.sub_window import SubWindow
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
@@ -97,7 +100,44 @@ def is_active_patch(patch:_patch[Any]) -> bool:
     return getattr(patch, "is_local", False)
 
 
-class DBTestCase(TestCase):
+class DefaultTestCase(TestCase):
+    """This class is used to create a default test case which every test case should inherit from."""
+
+    class SubWindowCloseWorker(QObject):
+        close_window = Signal(SubWindow)
+
+    TIMEOUT_SEC = 6  # Default timeout for test to auto-close sub-windows in seconds
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.test_running = True
+        self.sub_window_closer = self.SubWindowCloseWorker()
+        self.timeout_error: Exception | None = None
+        self.sub_window_closer.close_window.connect(lambda window: window.done(1))
+        Thread(target=self.close_all_sub_windows).start()
+        
+
+    def close_all_sub_windows(self) -> None:
+        """This method will close all sub-windows after each test."""
+
+        sleep(self.TIMEOUT_SEC)
+        if self.test_running:
+            self.timeout_error = TimeoutError(f"Test took too long to complete (>{self.TIMEOUT_SEC} seconds), closing all sub-windows and failing the test.")
+            while self.test_running:
+                for sub_window in WindowsRegistry.MainWindow.sub_windows.values():
+                    if sub_window.isVisible():
+                        self.sub_window_closer.close_window.emit(sub_window)
+                sleep(0.1)
+
+
+    def tearDown(self) -> None:
+        self.test_running = False
+        if self.timeout_error:
+            raise self.timeout_error
+        super().tearDown()
+
+
+class DBTestCase(DefaultTestCase):
     """This class is used to create a test case that uses a database.
         It creates a test database and removes it after the test is finished."""
 
@@ -197,9 +237,11 @@ class DBTestCase(TestCase):
         if os.path.exists(TEST_BACKUPS_DIRECTORY):
             shutil.rmtree(TEST_BACKUPS_DIRECTORY)
 
+        super().tearDown()
 
 
-class OutOfScopeTestCase(TestCase):
+
+class OutOfScopeTestCase(DefaultTestCase):
     """This class is used to capture the tests assertion errors from functions that are runned using QTimer.singleShot."""
 
     def __init_subclass__(cls) -> None:
@@ -214,17 +256,17 @@ class OutOfScopeTestCase(TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self._assertion_error:AssertionError | None = None
+        self._assertion_error: Exception | None = None
 
 
-    def catch_failure(self, func:Callable[[], None]) -> Callable[[], None]:
+    def catch_failure(self, func: Callable[[], None]) -> Callable[[], None]:
         """This decorator is used to catch the assertion errors from functions that are runned using QTimer.singleShot."""
 
         @wraps(func)
         def wrapper() -> None:
             try:
                 func()
-            except AssertionError as e:
+            except Exception as e:
                 self._assertion_error = e
                 raise e
         

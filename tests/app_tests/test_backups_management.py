@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
     """Test backup management in the application."""
 
+    TIMEOUT_SEC = 15
+
     def open_backup_management_window(self, func:Callable[[], None]) -> None:
         """Open backup management window and call function after some delay.
 
