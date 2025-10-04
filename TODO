@@ -17,12 +17,12 @@ Project life improvements:
   ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF
   ☐ add % sign before and after variables in languages.json
   ☐ add check for every click in tests whether button or widget is actually visible
-  ☐ replace unsafe path compositions in project with os.path.join @started(25-10-04 19:21)
 
 Bugs:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ replace unsafe path compositions in project with os.path.join @started(25-10-04 19:21) @done(25-10-05 00:15) @lasted(4h54m42s) @project(Project life improvements)
   ✔ add animation steps and interval constant for InformationMessageWindow @started(25-10-04 18:37) @done(25-10-04 18:52) @lasted(15m33s) @project(Project life improvements)
   ✔ close all windows after each test to prevent tests execution blocking if some test will fail @started(25-10-03 18:04) @project(Project life improvements) @done(25-10-04 16:59) @lasted(22h55m44s) @project(Project life improvements)
   ✔ fix issue with checking for updates if no internet connection so that it doesn't freeze the app for some time @started(25-09-28 21:41) @done(25-09-28 23:17) @lasted(1h36m38s) @project(Bugs)
