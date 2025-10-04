@@ -27,12 +27,18 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
 
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test incomes creation category")))
         WindowsRegistry.MainWindow.add_incomes_category.click()
-        self.assertTrue(app_core.db.category_query.category_exists("Test incomes creation category", "Incomes"), "Incomes category hasn't been created")
+        self.assertTrue(
+            app_core.db.category_query.category_exists("Test incomes creation category", "Incomes"),
+            "Incomes category hasn't been created"
+        )
 
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test expenses creation category")))
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         WindowsRegistry.MainWindow.add_expenses_category.click()
-        self.assertTrue(app_core.db.category_query.category_exists("Test expenses creation category", "Expenses"), "Expenses category hasn't been created")
+        self.assertTrue(
+            app_core.db.category_query.category_exists("Test expenses creation category", "Expenses"),
+            "Expenses category hasn't been created"
+        )
         
         qsleep(500)
     
@@ -56,8 +62,14 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_delete_category))
             category.settings.click()
 
-        self.assertFalse(app_core.db.category_query.category_exists(income_category_name, "Incomes"), "Income category hasn't been deleted")
-        self.assertFalse(app_core.db.category_query.category_exists(expenses_category_name, "Expenses"), "Expense category hasn't been deleted")
+        self.assertFalse(
+            app_core.db.category_query.category_exists(income_category_name, "Incomes"),
+            "Income category hasn't been deleted"
+        )
+        self.assertFalse(
+            app_core.db.category_query.category_exists(expenses_category_name, "Expenses"),
+            "Expense category hasn't been deleted"
+        )
 
         qsleep(500)
     
@@ -159,7 +171,10 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                     expected_transactions = f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
                     expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
 
-                    self.assertEqual(expected_transactions, app.clipboard().text(), f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}")
+                    self.assertEqual(
+                        expected_transactions, app.clipboard().text(),
+                        f"Monthly transaction hasn't been copied. Clipboard text {app.clipboard().text()}"
+                    )
                     WindowsRegistry.CategorySettingsWindow.done(1)
 
                 QTimer.singleShot(100, self.catch_failure(_check_copied_transactions))

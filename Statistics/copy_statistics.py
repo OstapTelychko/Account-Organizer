@@ -20,13 +20,17 @@ def copy_monthly_transactions() -> None:
     if WindowsRegistry.CategorySettingsWindow.copy_transactions.isEnabled():
         WindowsRegistry.CategorySettingsWindow.copy_transactions.setEnabled(False)
         category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
-        category = app_core.db.category_query.get_category(category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+        category = app_core.db.category_query.get_category(
+            category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+        )
         if category is None:
             logger.error(f"Category {category_name} not found monthly transactions haven't been copied")
             return
         category_id = category.id
         
-        transactions = app_core.db.transaction_query.get_transactions_by_month(category_id, app_core.current_year, app_core.current_month)
+        transactions = app_core.db.transaction_query.get_transactions_by_month(
+            category_id, app_core.current_year, app_core.current_month
+        )
         if len(transactions):
             result = ""
             result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"

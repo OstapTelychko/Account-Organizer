@@ -7,10 +7,12 @@ if TYPE_CHECKING:
 
 
 class Category:
-    """Represents a category in the application.
+    """
+    Represents a category in the application.
     It contains the `id`, `type` (income or expense), `name`, `position` (for sorting),
     and labels like `total_value_label`, `name_label`, buttons like `settings`, 
-    `table_data`, `add_transaction`, `delete_transaction`, and `edit_transaction` for displaying and managing the category."""
+    `table_data`, `add_transaction`, `delete_transaction`, and `edit_transaction` for displaying and managing the category.
+    """
 
     def __init__(
             self, 
@@ -26,7 +28,8 @@ class Category:
             add_transaction:QPushButton,
             delete_transaction:QPushButton,
             edit_transaction:QPushButton,
-            window:QWidget) -> None:
+            window:QWidget
+        ) -> None:
     
         self.id = id
         self.type = type

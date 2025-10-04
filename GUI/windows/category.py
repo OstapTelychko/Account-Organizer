@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy,\
+    QGraphicsDropShadowEffect
 from PySide6.QtGui import QIntValidator
 from PySide6.QtCore import Qt
 
@@ -75,7 +76,9 @@ class ChangeCategoryPositionWindow(SubWindow):
 
         self.preview_category_container = QWidget()
         self.preview_category_container.setProperty("class", "category_list_item")
-        self.preview_category_container.setGraphicsEffect(QGraphicsDropShadowEffect(self.preview_category_container, **SHADOW_EFFECT_ARGUMENTS))
+        self.preview_category_container.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.preview_category_container, **SHADOW_EFFECT_ARGUMENTS)
+        )
 
         self.preview_category_layout = QHBoxLayout()
         self.preview_category_layout.addWidget(self.preview_category_position, alignment=ALIGNMENT.AlignRight)
@@ -107,7 +110,9 @@ class ChangeCategoryPositionWindow(SubWindow):
         self.categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.categories_list_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
         self.categories_list_scroll.setProperty("class", "wrapper")
-        self.categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+        self.categories_list_scroll.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
+        )
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)

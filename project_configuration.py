@@ -25,14 +25,14 @@ if platform == "win32":
 else:
     MAIN_EXECUTABLE = "main"
 
-IMAGES_DIRECTORY = f"{APP_DIRECTORY}Images/"
-FLAGS_DIRECTORY = f"{IMAGES_DIRECTORY}Flags/"
-TRANSACTIONS_DIRECTORY = f"{IMAGES_DIRECTORY}Transactions/"
-THEME_DIRECTORY = f"{IMAGES_DIRECTORY}Theme/"
-GENERAL_ICONS_DIRECTORY = f"{IMAGES_DIRECTORY}General Icons/"
-    
-USER_CONF_PATH = f"{APP_DIRECTORY}/User_configuration.toml"
-TEST_USER_CONF_PATH = f"{APP_DIRECTORY}/test_User_configuration.toml"
+IMAGES_DIRECTORY = os.path.join(APP_DIRECTORY, "Images")
+FLAGS_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "Flags")
+TRANSACTIONS_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "Transactions")
+THEME_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "Theme")
+GENERAL_ICONS_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "General Icons")
+
+USER_CONF_PATH = os.path.join(APP_DIRECTORY, "User_configuration.toml")
+TEST_USER_CONF_PATH = os.path.join(APP_DIRECTORY, "test_User_configuration.toml")
 DB_PATH = f"sqlite:///{APP_DIRECTORY}Accounts.sqlite"
 DB_FILE_PATH = DB_PATH.replace("sqlite:///","")
 TEST_DB_PATH = f"sqlite:///{APP_DIRECTORY}test_Accounts.sqlite"
@@ -50,12 +50,12 @@ GUI_LIBRARY_HASH_FILE = f"{GUI_LIBRARY}.hash256"
 GUI_LIBRARY_HASH_FILE_PATH = os.path.join(APP_HASHES_DIRECTORY, GUI_LIBRARY_HASH_FILE)
 TEST_GUI_LIBRARY_HASH_FILE_PATH = os.path.join(TEST_APP_HASHES_DIRECTORY, GUI_LIBRARY_HASH_FILE)
 
-UPDATE_DIRECTORY = f"{ROOT_DIRECTORY}Temp Update"
+UPDATE_DIRECTORY = os.path.join(ROOT_DIRECTORY, "Temp Update")
 TEST_UPDATE_DIRECTORY = os.path.join(APP_DIRECTORY, "Test Temp Update")
 UPDATE_APP_DIRECTORY = os.path.join(UPDATE_DIRECTORY, '_internal')
 TEST_UPDATE_APP_DIRECTORY = os.path.join(TEST_UPDATE_DIRECTORY, '_internal')
 GUI_LIBRARY_UPDATE_PATH = os.path.join(UPDATE_APP_DIRECTORY, GUI_LIBRARY)
-PREVIOUS_VERSION_COPY_DIRECTORY = f"{ROOT_DIRECTORY}Previous Version"
+PREVIOUS_VERSION_COPY_DIRECTORY = os.path.join(ROOT_DIRECTORY, "Previous Version")
 TEST_PREVIOUS_VERSION_COPY_DIRECTORY = os.path.join(TEST_UPDATE_DIRECTORY, "Previous Version")
 LINUX_GUI_LIBRARY_ZIP = f"Linux_{GUI_LIBRARY_ZIP}"
 WINDOWS_GUI_LIBRARY_ZIP = f"Windows_{GUI_LIBRARY_ZIP}"
@@ -70,9 +70,9 @@ ATTEMPTS_TO_DOWNLOAD_ZIP = 3
 CHUNK_SIZE_FOR_DOWNLOADING = 1024*256#256 KB
 CHUNK_SIZE_FOR_FILE_HASHER = 1024*1024*1#1 MB
 
-LOGS_DIRECTORY = f"{ROOT_DIRECTORY}Logs/"
-APP_LOG_FILE = f"{LOGS_DIRECTORY}App.log"
-ERROR_LOG_FILE = f"{LOGS_DIRECTORY}Error.log"
+LOGS_DIRECTORY = os.path.join(ROOT_DIRECTORY, "Logs")
+APP_LOG_FILE = os.path.join(LOGS_DIRECTORY, "App.log")
+ERROR_LOG_FILE = os.path.join(LOGS_DIRECTORY, "Error.log")
 MAX_LOG_SIZE = 5*1024*1024#5 MB
 MAX_ERROR_LOG_SIZE = 2*1024*1024#2 MB
 MAX_LOG_BACKUPS = 5
@@ -100,7 +100,11 @@ MAX_RECOMMENDED_LEGACY_BACKUPS = 5
 BACKUPS_DATE_FORMAT = "%d-%m-%Y_%H-%M-%S"
 
 CATEGORY_TYPE = {0:"Incomes",1:"Expenses"}
-FORBIDDEN_CALCULATOR_WORDS = ["import","def","for","while","open","del","__","with","exit","raise","print","range","quit","class","try","if","input","object","global","lambda","match"]
+FORBIDDEN_CALCULATOR_WORDS = [
+    "import","def","for","while","open","del","__",
+    "with","exit","raise","print","range","quit","class","try",
+    "if","input","object","global","lambda","match"
+]
 MONTHS_DAYS = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 AVAILABLE_LANGUAGES = ["English","Українська","Polski"]
 

@@ -50,8 +50,18 @@ class IgnoreFilter(logging.Filter):
 
 class ReplaceMessageFormatter(logging.Formatter):
 
-    def __init__(self, fmt:str|None = None, datefmt:str|None = None, style:Literal['%', '{', '$'] = "%", validate:bool = True, *, replace_messages:Mapping[str, str]|None=None, defaults:dict[str, str]|None = None) -> None:
-        """This formatter is used to replace messages in the log with the values in the replace_messages dict.
+    def __init__(
+        self,
+        fmt:str|None = None,
+        datefmt:str|None = None,
+        style:Literal['%', '{', '$'] = "%",
+        validate:bool = True,
+        *,
+        replace_messages:Mapping[str, str]|None=None,
+        defaults:dict[str, str]|None = None
+    ) -> None:
+        """
+            This formatter is used to replace messages in the log with the values in the replace_messages dict.
 
             Arguments
             ---------
@@ -83,8 +93,12 @@ class ReplaceMessageFormatter(logging.Formatter):
         return super().format(record)
 
 
-ReplaceFormatter = ReplaceMessageFormatter(fmt=APP_LOG_FORMAT, datefmt=LOG_DATE_FORMAT, replace_messages=REPLACE_LOG_MESSAGES)
-ErrorReplaceFormatter = ReplaceMessageFormatter(fmt=ERROR_LOG_FORMAT, datefmt=LOG_DATE_FORMAT, replace_messages=REPLACE_LOG_MESSAGES)
+ReplaceFormatter = ReplaceMessageFormatter(
+    fmt=APP_LOG_FORMAT, datefmt=LOG_DATE_FORMAT, replace_messages=REPLACE_LOG_MESSAGES
+)
+ErrorReplaceFormatter = ReplaceMessageFormatter(
+    fmt=ERROR_LOG_FORMAT, datefmt=LOG_DATE_FORMAT, replace_messages=REPLACE_LOG_MESSAGES
+)
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -95,7 +109,9 @@ app_handler.setLevel(logging.DEBUG)
 app_handler.addFilter(InfoFilter())
 logger.addHandler(app_handler)
 
-error_handler = RotatingFileHandler(ERROR_LOG_FILE, maxBytes=MAX_ERROR_LOG_SIZE, backupCount=MAX_LOG_BACKUPS, encoding="utf-8")
+error_handler = RotatingFileHandler(
+    ERROR_LOG_FILE, maxBytes=MAX_ERROR_LOG_SIZE, backupCount=MAX_LOG_BACKUPS, encoding="utf-8"
+)
 error_handler.setFormatter(ErrorReplaceFormatter)
 error_handler.setLevel(logging.WARNING)
 logger.addHandler(error_handler)

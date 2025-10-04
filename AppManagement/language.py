@@ -18,7 +18,9 @@ def change_language() -> None:
     app_core = AppCore.instance()
     WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(app_core.config.language))
 
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(round(app_core.current_balance, 2)))
+    WindowsRegistry.MainWindow.account_current_balance.setText(
+        f"{LanguageStructure.MainWindow.get_translation(0)}{round(app_core.current_balance, 2)}"
+    )
     WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(1, LanguageStructure.MainWindow.get_translation(2))
@@ -36,7 +38,10 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(Incomes))
     Expenses = WindowsRegistry.SettingsWindow.total_expense.text().split(":")[1].replace(" ","")
     WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Expenses))
-    WindowsRegistry.SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))
+    WindowsRegistry.SettingsWindow.account_created_date.setText(
+        LanguageStructure.Settings.get_translation(1)
+        + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S"))
+    )
     WindowsRegistry.SettingsWindow.backup_management.setText(LanguageStructure.BackupManagement.get_translation(0))
     WindowsRegistry.SettingsWindow.general_section.section_name.setText(LanguageStructure.Settings.get_translation(3))
     WindowsRegistry.SettingsWindow.account_section.section_name.setText(LanguageStructure.Settings.get_translation(4))
@@ -53,8 +58,12 @@ def change_language() -> None:
 
     WindowsRegistry.SwitchAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(6))
     for account, account_switch_widget in zip(app_core.accounts_list, app_core.account_switch_widgets):
-        account_switch_widget.account_balance_label.setText(LanguageStructure.MainWindow.get_translation(0) + str(account.current_balance))
-        account_switch_widget.account_creation_date_label.setText(LanguageStructure.Settings.get_translation(1) + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
+        account_switch_widget.account_balance_label.setText(
+            f"{LanguageStructure.MainWindow.get_translation(0)}{round(account.current_balance, 2)}"
+)
+        account_switch_widget.account_creation_date_label.setText(
+            f"{LanguageStructure.Settings.get_translation(1)}{account.created_date.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
         account_switch_widget.switch_button.setText(LanguageStructure.GeneralManagement.get_translation(8))
 
     WindowsRegistry.AddCategoryWindow.category_name.setPlaceholderText(LanguageStructure.Transactions.get_translation(0))
@@ -64,17 +73,29 @@ def change_language() -> None:
     WindowsRegistry.CategorySettingsWindow.delete_category.setText(LanguageStructure.Categories.get_translation(1))
     WindowsRegistry.CategorySettingsWindow.rename_category.setText(LanguageStructure.Categories.get_translation(2))
     WindowsRegistry.CategorySettingsWindow.copy_transactions.setText(LanguageStructure.Categories.get_translation(4))
-    WindowsRegistry.CategorySettingsWindow.change_category_position.setText(LanguageStructure.Categories.get_translation(9))
+    WindowsRegistry.CategorySettingsWindow.change_category_position.setText(
+        LanguageStructure.Categories.get_translation(9)
+    )
 
-    WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.setText(LanguageStructure.GeneralManagement.get_translation(6))
+    WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.setText(
+        LanguageStructure.GeneralManagement.get_translation(6)
+    )
 
-    WindowsRegistry.RenameCategoryWindow.new_category_name.setPlaceholderText(LanguageStructure.Categories.get_translation(3))
+    WindowsRegistry.RenameCategoryWindow.new_category_name.setPlaceholderText(
+        LanguageStructure.Categories.get_translation(3)
+    )
     WindowsRegistry.RenameCategoryWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(2))
 
     WindowsRegistry.TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(5))
-    WindowsRegistry.TransactionManagementWindow.transaction_name.setPlaceholderText(LanguageStructure.Transactions.get_translation(0))
-    WindowsRegistry.TransactionManagementWindow.transaction_day.setPlaceholderText(LanguageStructure.Transactions.get_translation(1))
-    WindowsRegistry.TransactionManagementWindow.transaction_value.setPlaceholderText(LanguageStructure.Transactions.get_translation(2))
+    WindowsRegistry.TransactionManagementWindow.transaction_name.setPlaceholderText(
+        LanguageStructure.Transactions.get_translation(0)
+    )
+    WindowsRegistry.TransactionManagementWindow.transaction_day.setPlaceholderText(
+        LanguageStructure.Transactions.get_translation(1)
+    )
+    WindowsRegistry.TransactionManagementWindow.transaction_value.setPlaceholderText(
+        LanguageStructure.Transactions.get_translation(2)
+    )
 
     WindowsRegistry.StatisticsWindow.setWindowTitle(LanguageStructure.Statistics.get_translation(0))
     WindowsRegistry.StatisticsWindow.monthly_statistics.setText(LanguageStructure.Statistics.get_translation(1))
@@ -96,18 +117,32 @@ def change_language() -> None:
     
     WindowsRegistry.YearlyStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(3))
     WindowsRegistry.YearlyStatistics.copy_statistics.setText(LanguageStructure.Statistics.get_translation(32))
-    WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.label.setText(LanguageStructure.Categories.get_translation(10))
+    WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.label.setText(
+        LanguageStructure.Categories.get_translation(10)
+    )
     for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
         ymonth.label.setText(LanguageStructure.Months.get_translation(ymonth.month_number))
     
     WindowsRegistry.CustomRangeStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(34))
     WindowsRegistry.CustomRangeStatistics.show_statistics.setText(LanguageStructure.Statistics.get_translation(0))
-    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.setText(LanguageStructure.GeneralManagement.get_translation(9))
-    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.setText(LanguageStructure.GeneralManagement.get_translation(9))
-    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.setText(LanguageStructure.GeneralManagement.get_translation(10))
-    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.setText(LanguageStructure.GeneralManagement.get_translation(10))
-    WindowsRegistry.CustomRangeStatisticsView.setWindowTitle(LanguageStructure.Statistics.get_translation(34))
-    WindowsRegistry.CustomRangeStatisticsView.copy_statistics.setText(LanguageStructure.Statistics.get_translation(35))
+    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.setText(
+        LanguageStructure.GeneralManagement.get_translation(9)
+    )
+    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.setText(
+        LanguageStructure.GeneralManagement.get_translation(9)
+    )
+    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.setText(
+        LanguageStructure.GeneralManagement.get_translation(10)
+    )
+    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.setText(
+        LanguageStructure.GeneralManagement.get_translation(10)
+    )
+    WindowsRegistry.CustomRangeStatisticsView.setWindowTitle(
+        LanguageStructure.Statistics.get_translation(34)
+    )
+    WindowsRegistry.CustomRangeStatisticsView.copy_statistics.setText(
+        LanguageStructure.Statistics.get_translation(35)
+    )
     WindowsRegistry.CustomRangeStatisticsView.copy_transactions.setText(LanguageStructure.Statistics.get_translation(37))
 
 
@@ -115,49 +150,89 @@ def change_language() -> None:
         message.setText(LanguageStructure.Messages.get_translation(account_layout_item))
         message.button(QMessageBox.StandardButton.Ok).setText(LanguageStructure.GeneralManagement.get_translation(3))
         if message.button(QMessageBox.StandardButton.Cancel) != None:
-            message.button(QMessageBox.StandardButton.Cancel).setText(LanguageStructure.GeneralManagement.get_translation(4))
-    
+            message.button(QMessageBox.StandardButton.Cancel).setText(
+                LanguageStructure.GeneralManagement.get_translation(4)
+            )
+
     for category in app_core.categories:
         app_core.categories[category].delete_transaction.setText(LanguageStructure.GeneralManagement.get_translation(0))
         app_core.categories[category].add_transaction.setText(LanguageStructure.GeneralManagement.get_translation(1))
         app_core.categories[category].edit_transaction.setText(LanguageStructure.GeneralManagement.get_translation(7))
-        app_core.categories[category].table_data.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(0), LanguageStructure.Transactions.get_translation(1), LanguageStructure.Transactions.get_translation(2)))
+        app_core.categories[category].table_data.setHorizontalHeaderLabels(
+            (LanguageStructure.Transactions.get_translation(0),
+            LanguageStructure.Transactions.get_translation(1),
+            LanguageStructure.Transactions.get_translation(2))
+        )
         total_value = app_core.categories[category].total_value_label.text().split(" ")[1]
-        app_core.categories[category].total_value_label.setText(LanguageStructure.Categories.get_translation(10) + total_value)
+        app_core.categories[category].total_value_label.setText(
+            LanguageStructure.Categories.get_translation(10) + total_value
+        )
     
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance))
+    WindowsRegistry.MainWindow.account_current_balance.setText(
+        LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance)
+    )
 
     WindowsRegistry.BackupManagementWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(0))
-    WindowsRegistry.BackupManagementWindow.backups_table.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(1), LanguageStructure.Settings.get_translation(2).replace(":", "")))
+    WindowsRegistry.BackupManagementWindow.backups_table.setHorizontalHeaderLabels(
+        (
+            LanguageStructure.Transactions.get_translation(1),
+            LanguageStructure.Settings.get_translation(2).replace(":", "")
+        )
+    )
     WindowsRegistry.BackupManagementWindow.create_backup.setText(LanguageStructure.BackupManagement.get_translation(1))
     WindowsRegistry.BackupManagementWindow.delete_backup.setText(LanguageStructure.BackupManagement.get_translation(2))
     WindowsRegistry.BackupManagementWindow.load_backup.setText(LanguageStructure.BackupManagement.get_translation(3))
     WindowsRegistry.SettingsWindow.auto_backup.setText(LanguageStructure.BackupManagement.get_translation(4))
-    WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+    WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+        f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(5)}"
+    )
 
     WindowsRegistry.AutoBackupWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(4))
     if app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.MONTHLY.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(5)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(5)}"
+        )
 
     elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.WEEKLY.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(6)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(6)}"
+        )
 
     elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.DAILY.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-    
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(7)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(7)}"
+        )
+
     elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(20)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(20)}"
+        )
     WindowsRegistry.AutoBackupWindow.monthly.setText(LanguageStructure.BackupManagement.get_translation(9))
     WindowsRegistry.AutoBackupWindow.weekly.setText(LanguageStructure.BackupManagement.get_translation(10))
     WindowsRegistry.AutoBackupWindow.daily.setText(LanguageStructure.BackupManagement.get_translation(11))
     WindowsRegistry.AutoBackupWindow.no_auto_backup.setText(LanguageStructure.BackupManagement.get_translation(15))
-    WindowsRegistry.AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(app_core.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
+    WindowsRegistry.AutoBackupWindow.max_backups_label.setText(
+        f"{LanguageStructure.BackupManagement.get_translation(12).replace('max_backups', str(app_core.config.max_backups))}\
+        \n{LanguageStructure.BackupManagement.get_translation(13)}"
+    )
     WindowsRegistry.AutoBackupWindow.max_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(14))
-    WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(app_core.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
+    WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(
+        f"{LanguageStructure.BackupManagement.get_translation(17).replace('max_legacy_backups', str(app_core.config.max_legacy_backups))}\
+        \n{LanguageStructure.BackupManagement.get_translation(18)}"
+    
+    )
     WindowsRegistry.AutoBackupWindow.max_legacy_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(19))
     WindowsRegistry.AutoBackupWindow.no_auto_removal.setText(LanguageStructure.BackupManagement.get_translation(16))
     WindowsRegistry.AutoBackupWindow.save.setText(LanguageStructure.GeneralManagement.get_translation(6))

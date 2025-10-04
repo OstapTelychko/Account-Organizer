@@ -29,7 +29,9 @@ class UpdateProgressWindow(SubWindow):
         self.download_wrapper = QWidget()
         self.download_wrapper.setLayout(self.download_layout)
         self.download_wrapper.setProperty("class", "wrapper")
-        self.download_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.download_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.download_wrapper.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.download_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+        )
         self.download_wrapper.setFixedWidth(300)
 
         self.backups_upgrade_label = QLabel()
@@ -44,7 +46,9 @@ class UpdateProgressWindow(SubWindow):
         self.backups_upgrade_wrapper = QWidget()
         self.backups_upgrade_wrapper.setLayout(self.backups_upgrade_layout)
         self.backups_upgrade_wrapper.setProperty("class", "wrapper")
-        self.backups_upgrade_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.backups_upgrade_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.backups_upgrade_wrapper.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.backups_upgrade_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+        )
         self.backups_upgrade_wrapper.setFixedWidth(300)
 
         self.apply_update_label = QLabel()
@@ -58,7 +62,9 @@ class UpdateProgressWindow(SubWindow):
         self.apply_update_wrapper = QWidget()
         self.apply_update_wrapper.setLayout(self.apply_update_layout)
         self.apply_update_wrapper.setProperty("class", "wrapper")
-        self.apply_update_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.apply_update_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.apply_update_wrapper.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.apply_update_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+        )
         self.apply_update_wrapper.setFixedWidth(300)
 
         self.scroll_layout = QVBoxLayout()

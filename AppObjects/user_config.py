@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING
 import toml
 from enum import Enum
 
-from project_configuration import USER_CONF_PATH, TEST_USER_CONF_PATH, MAX_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS
+from project_configuration import USER_CONF_PATH, TEST_USER_CONF_PATH, MAX_RECOMMENDED_BACKUPS,\
+MAX_RECOMMENDED_LEGACY_BACKUPS
 
 if TYPE_CHECKING:
     UserConfCategory = dict[str, str | int | bool]
@@ -98,10 +99,14 @@ class UserConfig:
             self.account_name = str(User_conf["General"].get("Account_name", ""))
             self.update_channel = str(User_conf["General"].get("Update_channel", UserConfig.UpdateChannel.RELEASE.value))
 
-            self.auto_backup_status = str(User_conf["Backup"].get("Auto_backup_status", UserConfig.AutoBackupStatus.MONTHLY.value))
+            self.auto_backup_status = str(User_conf["Backup"].get(
+                "Auto_backup_status", UserConfig.AutoBackupStatus.MONTHLY.value)
+            )
             self.max_backups = int(User_conf["Backup"].get("Max_backups", self.max_backups))
             self.max_legacy_backups = int(User_conf["Backup"].get("Max_legacy_backups", self.max_legacy_backups))
-            self.auto_backup_removal_enabled = bool(User_conf["Backup"].get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled))
+            self.auto_backup_removal_enabled = bool(User_conf["Backup"].get(
+                "Auto_backup_removal_enabled", self.auto_backup_removal_enabled)
+            )
 
             for shortcut_id, shortcut_value in self.shortcuts.items():
                 if shortcut_id in User_conf["Shortcuts"]:
@@ -111,14 +116,16 @@ class UserConfig:
 
         else:
             # If the file is not in the new format, load it as a legacy configuration (1.1.1)
-            Legacy_user_conf:LegacyUserConfType = User_conf # type: ignore #Conficts with new UserConfType
+            Legacy_user_conf:LegacyUserConfType = User_conf # type: ignore #Conflicts with new UserConfType
             self.theme = str(Legacy_user_conf.get("Theme", self.theme))
             self.language = str(Legacy_user_conf.get("Language", self.language))
             self.account_name = str(Legacy_user_conf.get("Account_name", self.account_name))
             self.auto_backup_status = str(Legacy_user_conf.get("Auto_backup_status", self.auto_backup_status))
             self.max_backups = int(Legacy_user_conf.get("Max_backups", self.max_backups))
             self.max_legacy_backups = int(Legacy_user_conf.get("Max_legacy_backups", self.max_legacy_backups))
-            self.auto_backup_removal_enabled = bool(Legacy_user_conf.get("Auto_backup_removal_enabled", self.auto_backup_removal_enabled))
+            self.auto_backup_removal_enabled = bool(Legacy_user_conf.get(
+                "Auto_backup_removal_enabled", self.auto_backup_removal_enabled)
+            )
 
 
     def create_user_config(self) -> None:

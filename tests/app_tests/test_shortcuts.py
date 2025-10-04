@@ -31,7 +31,11 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
                 WindowsRegistry.AddCategoryWindow,
                 QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.CLOSE_CURRENT_WINDOW]))
             qsleep(200)
-            self.assertFalse(WindowsRegistry.AddCategoryWindow.isVisible(), f"Add category window should be closed after {app_core.config.shortcuts[app_core.config.ShortcutId.CLOSE_CURRENT_WINDOW]} shortcut.")
+            self.assertFalse(
+                WindowsRegistry.AddCategoryWindow.isVisible(),
+                f"Add category window should be closed after \
+                {app_core.config.shortcuts[app_core.config.ShortcutId.CLOSE_CURRENT_WINDOW]} shortcut."
+            )
 
         QTimer.singleShot(200, self.catch_failure(_check_closure))
         WindowsRegistry.MainWindow.add_incomes_category.click()
@@ -42,11 +46,18 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         """Test opening windows with shortcuts."""
 
         app_core = AppCore.instance()
-        open_some_window_shortcuts:dict[str, SubWindow] = {app_core.config.ShortcutId.OPEN_SETTINGS:WindowsRegistry.SettingsWindow, app_core.config.ShortcutId.OPEN_STATISTICS:WindowsRegistry.StatisticsWindow, app_core.config.ShortcutId.SWITCH_ACCOUNT:WindowsRegistry.SwitchAccountWindow}
+        open_some_window_shortcuts:dict[str, SubWindow] = {
+            app_core.config.ShortcutId.OPEN_SETTINGS:WindowsRegistry.SettingsWindow,
+            app_core.config.ShortcutId.OPEN_STATISTICS:WindowsRegistry.StatisticsWindow,
+            app_core.config.ShortcutId.SWITCH_ACCOUNT:WindowsRegistry.SwitchAccountWindow
+        }
         for shortcut_id, window in open_some_window_shortcuts.items():
             
             def _check_visibility() -> None:
-                self.assertTrue(window.isVisible(), f"{window.windowTitle()} should be opened after {app_core.config.shortcuts[shortcut_id]} shortcut.")
+                self.assertTrue(
+                    window.isVisible(),
+                    f"{window.windowTitle()} should be opened after {app_core.config.shortcuts[shortcut_id]} shortcut."
+                )
                 window.done(0)
                 
             QTimer.singleShot(200, self.catch_failure(_check_visibility))
@@ -61,7 +72,12 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         
         app_core = AppCore.instance()
         def _check_switch() -> None:
-            self.assertEqual(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(), 1, f"Tab should be switched to expense after {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut.")
+            self.assertEqual(
+                WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(),
+                1,
+                f"Tab should be switched to expense after \
+                {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut."
+            )
             
         QTimer.singleShot(200, self.catch_failure(_check_switch))
         QTest.keySequence(
@@ -75,7 +91,12 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         
         app_core = AppCore.instance()
         def _check_switch() -> None:
-            self.assertEqual(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(), 0, f"Tab should be switched to income after {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]} shortcut.")
+            self.assertEqual(
+                WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(),
+                0,
+                f"Tab should be switched to income after \
+                {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]} shortcut."
+            )
             
         QTimer.singleShot(200, self.catch_failure(_check_switch))
         QTest.keySequence(
@@ -97,7 +118,10 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
 
         self.assertEqual(
             app_core.current_month, expected_previous_month,
-            f"Month should be switched to previous ({expected_previous_month}) after {app_core.config.shortcuts[app_core.config.ShortcutId.LOAD_PREVIOUS_MONTH]} shortcut not {app_core.current_month} month.")
+            f"Month should be switched to previous ({expected_previous_month}) after \
+            {app_core.config.shortcuts[app_core.config.ShortcutId.LOAD_PREVIOUS_MONTH]} shortcut not \
+            {app_core.current_month} month."
+        )
 
 
     def test_06_load_next_month(self) -> None:
@@ -113,7 +137,10 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
 
         self.assertEqual(
             app_core.current_month, expected_next_month,
-            f"Month should be switched to next ({expected_next_month}) after {app_core.config.shortcuts[app_core.config.ShortcutId.LOAD_NEXT_MONTH]} shortcut not {app_core.current_month} month.")
+            f"Month should be switched to next ({expected_next_month}) after \
+            {app_core.config.shortcuts[app_core.config.ShortcutId.LOAD_NEXT_MONTH]} shortcut not \
+            {app_core.current_month} month."
+        )
     
 
     def test_07_focus_on_next_category(self) -> None:
@@ -126,7 +153,15 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             logger.error("Just created category not found in the database")
             raise ValueError("Just created category not found in the database")
 
-        app_core.categories[new_category.id] = expected_focused_category = load_category(new_category.category_type, new_category.name, app_core.db, new_category.id, 0, app_core.current_year, app_core.current_month)
+        app_core.categories[new_category.id] = expected_focused_category = load_category(
+            new_category.category_type,
+            new_category.name,
+            app_core.db,
+            new_category.id,
+            0,
+            app_core.current_year,
+            app_core.current_month
+        )
         activate_categories()
 
         reset_focused_category()
@@ -142,7 +177,10 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
 
         self.assertEqual(
             app_core.focused_income_category, expected_focused_category,
-            f"Focused category should be {expected_focused_category.name} after {app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]} shortcut not {app_core.focused_income_category.name}.")
+            f"Focused category should be {expected_focused_category.name} after \
+            {app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]} shortcut not \
+            {app_core.focused_income_category.name}."
+        )
     
 
     def test_08_focus_on_previous_category(self) -> None:
@@ -155,7 +193,15 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             logger.error("Just created category not found in the database")
             raise ValueError("Just created category not found in the database")
 
-        app_core.categories[new_category.id] = load_category(new_category.category_type, new_category.name, app_core.db, new_category.id, 0, app_core.current_year, app_core.current_month)
+        app_core.categories[new_category.id] = load_category(
+            new_category.category_type,
+            new_category.name,
+            app_core.db,
+            new_category.id,
+            0,
+            app_core.current_year,
+            app_core.current_month
+        )
         activate_categories()
 
         reset_focused_category()
@@ -177,7 +223,10 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
 
         self.assertEqual(
             app_core.focused_income_category, app_core.categories[self.income_category.id],
-            f"Focused category should be {self.income_category.name} after {app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]} shortcut not {app_core.focused_income_category.name}.")
+            f"Focused category should be {self.income_category.name} after \
+            {app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]} shortcut not \
+            {app_core.focused_income_category.name}."
+        )
         
     
     def test_09_add_transaction_to_focused_category(self) -> None:
@@ -185,13 +234,22 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         
         app_core = AppCore.instance()
         def _add_transaction() -> None:
-            self.assertTrue(WindowsRegistry.TransactionManagementWindow.isVisible(), f"Transaction management window should be opened after {app_core.config.shortcuts[app_core.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut.")
+            self.assertTrue(
+                WindowsRegistry.TransactionManagementWindow.isVisible(),
+                f"Transaction management window should be opened after \
+                {app_core.config.shortcuts[app_core.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut."
+            )
             WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
             WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
             WindowsRegistry.TransactionManagementWindow.button.click()
             qsleep(100)
 
-            self.assertEqual(len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)), 2, f"Transaction should be added to {self.income_category.name} after {app_core.config.shortcuts[app_core.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut.")
+            self.assertEqual(
+                len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)),
+                2,
+                f"Transaction should be added to {self.income_category.name} after \
+                {app_core.config.shortcuts[app_core.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]} shortcut."
+            )
         
         QTimer.singleShot(200, self.catch_failure(_add_transaction))
         QTest.keySequence(
@@ -228,7 +286,10 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         selected_transaction = app_core.categories[self.income_category.id].table_data.currentRow()
         self.assertEqual(
             selected_transaction, 1,
-            f"Next transaction should be selected after {app_core.config.shortcuts[app_core.config.ShortcutId.SELECT_NEXT_TRANSACTION]} shortcut not {selected_transaction} transaction.")
+            f"Next transaction should be selected after \
+            {app_core.config.shortcuts[app_core.config.ShortcutId.SELECT_NEXT_TRANSACTION]} shortcut not \
+            {selected_transaction} transaction."
+        )
         
         QTest.keySequence(
             WindowsRegistry.MainWindow,
@@ -238,7 +299,10 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         selected_transaction = app_core.categories[self.income_category.id].table_data.currentRow()
         self.assertEqual(
             selected_transaction, 0,
-            f"Previous transaction should be selected after {app_core.config.shortcuts[app_core.config.ShortcutId.SELECT_PREVIOUS_TRANSACTION]} shortcut not {selected_transaction} transaction.")
+            f"Previous transaction should be selected after \
+            {app_core.config.shortcuts[app_core.config.ShortcutId.SELECT_PREVIOUS_TRANSACTION]} shortcut not \
+            {selected_transaction} transaction."
+        )
 
         qsleep(200)
 
@@ -259,9 +323,13 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
 
             QTimer.singleShot(200,
                 self.catch_failure(lambda: 
-                self.assertEqual(len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)),
-                                0,
-                                f"Transaction should be deleted after {app_core.config.shortcuts[app_core.config.ShortcutId.DELETE_TRANSACTION]} shortcut.")))
+                    self.assertEqual(
+                        len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)),
+                        0,
+                        f"Transaction should be deleted after \
+                        {app_core.config.shortcuts[app_core.config.ShortcutId.DELETE_TRANSACTION]} shortcut."
+                    )
+            ))
 
         QTimer.singleShot(200, self.catch_failure(_perform_deletion))
         QTest.keySequence(
@@ -286,7 +354,12 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             WindowsRegistry.TransactionManagementWindow.button.click()
             qsleep(200)
 
-            self.assertEqual(app_core.db.transaction_query.get_all_transactions(self.income_category.id)[0].value, 2000, f"Transaction should be edited after {app_core.config.shortcuts[app_core.config.ShortcutId.EDIT_TRANSACTION]} shortcut.")
+            self.assertEqual(
+                app_core.db.transaction_query.get_all_transactions(self.income_category.id)[0].value,
+                2000,
+                f"Transaction should be edited after \
+                {app_core.config.shortcuts[app_core.config.ShortcutId.EDIT_TRANSACTION]} shortcut."
+            )
 
         QTimer.singleShot(200, self.catch_failure(_perform_edit))
         QTest.keySequence(

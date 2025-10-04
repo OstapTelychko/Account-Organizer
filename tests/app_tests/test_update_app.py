@@ -28,12 +28,12 @@ from AppManagement.AppUpdate.prepare_update import prepare_update, create_single
 from AppManagement.AppUpdate.apply_update import apply_update
 from AppManagement.backup_management import create_backup
 
-from project_configuration import DEVELOPMENT_ROOT_DIRECTORY, WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP, \
+from project_configuration import DEVELOPMENT_ROOT_DIRECTORY, WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
     TEST_PREVIOUS_VERSION_COPY_DIRECTORY, TEST_BACKUPS_DIRECTORY, TEST_UPDATE_BACKUPS_DIRECTORY, \
     PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, MOVE_FILES_TO_UPDATE_INTERNAL,\
     MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, APP_DIRECTORY, ALEMBIC_CONFIG_FILE, PREVIOUS_VERSION_COPY_DIRECTORY,\
-    ROOT_DIRECTORY, MAIN_EXECUTABLE, DEVELOPMENT_BACKUPS_DIRECTORY
+    ROOT_DIRECTORY, MAIN_EXECUTABLE, DEVELOPMENT_BACKUPS_DIRECTORY, LINUX_GUI_LIBRARY_ZIP, LINUX_UPDATE_ZIP
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -171,32 +171,48 @@ class TestDownloadUpdate(DefaultTestCase):
         mock_successful_head_response:MockedResponse = create_autospec(Response, spec_set=True)
         mock_successful_head_response.raise_for_status = MagicMock(return_value=None)
         mock_head.return_value = mock_successful_head_response
-        self.assertTrue(check_internet_connection(), "Internet connection check failed although success had been expected")
+        self.assertTrue(
+            check_internet_connection(), "Internet connection check failed although success had been expected"
+        )
 
         mock_timeout_head_response:MockedResponse = create_autospec(Response, spec_set=True)
         mock_timeout_head_response.raise_for_status = MagicMock(side_effect=Timeout)
         mock_head.return_value = mock_timeout_head_response
-        self.assertFalse(check_internet_connection(), "Internet connection check passed although failure was expected caused by timeout")
+        self.assertFalse(
+            check_internet_connection(), "Internet connection check passed although failure was expected caused by timeout"
+        )
 
         mock_connection_error_head_response:MockedResponse = create_autospec(Response, spec_set=True)
         mock_connection_error_head_response.raise_for_status = MagicMock(side_effect=ConnectionError)
         mock_head.return_value = mock_connection_error_head_response
-        self.assertFalse(check_internet_connection(), "Internet connection check passed although failure was expected caused by connection error")
+        self.assertFalse(
+            check_internet_connection(),
+            "Internet connection check passed although failure was expected caused by connection error"
+        )
 
         mock_too_many_redirects_head_response:MockedResponse = create_autospec(Response, spec_set=True)
         mock_too_many_redirects_head_response.raise_for_status = MagicMock(side_effect=TooManyRedirects)
         mock_head.return_value = mock_too_many_redirects_head_response
-        self.assertFalse(check_internet_connection(), "Internet connection check passed although failure was expected caused by too many redirects")
+        self.assertFalse(
+            check_internet_connection(),
+            "Internet connection check passed although failure was expected caused by too many redirects"
+        )
 
         mock_request_exception_head_response:MockedResponse = create_autospec(Response, spec_set=True)
         mock_request_exception_head_response.raise_for_status = MagicMock(side_effect=RequestException)
         mock_head.return_value = mock_request_exception_head_response
-        self.assertFalse(check_internet_connection(), "Internet connection check passed although failure was expected caused by request exception")
+        self.assertFalse(
+            check_internet_connection(),
+            "Internet connection check passed although failure was expected caused by request exception"
+        )
 
         mock_runtime_error_head_response:MockedResponse = create_autospec(Response, spec_set=True)
         mock_runtime_error_head_response.raise_for_status = MagicMock(side_effect=RuntimeError)
         mock_head.return_value = mock_runtime_error_head_response
-        self.assertFalse(check_internet_connection(), "Internet connection check passed although failure was expected caused by runtime error")
+        self.assertFalse(
+            check_internet_connection(),
+            "Internet connection check passed although failure was expected caused by runtime error"
+        )
     
 
     @patch('AppManagement.AppUpdate.download_update.req.Session.get', autospec=True)
@@ -211,7 +227,9 @@ class TestDownloadUpdate(DefaultTestCase):
         mock_get.return_value = mock_successful_get_response
 
         result = get_release()
-        self.assertEqual(result, expected_result, f"Failed to get expected release data. Expected: {expected_result}, Got: {result}")
+        self.assertEqual(
+            result, expected_result, f"Failed to get expected release data. Expected: {expected_result}, Got: {result}"
+        )
 
         mock_wrong_status_code_get_response:MockedResponse = create_autospec(Response)
         type(mock_wrong_status_code_get_response).status_code = PropertyMock(return_value=404)
@@ -233,7 +251,9 @@ class TestDownloadUpdate(DefaultTestCase):
 
         expected_result = {"prerelease": "Hello"}
         result = get_prerelease()
-        self.assertEqual(result, expected_result, f"Failed to get expected prerelease data. Expected: {expected_result}, Got: {result}")
+        self.assertEqual(
+            result, expected_result, f"Failed to get expected prerelease data. Expected: {expected_result}, Got: {result}"
+        )
 
         mock_wrong_status_code_get_response:MockedResponse = create_autospec(Response)
         type(mock_wrong_status_code_get_response).status_code = PropertyMock(return_value=404)
@@ -272,7 +292,11 @@ class TestDownloadUpdate(DefaultTestCase):
         self.assertIsNotNone(update_zip_asset, f"Test update asset {WINDOWS_UPDATE_ZIP} not found in test assets.")
         self.assertIsNotNone(gui_library_asset, f"Test GUI library asset {WINDOWS_GUI_LIBRARY_ZIP} not found in test assets.")
 
-        self.assertEqual((update_zip_asset, gui_library_asset), get_platform_assets(self.test_assets), "Failed to get platform assets for Windows.")
+        self.assertEqual(
+            (update_zip_asset, gui_library_asset),
+            get_platform_assets(self.test_assets),
+            "Failed to get platform assets for Windows."
+        )
 
         with self.assertRaises(UpdateAssetNotFoundError, msg="Update asset not found error not raised as expected for platform windows"):
             get_platform_assets([{"name":""}])
@@ -303,7 +327,11 @@ class TestDownloadUpdate(DefaultTestCase):
         self.assertIsNotNone(update_zip_asset, f"Test update asset {LINUX_UPDATE_ZIP} not found in test assets.")
         self.assertIsNotNone(gui_library_asset, f"Test GUI library asset {LINUX_GUI_LIBRARY_ZIP} not found in test assets.")
 
-        self.assertEqual((update_zip_asset, gui_library_asset), get_platform_assets(self.test_assets), "Failed to get platform assets for Linux.")
+        self.assertEqual(
+            (update_zip_asset, gui_library_asset),
+            get_platform_assets(self.test_assets),
+            "Failed to get platform assets for Linux."
+        )
 
         with self.assertRaises(UpdateAssetNotFoundError, msg="Update asset not found error not raised as expected for platform linux"):
             get_platform_assets([{"name":""}])
@@ -410,7 +438,11 @@ class TestDownloadUpdate(DefaultTestCase):
                 gui_library_zip_download_name = asset["name"]
                 gui_library_zip_download_url = asset["browser_download_url"]
                 gui_library_zip_size = asset["size"]
-        self.assertNotEqual("", gui_library_zip_download_name, f"Test GUI library asset {LINUX_GUI_LIBRARY_ZIP} not found in test assets.")
+        self.assertNotEqual(
+            "",
+            gui_library_zip_download_name,
+            f"Test GUI library asset {LINUX_GUI_LIBRARY_ZIP} not found in test assets."
+        )
 
         mock_zip_file_instance = MagicMock()
         mock_zipfile.return_value.__enter__.return_value = mock_zip_file_instance
@@ -473,7 +505,10 @@ class TestDownloadUpdate(DefaultTestCase):
 
         self.assertTrue(download_latest_update(self.test_release), f"Failed to download latest update.")
         mock_os_remove.assert_called_once_with(os.path.join(TEST_UPDATE_APP_DIRECTORY, gui_library_asset[0]))
-        self.assertTrue(os.path.exists(TEST_GUI_LIBRARY_HASH_FILE_PATH), "GUI library hash file not found after downloading latest update.")
+        self.assertTrue(
+            os.path.exists(TEST_GUI_LIBRARY_HASH_FILE_PATH),
+            "GUI library hash file not found after downloading latest update."
+        )
         os.unlink(TEST_GUI_LIBRARY_HASH_FILE_PATH)
 
         wrong_update_zip_hash = itertools.cycle(["wrong_hash"])
@@ -499,21 +534,48 @@ class TestPrepareUpdate(DBTestCase):
         self.patched_path_exists = patch("AppManagement.AppUpdate.prepare_update.path_exists", autospec=True)
         self.patched_copy2 = patch("AppManagement.AppUpdate.prepare_update.shutil.copy2", autospec=True)
         self.patched_makedirs = patch("AppManagement.AppUpdate.prepare_update.os.makedirs", autospec=True)
-        self.patched_create_single_backup = patch("AppManagement.AppUpdate.prepare_update.create_single_backup", autospec=True)
-        self.patched_migrate_single_backup = patch("AppManagement.AppUpdate.prepare_update.migrate_single_backup", autospec=True)
+        self.patched_create_single_backup = patch(
+            "AppManagement.AppUpdate.prepare_update.create_single_backup", autospec=True
+        )
+        self.patched_migrate_single_backup = patch(
+            "AppManagement.AppUpdate.prepare_update.migrate_single_backup", autospec=True
+        )
         self.patched_makedirs = patch("AppManagement.AppUpdate.prepare_update.os.makedirs", autospec=True)
         self.patched_chmod = patch("AppManagement.AppUpdate.prepare_update.os.chmod", autospec=True)
-        self.patched_open = patch("AppManagement.AppUpdate.prepare_update.open", new_callable=mock_open, read_data=self.test_update_version)
+        self.patched_open = patch(
+            "AppManagement.AppUpdate.prepare_update.open", new_callable=mock_open, read_data=self.test_update_version
+        )
 
-        self.patched_update_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY)
-        self.patched_update_app_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
-        self.patched_previous_version_copy_directory = patch("AppManagement.AppUpdate.prepare_update.PREVIOUS_VERSION_COPY_DIRECTORY", new=TEST_PREVIOUS_VERSION_COPY_DIRECTORY)
-        self.patched_update_backups_directory = patch("AppManagement.AppUpdate.prepare_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
-        self.patched_backups_directory = patch("AppManagement.AppUpdate.prepare_update.BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
-        self.patched_development_backups_directory = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
-        self.patched_development_gui_library_directory = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_GUI_LIBRARY_DIRECTORY", new=GUI_LIBRARY_DIRECTORY)
+        self.patched_update_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY
+        )
+        self.patched_update_app_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY
+        )
+        self.patched_previous_version_copy_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.PREVIOUS_VERSION_COPY_DIRECTORY",
+            new=TEST_PREVIOUS_VERSION_COPY_DIRECTORY
+        )
+        self.patched_update_backups_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.UPDATE_BACKUPS_DIRECTORY",
+            new=TEST_UPDATE_BACKUPS_DIRECTORY
+        )
+        self.patched_backups_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.BACKUPS_DIRECTORY",
+            new=TEST_BACKUPS_DIRECTORY
+        )
+        self.patched_development_backups_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.DEVELOPMENT_BACKUPS_DIRECTORY",
+            new=TEST_BACKUPS_DIRECTORY
+        )
+        self.patched_development_gui_library_directory = patch(
+            "AppManagement.AppUpdate.prepare_update.DEVELOPMENT_GUI_LIBRARY_DIRECTORY",
+            new=GUI_LIBRARY_DIRECTORY
+        )
 
-        self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=False)
+        self.patched_disabled_development_mode = patch(
+            "AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=False
+        )
         self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.prepare_update.DEVELOPMENT_MODE", new=True)
         self.patched_windows_platform = patch("AppManagement.AppUpdate.prepare_update.platform", new="win32")
         self.patched_linux_platform = patch("AppManagement.AppUpdate.prepare_update.platform", new="linux")
@@ -604,14 +666,18 @@ class TestPrepareUpdate(DBTestCase):
         if not gui_library_included:
             assert_any_call_with_details(self.mock_copytree, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH)
         else:
-            self.assertNotIn(call(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH), self.mock_copytree.mock_calls,
-                            "GUI library directory was copied although it was expected that the update includes the GUI library.")
+            self.assertNotIn(
+                call(GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH), self.mock_copytree.mock_calls,
+                "GUI library directory was copied although it was expected that the update includes the GUI library."
+            )
 
         for file in MOVE_FILES_TO_UPDATE_INTERNAL:
             assert_any_call_with_details(self.mock_copy2, file, TEST_UPDATE_APP_DIRECTORY)
         
         for directory in MOVE_DIRECTORIES_TO_UPDATE_INTERNAL:
-            assert_any_call_with_details(self.mock_copytree, directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name))
+            assert_any_call_with_details(
+                self.mock_copytree, directory, os.path.join(TEST_UPDATE_APP_DIRECTORY, Path(directory).name)
+            )
 
         if is_active_patch(self.patched_linux_platform):
             assert_any_call_with_details(self.mock_chmod, os.path.join(TEST_UPDATE_DIRECTORY, "main"), 0o755)
@@ -633,11 +699,15 @@ class TestPrepareUpdate(DBTestCase):
         updated_paths = []
         for backup in AppCore.instance().backups.values():
             expected_updated_backup_file_path = os.path.join(TEST_UPDATE_BACKUPS_DIRECTORY,
-                                                            f"Accounts_{backup.timestamp}_{self.test_update_version}.sqlite")
+                                                    f"Accounts_{backup.timestamp}_{self.test_update_version}.sqlite")
             result_path = create_single_backup(backup, AppCore.instance(), self.test_update_version)
 
-            self.assertEqual(result_path, expected_updated_backup_file_path,
-            f"The created backup path for update directory is incorrect. Expected {expected_updated_backup_file_path}, but got {result_path}")
+            self.assertEqual(
+                result_path,
+                expected_updated_backup_file_path,
+                f"The created backup path for update directory is incorrect. Expected \
+                {expected_updated_backup_file_path}, but got {result_path}"
+            )
             self.assertTrue(os.path.exists(expected_updated_backup_file_path),
                             f"The expected backup file does not exist: {expected_updated_backup_file_path}")
             updated_paths.append(result_path)
@@ -663,7 +733,10 @@ class TestPrepareUpdate(DBTestCase):
 
 
     def test_02_prepare_update_development_false_without_gui_library_linux(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library and os is linux."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is False and update doesn't include GUI library and os is linux.
+        """
 
         self.patched_disabled_development_mode.start()
         self.patched_linux_platform.start()
@@ -671,7 +744,10 @@ class TestPrepareUpdate(DBTestCase):
 
 
     def test_03_prepare_update_development_true_without_gui_library_linux(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is True and update doesn't include GUI library and os is linux."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is True and update doesn't include GUI library and os is linux.
+        """
 
         self.patched_enabled_development_mode.start()
         self.patched_linux_platform.start()
@@ -679,7 +755,10 @@ class TestPrepareUpdate(DBTestCase):
     
 
     def test_04_prepare_update_development_false_with_gui_library_linux(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is False and update includes GUI library and os is linux."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is False and update includes GUI library and os is linux.
+        """
 
         self.patched_disabled_development_mode.start()
         self.patched_linux_platform.start()
@@ -687,7 +766,10 @@ class TestPrepareUpdate(DBTestCase):
     
 
     def test_05_prepare_update_development_true_with_gui_library_linux(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is True and update includes GUI library and os is linux."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is True and update includes GUI library and os is linux.
+        """
 
         self.patched_enabled_development_mode.start()
         self.patched_linux_platform.start()
@@ -695,7 +777,10 @@ class TestPrepareUpdate(DBTestCase):
 
 
     def test_06_prepare_update_development_false_without_gui_library_windows(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is False and update doesn't include GUI library and os is windows."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is False and update doesn't include GUI library and os is windows.
+        """
 
         self.patched_disabled_development_mode.start()
         self.patched_windows_platform.start()
@@ -703,7 +788,10 @@ class TestPrepareUpdate(DBTestCase):
     
 
     def test_07_prepare_update_development_true_without_gui_library_windows(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is True and update doesn't include GUI library and os is windows."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is True and update doesn't include GUI library and os is windows.
+        """
 
         self.patched_enabled_development_mode.start()
         self.patched_windows_platform.start()
@@ -711,7 +799,10 @@ class TestPrepareUpdate(DBTestCase):
     
 
     def test_08_prepare_update_development_false_with_gui_library_windows(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is False and update includes GUI library and os is windows."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is False and update includes GUI library and os is windows.
+        """
 
         self.patched_disabled_development_mode.start()
         self.patched_windows_platform.start()
@@ -719,7 +810,10 @@ class TestPrepareUpdate(DBTestCase):
     
 
     def test_09_prepare_update_development_true_with_gui_library_windows(self) -> None:
-        """Test prepare update functionality. DEVELOPMENT_MODE is True and update includes GUI library and os is windows."""
+        """
+        Test prepare update functionality.
+        DEVELOPMENT_MODE is True and update includes GUI library and os is windows.
+        """
 
         self.patched_enabled_development_mode.start()
         self.patched_windows_platform.start()
@@ -737,11 +831,21 @@ class TestApplyUpdate(DBTestCase):
         self.patched_rmtree = patch("AppManagement.AppUpdate.apply_update.shutil.rmtree", autospec=True)
         self.patched_move = patch("AppManagement.AppUpdate.apply_update.shutil.move", autospec=True)
 
-        self.patched_update_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY)
-        self.patched_update_app_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY)
-        self.patched_update_backups_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
-        self.patched_backups_directory = patch("AppManagement.AppUpdate.apply_update.BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY)
-        self.patched_update_backups_directory = patch("AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY)
+        self.patched_update_directory = patch(
+            "AppManagement.AppUpdate.apply_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY
+        )
+        self.patched_update_app_directory = patch(
+            "AppManagement.AppUpdate.apply_update.UPDATE_APP_DIRECTORY", new=TEST_UPDATE_APP_DIRECTORY
+        )
+        self.patched_update_backups_directory = patch(
+            "AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY
+        )
+        self.patched_backups_directory = patch(
+            "AppManagement.AppUpdate.apply_update.BACKUPS_DIRECTORY", new=TEST_BACKUPS_DIRECTORY
+        )
+        self.patched_update_backups_directory = patch(
+            "AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY
+        )
 
         self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=False)
         self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=True)
@@ -812,7 +916,10 @@ class TestApplyUpdate(DBTestCase):
                                      os.path.join(root_directory, MAIN_EXECUTABLE))
         
         assert_any_call_with_details(self.mock_rmtree, TEST_UPDATE_DIRECTORY)
-        self.assertFalse(WindowsRegistry.UpdateProgressWindow.isVisible(), "Update progress window is still visible after update apply")
+        self.assertFalse(
+            WindowsRegistry.UpdateProgressWindow.isVisible(),
+            "Update progress window is still visible after update apply"
+        )
         self.assertTrue(WindowsRegistry.MainWindow.isVisible(), "Main windows is not visible after update apply")
 
 

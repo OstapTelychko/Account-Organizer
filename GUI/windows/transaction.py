@@ -37,8 +37,8 @@ class TransactionManagementWindow(SubWindow):
         self.transaction_name = QLineEdit()
 
         self.transaction_day = QLineEdit()
-        self.day_regularexpression = QRegularExpression(TRANSACTION_DAY_REGEX)
-        self.transaction_day_validator = QRegularExpressionValidator(self.day_regularexpression)
+        self.day_regular_expression = QRegularExpression(TRANSACTION_DAY_REGEX)
+        self.transaction_day_validator = QRegularExpressionValidator(self.day_regular_expression)
         self.transaction_day.setValidator(self.transaction_day_validator)
 
         self.transaction_value = QLineEdit()

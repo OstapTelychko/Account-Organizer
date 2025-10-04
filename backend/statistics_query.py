@@ -33,7 +33,9 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                total = session.query(sql_func.sum(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+                total = session.query(sql_func.sum(Transaction.value)).filter_by(
+                    category_id=category_id, year=year, month=month
+                ).scalar()
                 return float(total) if total else 0
     
 
@@ -111,7 +113,9 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                min_value = session.query(sql_func.min(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+                min_value = session.query(sql_func.min(Transaction.value)).filter_by(
+                    category_id=category_id, year=year, month=month
+                ).scalar()
                 return float(min_value) if min_value else 0
     
 
@@ -130,7 +134,9 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                max_value = session.query(sql_func.max(Transaction.value)).filter_by(category_id=category_id, year=year, month=month).scalar()
+                max_value = session.query(sql_func.max(Transaction.value)).filter_by(
+                    category_id=category_id, year=year, month=month
+                ).scalar()
                 return float(max_value) if max_value else 0
     
 

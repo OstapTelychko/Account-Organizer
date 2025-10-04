@@ -42,7 +42,14 @@ class AppCore:
         return cls.__instance
 
 
-    def __init__(self, single_instance_guard:SingleInstanceGuard, db_controller:DBController, user_config:UserConfig, test_mode:bool, test_alembic_config:Config|None=None) -> None:
+    def __init__(
+            self,
+            single_instance_guard:SingleInstanceGuard,
+            db_controller:DBController,
+            user_config:UserConfig,
+            test_mode:bool,
+            test_alembic_config:Config|None=None
+        ) -> None:
         
         self.app_version = self.load_app_version()
 
@@ -70,7 +77,10 @@ class AppCore:
 
  
     def start_session(self) -> None:
-        """Start session. It loads user configuration, app version, and backups. It also sets the current date and creates the backups directory if it doesn't exist."""
+        """
+        Start session. It loads user configuration, app version, and backups.
+        It also sets the current date and creates the backups directory if it doesn't exist.
+        """
 
         logger.info("__BREAK_LINE__")
         logger.info("__BREAK_LINE__")
@@ -118,7 +128,7 @@ class AppCore:
     def load_app_version() -> str:
         """Load app version from file and returns as string."""
 
-        with open(f"{APP_DIRECTORY}/app version.txt") as file:
+        with open(os.path.join(APP_DIRECTORY, "app version.txt")) as file:
             app_version = file.read().strip()
         return app_version
 

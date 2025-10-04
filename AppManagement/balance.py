@@ -27,12 +27,23 @@ def calculate_current_balance() -> None:
     app_core.current_total_income = round(app_core.current_total_income, 2)
     app_core.current_total_expenses = round(app_core.current_total_expenses, 2)
 
-    app_core.current_balance = app_core.db.account_query.get_account().start_balance + round(app_core.current_total_income - app_core.current_total_expenses, 2)
+    start_balance = app_core.db.account_query.get_account().start_balance
+    app_core.current_balance = start_balance + round(app_core.current_total_income - app_core.current_total_expenses, 2)
 
-    app_core.db.account_query.update_account_balance(app_core.current_balance, app_core.current_total_income, app_core.current_total_expenses)
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance))
-    WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(app_core.current_total_income))
-    WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(app_core.current_total_expenses))
+    app_core.db.account_query.update_account_balance(
+        app_core.current_balance,
+        app_core.current_total_income,
+        app_core.current_total_expenses
+    )
+    WindowsRegistry.MainWindow.account_current_balance.setText(
+        f"{LanguageStructure.MainWindow.get_translation(0)}{app_core.current_balance}"
+    )
+    WindowsRegistry.SettingsWindow.total_income.setText(
+        f"{LanguageStructure.Statistics.get_translation(4)}{app_core.current_total_income}"
+    )
+    WindowsRegistry.SettingsWindow.total_expense.setText(
+        f"{LanguageStructure.Statistics.get_translation(6)}{app_core.current_total_expenses}"
+    )
 
 
 def load_account_balance() -> None:
@@ -48,11 +59,19 @@ def load_account_balance() -> None:
     if app_core.current_total_income == 0 and app_core.current_total_expenses == 0:
         logger.info("Recalculating account balance")
         calculate_current_balance()
-    
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance))
-    WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(app_core.current_total_income))
-    WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(app_core.current_total_expenses))
-    logger.info(f"Current balance: {app_core.current_balance} | Total income: {app_core.current_total_income} | Total expenses: {app_core.current_total_expenses}")
+
+    WindowsRegistry.MainWindow.account_current_balance.setText(
+        f"{LanguageStructure.MainWindow.get_translation(0)}{app_core.current_balance}"
+    )
+    WindowsRegistry.SettingsWindow.total_income.setText(
+        f"{LanguageStructure.Statistics.get_translation(4)}{app_core.current_total_income}"
+    )
+    WindowsRegistry.SettingsWindow.total_expense.setText(
+        f"{LanguageStructure.Statistics.get_translation(6)}{app_core.current_total_expenses}"
+    )
+    logger.info(f"Current balance: {app_core.current_balance}\
+                | Total income: {app_core.current_total_income}\
+                | Total expenses: {app_core.current_total_expenses}")
 
 
 def update_account_balance() -> None:
@@ -61,6 +80,12 @@ def update_account_balance() -> None:
     app_core = AppCore.instance()
     app_core.db.account_query.update_account_balance(app_core.current_balance, app_core.current_total_income, app_core.current_total_expenses)
 
-    WindowsRegistry.MainWindow.account_current_balance.setText(LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance))
-    WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(app_core.current_total_income))
-    WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(app_core.current_total_expenses))
+    WindowsRegistry.MainWindow.account_current_balance.setText(
+        f"{LanguageStructure.MainWindow.get_translation(0)}{app_core.current_balance}"
+    )
+    WindowsRegistry.SettingsWindow.total_income.setText(
+        f"{LanguageStructure.Statistics.get_translation(4)}{app_core.current_total_income}"
+    )
+    WindowsRegistry.SettingsWindow.total_expense.setText(
+        f"{LanguageStructure.Statistics.get_translation(6)}{app_core.current_total_expenses}"
+    )

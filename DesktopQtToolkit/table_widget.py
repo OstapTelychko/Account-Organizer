@@ -10,7 +10,11 @@ if TYPE_CHECKING:
 
 # pyright: reportIncompatibleMethodOverride=false
 class CustomTableWidget(QTableWidget):
-    """This class is used to create a custom table widget that allows for copying multiple cells to the clipboard and prevents scrolling out of widget when the table widget runs out of rows."""
+    """
+    This class is used to create a custom table widget
+    that allows for copying multiple cells to the clipboard
+    and prevents scrolling out of widget when the table widget runs out of rows.
+    """
 
     @overload
     def __init__(self, parent:QWidget|None = ...) -> None: ...

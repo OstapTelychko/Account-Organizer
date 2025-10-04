@@ -35,7 +35,9 @@ class CategoryQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                result = session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
+                result = session.query(Category).filter_by(
+                    name=name, category_type=category_type, account_id=self.account_id
+                ).first()
                 return bool(result)
 
 
@@ -68,7 +70,9 @@ class CategoryQuery:
         with self.session_factory() as session:
             with session.begin():
                 
-                last_category = session.query(Category).filter_by(category_type=category_type, account_id=self.account_id).order_by(desc(Category.position)).first()
+                last_category = session.query(Category).filter_by(
+                    category_type=category_type, account_id=self.account_id
+                ).order_by(desc(Category.position)).first()
 
                 if last_category is None:
                     return 0
@@ -90,12 +94,26 @@ class CategoryQuery:
         with self.session_factory() as session:
             with session.begin():
                 if new_position < old_position:
-                    session.query(Category).filter(and_(Category.position < old_position, Category.position >= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
-                        {Category.position: Category.position + 1}, synchronize_session=False)
+                    session.query(Category).filter(and_(
+                            Category.position < old_position,
+                            Category.position >= new_position,
+                            Category.category_type == category_type,
+                            Category.account_id == self.account_id
+                        )).update(
+                            {Category.position: Category.position + 1}, synchronize_session=False
+                        )
                 else:
-                    session.query(Category).filter(and_(Category.position > old_position, Category.position <= new_position, Category.category_type == category_type, Category.account_id == self.account_id)).update(
-                        {Category.position: Category.position - 1}, synchronize_session=False)
-                session.query(Category).filter_by(id=category_id).update({Category.position: new_position}, synchronize_session=False)
+                    session.query(Category).filter(and_(
+                        Category.position > old_position,
+                        Category.position <= new_position,
+                        Category.category_type == category_type,
+                        Category.account_id == self.account_id
+                    )).update(
+                        {Category.position: Category.position - 1}, synchronize_session=False
+                    )
+                session.query(Category).filter_by(id=category_id).update(
+                    {Category.position: new_position}, synchronize_session=False
+                )
 
 
     def remove_position(self, category_id:int) -> None:
@@ -131,7 +149,9 @@ class CategoryQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                category = session.query(Category).filter_by(name=name, category_type=category_type, account_id=self.account_id).first()
+                category = session.query(Category).filter_by(
+                    name=name, category_type=category_type, account_id=self.account_id
+                ).first()
 
                 if category:
                     return category

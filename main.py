@@ -45,16 +45,22 @@ from AppObjects.windows_registry import WindowsRegistry
 from GUI.gui_constants import app
 from GUI.theme import switch_theme, load_theme
 
-from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list, remove_all_categories_from_statistics_list
-from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics, copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
+from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics,\
+    show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list,\
+    remove_all_categories_from_statistics_list
+from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics,\
+    copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
 from AppManagement.language import load_language, change_language_during_add_account
 from AppManagement.balance import load_account_balance
-from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window, rename_category,  activate_categories, show_change_category_position, change_category_position
+from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
+    rename_category,  activate_categories, show_change_category_position, change_category_position
 from AppManagement.transaction import transaction_data_handler
 from AppManagement.date import next_month, previous_month, next_year, previous_year
-from AppManagement.account import show_add_user_window, add_account, remove_account, show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
-from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup, open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
+from AppManagement.account import show_add_user_window, add_account, remove_account,\
+    show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
+from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup,\
+    open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
 from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
 from AppManagement.AppUpdate.check_for_update import check_for_updates
 
@@ -155,7 +161,12 @@ def main(test_mode:bool=False) -> None:
         Single_instance_guard = SingleInstanceGuard()
         db_controller = DBController(False)
         user_config = UserConfig(False)
-        app_core = AppCore(single_instance_guard=Single_instance_guard, db_controller=db_controller, user_config=user_config, test_mode=False)
+        app_core = AppCore(
+            single_instance_guard=Single_instance_guard,
+            db_controller=db_controller,
+            user_config=user_config,
+            test_mode=False
+        )
 
 
     app_core.start_session()
@@ -195,17 +206,33 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     WindowsRegistry.YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
     WindowsRegistry.CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
-    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.clicked.connect(partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories))
-    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.clicked.connect(partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories))
-    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories))
-    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.clicked.connect(partial(remove_all_categories_from_statistics_list, WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories))
+    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.clicked.connect(
+        partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories)
+    )
+    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.clicked.connect(
+        partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories)
+    )
+    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.clicked.connect(
+        partial(
+            remove_all_categories_from_statistics_list,
+            WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories
+        )
+    )
+    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.clicked.connect(
+        partial(
+            remove_all_categories_from_statistics_list,
+            WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories
+        )
+    )
     WindowsRegistry.CustomRangeStatisticsView.copy_statistics.clicked.connect(copy_custom_range_statistics)
     WindowsRegistry.CustomRangeStatisticsView.copy_transactions.clicked.connect(copy_custom_range_transactions)
     
     #Category settings
     WindowsRegistry.CategorySettingsWindow.delete_category.clicked.connect(remove_category)
     WindowsRegistry.CategorySettingsWindow.rename_category.clicked.connect(show_rename_category_window)
-    WindowsRegistry.CategorySettingsWindow.change_category_position.clicked.connect(lambda: show_change_category_position(WindowsRegistry.CategorySettingsWindow.windowTitle()))
+    WindowsRegistry.CategorySettingsWindow.change_category_position.clicked.connect(
+        lambda: show_change_category_position(WindowsRegistry.CategorySettingsWindow.windowTitle())
+    )
     WindowsRegistry.CategorySettingsWindow.copy_transactions.clicked.connect(copy_monthly_transactions)
     WindowsRegistry.RenameCategoryWindow.button.clicked.connect(rename_category)
     WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
@@ -250,10 +277,18 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.BackupManagementWindow.load_backup.clicked.connect(load_backup)
     WindowsRegistry.SettingsWindow.auto_backup.clicked.connect(open_auto_backup_window)
 
-    WindowsRegistry.AutoBackupWindow.monthly.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.monthly))
-    WindowsRegistry.AutoBackupWindow.weekly.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.weekly))
-    WindowsRegistry.AutoBackupWindow.daily.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.daily))
-    WindowsRegistry.AutoBackupWindow.no_auto_backup.stateChanged.connect(partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.no_auto_backup))
+    WindowsRegistry.AutoBackupWindow.monthly.stateChanged.connect(
+        partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.monthly)
+    )
+    WindowsRegistry.AutoBackupWindow.weekly.stateChanged.connect(
+        partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.weekly)
+    )
+    WindowsRegistry.AutoBackupWindow.daily.stateChanged.connect(
+        partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.daily)
+    )
+    WindowsRegistry.AutoBackupWindow.no_auto_backup.stateChanged.connect(
+        partial(prevent_same_auto_backup_status, WindowsRegistry.AutoBackupWindow.no_auto_backup)
+    )
     WindowsRegistry.AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
     QTimer.singleShot(50, post_show_setup)

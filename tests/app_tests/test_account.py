@@ -40,12 +40,15 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 WindowsRegistry.AddAccountWindow.account_name.setText("Second test user")
                 WindowsRegistry.AddAccountWindow.current_balance.setText("100")
 
-                def _check_account_existance() -> None:
+                def _check_account_existence() -> None:
                     """Check if account exists in the database."""
 
-                    self.assertTrue(AppCore.instance().db.account_query.account_exists("Second test user"), "Second test user hasn't been created")
+                    self.assertTrue(
+                        AppCore.instance().db.account_query.account_exists("Second test user"),
+                        "Second test user hasn't been created"
+                    )
                     WindowsRegistry.SettingsWindow.done(1)
-                QTimer.singleShot(100, self.catch_failure(_check_account_existance))
+                QTimer.singleShot(100, self.catch_failure(_check_account_existence))
                 WindowsRegistry.AddAccountWindow.button.click()
 
             QTimer.singleShot(100, self.catch_failure(_add_account))
@@ -70,7 +73,10 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _check_account_name() -> None:
                     """Check if account name has been changed."""
 
-                    self.assertEqual(app_core.db.account_query.get_account().name, "Test user rename test", "Test user hasn't been renamed")
+                    self.assertEqual(
+                        app_core.db.account_query.get_account().name,
+                        "Test user rename test", "Test user hasn't been renamed"
+                    )
                 QTimer.singleShot(100, self.catch_failure(_check_account_name))
                 WindowsRegistry.RenameAccountWindow.button.click()
 
@@ -80,7 +86,11 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _rename_back() -> None:
                     """Rename account back to original name. So it doesn't affect other tests."""
 
-                    self.assertEqual(app_core.db.account_query.get_account().name, "Test user", "Test user hasn't been renamed back")
+                    self.assertEqual(
+                        app_core.db.account_query.get_account().name,
+                        "Test user",
+                        "Test user hasn't been renamed back"
+                    )
                     WindowsRegistry.SettingsWindow.done(0)
                 QTimer.singleShot(100, self.catch_failure(_rename_back))
                 WindowsRegistry.RenameAccountWindow.button.click()
@@ -114,8 +124,15 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 def _check_deletion() -> None:
                     """Check if account has been deleted."""
 
-                    self.assertFalse(app_core.db.account_query.account_exists("Second test user"), "Account hasn't been removed")
-                    self.assertEqual(app_core.config.account_name, "Test user", "Test user hasn't been loaded after Second test user deletion")
+                    self.assertFalse(
+                        app_core.db.account_query.account_exists("Second test user"),
+                        "Account hasn't been removed"
+                    )
+                    self.assertEqual(
+                        app_core.config.account_name,
+                        "Test user",
+                        "Test user hasn't been loaded after Second test user deletion"
+                    )
                     WindowsRegistry.SettingsWindow.done(0)
                 QTimer.singleShot(200, self.catch_failure(_check_deletion))
 

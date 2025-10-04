@@ -40,7 +40,10 @@ def add_account() -> int:
     raw_balance = WindowsRegistry.AddAccountWindow.current_balance.text()
 
     def _complete_adding_account() -> None:
-        """Complete adding account. Close add account window, update user config, load accounts and load account data. Created to avoid code duplication."""
+        """
+        Complete adding account. Close add account window, update user config, load accounts and load account data.
+        Created to avoid code duplication.
+        """
 
         WindowsRegistry.AddAccountWindow.done(1)
 
@@ -86,7 +89,10 @@ def load_account_data(name:str) -> None:
 
     app_core.config.account_name = name
     app_core.db.set_account_id(app_core.config.account_name)
-    WindowsRegistry.SettingsWindow.account_created_date.setText(LanguageStructure.Settings.get_translation(1) + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S")))    
+    WindowsRegistry.SettingsWindow.account_created_date.setText(
+        LanguageStructure.Settings.get_translation(1) 
+        + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S"))
+    )    
     
     app_core.config.update_user_config()
     load_categories()
@@ -104,8 +110,11 @@ def load_accounts() -> None:
     for account in app_core.accounts_list:
         account_switch_widget = WindowsRegistry.SwitchAccountWindow.AccountSwitchWidget()
         account_switch_widget.account_name_label.setText(account.name)
-        account_switch_widget.account_balance_label.setText(LanguageStructure.MainWindow.get_translation(0) + str(account.current_balance))
-        account_switch_widget.account_creation_date_label.setText(LanguageStructure.Settings.get_translation(1) + account.created_date.strftime("%Y-%m-%d %H:%M:%S"))
+        account_switch_widget.account_balance_label.setText(
+            LanguageStructure.MainWindow.get_translation(0) + str(account.current_balance))
+        account_switch_widget.account_creation_date_label.setText(
+            LanguageStructure.Settings.get_translation(1) + account.created_date.strftime("%Y-%m-%d %H:%M:%S")
+        )
 
         account_switch_widget.switch_button.clicked.connect(partial(switch_account, account.name))
         account_switch_widget.switch_button.setText(LanguageStructure.GeneralManagement.get_translation(8))
@@ -127,14 +136,17 @@ def clear_accounts_layout() -> None:
 
 
 def switch_account(name:str) -> None:
-    """Switch account. Show warning message and load account data. Disable switch button for current account and enable for other accounts.
+    """
+        Switch account. Show warning message and load account data.
+        Disable switch button for current account and enable for other accounts.
 
         Arguments
         ---------
             `name` : (str) - Account name to switch to.
     """
 
-    WindowsRegistry.Messages.load_account_question.setText(LanguageStructure.Messages.get_translation(10).replace("account", name))
+    WindowsRegistry.Messages.load_account_question.setText(
+        LanguageStructure.Messages.get_translation(10).replace("account", name))
     WindowsRegistry.Messages.load_account_question.exec()
 
     if WindowsRegistry.Messages.load_account_question.clickedButton() == WindowsRegistry.Messages.load_account_question.ok_button:
@@ -152,7 +164,8 @@ def remove_account() -> None:
     """Remove account. Show warning message and remove account from database. If last account is removed, close app."""
 
     app_core = AppCore.instance()
-    WindowsRegistry.Messages.delete_account_warning.setText(LanguageStructure.Messages.get_translation(11).replace("account", app_core.config.account_name))
+    WindowsRegistry.Messages.delete_account_warning.setText(
+        LanguageStructure.Messages.get_translation(11).replace("account", app_core.config.account_name))
     WindowsRegistry.Messages.delete_account_warning.exec()
 
     if WindowsRegistry.Messages.delete_account_warning.clickedButton() == WindowsRegistry.Messages.delete_account_warning.ok_button:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
+import os
 import logging
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
@@ -28,15 +29,18 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 class DBController():
-    """This class is used to manage the database connection and queries.
-    It handles the creation of the database engine, session, and queries for accounts, categories, transactions, backups, and statistics."""
+    """
+    This class is used to manage the database connection and queries.
+    It handles the creation of the database engine, session, and queries
+    for accounts, categories, transactions, backups, and statistics.
+    """
 
     def __init__(self, test_mode:bool, test_alembic_config:Config|None = None) -> None:
         # Init db connection 
 
         logger.info("Loading alembic config")
-        self.alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
-        self.alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
+        self.alembic_config = Config(os.path.join(APP_DIRECTORY, "alembic.ini"))
+        self.alembic_config.set_main_option("script_location", os.path.join(APP_DIRECTORY, "alembic"))
         self.alembic_config.set_main_option("sqlalchemy.url", DB_PATH)
 
         if test_mode:
