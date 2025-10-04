@@ -162,7 +162,7 @@ class SwitchAccountWindow(SubWindow):
         self.accounts_scroll_area.setStyleSheet("QScrollArea{border:none;background-color:transparent;}")
         self.accounts_scroll_area.setWidget(self.accounts_wrapper)
         self.accounts_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.accounts_scroll_area.setMinimumSize(400, 220)
+        self.accounts_scroll_area.setMinimumSize(800, 220)
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(20)
