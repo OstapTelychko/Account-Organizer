@@ -7,7 +7,6 @@ import time
 from typing import TYPE_CHECKING
 from sqlalchemy import create_engine
 from alembic.config import Config
-from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch, call
 from io import BytesIO
 from pathlib import Path
@@ -16,7 +15,7 @@ from requests import Response
 from requests.exceptions import Timeout, ConnectionError, TooManyRedirects, RequestException, HTTPError
 from PySide6.QtCore import QTimer
 
-from tests.tests_toolkit import DBTestCase, assert_any_call_with_details, is_active_patch
+from tests.tests_toolkit import DBTestCase, DefaultTestCase, assert_any_call_with_details, is_active_patch
 
 from AppObjects.app_exceptions import PrereleaseNotFoundError, UpdateAssetNotFoundError, GUILibraryAssetNotFoundError,\
 FailedToDownloadGUILibraryZipError, FailedToDownloadUpdateZipError
@@ -49,7 +48,7 @@ if TYPE_CHECKING:
     ASSET = dict[str, Any]
 
 
-class TestDownloadUpdate(TestCase):
+class TestDownloadUpdate(DefaultTestCase):
     """Test update application functionality."""
 
     def setUp(self) -> None:
@@ -728,7 +727,7 @@ class TestPrepareUpdate(DBTestCase):
     
     
 
-class TestApplyUpdate(TestCase):
+class TestApplyUpdate(DBTestCase):
 
     def setUp(self) -> None:
         """Setup for apply update tests."""
