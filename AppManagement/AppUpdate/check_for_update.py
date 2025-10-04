@@ -72,7 +72,7 @@ def check_for_updates() -> None:
     logger.info("__BREAK_LINE__")
     logger.info("Checking for updates")
 
-    def worker():
+    def worker() -> None:
         try:
             latest = get_latest_version()
         except Exception as ex:

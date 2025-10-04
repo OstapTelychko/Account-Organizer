@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QTimer
 
 from DesktopQtToolkit.qsingleton import QSingleton
 from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
-from project_configuration import INFORMATION_MESSAGE_DURATION
+from project_configuration import INFORMATION_MESSAGE_DURATION, INFORMATION_MESSAGE_STEP_INTERVAL, INFORMATION_MESSAGE_STEPS
 
 
 
@@ -51,6 +51,7 @@ class InformationMessage(QWidget, metaclass=QSingleton):
         self.fade_out_timer.timeout.connect(self.fade_out_step)
         self.display_timer = QTimer()
         self.display_timer.timeout.connect(self.start_fade_out)
+        self.opacity_step = 1.0 / INFORMATION_MESSAGE_STEPS
 
 
     def run(self) -> None:
@@ -61,13 +62,13 @@ class InformationMessage(QWidget, metaclass=QSingleton):
         self.setWindowOpacity(0)
         self.show()
         
-        self.fade_in_timer.start(50)  # 50ms interval between steps
+        self.fade_in_timer.start(INFORMATION_MESSAGE_STEP_INTERVAL)
 
 
     def fade_in_step(self) -> None:
         """Increase opacity for fade-in effect."""
 
-        self.opacity += 0.2
+        self.opacity += self.opacity_step
         self.setWindowOpacity(self.opacity)
         self.update()
         
@@ -80,13 +81,13 @@ class InformationMessage(QWidget, metaclass=QSingleton):
         """Start the fade-out animation after display time."""
 
         self.display_timer.stop()
-        self.fade_out_timer.start(50)
+        self.fade_out_timer.start(INFORMATION_MESSAGE_STEP_INTERVAL)
 
 
     def fade_out_step(self) -> None:
         """Decrease opacity for fade-out effect."""
 
-        self.opacity -= 0.2
+        self.opacity -= self.opacity_step
         self.setWindowOpacity(self.opacity)
         self.update()
         

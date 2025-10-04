@@ -18,7 +18,7 @@ Project life improvements:
   ☐ add % sign before and after variables in languages.json
   ☐ add check for every click in tests whether button or widget is actually visible
   ☐ replace unsafe path compositions in project with os.path.join
-  ☐ add animation steps and interval constant for InformationMessageWindow
+  ☐ add animation steps and interval constant for InformationMessageWindow @started(25-10-04 18:37)
 
 Bugs:
   ☐ empty @don't-touch
