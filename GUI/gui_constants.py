@@ -1,3 +1,4 @@
+import os
 from sys import argv, platform
 
 from PySide6.QtWidgets import QApplication
@@ -19,13 +20,13 @@ ALIGN_V_CENTER = ALIGNMENT.AlignVCenter
 ICON_SIZE = QSize(30, 30)
 
 if platform == "linux":
-    APP_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App icon.png")
+    APP_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "App icon.png"))
 else:
-    APP_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App icon.ico")
+    APP_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "App icon.ico"))
 app.setWindowIcon(APP_ICON)
 
-APP_UPGRADE_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/App upgrade icon.svg").pixmap(64, 64)
-NO_INTERNET_ICON = QIcon(f"{GENERAL_ICONS_DIRECTORY}/no internet connection.png").pixmap(64, 64)
+APP_UPGRADE_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "App upgrade icon.svg")).pixmap(64, 64)
+NO_INTERNET_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "no internet connection.png")).pixmap(64, 64)
 
 SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
 FOCUSED_SHADOW_EFFECT_ARGUMENTS = {"blurRadius":20, "xOffset":0, "yOffset":0, "color":QColor(70, 120, 255)}

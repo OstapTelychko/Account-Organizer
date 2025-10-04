@@ -29,9 +29,21 @@ class TestTransaction(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_add_transaction))
             category.add_transaction.click()
 
-        self.assertEqual(len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)), 2, "Income transaction hasn't been added")
-        self.assertEqual(len(app_core.db.transaction_query.get_all_transactions(self.expenses_category.id)), 2, "Expense transaction hasn't been added")
-        self.assertEqual(app_core.db.account_query.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+        self.assertEqual(
+            len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)),
+            2,
+            "Income transaction hasn't been added"
+        )
+        self.assertEqual(
+            len(app_core.db.transaction_query.get_all_transactions(self.expenses_category.id)),
+            2,
+            "Expense transaction hasn't been added"
+        )
+        self.assertEqual(
+            app_core.db.account_query.get_account().current_balance,
+            0,
+            "Current balance has been changed after adding income and expense transactions with same value"
+        )
 
         qsleep(500)
     
@@ -55,9 +67,21 @@ class TestTransaction(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_update_transaction))
             category.edit_transaction.click()
 
-        self.assertEqual(app_core.db.transaction_query.get_all_transactions(self.income_category.id)[0].name, "Updated transaction name", "Income transaction hasn't been updated")
-        self.assertEqual(app_core.db.transaction_query.get_all_transactions(self.expenses_category.id)[0].name, "Updated transaction name", "Expense transaction hasn't been updated")
-        self.assertEqual(app_core.db.account_query.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+        self.assertEqual(
+            app_core.db.transaction_query.get_all_transactions(self.income_category.id)[0].name,
+            "Updated transaction name",
+            "Income transaction hasn't been updated"
+        )
+        self.assertEqual(
+            app_core.db.transaction_query.get_all_transactions(self.expenses_category.id)[0].name,
+            "Updated transaction name",
+            "Expense transaction hasn't been updated"
+        )
+        self.assertEqual(
+            app_core.db.account_query.get_account().current_balance,
+            0,
+            "Current balance has been changed after adding income and expense transactions with same value"
+        )
 
         qsleep(500)
     
@@ -76,9 +100,21 @@ class TestTransaction(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_confirm_deletion))
             category.delete_transaction.click()
 
-        self.assertEqual(len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)), 0, "Income transaction hasn't been deleted")
-        self.assertEqual(len(app_core.db.transaction_query.get_all_transactions(self.expenses_category.id)), 0, "Expense transaction hasn't been deleted")
-        self.assertEqual(app_core.db.account_query.get_account().current_balance, 0, "Current balance has been changed after adding income and expense transactions with same value")
+        self.assertEqual(
+            len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)),
+            0,
+            "Income transaction hasn't been deleted"
+        )
+        self.assertEqual(
+            len(app_core.db.transaction_query.get_all_transactions(self.expenses_category.id)),
+            0,
+            "Expense transaction hasn't been deleted"
+        )
+        self.assertEqual(
+            app_core.db.account_query.get_account().current_balance,
+            0,
+            "Current balance has been changed after adding income and expense transactions with same value"
+        )
 
         qsleep(500)
             

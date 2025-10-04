@@ -17,9 +17,11 @@ QtMeta = type(QDialog)
 SubWindowChild = TypeVar("SubWindowChild", bound="SubWindow")
 
 class SubWindowSingleton(QtMeta, Generic[SubWindowChild]):#type: ignore[valid-type, misc] #Mypy doesn't support dynamic base classes
-    """This is a metaclass that is used to ensure that only one instance of the SubWindow class is created. 
+    """
+    This is a metaclass that is used to ensure that only one instance of the SubWindow class is created. 
     It doest't mean that only one sub window can be created, but only one window with same structure can be created.
-    For example, if you will create SettingsWindow and then will try to create another SettingsWindow, it will return an error."""
+    For example, if you will create SettingsWindow and then will try to create another SettingsWindow, it will return an error.
+    """
 
     _instances:dict[str, SubWindow] = dict()
 

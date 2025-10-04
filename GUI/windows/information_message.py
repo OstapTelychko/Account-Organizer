@@ -3,7 +3,8 @@ from PySide6.QtCore import Qt, QTimer
 
 from DesktopQtToolkit.qsingleton import QSingleton
 from GUI.gui_constants import ALIGNMENT, APP_ICON, BASIC_FONT
-from project_configuration import INFORMATION_MESSAGE_DURATION, INFORMATION_MESSAGE_STEP_INTERVAL, INFORMATION_MESSAGE_STEPS
+from project_configuration import INFORMATION_MESSAGE_DURATION, INFORMATION_MESSAGE_STEP_INTERVAL,\
+    INFORMATION_MESSAGE_STEPS
 
 
 
@@ -24,7 +25,7 @@ class InformationMessage(QWidget, metaclass=QSingleton):
         super().__init__()
         self.buttons = buttons
 
-        self.setWindowFlags( Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
         self.resize(250,50)
         self.setMaximumWidth(250)
         self.setMaximumHeight(50)

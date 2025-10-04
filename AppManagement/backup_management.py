@@ -7,7 +7,8 @@ from PySide6.QtCore import QTimer, Qt
 
 from languages import LanguageStructure
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
-from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS, DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, BACKUPS_DATE_FORMAT
+from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS,\
+DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, BACKUPS_DATE_FORMAT
 from backend.db_controller import DBController
 from AppManagement.account import load_account_data, clear_accounts_layout, load_accounts
 
@@ -31,8 +32,14 @@ def load_backups() -> None:
     WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(0)
     WindowsRegistry.BackupManagementWindow.backups_table.setRowCount(len(app_core.backups))
     
-    backups_sorted_by_date = sorted(app_core.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT), reverse=True)
-    backups_sorted_by_app_version = sorted(backups_sorted_by_date, key=lambda backup: (*map(int, backup[1].app_version.split(".")),), reverse=True)
+    backups_sorted_by_date = sorted(
+        app_core.backups.items(),
+        key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT), reverse=True
+    )
+    backups_sorted_by_app_version = sorted(
+        backups_sorted_by_date,
+        key=lambda backup: (*map(int, backup[1].app_version.split(".")),), reverse=True
+    )
     for row, (backup_id, backup) in enumerate(backups_sorted_by_app_version):
         data = CustomTableWidgetItem(backup.timestamp)
         data.setFlags(~ Qt.ItemFlag.ItemIsEditable)
@@ -257,20 +264,36 @@ def save_auto_backup_settings() -> None:
         app_core.config.auto_backup_status = app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value
 
     if app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.MONTHLY.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(5))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(5)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(5)}"
+        )
 
     elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.WEEKLY.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(6))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(6)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(6)}"
+        )
 
     elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.DAILY.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(7))
-    
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(7)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(7)}"
+        )
+
     elif app_core.config.auto_backup_status == app_core.config.AutoBackupStatus.NO_AUTO_BACKUP.value:
-        WindowsRegistry.AutoBackupWindow.current_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
-        WindowsRegistry.SettingsWindow.auto_backup_status.setText(LanguageStructure.BackupManagement.get_translation(8)+" "+LanguageStructure.BackupManagement.get_translation(20))
+        WindowsRegistry.AutoBackupWindow.current_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(20)}"
+        )
+        WindowsRegistry.SettingsWindow.auto_backup_status.setText(
+            f"{LanguageStructure.BackupManagement.get_translation(8)} {LanguageStructure.BackupManagement.get_translation(20)}"
+        )
 
     if WindowsRegistry.AutoBackupWindow.no_auto_removal.isChecked():
         if app_core.config.auto_backup_removal_enabled:
@@ -296,7 +319,10 @@ def save_auto_backup_settings() -> None:
                     return
             
             app_core.config.max_backups = new_max_backups
-            WindowsRegistry.AutoBackupWindow.max_backups_label.setText(LanguageStructure.BackupManagement.get_translation(12).replace("max_backups", str(app_core.config.max_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(13)))
+            WindowsRegistry.AutoBackupWindow.max_backups_label.setText(
+                f"{LanguageStructure.BackupManagement.get_translation(12).replace('max_backups', str(app_core.config.max_backups))}\
+                \n{LanguageStructure.BackupManagement.get_translation(13)}"
+            )
         else:
             WindowsRegistry.Messages.auto_removal_disabled.exec()
 
@@ -316,7 +342,10 @@ def save_auto_backup_settings() -> None:
                     return
             
             app_core.config.max_legacy_backups = new_max_legacy_backups
-            WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(LanguageStructure.BackupManagement.get_translation(17).replace("max_legacy_backups", str(app_core.config.max_legacy_backups)+"\n"+LanguageStructure.BackupManagement.get_translation(18)))
+            WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(
+                f"{LanguageStructure.BackupManagement.get_translation(17).replace('max_legacy_backups', str(app_core.config.max_legacy_backups))}\
+                \n{LanguageStructure.BackupManagement.get_translation(18)}"
+            )
         else:
             WindowsRegistry.Messages.auto_removal_disabled.exec()
 
@@ -328,10 +357,16 @@ def save_auto_backup_settings() -> None:
 
 
 def auto_remove_backups() -> None:
-    """Remove backups if the auto backup removal is enabled. The backups are removed if the number of backups is greater than the maximum number of backups."""
+    """
+    Remove backups if the auto backup removal is enabled.
+    The backups are removed if the number of backups is greater than the maximum number of backups.
+    """
 
     app_core = AppCore.instance()
-    sorted_backups = sorted(app_core.backups.items(), key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT))
+    sorted_backups = sorted(
+        app_core.backups.items(),
+        key=lambda backup: datetime.strptime(backup[1].timestamp, BACKUPS_DATE_FORMAT)
+    )
     backups = [backup for backup in sorted_backups if backup[1].app_version == app_core.app_version]
     legacy_backups = [backup for backup in sorted_backups if backup[1].app_version != app_core.app_version]
 

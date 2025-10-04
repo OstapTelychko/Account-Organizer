@@ -27,8 +27,10 @@ SOFTWARE.
 """
 
 
+import os
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton,QSizePolicy, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton,QSizePolicy,\
+    QGraphicsDropShadowEffect
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QFont
@@ -78,7 +80,7 @@ class MainWindow(QWidget, metaclass=QSingleton):
         self.account_current_balance.setFont(QFont("C059 [urw]",pointSize=15))
 
         self.settings = QToolButton()
-        self.settings.setIcon(QIcon(f"{GENERAL_ICONS_DIRECTORY}/Settings icon.png"))
+        self.settings.setIcon(QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "Settings icon.png")))
         self.settings.setIconSize(ICON_SIZE)
 
         #Year and month
@@ -115,7 +117,9 @@ class MainWindow(QWidget, metaclass=QSingleton):
 
         self.Date_management_wrapper = QWidget()
         self.Date_management_wrapper.setProperty("class", "wrapper")
-        self.Date_management_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.Date_management_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.Date_management_wrapper.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.Date_management_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+        )
         self.Date_management_wrapper.setLayout(self.Date_management_layout)
 
         #Income and expenses windows 

@@ -72,7 +72,10 @@ def assign_shortcuts() -> None:
     shortcuts_manager.clear_shortcuts()
 
     for sub_window in WindowsRegistry.MainWindow.sub_windows.values():
-        shortcuts_manager.add_shortcut(QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.CLOSE_CURRENT_WINDOW]), sub_window, partial(lambda sub_window: sub_window.done(1), sub_window))
+        shortcuts_manager.add_shortcut(QKeySequence(
+            app_core.config.shortcuts[app_core.config.ShortcutId.CLOSE_CURRENT_WINDOW]),
+            sub_window,
+            partial(lambda sub_window: sub_window.done(1), sub_window))
 
     shortcuts_manager.add_shortcut(
         QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.OPEN_SETTINGS]),

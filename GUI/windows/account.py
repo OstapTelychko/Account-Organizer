@@ -1,5 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import os
+
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
@@ -29,7 +31,7 @@ class AddAccountWindow(SubWindow):
         self.languages.addItems(AVAILABLE_LANGUAGES)
 
         for language in range(len(AVAILABLE_LANGUAGES)):
-            self.languages.setItemIcon(language, QIcon(f"{FLAGS_DIRECTORY}/{language}-flag.png"))
+            self.languages.setItemIcon(language, QIcon(os.path.join(FLAGS_DIRECTORY, f"{language}-flag.png")))
 
         self.languages_layout = QHBoxLayout()
         self.languages_layout.addWidget(self.languages, alignment=ALIGNMENT.AlignRight)
@@ -109,7 +111,10 @@ class SwitchAccountWindow(SubWindow):
     """Represents Switch account window structure."""
 
     class AccountSwitchWidget():
-        """This class is used to create a widget that displays the account name, balance, and creation date and a button to switch to that account."""
+        """
+        This class is used to create a widget that displays the account name, balance,
+        and creation date and a button to switch to that account.
+        """
 
         def __init__(self) -> None:
             self.account_name_label = QLabel()

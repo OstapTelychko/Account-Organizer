@@ -1,6 +1,9 @@
 from __future__ import annotations
+import os
+
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView,\
+    QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
@@ -17,9 +20,9 @@ from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SI
 if TYPE_CHECKING:
     from backend.db_controller import DBController
 
-ADD_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/add transaction.png")
-REMOVE_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/remove transaction.png")
-EDIT_TRANSACTION_ICON = QIcon(f"{TRANSACTIONS_DIRECTORY}/edit transaction.png")
+ADD_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "add transaction.png"))
+REMOVE_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "remove transaction.png"))
+EDIT_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "edit transaction.png"))
 
 
 
@@ -63,7 +66,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_name.setFont(BASIC_FONT)
 
     category_settings = QToolButton()
-    category_settings.setIcon(QIcon(f"{GENERAL_ICONS_DIRECTORY}/Settings icon.png"))
+    category_settings.setIcon(QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "Settings icon.png")))
     category_settings.setIconSize(QSize(30,30))
 
     Category_general_info = QHBoxLayout()
@@ -91,7 +94,11 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
     column.setStretchLastSection(True)
 
-    category_data.setHorizontalHeaderLabels((LanguageStructure.Transactions.get_translation(0), LanguageStructure.Transactions.get_translation(1), LanguageStructure.Transactions.get_translation(2)))
+    category_data.setHorizontalHeaderLabels((
+        LanguageStructure.Transactions.get_translation(0),
+        LanguageStructure.Transactions.get_translation(1),
+        LanguageStructure.Transactions.get_translation(2)
+    ))
 
     transactions = db.transaction_query.get_transactions_by_month(category_id, year, month)
     
@@ -117,8 +124,11 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
             category_data.setItem(index, 1, transaction_day)
             category_data.setItem(index, 2, transaction_value)
             category_data.setItem(index, 3, transaction_id)
-            
-    category_total_value.setText(LanguageStructure.Categories.get_translation(10)+str(round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)))
+
+    category_total_value.setText(
+        f"{LanguageStructure.Categories.get_translation(10)}\
+        {round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)}"
+    )
     category_data.setSortingEnabled(True)
 
     add_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(1),(185,40))
@@ -133,15 +143,15 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     edit_transaction.setIcon(EDIT_TRANSACTION_ICON)
     edit_transaction.setIconSize(ICON_SIZE)
     
-    transactions_managment = QHBoxLayout()
-    transactions_managment.addWidget(add_transaction)
-    transactions_managment.addWidget(delete_transaction)
-    transactions_managment.addWidget(edit_transaction)
+    transactions_management = QHBoxLayout()
+    transactions_management.addWidget(add_transaction)
+    transactions_management.addWidget(delete_transaction)
+    transactions_management.addWidget(edit_transaction)
 
     category_layout.addStretch(1)
     category_layout.addLayout(Category_general_info)
     category_layout.addWidget(category_data,alignment=ALIGN_V_CENTER)
-    category_layout.addLayout(transactions_managment)
+    category_layout.addLayout(transactions_management)
     category_layout.addStretch(1)
 
     category_window.setLayout(category_layout)

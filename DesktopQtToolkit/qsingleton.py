@@ -12,7 +12,8 @@ QtMeta = type(QObject)
 class QSingleton(QtMeta, Generic[ClassInstance]):#type: ignore[valid-type, misc] #Mypy doesn't support dynamic base classes
     """
     A metaclass for creating singleton classes.
-    Attribute `singleton_message` can be used to set a message that will be displayed when trying to create multiple instances of the class.
+    Attribute `singleton_message` can be used to set a message 
+    that will be displayed when trying to create multiple instances of the class.
     """
 
     __instances: dict[str, ClassInstance] = {}

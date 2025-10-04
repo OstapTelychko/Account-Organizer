@@ -1,10 +1,14 @@
 from GUI.windows.main_window import MainWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow, SwitchAccountWindow
 from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
-from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, ChangeCategoryPositionWindow, RenameCategoryWindow
+from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, ChangeCategoryPositionWindow,\
+RenameCategoryWindow
+
 from GUI.windows.messages import Messages
 from GUI.windows.settings import SettingsWindow
-from GUI.windows.statistics import StatisticsWindow, MonthlyStatistic, QuarterlyStatistics, YearlyStatistics, CustomRangeStatistics, CustomRangeStatisticsView
+from GUI.windows.statistics import StatisticsWindow, MonthlyStatistic, QuarterlyStatistics, YearlyStatistics,\
+CustomRangeStatistics, CustomRangeStatisticsView
+
 from GUI.windows.transaction import TransactionManagementWindow
 from GUI.windows.update_progress import UpdateProgressWindow
 from GUI.windows.information_message import InformationMessage

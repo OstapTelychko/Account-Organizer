@@ -74,12 +74,19 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                 self.assertEqual(
                     len(expected_monthly_statistics), WindowsRegistry.MonthlyStatistics.statistics.count(),
-                    f"Month statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {WindowsRegistry.MonthlyStatistics.statistics.count()} rows")
+                    (
+                        f"Month statistics have another amount of rows. Expected amount "
+                        f"{len(expected_monthly_statistics)} found "
+                        f"{WindowsRegistry.MonthlyStatistics.statistics.count()} rows"
+                    )
+                )
 
                 for index, expected_row in enumerate(expected_monthly_statistics):
                     self.assertEqual(
                         expected_row, WindowsRegistry.MonthlyStatistics.statistics.item(index).text(),
-                        f"In month statistics row {index} expected result {expected_row} not {WindowsRegistry.MonthlyStatistics.statistics.item(index).text()}")
+                        f"In month statistics row {index} expected result {expected_row} not \
+                        {WindowsRegistry.MonthlyStatistics.statistics.item(index).text()}"
+                    )
                     
                 WindowsRegistry.MonthlyStatistics.done(1)
             
@@ -98,8 +105,12 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
         for month in range(1, 13):
             if month not in (app_core.current_month, month_without_transactions):
-                app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction")
-                app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction")
+                app_core.db.transaction_query.add_transaction(
+                    self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction"
+                )
+                app_core.db.transaction_query.add_transaction(
+                    self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction"
+                )
         
         def _open_quarterly_statistics_window() -> None:
             """Click button that show quarterly statistics window."""
@@ -134,12 +145,16 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     statistics_data = quarter.total_quarter_statistics.data
                     self.assertEqual(
                         len(expected_total_quarterly_statistics), statistics_data.count(),
-                        f"Quarterly statistics have another amount of rows. Expected amount {len(expected_total_quarterly_statistics)} found {statistics_data.count()} rows")
+                        f"Quarterly statistics have another amount of rows. Expected amount \
+                        {len(expected_total_quarterly_statistics)} found {statistics_data.count()} rows"
+                        )
 
                     for index, expected_row in enumerate(expected_total_quarterly_statistics):
                         self.assertEqual(
                             expected_row, statistics_data.item(index).text(),
-                            f"In quarterly statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                            f"In quarterly statistics row {index} expected result {expected_row} not \
+                            {statistics_data.item(index).text()}"
+                        )
 
                     for month in quarter.months:
                         statistics_data = month.data
@@ -151,16 +166,28 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         if current_month != month_without_transactions:
                             self.assertEqual(
                                 len(expected_monthly_statistics), statistics_data.count(),
-                                f"Month {current_month} statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {statistics_data.count()} rows")
+                                f"Month {current_month} statistics have another amount of rows. Expected amount \
+                                {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
+                            )
 
                             for index, expected_row in enumerate(expected_monthly_statistics):
                                 self.assertEqual(
                                     expected_row, statistics_data.item(index).text(),
-                                    f"In quarter {quarter_number} month {current_month} statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                                    f"In quarter {quarter_number} month {current_month} statistics row \
+                                    {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                                )
 
                         else:
-                            self.assertEqual(1, statistics_data.count(), f"Month {current_month} without transactions don't have 1 row in statistics")
-                            self.assertEqual(WindowsRegistry.Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                            self.assertEqual(
+                                1,
+                                statistics_data.count(),
+                                f"Month {current_month} without transactions don't have 1 row in statistics"
+                            )
+                            self.assertEqual(
+                                WindowsRegistry.Messages.no_transactions.text(), 
+                                statistics_data.item(0).text(),
+                                "Month without transactions hasn't showed error text"
+                            )
 
                 WindowsRegistry.QuarterlyStatistics.done(1)
             
@@ -179,8 +206,12 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
         for month in range(1, 13):
             if month not in (app_core.current_month, month_without_transactions):
-                app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction")
-                app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction")
+                app_core.db.transaction_query.add_transaction(
+                    self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction"
+                )
+                app_core.db.transaction_query.add_transaction(
+                    self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction"
+                )
         
         def _open_yearly_statistics_window() -> None:
             """Click button that show yearly statistics window."""
@@ -211,12 +242,16 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 statistics_data = WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data
                 self.assertEqual(
                     len(expected_yearly_statistics), statistics_data.count(),
-                    f"Yearly statistics have another amount of rows. Expected amount {len(expected_yearly_statistics)} found {statistics_data.count()} rows")
+                    f"Yearly statistics have another amount of rows. Expected amount \
+                    {len(expected_yearly_statistics)} found {statistics_data.count()} rows"
+                    )
 
                 for index, expected_row in enumerate(expected_yearly_statistics):
                     self.assertEqual(
                         expected_row, statistics_data.item(index).text(),
-                        f"In total year statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                        f"In total year statistics row {index} expected result \
+                        {expected_row} not {statistics_data.item(index).text()}"
+                    )
 
                 for month in WindowsRegistry.YearlyStatistics.statistics.months:
                     statistics_data = month.data
@@ -227,16 +262,27 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     if month.month_number != month_without_transactions:
                         self.assertEqual(
                             len(expected_monthly_statistics), statistics_data.count(),
-                            f"Month {month.month_number} statistics have another amount of rows. Expected amount {len(expected_monthly_statistics)} found {statistics_data.count()} rows")
+                            f"Month {month.month_number} statistics have another amount of rows. Expected amount \
+                            {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
+                        )
 
                         for index, expected_row in enumerate(expected_monthly_statistics):
                             self.assertEqual(
                                 expected_row, statistics_data.item(index).text(),
-                                f"In month {month.month_number} statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                                f"In month {month.month_number} statistics row {index} expected result \
+                                {expected_row} not {statistics_data.item(index).text()}"
+                            )
 
                     else:
-                        self.assertEqual(1, statistics_data.count(), f"Month {month.month_number} without transactions don't have 1 row in statistics")
-                        self.assertEqual(WindowsRegistry.Messages.no_transactions.text(), statistics_data.item(0).text(), "Month without transactions hasn't showed error text")
+                        self.assertEqual(1, statistics_data.count(), 
+                            f"Month \
+                            {month.month_number} without transactions don't have 1 row in statistics"
+                        )
+                        self.assertEqual(
+                            WindowsRegistry.Messages.no_transactions.text(),
+                            statistics_data.item(0).text(),
+                            "Month without transactions hasn't showed error text"
+                        )
 
                 WindowsRegistry.YearlyStatistics.done(1)
             
@@ -253,8 +299,12 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         app_core = AppCore.instance()
         for month in range(1, 7):
             if month != app_core.current_month:
-                app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction")
-                app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction")
+                app_core.db.transaction_query.add_transaction(
+                    self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction"
+                )
+                app_core.db.transaction_query.add_transaction(
+                    self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction"
+                )
         
         def _open_custom_range_statistics_window() -> None:
             """Click button that show custom range statistics window."""
@@ -292,12 +342,18 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.statistics_list
                     self.assertEqual(
                         len(expected_custom_range_statistics), statistics_data.count(),
-                        f"Custom range statistics (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) have another amount of rows. Expected amount {len(expected_custom_range_statistics)} found {statistics_data.count()} rows")
+                        f"Custom range statistics (1, 1, {app_core.current_year} - 1, 6, \
+                        {app_core.current_year}) have another amount of rows. Expected amount \
+                        {len(expected_custom_range_statistics)} found {statistics_data.count()} rows"
+                    )
 
                     for index, expected_row in enumerate(expected_custom_range_statistics):
                         self.assertEqual(
                             expected_row, statistics_data.item(index).text(),
-                            f"In Custom range statistics (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) statistics row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                            f"In Custom range statistics (1, 1, {app_core.current_year} - 1, 6, \
+                            {app_core.current_year}) statistics row {index} expected result {expected_row} not \
+                            {statistics_data.item(index).text()}"
+                        )
                     
                     expected_transactions = [
                         f"{self.translated_incomes}<br/><br/>",
@@ -320,12 +376,18 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.transactions_list
                     self.assertEqual(
                         len(expected_transactions), statistics_data.count(),
-                        f"Custom range transactions list (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) have another amount of rows. Expected amount {len(expected_transactions)} found {statistics_data.count()} rows")
+                        f"Custom range transactions list (1, 1, {app_core.current_year} - 1, 6, \
+                        {app_core.current_year}) have another amount of rows. Expected amount \
+                        {len(expected_transactions)} found {statistics_data.count()} rows"
+                    )
 
                     for index, expected_row in enumerate(expected_transactions):
                         self.assertEqual(
                             expected_row, statistics_data.item(index).text(),
-                            f"In Custom range transactions list (1, 1, {app_core.current_year} - 1, 6, {app_core.current_year}) row {index} expected result {expected_row} not {statistics_data.item(index).text()}")
+                            f"In Custom range transactions list (1, 1, {app_core.current_year} - 1, 6, \
+                            {app_core.current_year}) row {index} expected result {expected_row} not \
+                            {statistics_data.item(index).text()}"
+                        )
                     
                     WindowsRegistry.CustomRangeStatisticsView.done(1)
                     WindowsRegistry.CustomRangeStatistics.done(1)

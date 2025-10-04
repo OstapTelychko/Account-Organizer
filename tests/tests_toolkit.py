@@ -122,7 +122,9 @@ class DefaultTestCase(TestCase):
 
         sleep(self.TIMEOUT_SEC)
         if self.test_running:
-            self.timeout_error = TimeoutError(f"Test took too long to complete (>{self.TIMEOUT_SEC} seconds), closing all sub-windows and failing the test.")
+            self.timeout_error = TimeoutError(
+                f"Test took too long to complete (>{self.TIMEOUT_SEC} seconds), closing all sub-windows and failing the test."
+            )
             while self.test_running:
                 for sub_window in WindowsRegistry.MainWindow.sub_windows.values():
                     if sub_window.isVisible():
@@ -158,7 +160,9 @@ class DBTestCase(DefaultTestCase):
     
     @staticmethod
     def set_up_decorator(func:Callable[[DBTestCase], None]) -> Callable[[DBTestCase], None]:
-        """This decorator is used to set up the test case. It creates first objects so we don't have to create them in every test case.
+        """
+            This decorator is used to set up the test case.
+            It creates first objects so we don't have to create them in every test case.
 
             Arguments
             ---------
@@ -186,11 +190,36 @@ class DBTestCase(DefaultTestCase):
             self.income_category = new_income_category
             self.expenses_category = new_expenses_category
 
-            app_core.db.transaction_query.add_transaction(self.income_category.id, app_core.current_year, app_core.current_month, 1, 1000, "Test income transaction")
-            app_core.db.transaction_query.add_transaction(self.expenses_category.id, app_core.current_year, app_core.current_month, 1, 1000, "Test expenses transaction")
+            app_core.db.transaction_query.add_transaction(
+                self.income_category.id, app_core.current_year, app_core.current_month, 1, 1000, "Test income transaction"
+            )
+            app_core.db.transaction_query.add_transaction(
+                self.expenses_category.id,
+                app_core.current_year,
+                app_core.current_month,
+                1,
+                1000,
+                "Test expenses transaction"
+            )
 
-            app_core.categories[self.income_category.id] = load_category(self.income_category.category_type, self.income_category.name, app_core.db, self.income_category.id, 0, app_core.current_year, app_core.current_month)
-            app_core.categories[self.expenses_category.id] = load_category(self.expenses_category.category_type, self.expenses_category.name, app_core.db, self.expenses_category.id, 0, app_core.current_year, app_core.current_month)
+            app_core.categories[self.income_category.id] = load_category(
+                self.income_category.category_type,
+                self.income_category.name,
+                app_core.db,
+                self.income_category.id,
+                0,
+                app_core.current_year,
+                app_core.current_month
+            )
+            app_core.categories[self.expenses_category.id] = load_category(
+                self.expenses_category.category_type,
+                self.expenses_category.name,
+                app_core.db,
+                self.expenses_category.id,
+                0,
+                app_core.current_year,
+                app_core.current_month
+            )
             activate_categories()
 
             return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)
@@ -242,7 +271,9 @@ class DBTestCase(DefaultTestCase):
 
 
 class OutOfScopeTestCase(DefaultTestCase):
-    """This class is used to capture the tests assertion errors from functions that are runned using QTimer.singleShot."""
+    """
+    This class is used to capture the tests assertion errors from functions that are runned using QTimer.singleShot.
+    """
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
@@ -260,7 +291,9 @@ class OutOfScopeTestCase(DefaultTestCase):
 
 
     def catch_failure(self, func: Callable[[], None]) -> Callable[[], None]:
-        """This decorator is used to catch the assertion errors from functions that are runned using QTimer.singleShot."""
+        """
+        This decorator is used to catch the assertion errors from functions that are runned using QTimer.singleShot.
+        """
 
         @wraps(func)
         def wrapper() -> None:

@@ -1,6 +1,9 @@
 from __future__ import annotations
+import os
+
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout, QGridLayout
+from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout,\
+    QGridLayout
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
@@ -31,7 +34,9 @@ class SettingsWindow(SubWindow):
 
             self.section_wrapper = QWidget()
             self.section_wrapper.setProperty("class", "wrapper")
-            self.section_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.section_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+            self.section_wrapper.setGraphicsEffect(
+                QGraphicsDropShadowEffect(self.section_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            )
             self.section_wrapper.setLayout(self.section_layout)
 
 
@@ -49,7 +54,7 @@ class SettingsWindow(SubWindow):
         self.languages.addItems(AVAILABLE_LANGUAGES)
 
         for language in range(len(AVAILABLE_LANGUAGES)):
-            self.languages.setItemIcon(language, QIcon(f"{FLAGS_DIRECTORY}/{language}-flag.png"))
+            self.languages.setItemIcon(language, QIcon(os.path.join(FLAGS_DIRECTORY, f"{language}-flag.png")))
 
         self.shortcuts_management = create_button("Shortcuts management", (220, 50))
         

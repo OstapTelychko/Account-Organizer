@@ -47,7 +47,7 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     WindowsRegistry.TransactionManagementWindow.transaction_day.setText(selected_row[1].text())
     WindowsRegistry.TransactionManagementWindow.transaction_value.setText(selected_row[2].text())
 
-    WindowsRegistry.TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(), 3).text()) # type: ignore[reportOptionalMemberAcces, unused-ignore] #This will never be None, because row is selected
+    WindowsRegistry.TransactionManagementWindow.transaction_id = int(category_data.item(selected_row[0].row(), 3).text()) # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, because row is selected
     return WindowsRegistry.TransactionManagementWindow.exec()
 
 
@@ -122,7 +122,14 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     """
 
     app_core = AppCore.instance()
-    transaction = app_core.db.transaction_query.add_transaction(category_id, app_core.current_year, app_core.current_month, transaction_day, transaction_value, transaction_name)
+    transaction = app_core.db.transaction_query.add_transaction(
+        category_id,
+        app_core.current_year,
+        app_core.current_month,
+        transaction_day,
+        transaction_value,
+        transaction_name
+    )
 
     if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
         app_core.current_total_income = round(app_core.current_total_income + transaction_value, 2)
@@ -165,7 +172,10 @@ def transaction_data_handler() -> int:
     raw_transaction_value = WindowsRegistry.TransactionManagementWindow.transaction_value.text()
 
     app_core = AppCore.instance()
-    category = app_core.db.category_query.get_category(WindowsRegistry.TransactionManagementWindow.windowTitle(), CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()])
+    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category = app_core.db.category_query.get_category(
+        WindowsRegistry.TransactionManagementWindow.windowTitle(), category_type
+    )
     if category is None:
         logger.error(f"Category {WindowsRegistry.TransactionManagementWindow.windowTitle()} not found. Transaction haven't been handled.")
         raise RuntimeError(f"Category {WindowsRegistry.TransactionManagementWindow.windowTitle()} not found. Transaction haven't been handled.")
@@ -192,10 +202,17 @@ def transaction_data_handler() -> int:
     if WindowsRegistry.TransactionManagementWindow.button.text() == LanguageStructure.GeneralManagement.get_translation(5): #Update 
         transaction_id = WindowsRegistry.TransactionManagementWindow.transaction_id
         update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
-        logger.debug(f"Transaction updated: {transaction_name} | {transaction_day} | {transaction_value} | Transaction id: {transaction_id} | Category id: {category_id}")
+        logger.debug(f"Transaction updated: {transaction_name}\
+                     | {transaction_day}\
+                     | {transaction_value}\
+                     | Transaction id: {transaction_id}\
+                     | Category id: {category_id}")
     else: #Add
         add_transaction(transaction_name, transaction_day, transaction_value, category_data, category_id)
-        logger.debug(f"Transaction added: {transaction_name} | {transaction_day} | {transaction_value} | Category id: {category_id}")
+        logger.debug(f"Transaction added: {transaction_name}\
+                     | {transaction_day}\
+                     | {transaction_value}\
+                     | Category id: {category_id}")
 
 
     update_category_total_value(category_id)
@@ -229,7 +246,8 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
         return WindowsRegistry.Messages.only_one_row.exec()
 
     WindowsRegistry.Messages.delete_transaction_confirmation.exec()
-    if WindowsRegistry.Messages.delete_transaction_confirmation.clickedButton() == WindowsRegistry.Messages.delete_transaction_confirmation.ok_button:
+    ok_button = WindowsRegistry.Messages.delete_transaction_confirmation.ok_button
+    if WindowsRegistry.Messages.delete_transaction_confirmation.clickedButton() == ok_button:
         transaction_value = float(selected_row[2].text())
         app_core.db.transaction_query.delete_transaction(transaction_id)
 

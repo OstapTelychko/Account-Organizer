@@ -302,14 +302,14 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
     logger.debug("Created update directory")
 
     logger.info(f"Saving update on disk. Attempt {attempt}")
-    with open(f"{UPDATE_DIRECTORY}/{update_zip_download_name}", "wb") as file:
+    with open(os.path.join(UPDATE_DIRECTORY, update_zip_download_name), "wb") as file:
         for chunk in download_response.iter_content(chunk_size=CHUNK_SIZE_FOR_DOWNLOADING):
             download_size += len(chunk)
             file.write(chunk)
             WindowsRegistry.UpdateProgressWindow.download_progress.setValue(int((download_size/update_zip_size)*100))
     logger.info(f"Update saved on disk. Attempt {attempt}")
 
-    with ZipFile(f"{UPDATE_DIRECTORY}/{update_zip_download_name}", "r") as zip_ref:
+    with ZipFile(os.path.join(UPDATE_DIRECTORY, update_zip_download_name), "r") as zip_ref:
         zip_ref.extractall(UPDATE_DIRECTORY)
     logger.info(f"Update extracted. Attempt {attempt}")
 

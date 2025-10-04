@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import NamedTuple, TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QGraphicsDropShadowEffect, QDateEdit
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QGraphicsDropShadowEffect,\
+    QDateEdit
 from PySide6.QtCore import Qt, QDate
 
 from DesktopQtToolkit.sub_window import SubWindow
@@ -37,19 +38,25 @@ class StatisticsWindow(SubWindow):
         
         self.statistics_wrapper = QWidget()
         self.statistics_wrapper.setLayout(self.statistics_wrapper_layout)
-        self.statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.statistics_wrapper.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+        )
         self.statistics_wrapper.setProperty("class", "wrapper")
 
         self.custom_range_statistics = create_button("Custom date range", (180, 40))
 
         self.custom_statistics_wrapper_layout = QVBoxLayout()
-        self.custom_statistics_wrapper_layout.addWidget(self.custom_range_statistics, alignment=ALIGN_V_CENTER | ALIGN_H_CENTER)
+        self.custom_statistics_wrapper_layout.addWidget(
+            self.custom_range_statistics, alignment=ALIGN_V_CENTER | ALIGN_H_CENTER
+        )
         self.custom_statistics_wrapper_layout.setContentsMargins(17, 30, 17, 30)
 
         self.custom_statistics_wrapper = QWidget()
         self.custom_statistics_wrapper.setLayout(self.custom_statistics_wrapper_layout)
         self.custom_statistics_wrapper.setProperty("class", "wrapper")
-        self.custom_statistics_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.custom_statistics_wrapper.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+        )
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(20)
@@ -118,9 +125,19 @@ class QuarterlyStatistics(SubWindow):
         self.statistics_layout = QVBoxLayout()
         self.statistics_window = QWidget()
 
-        TotalQuarterStatisticsView = NamedTuple("TotalQuarterStatisticsView", [("label", QLabel), ("data", CustomListWidget)])
-        QMonthlyStatisticsView = NamedTuple("QMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", CustomListWidget)])
-        QuarterStatisticsView = NamedTuple("QuarterStatisticsView", [("quarter_number", int), ("label", QLabel), ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[QMonthlyStatisticsView])])
+        TotalQuarterStatisticsView = NamedTuple(
+            "TotalQuarterStatisticsView", [("label", QLabel), ("data", CustomListWidget)]
+        )
+        QMonthlyStatisticsView = NamedTuple(
+            "QMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", CustomListWidget)]
+        )
+        QuarterStatisticsView = NamedTuple(
+            "QuarterStatisticsView", [
+                ("quarter_number", int),
+                ("label", QLabel),
+                ("total_quarter_statistics", TotalQuarterStatisticsView), ("months", list[QMonthlyStatisticsView])
+            ]
+        )
         StatisticsView = NamedTuple("StatisticsView", [("quarters", list[QuarterStatisticsView])])
 
         self.quarters_statistics_list = []
@@ -156,10 +173,14 @@ class QuarterlyStatistics(SubWindow):
                 if statistic_list == 0:
                     total_quarter_statistics = TotalQuarterStatisticsView(statistic_label, statistic_data)
                 else:
-                    quarter_statistics_part = QMonthlyStatisticsView((quarter -1)*3 + statistic_list, statistic_label, statistic_data)
+                    quarter_statistics_part = QMonthlyStatisticsView(
+                        (quarter -1)*3 + statistic_list, statistic_label, statistic_data
+                    )
                     quarter_months_statistics_list.append(quarter_statistics_part)
             
-            quarter_statistics = QuarterStatisticsView(quarter, quarter_label, total_quarter_statistics, quarter_months_statistics_list)
+            quarter_statistics = QuarterStatisticsView(
+                quarter, quarter_label, total_quarter_statistics, quarter_months_statistics_list
+            )
             self.quarters_statistics_list.append(quarter_statistics)
 
             self.quarter_window.setLayout(quarter_layout)
@@ -215,8 +236,12 @@ class YearlyStatistics(SubWindow):
         {background: transparent}""")#Disable background color change on mouseover
 
         TotalYearStatisticsView = NamedTuple("TotalYearStatisticsView", [("label", QLabel), ("data", CustomListWidget)])
-        YMonthlyStatisticsView = NamedTuple("YMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", CustomListWidget)])
-        StatisticsView = NamedTuple("StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[YMonthlyStatisticsView])])
+        YMonthlyStatisticsView = NamedTuple(
+            "YMonthlyStatisticsView", [("month_number", int), ("label", QLabel), ("data", CustomListWidget)]
+        )
+        StatisticsView = NamedTuple(
+            "StatisticsView", [("total_year_statistics", TotalYearStatisticsView), ("months", list[YMonthlyStatisticsView])]
+        )
 
         self.statistics_window = QWidget()
         self.statistics_window_layout = QVBoxLayout()
@@ -276,7 +301,8 @@ class CustomRangeStatistics(SubWindow):
         Warning
         -------
         This class contains non-GUI related objects, like `selected_categories_data`.\n
-        `selected_categories_data` - is a dictionary that contains the selected categories data. Used to create custom statistics based on selection\n
+        `selected_categories_data` - is a dictionary that contains the selected categories data.\
+                                    Used to create custom statistics based on selection\n
     """
     
     class CategoryItem(QWidget):
@@ -303,7 +329,9 @@ class CustomRangeStatistics(SubWindow):
             self.category_wrapper = QWidget()
             self.category_wrapper.setLayout(self.category_layout)
             self.category_wrapper.setProperty("class", "category_list_item")
-            self.category_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.category_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+            self.category_wrapper.setGraphicsEffect(
+                QGraphicsDropShadowEffect(self.category_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            )
 
 
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
@@ -342,7 +370,9 @@ class CustomRangeStatistics(SubWindow):
         self.incomes_categories_list_scroll.setMinimumWidth(530)
         self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.incomes_categories_list_scroll.setProperty("class", "wrapper")
-        self.incomes_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+        self.incomes_categories_list_scroll.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
+        )
 
         self.add_all_expenses_categories = create_button("Add all", (150, 40))
         self.remove_all_expenses_categories = create_button("Remove all", (150, 40))
@@ -371,7 +401,9 @@ class CustomRangeStatistics(SubWindow):
         self.expenses_categories_list_scroll.setMinimumWidth(530)
         self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.expenses_categories_list_scroll.setProperty("class", "wrapper")
-        self.expenses_categories_list_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS))
+        self.expenses_categories_list_scroll.setGraphicsEffect(
+            QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
+        )
 
         self.categories_lists_layout = QHBoxLayout()
         self.categories_lists_layout.addWidget(self.incomes_categories_list_scroll)
