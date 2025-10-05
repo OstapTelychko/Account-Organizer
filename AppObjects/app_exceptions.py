@@ -23,3 +23,13 @@ class FailedToDownloadUpdateZipError(Exception):
 class FailedToDownloadGUILibraryZipError(Exception):
     """Exception raised when the GUI library zip file failed to download."""
     pass
+
+
+class WidgetIsDisabledError(Exception):
+    """Exception raised when a widget is disabled."""
+    pass
+
+
+class WidgetIsNotVisibleError(Exception):
+    """Exception raised when a widget is not visible."""
+    pass

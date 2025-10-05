@@ -28,7 +28,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         """Open statistics window and call function after some delay."""
 
         QTimer.singleShot(100, self.catch_failure(func))
-        WindowsRegistry.MainWindow.statistics.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.statistics)
     
 
     def create_monthly_statistics(self, days_amount:int) -> list[str]:
@@ -91,7 +91,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 WindowsRegistry.MonthlyStatistics.done(1)
             
             QTimer.singleShot(100, self.catch_failure(_check_monthly_statistics))
-            WindowsRegistry.StatisticsWindow.monthly_statistics.click()
+            self.click_on_widget(WindowsRegistry.StatisticsWindow.monthly_statistics)
         self.open_statistics_window(_open_monthly_statics_window)
         qsleep(500)
     
@@ -192,7 +192,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 WindowsRegistry.QuarterlyStatistics.done(1)
             
             QTimer.singleShot(100, self.catch_failure(_check_quarterly_statistics))
-            WindowsRegistry.StatisticsWindow.quarterly_statistics.click()
+            self.click_on_widget(WindowsRegistry.StatisticsWindow.quarterly_statistics)
         
         self.open_statistics_window(_open_quarterly_statistics_window)
         qsleep(2000)
@@ -287,7 +287,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 WindowsRegistry.YearlyStatistics.done(1)
             
             QTimer.singleShot(100, self.catch_failure(_check_yearly_statistics))
-            WindowsRegistry.StatisticsWindow.yearly_statistics.click()
+            self.click_on_widget(WindowsRegistry.StatisticsWindow.yearly_statistics)
         
         self.open_statistics_window(_open_yearly_statistics_window)
         qsleep(2000)
@@ -312,8 +312,8 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             def _select_custom_range() -> None:
                 """Select custom range and click show statistics button."""
 
-                WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.click()
-                WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.click()
+                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories)
+                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories)
                 
                 WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(app_core.current_year, 1, 1))
                 WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(app_core.current_year, 6, 1))
@@ -393,10 +393,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     WindowsRegistry.CustomRangeStatistics.done(1)
 
                 QTimer.singleShot(100, self.catch_failure(_check_custom_range_statistics))
-                WindowsRegistry.CustomRangeStatistics.show_statistics.click()
+                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.show_statistics)
 
             QTimer.singleShot(100, self.catch_failure(_select_custom_range))
-            WindowsRegistry.StatisticsWindow.custom_range_statistics.click()
+            self.click_on_widget(WindowsRegistry.StatisticsWindow.custom_range_statistics)
 
         self.open_statistics_window(_open_custom_range_statistics_window)
         qsleep(500)

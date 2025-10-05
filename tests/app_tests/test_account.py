@@ -25,7 +25,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
         """
 
         QTimer.singleShot(100, self.catch_failure(func))
-        WindowsRegistry.MainWindow.settings.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.settings)
 
 
     def test_1_account_adding(self) -> None:
@@ -49,10 +49,10 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                     )
                     WindowsRegistry.SettingsWindow.done(1)
                 QTimer.singleShot(100, self.catch_failure(_check_account_existence))
-                WindowsRegistry.AddAccountWindow.button.click()
+                self.click_on_widget(WindowsRegistry.AddAccountWindow.button)
 
             QTimer.singleShot(100, self.catch_failure(_add_account))
-            WindowsRegistry.SettingsWindow.add_account.click()
+            self.click_on_widget(WindowsRegistry.SettingsWindow.add_account)
 
         self.open_settings(_open_add_window)
         qsleep(500)           
@@ -69,38 +69,40 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 """Set new account name and click rename button."""
 
                 WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user rename test")
-
-                def _check_account_name() -> None:
-                    """Check if account name has been changed."""
-
-                    self.assertEqual(
-                        app_core.db.account_query.get_account().name,
-                        "Test user rename test", "Test user hasn't been renamed"
-                    )
-                QTimer.singleShot(100, self.catch_failure(_check_account_name))
-                WindowsRegistry.RenameAccountWindow.button.click()
+                QTimer.singleShot(100, lambda: self.assertEqual(
+                    app_core.db.account_query.get_account().name,
+                    "Test user rename test", "Test user hasn't been renamed"
+                ))
+                self.click_on_widget(WindowsRegistry.RenameAccountWindow.button)
 
                 qsleep(300)
-
-                WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user")
-                def _rename_back() -> None:
-                    """Rename account back to original name. So it doesn't affect other tests."""
-
-                    self.assertEqual(
-                        app_core.db.account_query.get_account().name,
-                        "Test user",
-                        "Test user hasn't been renamed back"
-                    )
-                    WindowsRegistry.SettingsWindow.done(0)
-                QTimer.singleShot(100, self.catch_failure(_rename_back))
-                WindowsRegistry.RenameAccountWindow.button.click()
+                WindowsRegistry.SettingsWindow.done(0)
 
             QTimer.singleShot(100, self.catch_failure(_rename_account))
-            WindowsRegistry.SettingsWindow.rename_account.click()
+            self.click_on_widget(WindowsRegistry.SettingsWindow.rename_account)
 
         self.open_settings(_open_rename_window)
 
-        qsleep(700)
+        WindowsRegistry.MainWindow.mini_calculator_label.setText("")
+        def _rename_back() -> None:
+            """Rename account back to original name. So it doesn't affect other tests."""
+
+            def _rename() -> None:
+                """Set account name back and click rename button."""
+                WindowsRegistry.RenameAccountWindow.new_account_name.setText("Test user")
+                QTimer.singleShot(100, lambda: self.assertEqual(
+                    app_core.db.account_query.get_account().name,
+                    "Test user",
+                    "Test user hasn't been renamed back"
+                ))
+                self.click_on_widget(WindowsRegistry.RenameAccountWindow.button)
+                WindowsRegistry.SettingsWindow.done(0)
+
+            QTimer.singleShot(100, self.catch_failure(_rename))
+            self.click_on_widget(WindowsRegistry.SettingsWindow.rename_account)
+
+        self.open_settings(_rename_back)
+        qsleep(1000)
     
 
     def test_3_account_deletion(self) -> None:
@@ -120,7 +122,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
             def _confirm_deletion() -> None:
                 """Click delete account button."""
 
-                WindowsRegistry.Messages.delete_account_warning.ok_button.click()
+                self.click_on_widget(WindowsRegistry.Messages.delete_account_warning.ok_button)
                 def _check_deletion() -> None:
                     """Check if account has been deleted."""
 
@@ -137,7 +139,7 @@ class TestAccount(DBTestCase, OutOfScopeTestCase):
                 QTimer.singleShot(200, self.catch_failure(_check_deletion))
 
             QTimer.singleShot(100, self.catch_failure(_confirm_deletion))
-            WindowsRegistry.SettingsWindow.delete_account.click()
+            self.click_on_widget(WindowsRegistry.SettingsWindow.delete_account)
 
         self.open_settings(_delete_account)
         qsleep(500)

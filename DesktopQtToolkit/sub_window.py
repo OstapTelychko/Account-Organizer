@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTim
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICON, SHADOW_EFFECT_ARGUMENTS
 from DesktopQtToolkit.create_button import create_button
+from AppObjects.app_core import AppCore
 
 if TYPE_CHECKING:
     from typing import Any
@@ -97,7 +98,7 @@ class SubWindow(QDialog, metaclass=SubWindowSingleton):
 
             self.move(main_window_center)
 
-            if platform != "win32":
+            if platform != "win32" and not AppCore.instance().test_mode:
                 initial_size = self.window_container.geometry()
                 window_width = initial_size.width()
                 window_height = initial_size.height()
@@ -128,7 +129,7 @@ class SubWindow(QDialog, metaclass=SubWindowSingleton):
             QDialog.done(self, return_code)
             self.window_container.setGeometry(self.size_animation.endValue())
 
-        if platform != "win32":
+        if platform != "win32" and not AppCore.instance().test_mode:
             self.animation_group.setDirection(QPropertyAnimation.Direction.Backward)
             self.animation_group.start()
             QTimer.singleShot(200, hide_window)

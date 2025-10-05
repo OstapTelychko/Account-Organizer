@@ -16,7 +16,7 @@ Project life improvements:
   ☐ empty @don't-touch
   ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF
   ☐ add % sign before and after variables in languages.json
-  ☐ add check for every click in tests whether button or widget is actually visible
+  ☐ add check for every click in tests whether button or widget is actually visible @started(25-10-05 20:17)
 
 Bugs:
   ☐ empty @don't-touch

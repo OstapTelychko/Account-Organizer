@@ -42,7 +42,7 @@ class TestMainWindow(OutOfScopeTestCase):
                 window.done(1)
             
             QTimer.singleShot(100, self.catch_failure(_check_window_appearance))# Timer will call this function after 100 milliseconds. QDialog use exec to show up so it block program loop
-            open_window_button.click()
+            self.click_on_widget(open_window_button)
         
         qsleep(500)
 
@@ -61,7 +61,7 @@ class TestMainWindow(OutOfScopeTestCase):
         )
 
         translated_next_month = LanguageStructure.Months.get_translation(current_month+1) if current_month != 12 else LanguageStructure.Months.get_translation(1)
-        WindowsRegistry.MainWindow.next_month_button.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.next_month_button)
         current_showed_month = WindowsRegistry.MainWindow.current_month.text()
         self.assertEqual(
             translated_next_month,
@@ -70,7 +70,7 @@ class TestMainWindow(OutOfScopeTestCase):
         )
         
         translated_previous_month = LanguageStructure.Months.get_translation(current_month)
-        WindowsRegistry.MainWindow.previous_month_button.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.previous_month_button)
         current_showed_month = WindowsRegistry.MainWindow.current_month.text()
         self.assertEqual(
             translated_previous_month,
@@ -86,15 +86,15 @@ class TestMainWindow(OutOfScopeTestCase):
             f"Wrong current year has been showed {current_showed_year} instead of {current_year}"
         )
 
-        WindowsRegistry.MainWindow.next_year_button.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.next_year_button)
         current_showed_year = WindowsRegistry.MainWindow.current_year.text()
         self.assertEqual(
             str(current_year+1),
             current_showed_year,
             f"Wrong next year has been showed {current_showed_year} instead of {current_year+1}"
         )
-        
-        WindowsRegistry.MainWindow.previous_year_button.click()
+
+        self.click_on_widget(WindowsRegistry.MainWindow.previous_year_button)
         current_showed_year = WindowsRegistry.MainWindow.current_year.text()
         self.assertEqual(
             str(current_year),
@@ -107,14 +107,14 @@ class TestMainWindow(OutOfScopeTestCase):
         """Test mini calculator in the application."""
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("2*2")
-        WindowsRegistry.MainWindow.calculate.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.calculate)
         result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         self.assertEqual(
             "4", result, f"Mini calculator has returned wrong result for expression 2*2 {result} instead of 4"
         )
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("100+300+400+500")
-        WindowsRegistry.MainWindow.calculate.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.calculate)
         result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         self.assertEqual(
             "1300",
@@ -123,7 +123,7 @@ class TestMainWindow(OutOfScopeTestCase):
         )
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("1000Money+friends")
-        WindowsRegistry.MainWindow.calculate.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.calculate)
         result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         translated_warning = LanguageStructure.MiniCalculator.get_translation(2)
         self.assertEqual(
@@ -133,7 +133,7 @@ class TestMainWindow(OutOfScopeTestCase):
         )
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("5/0")
-        WindowsRegistry.MainWindow.calculate.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.calculate)
         result = WindowsRegistry.MainWindow.mini_calculator_text.text()
         translated_warning = LanguageStructure.MiniCalculator.get_translation(1)
         self.assertEqual(
@@ -155,7 +155,7 @@ class TestMainWindow(OutOfScopeTestCase):
             WindowsRegistry.Messages.empty_expression.done(1)
 
         QTimer.singleShot(100, self.catch_failure(_check_empty_expression_error))
-        WindowsRegistry.MainWindow.calculate.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.calculate)
 
         WindowsRegistry.MainWindow.mini_calculator_text.setText("quit()")
         def _check_forbidden_expression() -> None:
@@ -170,7 +170,7 @@ class TestMainWindow(OutOfScopeTestCase):
             WindowsRegistry.Messages.forbidden_calculator_word.done(1)
 
         QTimer.singleShot(100, self.catch_failure(_check_forbidden_expression))
-        WindowsRegistry.MainWindow.calculate.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.calculate)
         qsleep(500)
 
 
@@ -199,7 +199,7 @@ class TestMainWindow(OutOfScopeTestCase):
             WindowsRegistry.SettingsWindow.done(1)
 
         QTimer.singleShot(100, self.catch_failure(_open_settings))
-        WindowsRegistry.MainWindow.settings.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.settings)
         qsleep(500)
     
 
@@ -214,7 +214,7 @@ class TestMainWindow(OutOfScopeTestCase):
             current_style_sheet = app.styleSheet()
             current_theme_icon = WindowsRegistry.SettingsWindow.switch_themes_button.icon()
 
-            WindowsRegistry.SettingsWindow.switch_themes_button.click()
+            self.click_on_widget(WindowsRegistry.SettingsWindow.switch_themes_button)
 
             self.assertNotEqual(
                 current_theme, app_core.config.theme, f"Session theme hasn't changed. Theme {current_theme}"
@@ -226,9 +226,9 @@ class TestMainWindow(OutOfScopeTestCase):
                 f"Theme icon  hasn't changed."
             )
 
-            WindowsRegistry.SettingsWindow.switch_themes_button.click()
+            self.click_on_widget(WindowsRegistry.SettingsWindow.switch_themes_button)
             WindowsRegistry.SettingsWindow.done(1)
         
         QTimer.singleShot(100, self.catch_failure(_open_settings))
-        WindowsRegistry.MainWindow.settings.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.settings)
         qsleep(500)
