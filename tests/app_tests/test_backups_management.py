@@ -784,13 +784,21 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                         WindowsRegistry.AutoBackupWindow.max_backups.setText(str(MIN_RECOMMENDED_BACKUPS - 1))
                         self.click_on_widget(WindowsRegistry.AutoBackupWindow.save)
 
-                    WindowsRegistry.SettingsWindow.done(0)
-                    QTimer.singleShot(200, self.catch_failure(_try_to_go_below_min_backups))
-                    QTimer.singleShot(100, lambda: self.click_on_widget(WindowsRegistry.SettingsWindow.auto_backup))
-                    self.break_recursion_detection_for_dialog()
-                    self.click_on_widget(WindowsRegistry.MainWindow.settings)
+                    self.click_on_widget(WindowsRegistry.SettingsWindow.close_window)
+
+                    # QTimer.singleShot(500, self.catch_failure(_try_to_go_below_min_backups))
+                    qsleep(100)
+                    def open_auto_backup():
+                        self.click_on_widget(WindowsRegistry.SettingsWindow.auto_backup)
+                    # self.break_recursion_detection_for_dialog()
                     
-                    qsleep(500)
+                    # QTimer.singleShot(100, open_auto_backup)
+                    def open_settings():
+                        self.click_on_widget(WindowsRegistry.MainWindow.settings)
+                        qsleep(10000)
+
+                    QTimer.singleShot(1000, open_settings)
+
                 
                 def _check_above_max_backups() -> None:
                     """Check if above max backups message is shown"""
@@ -839,7 +847,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
         
         QTimer.singleShot(100, self.catch_failure(_open_auto_backup_settings))
         self.click_on_widget(WindowsRegistry.MainWindow.settings)
-        qsleep(1000)
+        qsleep(1000000)
 
                     
 

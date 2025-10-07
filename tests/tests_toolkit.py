@@ -133,7 +133,7 @@ class DefaultTestCase(TestCase):
                     if sub_window.isVisible():
                         self.sub_window_closer.close_window.emit(sub_window)
                 sleep(0.1)
-
+    
 
     def click_on_widget(self, widget:QPushButton|QToolButton|QCheckBox) -> None:
         """Click on a widget.
@@ -151,14 +151,9 @@ class DefaultTestCase(TestCase):
 
         if not widget.isEnabled():
             raise WidgetIsDisabledError(f"\nWidget {widget} with text '{widget.text()}' is not enabled\n")
-
+        
         widget.click()
     
-
-    def break_recursion_detection_for_dialog(self) -> None:
-        """This method is used to brake recursion detection for dialogs that are opened multiple times during the test."""
-        WindowsRegistry.MainWindow.mini_calculator_label.setText("")
-
 
     def get_incomes_and_expenses_categories(self) -> Tuple[list[GUICategory], list[GUICategory]]:
         """This method is used to get all income and expense categories from the application.
