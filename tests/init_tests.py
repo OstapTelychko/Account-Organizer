@@ -90,8 +90,8 @@ def test_main(app_main:Callable[[bool], None]) -> None:
         # loader.loadTestsFromTestCase(TestAccount),
         # loader.loadTestsFromTestCase(TestTransaction),
         # loader.loadTestsFromTestCase(TestStatistics),
-        loader.loadTestsFromTestCase(TestBackupsManagement),
-        # loader.loadTestsFromTestCase(TestShortcuts),
+        # loader.loadTestsFromTestCase(TestBackupsManagement),
+        loader.loadTestsFromTestCase(TestShortcuts),
         # loader.loadTestsFromTestCase(TestDownloadUpdate),
         # loader.loadTestsFromTestCase(TestPrepareUpdate),
         # loader.loadTestsFromTestCase(TestApplyUpdate)

@@ -118,6 +118,12 @@ class DefaultTestCase(TestCase):
         self.timeout_error: Exception | None = None
         self.sub_window_closer.close_window.connect(lambda window: window.done(1))
         Thread(target=self.close_all_sub_windows).start()
+    
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        qsleep(2000)#Wait for the application to initialize properly
         
 
     def close_all_sub_windows(self) -> None:
