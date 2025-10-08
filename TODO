@@ -1,6 +1,7 @@
 New features:
   ☐ empty @don't-touch
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
+  ☐ add option to change account position in switch account window
 	
 Updates to existing features:
   ☐ empty @don't-touch
