@@ -14,7 +14,9 @@ from pygments.formatters import TerminalFormatter
 
 from unittest import TestCase, TextTestResult
 from unittest.mock import Mock
+
 from PySide6.QtCore import QEventLoop, QTimer, QObject, Signal
+from PySide6.QtWidgets import QPushButton, QToolButton, QCheckBox
 
 from backend.models import Category, Transaction, Account
 from project_configuration import CATEGORY_TYPE, TEST_BACKUPS_DIRECTORY
@@ -26,6 +28,7 @@ from DesktopQtToolkit.sub_window import SubWindow
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
+from AppObjects.app_exceptions import WidgetIsDisabledError, WidgetIsNotVisibleError
 
 
 if TYPE_CHECKING:
@@ -115,6 +118,12 @@ class DefaultTestCase(TestCase):
         self.timeout_error: Exception | None = None
         self.sub_window_closer.close_window.connect(lambda window: window.done(1))
         Thread(target=self.close_all_sub_windows).start()
+    
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        qsleep(2000)#Wait for the application to initialize properly
         
 
     def close_all_sub_windows(self) -> None:
@@ -130,6 +139,42 @@ class DefaultTestCase(TestCase):
                     if sub_window.isVisible():
                         self.sub_window_closer.close_window.emit(sub_window)
                 sleep(0.1)
+    
+
+    def click_on_widget(self, widget:QPushButton|QToolButton|QCheckBox) -> None:
+        """Click on a widget.
+
+            Arguments
+            ---------
+                `widget` : (QWidget) - Widget to click on.
+        """
+
+        if not isinstance(widget, (QPushButton, QToolButton, QCheckBox)):
+            raise TypeError(f"Widget must be an instance of QPushButton, QToolButton or QCheckBox not {type(widget).__name__}")
+        
+        if not widget.isVisible():
+            raise WidgetIsNotVisibleError(f"\nWidget {widget} with text '{widget.text()}' is not visible\n")
+
+        if not widget.isEnabled():
+            raise WidgetIsDisabledError(f"\nWidget {widget} with text '{widget.text()}' is not enabled\n")
+        
+        widget.click()
+    
+
+    def get_incomes_and_expenses_categories(self) -> Tuple[list[GUICategory], list[GUICategory]]:
+        """This method is used to get all income and expense categories from the application.
+
+            Returns
+            -------
+                `Tuple[list[GUICategory], list[GUICategory]]` - Tuple of two lists, first list contains income categories,
+                second list contains expense categories.
+        """
+
+        app_core = AppCore.instance()
+        income_categories = [category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[0]]
+        expense_categories = [category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[1]]
+
+        return income_categories, expense_categories
 
 
     def tearDown(self) -> None:

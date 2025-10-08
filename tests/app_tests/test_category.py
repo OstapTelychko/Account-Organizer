@@ -4,6 +4,8 @@ from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
+from project_configuration import CATEGORY_TYPE
+from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
@@ -23,10 +25,10 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             """Set category name and click add button."""
             
             WindowsRegistry.AddCategoryWindow.category_name.setText(name)
-            WindowsRegistry.AddCategoryWindow.button.click()
+            self.click_on_widget(WindowsRegistry.AddCategoryWindow.button)
 
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test incomes creation category")))
-        WindowsRegistry.MainWindow.add_incomes_category.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.add_incomes_category)
         self.assertTrue(
             app_core.db.category_query.category_exists("Test incomes creation category", "Incomes"),
             "Incomes category hasn't been created"
@@ -34,7 +36,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
 
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test expenses creation category")))
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
-        WindowsRegistry.MainWindow.add_expenses_category.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.add_expenses_category)
         self.assertTrue(
             app_core.db.category_query.category_exists("Test expenses creation category", "Expenses"),
             "Expenses category hasn't been created"
@@ -56,11 +58,14 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             def _delete_category() -> None:
                 """Click delete button and confirm deletion."""
 
-                QTimer.singleShot(100, lambda: WindowsRegistry.Messages.delete_category_confirmation.ok_button.click())
-                WindowsRegistry.CategorySettingsWindow.delete_category.click()
+                QTimer.singleShot(
+                    100,
+                    lambda:self.click_on_widget(WindowsRegistry.Messages.delete_category_confirmation.ok_button)
+                )
+                self.click_on_widget(WindowsRegistry.CategorySettingsWindow.delete_category)
 
             QTimer.singleShot(100, self.catch_failure(_delete_category))
-            category.settings.click()
+            self.click_on_widget(category.settings)
 
         self.assertFalse(
             app_core.db.category_query.category_exists(income_category_name, "Incomes"),
@@ -91,13 +96,13 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                     """Set new category name and click rename button."""
 
                     WindowsRegistry.RenameCategoryWindow.new_category_name.setText(f"{category.name} rename test")
-                    WindowsRegistry.RenameCategoryWindow.button.click()
+                    self.click_on_widget(WindowsRegistry.RenameCategoryWindow.button)
 
                 QTimer.singleShot(100, self.catch_failure(_rename_category))
-                WindowsRegistry.CategorySettingsWindow.rename_category.click()
+                self.click_on_widget(WindowsRegistry.CategorySettingsWindow.rename_category)
 
             QTimer.singleShot(100, self.catch_failure(_open_settings))
-            category.settings.click()
+            self.click_on_widget(category.settings)
 
         with app_core.db.session_factory() as session:
             with session.begin():
@@ -127,13 +132,13 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                     """Set new category position and click change button."""
 
                     WindowsRegistry.ChangeCategoryPositionWindow.new_position.setText("1")
-                    WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.click()
+                    self.click_on_widget(WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position)
 
                 QTimer.singleShot(100, self.catch_failure(_change_position))
-                WindowsRegistry.CategorySettingsWindow.change_category_position.click()
+                self.click_on_widget(WindowsRegistry.CategorySettingsWindow.change_category_position)
 
             QTimer.singleShot(100, self.catch_failure(_open_settings))
-            category.settings.click()
+            self.click_on_widget(category.settings)
         
         income_category = app_core.db.category_query.get_category(self.income_category.name, "Incomes")
         second_income_category = app_core.db.category_query.get_category("Second "+self.income_category.name, "Incomes")
@@ -155,8 +160,9 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
     def test_5_copy_month_transactions(self) -> None:
         """Test copying monthly transactions to the clipboard."""
 
-        app_core = AppCore.instance()
-        for category in app_core.categories.values():
+        def check_single_category() -> None:
+            """Check copying monthly transactions for single category."""
+
             def _copy_transactions() -> None:
                 """Click copy transactions button and check if transactions are copied to the clipboard."""
 
@@ -177,11 +183,26 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                     )
                     WindowsRegistry.CategorySettingsWindow.done(1)
 
-                QTimer.singleShot(100, self.catch_failure(_check_copied_transactions))
-                WindowsRegistry.CategorySettingsWindow.copy_transactions.click()
+                QTimer.singleShot(1000, self.catch_failure(_check_copied_transactions))
+                self.click_on_widget(WindowsRegistry.CategorySettingsWindow.copy_transactions)
 
-            QTimer.singleShot(100, self.catch_failure(_copy_transactions))
-            category.settings.click()
+            QTimer.singleShot(500, self.catch_failure(_copy_transactions))
+            self.click_on_widget(category.settings)
+
+        app_core = AppCore.instance()
+        income_categories, expense_categories = self.get_incomes_and_expenses_categories()
+
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(0)
+        for category in income_categories:
+            check_single_category()
+            move_to_next_category()
+            qsleep(500)
         
-        qsleep(500)
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
+        for category in expense_categories:
+            check_single_category()
+            move_to_next_category()
+            qsleep(500)
+
+        qsleep(1700)
 

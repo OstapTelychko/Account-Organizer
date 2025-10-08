@@ -1,6 +1,7 @@
 New features:
   ☐ empty @don't-touch
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
+  ☐ add option to change account position in switch account window
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -16,12 +17,12 @@ Project life improvements:
   ☐ empty @don't-touch
   ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF
   ☐ add % sign before and after variables in languages.json
-  ☐ add check for every click in tests whether button or widget is actually visible
 
 Bugs:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ add check for every click in tests whether button or widget is actually visible @started(25-10-05 20:17) @done(25-10-08 23:54) @lasted(3d3h37m21s) @project(Project life improvements)
   ✔ replace unsafe path compositions in project with os.path.join @started(25-10-04 19:21) @done(25-10-05 00:15) @lasted(4h54m42s) @project(Project life improvements)
   ✔ add animation steps and interval constant for InformationMessageWindow @started(25-10-04 18:37) @done(25-10-04 18:52) @lasted(15m33s) @project(Project life improvements)
   ✔ close all windows after each test to prevent tests execution blocking if some test will fail @started(25-10-03 18:04) @project(Project life improvements) @done(25-10-04 16:59) @lasted(22h55m44s) @project(Project life improvements)

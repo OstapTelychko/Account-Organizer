@@ -25,6 +25,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
     def test_01_close_current_window(self) -> None:
         """Test closing current window with shortcut."""
 
+        qsleep(1000)
         app_core = AppCore.instance()
         def _check_closure() -> None:
             QTest.keySequence(
@@ -38,7 +39,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             )
 
         QTimer.singleShot(200, self.catch_failure(_check_closure))
-        WindowsRegistry.MainWindow.add_incomes_category.click()
+        self.click_on_widget(WindowsRegistry.MainWindow.add_incomes_category)
         qsleep(200)
 
     
@@ -241,7 +242,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             )
             WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
             WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
-            WindowsRegistry.TransactionManagementWindow.button.click()
+            self.click_on_widget(WindowsRegistry.TransactionManagementWindow.button)
             qsleep(100)
 
             self.assertEqual(
@@ -263,15 +264,17 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
 
         reset_focused_category()
         app_core = AppCore.instance()
+        qsleep(500)
         def _add_transaction() -> None:
             """Add transaction to be able to test selecting next and previous transaction."""
 
             WindowsRegistry.TransactionManagementWindow.transaction_day.setText("1")
             WindowsRegistry.TransactionManagementWindow.transaction_value.setText("1000")
-            WindowsRegistry.TransactionManagementWindow.button.click()
+            self.click_on_widget(WindowsRegistry.TransactionManagementWindow.button)
 
-        QTimer.singleShot(200, self.catch_failure(_add_transaction))
-        app_core.categories[self.income_category.id].add_transaction.click()
+        QTimer.singleShot(100, self.catch_failure(_add_transaction))
+        gui_category = app_core.categories[self.income_category.id]
+        self.click_on_widget(gui_category.add_transaction)
 
         qsleep(200)
         QTest.keySequence(
@@ -319,7 +322,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         def _perform_deletion() -> None:
             """Confirm and check transaction deletion."""
 
-            WindowsRegistry.Messages.delete_transaction_confirmation.ok_button.click()
+            self.click_on_widget(WindowsRegistry.Messages.delete_transaction_confirmation.ok_button)
 
             QTimer.singleShot(200,
                 self.catch_failure(lambda: 
@@ -351,7 +354,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             """Edit transaction and check if it was edited."""
             
             WindowsRegistry.TransactionManagementWindow.transaction_value.setText("2000")
-            WindowsRegistry.TransactionManagementWindow.button.click()
+            self.click_on_widget(WindowsRegistry.TransactionManagementWindow.button)
             qsleep(200)
 
             self.assertEqual(

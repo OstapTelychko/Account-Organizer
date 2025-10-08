@@ -900,7 +900,7 @@ class TestApplyUpdate(DBTestCase):
             root_directory = ROOT_DIRECTORY
 
 
-        QTimer.singleShot(150, WindowsRegistry.Messages.update_finished.ok_button.click)
+        QTimer.singleShot(150, lambda: self.click_on_widget(WindowsRegistry.Messages.update_finished.ok_button))
         apply_update()
         self.mock_close_connection.assert_called_once()
         assert_any_call_with_details(self.mock_move, old_internal,
