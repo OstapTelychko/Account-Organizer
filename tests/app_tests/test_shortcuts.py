@@ -25,6 +25,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
     def test_01_close_current_window(self) -> None:
         """Test closing current window with shortcut."""
 
+        qsleep(1000)
         app_core = AppCore.instance()
         def _check_closure() -> None:
             QTest.keySequence(

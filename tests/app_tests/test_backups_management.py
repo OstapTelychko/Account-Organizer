@@ -177,6 +177,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
         """Test loading backup in the application."""
 
         app_core = AppCore.instance()
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(0)
         def _prepare_load_backup() -> None:
             """Create new backup that doesn't have new income category and load it"""
 
@@ -282,14 +283,16 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                     QTimer.singleShot(100, self.catch_failure(_check_load_confirmation))
                     self.click_on_widget(WindowsRegistry.BackupManagementWindow.load_backup)
 
+                qsleep(1000)
                 QTimer.singleShot(200, partial(self.open_backup_management_window, self.catch_failure(_load_backup)))
                 self.click_on_widget(WindowsRegistry.AddCategoryWindow.button)
-            
+
+            qsleep(1000)
             QTimer.singleShot(100, self.catch_failure(_add_category))
             self.click_on_widget(WindowsRegistry.MainWindow.add_incomes_category)
 
         self.open_backup_management_window(_prepare_load_backup)
-        qsleep(5000)
+        qsleep(7000)
     
 
     def test_4_auto_backup_status_change(self) -> None:

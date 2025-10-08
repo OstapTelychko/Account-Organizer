@@ -183,10 +183,10 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                     )
                     WindowsRegistry.CategorySettingsWindow.done(1)
 
-                QTimer.singleShot(100, self.catch_failure(_check_copied_transactions))
+                QTimer.singleShot(1000, self.catch_failure(_check_copied_transactions))
                 self.click_on_widget(WindowsRegistry.CategorySettingsWindow.copy_transactions)
 
-            QTimer.singleShot(100, self.catch_failure(_copy_transactions))
+            QTimer.singleShot(500, self.catch_failure(_copy_transactions))
             self.click_on_widget(category.settings)
 
         app_core = AppCore.instance()
@@ -196,11 +196,13 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         for category in income_categories:
             check_single_category()
             move_to_next_category()
+            qsleep(500)
         
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         for category in expense_categories:
             check_single_category()
             move_to_next_category()
-        
-        qsleep(700)
+            qsleep(500)
+
+        qsleep(1700)
 
