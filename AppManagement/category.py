@@ -311,7 +311,7 @@ def change_category_position() -> int:
 
     if not 0 <= new_position <= max_position:
         WindowsRegistry.Messages.position_out_range.setText(
-            LanguageStructure.Messages.get_translation(17).replace("max_position", str(max_position))
+            LanguageStructure.Messages.get_translation(17).replace("%max_position%", str(max_position))
         )
         return WindowsRegistry.Messages.position_out_range.exec()
     

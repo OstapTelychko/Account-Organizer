@@ -160,7 +160,7 @@ def save_shortcuts() -> int:
     repeated_shortcuts = [shortcut for shortcut, count in shortcuts_keystrokes_occurrences.items() if count > 1]
 
     if repeated_shortcuts:
-        formatted_text = LanguageStructure.Messages.get_translation(33).replace("keystroke_value", repeated_shortcuts[0])
+        formatted_text = LanguageStructure.Messages.get_translation(33).replace("%keystroke_value%", repeated_shortcuts[0])
         WindowsRegistry.Messages.shortcut_already_used.setText(formatted_text)
         return WindowsRegistry.Messages.shortcut_already_used.exec()
             
