@@ -224,12 +224,12 @@ def change_language() -> None:
     WindowsRegistry.AutoBackupWindow.daily.setText(LanguageStructure.BackupManagement.get_translation(11))
     WindowsRegistry.AutoBackupWindow.no_auto_backup.setText(LanguageStructure.BackupManagement.get_translation(15))
     WindowsRegistry.AutoBackupWindow.max_backups_label.setText(
-        f"{LanguageStructure.BackupManagement.get_translation(12).replace('max_backups', str(app_core.config.max_backups))}\
+        f"{LanguageStructure.BackupManagement.get_translation(12).replace('%max_backups%', str(app_core.config.max_backups))}\
         \n{LanguageStructure.BackupManagement.get_translation(13)}"
     )
     WindowsRegistry.AutoBackupWindow.max_backups.setPlaceholderText(LanguageStructure.BackupManagement.get_translation(14))
     WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(
-        f"{LanguageStructure.BackupManagement.get_translation(17).replace('max_legacy_backups', str(app_core.config.max_legacy_backups))}\
+        f"{LanguageStructure.BackupManagement.get_translation(17).replace('%max_legacy_backups%', str(app_core.config.max_legacy_backups))}\
         \n{LanguageStructure.BackupManagement.get_translation(18)}"
     
     )

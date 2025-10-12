@@ -132,7 +132,7 @@ def load_backup() -> int:
     if backup.app_version != app_core.app_version:
         return WindowsRegistry.Messages.different_app_version.exec()
     
-    WindowsRegistry.Messages.load_backup_confirmation.setText(LanguageStructure.Messages.get_translation(24).replace("timestamp", backup.timestamp))
+    WindowsRegistry.Messages.load_backup_confirmation.setText(LanguageStructure.Messages.get_translation(24).replace("%timestamp%", backup.timestamp))
     WindowsRegistry.Messages.load_backup_confirmation.exec()
     if WindowsRegistry.Messages.load_backup_confirmation.clickedButton() != WindowsRegistry.Messages.load_backup_confirmation.ok_button:
         return 0
@@ -320,7 +320,7 @@ def save_auto_backup_settings() -> None:
             
             app_core.config.max_backups = new_max_backups
             WindowsRegistry.AutoBackupWindow.max_backups_label.setText(
-                f"{LanguageStructure.BackupManagement.get_translation(12).replace('max_backups', str(app_core.config.max_backups))}\
+                f"{LanguageStructure.BackupManagement.get_translation(12).replace('%max_backups%', str(app_core.config.max_backups))}\
                 \n{LanguageStructure.BackupManagement.get_translation(13)}"
             )
         else:
@@ -343,7 +343,7 @@ def save_auto_backup_settings() -> None:
             
             app_core.config.max_legacy_backups = new_max_legacy_backups
             WindowsRegistry.AutoBackupWindow.max_legacy_backups_label.setText(
-                f"{LanguageStructure.BackupManagement.get_translation(17).replace('max_legacy_backups', str(app_core.config.max_legacy_backups))}\
+                f"{LanguageStructure.BackupManagement.get_translation(17).replace('%max_legacy_backups%', str(app_core.config.max_legacy_backups))}\
                 \n{LanguageStructure.BackupManagement.get_translation(18)}"
             )
         else:

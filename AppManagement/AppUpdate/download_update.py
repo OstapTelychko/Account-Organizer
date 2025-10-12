@@ -285,7 +285,7 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
         `attempt`: (int) - The current attempt number for downloading the update.
     """
 
-    WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("update_size", str(round(update_zip_size/1024/1024, 2))))
+    WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("%update_size%", str(round(update_zip_size/1024/1024, 2))))
         
     download_response = req.get(update_zip_download_url, stream=True, timeout=15)
     download_response.raise_for_status()

@@ -89,12 +89,12 @@
                     "9": "Monthly backup (low disk space)",
                     "10": "Weekly backup (recommended)",
                     "11": "Daily backup (high disk space)",
-                    "12": "Current maximum number of backups: max_backups",
+                    "12": "Current maximum number of backups: %max_backups%",
                     "13": "This number corresponds to the number of databases that will be saved on disk. Databases will be deleted from oldest to newest when the program starts",
                     "14": "Max number of backups",
                     "15": "No auto backup (Strongly discouraged)",
                     "16": "No auto removal (unrecommended)",
-                    "17": "Max legacy backups (backups not supported by the current app version): max_legacy_backups",
+                    "17": "Max legacy backups (backups not supported by the current app version): %max_legacy_backups%",
                     "18": "This number corresponds to the amount of legacy databases that will be saved to ensure restoration if the current version corrupts the database.",
                     "19": "Max legacy backups",
                     "20": "Auto backup is off"
@@ -202,7 +202,7 @@
             "Update":{
                 "0": "Update",
                 "1": "Update progress",
-                "2": "Downloading update (update_size MB)",
+                "2": "Downloading update (%update_size% MB)",
                 "3": "Upgrading backups"
             }
         },
@@ -218,21 +218,21 @@
             "7": "You can't leave the <span style='color:dodgerblue'>fields empty</span>",
             "8": "The day must be <span style='color:red'>in range</span> ",
             "9": "Are you sure you want to <span style='color:red'>remove transaction?</span>",
-            "10": "Would you like to load account ?",
-            "11": "Are you sure you want to <span style='color:red'>remove account ?</span> This action is <span style='color:red'>irreversible</span>",
+            "10": "Would you like to load %account% ?",
+            "11": "Are you sure you want to <span style='color:red'>remove %account%?</span> This action is <span style='color:red'>irreversible</span>",
             "12": "I can't calculate <span style='color:dodgerblue'>empty expression</span>",
             "13": "You have used <span style='color:red'>forbidden word</span> in expression",
             "14": "You should have at least <span style='color:dodgerblue'>one</span> category for <span style='color:dodgerblue'>income</span> and <span style='color:dodgerblue'>one</span> for <span style='color:dodgerblue'>expenses</span> to see monthly statistics",
             "15": "You should have at least <span style='color:dodgerblue'>one income</span> transaction and <span style='color:dodgerblue'>one expense</span> transaction to see monthly statistics",
             "16": "Name of category can't be <span style='color:red'>empty field</span>",
-            "17": "The position must be within <span style='color:dodgerblue'>0-max_position</span>",
+            "17": "The position must be within <span style='color:dodgerblue'>0-%max_position%</span>",
             "18": "The position can't be <span style='color:red'>the same</span>",
             "19": "From-date can't be bigger than to-date",
             "20": "You have to select at least one category",
             "21": "Amount of backups will be <span style='color:red'>less</span> than recommended. <span style='color:dodgerblue'>Continue?</span>",
             "22": "Are you sure you want to <span style='color:red'>delete</span> database? This action is <span style='color:red'>irreversible</span>",
             "23": "<span style='color:dodgerblue'>Different app versions</span> detected. Downgrade the app to <span style='color:dodgerblue'>target version</span>",
-            "24": "Are you sure you want to <span style='color:dodgerblue'>load</span> this <span style='color:dodgerblue'>timestamp</span> backup?",
+            "24": "Are you sure you want to <span style='color:dodgerblue'>load</span> this <span style='color:dodgerblue'>%timestamp%</span> backup?",
             "25": "Amount of databases will be <span style='color:dodgerblue'>higher</span> than recommended. <span style='color:dodgerblue'>Continue?</span>",
             "26": "Are you sure you want to <span style='color:red'>disable auto backup</span>? You <span style='color:red'>won’t be able to restore your data</span> if, for example, you accidentally delete a category or an account.",
             "27": "Are you sure you want to <span style='color:red'>disable auto removal</span>? If auto backup is enabled, <span style='color:red'>the number of backups will grow</span>, <span style='color:dodgerblue'>consuming disk space</span> and <span style='color:dodgerblue'>increasing the app’s loading time</span>.",
@@ -241,7 +241,7 @@
             "30": "<span style='color:red'>No internet connection.</span> Check connection and try again",
             "31": "Failed to check for updates. <span style='color:dodgerblue'>Check connection</span> and try again",
             "32": "Update is successfully <span style='color:dodgerblue'>applied</span>. App will restart now",
-            "33": "Keystroke <span style='color:dodgerblue'>`keystroke_value`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key"
+            "33": "Keystroke <span style='color:dodgerblue'>`%keystroke_value%`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key"
         }
             
     },
@@ -337,12 +337,12 @@
                     "9": "Щомісячне створення резервної копії (низьке використання диска)",
                     "10": "Щотижневе створення резервної копії (рекомендовано)",
                     "11": "Щоденне створення резервної копії (високе використання диска)",
-                    "12": "Поточна максимальна кількість резервних копій: max_backups",
+                    "12": "Поточна максимальна кількість резервних копій: %max_backups%",
                     "13": "Дане число відповідає за кількість баз даних, які будуть збережені на диску. Бази даних будуть видалятися від найдавніших до новіших при запуску програми",
                     "14": "Mакс кількість баз даних",
                     "15": "Без автоматичного створення (наполегливо не рекомендується)",
                     "16": "Без автоматичного видалення (нерекомендовано)",
-                    "17": "Максимальна кількість застарілих резервних копій (резервні копії, які не підтримуються поточною версією додатку): max_legacy_backups",
+                    "17": "Максимальна кількість застарілих резервних копій (резервні копії, які не підтримуються поточною версією додатку): %max_legacy_backups%",
                     "18": "Це число відповідає за кількість застарілих баз даних, які будуть збережені для забезпечення відновлення, якщо поточна версія пошкодить базу даних.",
                     "19": "Макс кількість застарілих баз",
                     "20": "авто створення вимкнено"
@@ -452,7 +452,7 @@
             "Update":{
                 "0": "Оновлення",
                 "1": "Прогрес оновлення",
-                "2": "Завантаження оновлення (update_size МБ)",
+                "2": "Завантаження оновлення (%update_size% МБ)",
                 "3": "Оновлення баз даних"
             }
         },
@@ -468,21 +468,21 @@
             "7": "Не можна залишати <span style='color:dodgerblue'>поля пустими</span>",
             "8": "День повинен бути <span style='color:red'>в діапазоні</span> ",
             "9": "Ви впевнені, що хочете <span style='color:red'>видалити транзакцію?</span>",
-            "10": "Бажаєте загрузити account ?",
-            "11": "Ви впевнені, що хочете <span style='color:red'>видалити account ?</span> Ця дія є <span style='color:red'>незворотною</span>",
+            "10": "Бажаєте загрузити %account%?",
+            "11": "Ви впевнені, що хочете <span style='color:red'>видалити %account%?</span> Ця дія є <span style='color:red'>незворотною</span>",
             "12": "Я не можу обрахувати <span style='color:dodgerblue'>пустий</span> вираз",
             "13": "Ви використали <span style='color:red'>заборонені слова</span> в виразі",
             "14": "Ви повинні мати принаймні <span style='color:dodgerblue'>одну</span> категорію для <span style='color:dodgerblue'>доходів</span> і <span style='color:dodgerblue'>одну</span> для <span style='color:dodgerblue'>витрат</span>, щоб побачити місячну статистику",
             "15": "Ви повинні мати принаймні <span style='color:dodgerblue'>одну</span> транзакцію <span style='color:dodgerblue'>доходу</span> і <span style='color:dodgerblue'>одну</span> транзакцію <span style='color:dodgerblue'>витрат</span>, щоб побачити місячну статистику",
             "16": "Назвою категорії не може бути <span style='color:red'>пусте поле</span>",
-            "17": "Позиція повинна бути в межах <span style='color:dodgerblue'>0-max_position</span>",
+            "17": "Позиція повинна бути в межах <span style='color:dodgerblue'>0-%max_position%</span>",
             "18": "Позиція не може бути <span style='color:red'>такою самою</span>",
             "19": "Початкова дата не може бути більшою за кінцеву",
             "20": "Ви повинні вибрати принаймні одну категорію",
             "21": "Кількість бази даних буде <span style='color:red'>нижчою</span> від рекомендованої кількості. <span style='color:dodgerblue'>Продовжити?</span>",
             "22": "Ви впевнені, що хочете <span style='color:red'>видалити</span> базу даних? Ця дія є <span style='color:red'>незворотною</span>",
             "23": "Виявлено <span style='color:dodgerblue'>різні версії</span> додатку. Понизьте версію додатку до <span style='color:dodgerblue'>цільової версії</span>",
-            "24": "Ви впевнені, що хочете <span style='color:dodgerblue'>завантажити</span> цю резервну копію <span style='color:dodgerblue'>timestamp</span>?",
+            "24": "Ви впевнені, що хочете <span style='color:dodgerblue'>завантажити</span> цю резервну копію <span style='color:dodgerblue'>%timestamp%</span>?",
             "25": "Кількість баз даних буде <span style='color:dodgerblue'>більшою</span> від рекомендованої кількості. <span style='color:dodgerblue'>Продовжити?</span>",
             "26": "Ви впевнені, що хочете <span style='color:red'>вимкнути автоматичне створення резервних копій</span>? Ви <span style='color:red'>не зможете відновити свої дані</span>, якщо, наприклад, ви випадково видалите категорію або акаунт.",
             "27": "Ви впевнені, що хочете <span style='color:red'>вимкнути автоматичне видалення</span>? Якщо автоматичне створення резервних копій увімкнено, <span style='color:red'>кількість резервних копій зростатиме</span>, <span style='color:dodgerblue'>витрачаючи місце</span> на диску та <span style='color:dodgerblue'>збільшуючи час</span> завантаження додатка.",
@@ -491,7 +491,7 @@
             "30": "<span style='color:red'>Немає з'єднання з інтернетом</span>. Перевірте з'єднання та спробуйте знову",
             "31": "Не вдалося перевірити на наявність оновлень. <span style='color:dodgerblue'>Перевірте з'єднання</span> та спробуйте знову",
             "32": "Оновлення успішно <span style='color:dodgerblue'>застосовано</span>. Додаток зараз перезапуститься",
-            "33": "Комбінація клавіш <span style='color:dodgerblue'>`keystroke_value`</span> - вже <span style='color:dodgerblue'>призначена до іншого сполучення клавіш</span>. Будь ласка, виберіть іншу клавішу"
+            "33": "Комбінація клавіш <span style='color:dodgerblue'>`%keystroke_value%`</span> - вже <span style='color:dodgerblue'>призначена до іншого сполучення клавіш</span>. Будь ласка, виберіть іншу клавішу"
         }
     },
     
@@ -586,12 +586,12 @@
                     "9": "Miesięczne kopiowanie zapasowe (małe użycie dysku)",
                     "10": "Tygodniowe kopiowanie zapasowe (zalecane)",
                     "11": "Dzienne kopiowanie zapasowe (wysokie użycie dysku) ",
-                    "12": "Aktualna maksymalna liczba kopii zapasowych: max_backups",
+                    "12": "Aktualna maksymalna liczba kopii zapasowych: %max_backups%",
                     "13": "Ta liczba odpowiada liczbie baz danych, które zostaną zapisane na dysku. Bazy danych zostaną usunięte od najstarszej do najnowszej, przy uruchomieniu aplikacji",
                     "14": "Maks liczba baz danych",
                     "15": "Brak automatycznego kopiowania (zdecydowanie odradzane)",
                     "16": "Brak automatycznego usuwania (niezalecane)",
-                    "17": "Aktualna maksymalna liczba zastarzałych kopii zapasowych (kopie zapasowe nieobsługiwane przez aktualną wersję aplikacji): max_legacy_backups" ,
+                    "17": "Aktualna maksymalna liczba zastarzałych kopii zapasowych (kopie zapasowe nieobsługiwane przez aktualną wersję aplikacji): %max_legacy_backups%",
                     "18": "Ta liczba odpowiada ilości zastarzałych baz danych, które zostaną zapisane, aby zapewnić przywrócenie, jeśli obecna wersja uszkodzi bazę danych.",
                     "19": "Maks liczba zastarzałych baz",
                     "20": "Auto kopiowanie wyłączone"
@@ -699,7 +699,7 @@
             "Update":{
                 "0": "Aktualizacja",
                 "1": "Postęp aktualizacji",
-                "2": "Pobieranie aktualizacji (update_size MB)",
+                "2": "Pobieranie aktualizacji (%update_size% MB)",
                 "3": "Aktualizacja baz danych"
             }
         },
@@ -715,21 +715,21 @@
             "7": "Pola nie mogą <span style='color:dodgerblue'>pozostać puste</span>",
             "8": "Dzień powinien być <span style='color:red'>w zakresie</span> ",
             "9": "Czy na pewno chcecie <span style='color:red'>usunąć tę transakcję?</span>",
-            "10": "Załadować account ?",
-            "11": "Czy na pewno chcecie <span style='color:red'>usunąć account ?</span> Ta czynność jest <span style='color:red'>nieodwracalna</span>",
+            "10": "Załadować %account%?",
+            "11": "Czy na pewno chcecie <span style='color:red'>usunąć %account%?</span> Ta czynność jest <span style='color:red'>nieodwracalna</span>",
             "12": "Nie mogę obliczyć <span style='color:dodgerblue'>pustego</span> wyrażenia",
             "13": "W wyrażeniu użyłeś <span style='color:red'>zabronionych słów</span>",
             "14": "Aby zobaczyć statystykę miesięczną, musicie mieć co najmniej <span style='color:dodgerblue'>jedną</span> kategorię <span style='color:dodgerblue'>dochodów</span> i <span style='color:dodgerblue'>jedną</span> kategorię <span style='color:dodgerblue'>wydatków</span>",
             "15": "Aby zobaczyć miesięczną statystykę, musicie mieć co najmniej <span style='color:dodgerblue'>jedną</span> transakcję <span style='color:dodgerblue'>dochodową</span> i <span style='color:dodgerblue'>jedną</span> transakcję <span style='color:dodgerblue'>wydatkową</span>",
             "16": "Nazwą kategorii nie morze być <span style='color:red'>puste pole</span>",
-            "17": "Pozycja powinna być w zasięgu <span style='color:dodgerblue'>0-max_position</span>",
+            "17": "Pozycja powinna być w zasięgu <span style='color:dodgerblue'>0-%max_position%</span>",
             "18": "Nie można zastosować <span style='color:red'>tej samej pozycji</span>",
             "19": "Data początkowa nie może być większą od końcowej",
             "20": "Aby kontynuować, musicie wybrać co najmniej jedną kategorię",
             "21": "Ilość baz danych będzie <span style='color:red'>mniejsza</span> niż zalecana. <span style='color:dodgerblue'>Kontynuować?</span>",
             "22": "Czy na pewno chcecie <span style='color:red'>usunąć</span> bazę danych? Ta czynność jest <span style='color:red'>nieodwracalna</span>",
             "23": "Wykryto <span style='color:dodgerblue'>różne wersje</span> aplikacji. Zmniejsz wersję aplikacji do <span style='color:dodgerblue'>docelowej wersji</span>",
-            "24": "Czy na pewno chcecie <span style='color:dodgerblue'>załadować</span> tę kopię zapasową z <span style='color:dodgerblue'>timestamp</span>?",
+            "24": "Czy na pewno chcecie <span style='color:dodgerblue'>załadować</span> tę kopię zapasową z <span style='color:dodgerblue'>%timestamp%</span>?",
             "25": "Ilość baz danych będzie <span style='color:dodgerblue'>większa</span> niż zalecana. <span style='color:dodgerblue'>Kontynuować?</span>",
             "26": "Czy na pewno chcecie <span style='color:red'>wyłączyć automatyczne kopiowanie zapasowe</span>? <span style='color:red'>Nie będziecie mogli przywrócić swoich danych</span>, jeśli na przykład przypadkowo usuniecie kategorię lub konto.",
             "27": "Czy na pewno chcecie <span style='color:red'>wyłączyć automatyczne usuwanie</span>? Jeśli automatyczne kopiowanie zapasowe jest włączone, <span style='color:red'>liczba kopii zapasowych będzie rosła</span>, <span style='color:dodgerblue'>zużywając miejsce</span> na dysku i <span style='color:dodgerblue'>zwiększając czas</span> ładowania aplikacji.",
@@ -738,7 +738,7 @@
             "30": "<span style='color:red'>Brak połączenia z internetem</span>. Sprawdź połączenie i spróbuj ponownie",
             "31": "Nie udało się sprawdzić dostępności aktualizacji. <span style='color:dodgerblue'>Sprawdź połączenie</span> i spróbuj ponownie",
             "32": "Aktualizacja została pomyślnie <span style='color:dodgerblue'>zastosowana</span>. Aplikacja zostanie teraz ponownie uruchomiona",
-            "33": "Skrót <span style='color:dodgerblue'>`keystroke_value`</span> jest już <span style='color:dodgerblue'>przypisany do innego skrótu</span>. Proszę wybrać inny klawisz"
+            "33": "Skrót <span style='color:dodgerblue'>`%keystroke_value%`</span> jest już <span style='color:dodgerblue'>przypisany do innego skrótu</span>. Proszę wybrać inny klawisz"
         }
     }
 }

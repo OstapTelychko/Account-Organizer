@@ -146,7 +146,7 @@ def switch_account(name:str) -> None:
     """
 
     WindowsRegistry.Messages.load_account_question.setText(
-        LanguageStructure.Messages.get_translation(10).replace("account", name))
+        LanguageStructure.Messages.get_translation(10).replace("%account%", name))
     WindowsRegistry.Messages.load_account_question.exec()
 
     if WindowsRegistry.Messages.load_account_question.clickedButton() == WindowsRegistry.Messages.load_account_question.ok_button:
@@ -165,7 +165,7 @@ def remove_account() -> None:
 
     app_core = AppCore.instance()
     WindowsRegistry.Messages.delete_account_warning.setText(
-        LanguageStructure.Messages.get_translation(11).replace("account", app_core.config.account_name))
+        LanguageStructure.Messages.get_translation(11).replace("%account%", app_core.config.account_name))
     WindowsRegistry.Messages.delete_account_warning.exec()
 
     if WindowsRegistry.Messages.delete_account_warning.clickedButton() == WindowsRegistry.Messages.delete_account_warning.ok_button:
