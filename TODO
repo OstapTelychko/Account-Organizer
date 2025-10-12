@@ -19,6 +19,7 @@ Project life improvements:
 
 Bugs:
   ☐ empty @don't-touch
+  ☐ create issue for mypy which stopped working with sub_window.py after import of AppCore 
 
 Archive:
   ✔ add % sign before and after variables in languages.json @started(25-10-12 00:09) @done(25-10-12 23:33) @lasted(23h24m57s) @project(Project life improvements)
