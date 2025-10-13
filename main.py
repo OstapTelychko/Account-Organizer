@@ -36,11 +36,11 @@ from project_configuration import FORBIDDEN_CALCULATOR_WORDS, APP_NAME
 from languages import LanguageStructure
 from backend.db_controller import DBController
 
+from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.user_config import UserConfig
 from AppObjects.logger import get_logger
-from AppObjects.windows_registry import WindowsRegistry
 
 from GUI.gui_constants import app
 from GUI.theme import switch_theme, load_theme
