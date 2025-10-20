@@ -1,6 +1,6 @@
 from __future__ import annotations
 import datetime
-from sqlalchemy import String, Float, ForeignKey, DateTime, SmallInteger
+from sqlalchemy import String, Float, ForeignKey, DateTime, SmallInteger, Date
 from sqlalchemy.orm import Mapped, DeclarativeBase, relationship, mapped_column
 
 
@@ -67,9 +67,7 @@ class Transaction(Base):
     __tablename__ = "transactions"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    year: Mapped[int] = mapped_column(SmallInteger, nullable=False)
-    month: Mapped[int] = mapped_column(SmallInteger, nullable=False)
-    day: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    date: Mapped[datetime.date] = mapped_column(Date, nullable=False, index=True)
     value: Mapped[float] = mapped_column(Float, nullable=False)
     name: Mapped[str | None] = mapped_column(String)
 
@@ -80,7 +78,7 @@ class Transaction(Base):
     
 
     def __repr__(self) -> str:
-        return f"{self.year}-{self.month}-{self.day}-{self.name} value:{self.value}"
+        return f"{self.date}-{self.name} value:{self.value}"
     
 
     

@@ -15,7 +15,7 @@ Updates to existing features:
   
 Project life improvements:
   ☐ empty @don't-touch
-  ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF
+  ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF @started(25-10-20 22:11)
 
 Bugs:
   ☐ empty @don't-touch
