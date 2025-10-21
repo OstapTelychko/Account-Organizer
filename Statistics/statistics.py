@@ -1,12 +1,13 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TYPE_CHECKING, TypeAlias, cast
 from functools import partial
 from datetime import date
+from calendar import monthrange
 from collections import defaultdict, Counter
 from PySide6.QtWidgets import QPushButton
 
 from languages import LanguageStructure
-from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
+from project_configuration import CATEGORY_TYPE
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -274,7 +275,7 @@ def add_month_statistics(
 
     total_income = round(sum([Incomes_statistic[4][total_value] for total_value in Incomes_statistic[4]]), 2)
     total_expense = round(sum([Expenses_statistic[4][total_value] for total_value in Expenses_statistic[4]]), 2)
-    days_amount = MONTHS_DAYS[current_month-1] + (current_month == 2 and AppCore.instance().current_year % 4 == 0)#Add one day to February (29) if year is leap
+    _, days_amount = monthrange(AppCore.instance().current_year, current_month)
 
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(4)}{total_income}")
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>")
@@ -354,8 +355,10 @@ def show_quarterly_statistics() -> int:
         #Entire quarter statistics
         total_income:float = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
         total_expense:float = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
+
         quarter_number = quarter.quarter_number
-        days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and app_core.current_year % 4 == 0)
+        months_in_quarter = range((quarter_number - 1) * 3 + 1, quarter_number * 3 + 1)
+        days_amount = sum(monthrange(app_core.current_year, month)[1] for month in months_in_quarter)
 
         Total_statistic_list = quarter.total_quarter_statistics.data
 
@@ -630,7 +633,8 @@ def show_custom_range_statistics_view() -> int:
     Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
 
     all_transactions = AppCore.instance().db.statistics_query.get_transactions_by_range(
-        list(map(lambda category: category.id, Incomes_categories+Expenses_categories)), from_date_number, to_date_number
+        list(map(lambda category: category.id, Incomes_categories+Expenses_categories)),
+        cast(date, from_date.toPython()), cast(date, to_date.toPython())
     )
     categorized_transactions:defaultdict[int, list[Transaction]] = defaultdict(list)
     for transaction in all_transactions:
@@ -647,7 +651,7 @@ def show_custom_range_statistics_view() -> int:
         total_value = round(sum([transaction.value for transaction in category_transactions]), 2)
 
         Incomes_categories_transactions[income_category] = sorted(
-            category_transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day)
+            category_transactions, key=lambda transaction: transaction.date
         )
         Incomes_categories_total_values[income_category.id] = total_value
         
@@ -656,7 +660,7 @@ def show_custom_range_statistics_view() -> int:
         total_value = round(sum([transaction.value for transaction in category_transactions]), 2)
 
         Expenses_categories_transactions[expense_category] = sorted(
-            category_transactions, key=lambda transaction: date(transaction.year, transaction.month, transaction.day)
+            category_transactions, key=lambda transaction: transaction.date
         )
         Expenses_categories_total_values[expense_category.id] = total_value
     
@@ -703,11 +707,12 @@ def show_custom_range_statistics_view() -> int:
             WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("<br/>"+category.name+"<br/>")
 
             for transaction in category_transactions:
-                day = transaction.day                
-                month = transaction.month
+                day = transaction.date.day                
+                month = transaction.date.month
+                year = transaction.date.year
 
                 WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
-                    f"{day:02}/{month:02}/{transaction.year}\t{transaction.value}\t{transaction.name}"
+                    f"{day:02}/{month:02}/{year}\t{transaction.value}\t{transaction.name}"
                 )
     
     if len(Expenses_categories_transactions):
@@ -718,11 +723,12 @@ def show_custom_range_statistics_view() -> int:
             WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("<br/>"+category.name+"<br/>")
 
             for transaction in category_transactions:
-                day = transaction.day                
-                month = transaction.month
+                day = transaction.date.day                
+                month = transaction.date.month
+                year = transaction.date.year
 
                 WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
-                    f"{day:02}/{month:02}/{transaction.year}\t{transaction.value}\t{transaction.name}"
+                    f"{day:02}/{month:02}/{year}\t{transaction.value}\t{transaction.name}"
                 )
         
     logger.debug(f"Custom range statistics window is shown. From date: {from_date} To date: {to_date}")

@@ -105,7 +105,6 @@ FORBIDDEN_CALCULATOR_WORDS = [
     "with","exit","raise","print","range","quit","class","try",
     "if","input","object","global","lambda","match"
 ]
-MONTHS_DAYS = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 AVAILABLE_LANGUAGES = ["English","Українська","Polski"]
 
 MIN_TRANSACTION_VALUE = 0.0

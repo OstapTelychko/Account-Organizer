@@ -9,7 +9,7 @@ from project_configuration import CATEGORY_TYPE
 from languages import LanguageStructure
 
 from GUI.gui_constants import ALIGNMENT
-from GUI.category import load_category, add_category_to_position_list
+from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table
 
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 
@@ -51,25 +51,7 @@ def load_categories_data() -> None:
             app_core.current_month
         )
         if len(transactions) != 0:
-            category_data.setRowCount(len(transactions))
-            for row,transaction in enumerate(transactions):
-                name = CustomTableWidgetItem(str(transaction.name))
-                name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-
-                day = CustomTableWidgetItem(str(transaction.day))
-                day.setTextAlignment(ALIGNMENT.AlignCenter)
-                day.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-
-                value = CustomTableWidgetItem(str(transaction.value))
-                value.setTextAlignment(ALIGNMENT.AlignCenter)
-                value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-
-                transaction_id = CustomTableWidgetItem(str(transaction.id))
-
-                category_data.setItem(row,0,name)
-                category_data.setItem(row,1,day)
-                category_data.setItem(row,2,value)
-                category_data.setItem(row,3,transaction_id)
+            load_transactions_into_category_table(category_data, transactions)
 
         update_category_total_value(category)
 

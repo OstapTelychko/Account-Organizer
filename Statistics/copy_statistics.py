@@ -36,7 +36,7 @@ def copy_monthly_transactions() -> None:
             result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
             
             for index,transaction in enumerate(transactions):
-                result += f"{index}\t{transaction.value}\t\t{transaction.day}\t{transaction.name}\n"
+                result += f"{index}\t{transaction.value}\t\t{transaction.date.day}\t{transaction.name}\n"
             
 
             app.clipboard().setText(result)

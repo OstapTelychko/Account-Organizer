@@ -2,10 +2,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from datetime import date
 from PySide6.QtCore import QTimer, QDate
-from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
+from calendar import monthrange
 
+from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from languages import LanguageStructure
-from project_configuration import MONTHS_DAYS
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -62,7 +62,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         """Test showing monthly statistics."""
 
         app_core = AppCore.instance()
-        days_amount = MONTHS_DAYS[app_core.current_month-1] + (app_core.current_month == 2 and app_core.current_year % 4 == 0)
+        _, days_amount = monthrange(app_core.current_year, app_core.current_month)
 
         def _open_monthly_statics_window() -> None:
             """Click button that show monthly statistics window."""
@@ -106,10 +106,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         for month in range(1, 13):
             if month not in (app_core.current_month, month_without_transactions):
                 app_core.db.transaction_query.add_transaction(
-                    self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction"
+                    self.income_category.id, date(app_core.current_year, month, 1), 1000, "Test income transaction"
                 )
                 app_core.db.transaction_query.add_transaction(
-                    self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction"
+                    self.expenses_category.id, date(app_core.current_year, month, 1), 1000, "Test expenses transaction"
                 )
         
         def _open_quarterly_statistics_window() -> None:
@@ -120,7 +120,8 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                 for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
                     quarter_number = quarter.quarter_number
-                    days_amount = sum(MONTHS_DAYS[(quarter_number-1)*3:quarter_number*3]) + (quarter_number == 1 and app_core.current_year % 4 == 0)
+                    months_in_quarter = range((quarter_number - 1) * 3 + 1, quarter_number * 3 + 1)
+                    days_amount = sum(monthrange(app_core.current_year, month)[1] for month in months_in_quarter)
 
                     if quarter_number != quarter_without_transaction:
                         total_income = 3000.0
@@ -160,7 +161,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         statistics_data = month.data
 
                         current_month = month.month_number
-                        month_days_amount = MONTHS_DAYS[current_month-1] + (current_month == 2 and app_core.current_year % 4 == 0)
+                        _, month_days_amount = monthrange(app_core.current_year, current_month)
                         expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
 
                         if current_month != month_without_transactions:
@@ -207,10 +208,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         for month in range(1, 13):
             if month not in (app_core.current_month, month_without_transactions):
                 app_core.db.transaction_query.add_transaction(
-                    self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction"
+                    self.income_category.id, date(app_core.current_year, month, 1), 1000, "Test income transaction"
                 )
                 app_core.db.transaction_query.add_transaction(
-                    self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction"
+                    self.expenses_category.id, date(app_core.current_year, month, 1), 1000, "Test expenses transaction"
                 )
         
         def _open_yearly_statistics_window() -> None:
@@ -256,7 +257,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 for month in WindowsRegistry.YearlyStatistics.statistics.months:
                     statistics_data = month.data
 
-                    month_days_amount = MONTHS_DAYS[month.month_number-1] + (month.month_number == 2 and app_core.current_year % 4 == 0)
+                    _, month_days_amount = monthrange(app_core.current_year, month.month_number)
                     expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
 
                     if month.month_number != month_without_transactions:
@@ -300,10 +301,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         for month in range(1, 7):
             if month != app_core.current_month:
                 app_core.db.transaction_query.add_transaction(
-                    self.income_category.id, app_core.current_year, month, 1, 1000, "Test income transaction"
+                    self.income_category.id, date(app_core.current_year, month, 1), 1000, "Test income transaction"
                 )
                 app_core.db.transaction_query.add_transaction(
-                    self.expenses_category.id, app_core.current_year, month, 1, 1000, "Test expenses transaction"
+                    self.expenses_category.id, date(app_core.current_year, month, 1), 1000, "Test expenses transaction"
                 )
         
         def _open_custom_range_statistics_window() -> None:

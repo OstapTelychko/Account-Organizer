@@ -1,11 +1,13 @@
 from __future__ import annotations
 import shutil
 import os
+
 from typing import TYPE_CHECKING, Callable
 from functools import wraps
 from traceback import format_exception
 from threading import Thread
 from time import sleep
+from datetime import date
 
 from colorama import init as colorama_init, Fore
 from pygments import highlight
@@ -236,13 +238,14 @@ class DBTestCase(DefaultTestCase):
             self.expenses_category = new_expenses_category
 
             app_core.db.transaction_query.add_transaction(
-                self.income_category.id, app_core.current_year, app_core.current_month, 1, 1000, "Test income transaction"
+                self.income_category.id,
+                date(app_core.current_year, app_core.current_month, 1),
+                1000,
+                "Test income transaction"
             )
             app_core.db.transaction_query.add_transaction(
                 self.expenses_category.id,
-                app_core.current_year,
-                app_core.current_month,
-                1,
+                date(app_core.current_year, app_core.current_month, 1),
                 1000,
                 "Test expenses transaction"
             )

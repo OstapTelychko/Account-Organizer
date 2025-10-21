@@ -11,6 +11,7 @@ from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTOR
 from languages import LanguageStructure
 from AppObjects.category import Category
 from AppObjects.windows_registry import WindowsRegistry
+from backend.models import Transaction
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
@@ -24,6 +25,38 @@ ADD_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "add transacti
 REMOVE_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "remove transaction.png"))
 EDIT_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "edit transaction.png"))
 
+
+def load_transactions_into_category_table(category_data:CustomTableWidget, transactions:list[Transaction]) -> None:
+    """Load transactions into category table widget
+
+        Arguments
+        -------
+            `category_data` (CustomTableWidget): Table widget to load transactions into
+
+            `transactions` (list[Transaction]): List of transactions to load into the table
+    """
+
+    category_data.setRowCount(len(transactions))
+    for index,transaction in enumerate(transactions):
+
+        transaction_day = CustomTableWidgetItem(str(transaction.date.day))
+        transaction_day.setTextAlignment(ALIGNMENT.AlignCenter)
+        transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
+
+        transaction_value = CustomTableWidgetItem(str(transaction.value))
+        transaction_value.setTextAlignment(ALIGNMENT.AlignCenter)
+        transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
+        transaction_id = CustomTableWidgetItem(str(transaction.id))
+        transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
+        transaction_name = CustomTableWidgetItem(str(transaction.name))
+        transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+
+        category_data.setItem(index, 0, transaction_name)
+        category_data.setItem(index, 1, transaction_day)
+        category_data.setItem(index, 2, transaction_value)
+        category_data.setItem(index, 3, transaction_id)
 
 
 def load_category(category_type:str, name:str, db:DBController, category_id:int, position:int, year:int, month:int) -> Category:
@@ -103,27 +136,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     transactions = db.transaction_query.get_transactions_by_month(category_id, year, month)
     
     if len(transactions) > 0: #Check if transactions are in db
-        category_data.setRowCount(len(transactions))
-        for index,transaction in enumerate(transactions):
-
-            transaction_day = CustomTableWidgetItem(str(transaction.day))
-            transaction_day.setTextAlignment(ALIGNMENT.AlignCenter)
-            transaction_day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes so items can't be edited
-
-            transaction_value = CustomTableWidgetItem(str(transaction.value))
-            transaction_value.setTextAlignment(ALIGNMENT.AlignCenter)
-            transaction_value.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-
-            transaction_id = CustomTableWidgetItem(str(transaction.id))
-            transaction_id.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-
-            transaction_name = CustomTableWidgetItem(str(transaction.name))
-            transaction_name.setFlags(~ Qt.ItemFlag.ItemIsEditable)
-
-            category_data.setItem(index, 0, transaction_name)
-            category_data.setItem(index, 1, transaction_day)
-            category_data.setItem(index, 2, transaction_value)
-            category_data.setItem(index, 3, transaction_id)
+        load_transactions_into_category_table(category_data, transactions)
 
     category_total_value.setText(
         f"{LanguageStructure.Categories.get_translation(10)}\
