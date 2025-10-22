@@ -1,6 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from datetime import date
+from sqlalchemy import and_
+
 from backend.models import Transaction
+from GeneralTools.Utils import generate_month_range
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
@@ -28,7 +32,7 @@ class TransactionQuery:
                 session.query(Transaction).filter_by(id=transaction_id).delete(False)
             
 
-    def update_transaction(self, transaction_id:int, transaction_name:str, transaction_day:int, transaction_value:float) -> None:
+    def update_transaction(self, transaction_id:int, transaction_name:str, day:int, transaction_value:float) -> None:
         """Update a transaction in the database.
 
             Arguments
@@ -36,33 +40,35 @@ class TransactionQuery:
                 `transaction_id` : (int) - ID of the transaction to update.
                 `transaction_name` : (str) - New name of the transaction.
                 `transaction_day` : (int) - New day of the transaction.
-                `transaction_value` : (int|float) - New value of the transaction.
+                `transaction_value` : (float) - New value of the transaction.
         """
 
         with self.session_factory() as session:
             with session.begin():
-                session.query(Transaction).filter_by(id=transaction_id).update({
-                    Transaction.name:transaction_name,
-                    Transaction.day:transaction_day,
-                    Transaction.value:transaction_value}, False)
+                transaction = session.get(Transaction, transaction_id)
+
+                if not transaction:
+                    raise ValueError(f"Transaction with ID {transaction_id} does not exist.")
+                
+                transaction.name = transaction_name
+                transaction.date = date(transaction.date.year, transaction.date.month, day)
+                transaction.value = transaction_value
 
 
-    def add_transaction(self, category_id:int, year:int, month:int, day:int, value:float, name:str) -> Transaction:
+    def add_transaction(self, category_id:int, date:date, value:float, name:str) -> Transaction:
         """Add a new transaction to the database.
 
             Arguments
             ---------
                 `category_id` : (int) - ID of the category for the transaction.
-                `year` : (int) - Year of the transaction.
-                `month` : (int) - Month of the transaction.
-                `day` : (int) - Day of the transaction.
-                `value` : (int|float) - Value of the transaction.
+                `date` : (date) - Date of the transaction.
+                `value` : (float) - Value of the transaction.
                 `name` : (str) - Name of the transaction.
         """
 
         with self.session_factory() as session:
             with session.begin():
-                transaction = Transaction(year=year, month=month, day=day, value=value, name=name, category_id=category_id)
+                transaction = Transaction(date=date, value=value, name=name, category_id=category_id)
                 session.add(transaction)
                 return transaction
 
@@ -79,9 +85,16 @@ class TransactionQuery:
             -------
                 `list[Transaction]` - List of transactions for the specified category, month, and year.
         """
+
         with self.session_factory() as session:
             with session.begin():
-                return session.query(Transaction).filter_by(year=year, month=month, category_id=category_id).all()
+                return session.query(Transaction).filter(
+                    and_(
+                        Transaction.date.between(*generate_month_range(year, month)),
+                        Transaction.category_id == category_id
+                    )
+                ).all()
+
     
     
     def check_categories_have_transactions(self, categories_id:list[int], year:int, month:int) -> bool:
@@ -92,14 +105,13 @@ class TransactionQuery:
                 `categories_id` : (list[int]) - List of category IDs to check.
                 `year` : (int) - Year to filter transactions.
                 `month` : (int) - Month to filter transactions."""
-        
+
         with self.session_factory() as session:
             with session.begin():
-                row = session.query(Transaction).filter(
-                    Transaction.year == year,
-                    Transaction.month == month,
+                row = session.query(Transaction).filter(and_(
+                    Transaction.date.between(*generate_month_range(year, month)),
                     Transaction.category_id.in_(categories_id)
-                ).limit(1).first()
+                )).limit(1).first()
                 return row is not None
 
 

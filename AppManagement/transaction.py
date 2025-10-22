@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt
+from datetime import date
+from calendar import monthrange
 
 from GUI.gui_constants import ALIGNMENT
 
@@ -10,7 +12,7 @@ from AppObjects.windows_registry import WindowsRegistry
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 
 from languages import LanguageStructure
-from project_configuration import MONTHS_DAYS, CATEGORY_TYPE
+from project_configuration import CATEGORY_TYPE
 from AppManagement.balance import update_account_balance
 
 if TYPE_CHECKING:
@@ -124,9 +126,7 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     app_core = AppCore.instance()
     transaction = app_core.db.transaction_query.add_transaction(
         category_id,
-        app_core.current_year,
-        app_core.current_month,
-        transaction_day,
+        date(app_core.current_year, app_core.current_month, transaction_day),
         transaction_value,
         transaction_name
     )
@@ -141,7 +141,7 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     row = category_data.rowCount()
     category_data.setRowCount(row+1)
 
-    day = CustomTableWidgetItem(str(transaction.day))
+    day = CustomTableWidgetItem(str(transaction.date.day))
     day.setTextAlignment(ALIGNMENT.AlignCenter)
     day.setFlags(~ Qt.ItemFlag.ItemIsEditable)# symbol ~ mean invert bytes in this case cells in table can't be edited
 
@@ -183,7 +183,7 @@ def transaction_data_handler() -> int:
     category_id = category.id
     category_data = app_core.categories[category_id].table_data
 
-    max_month_day = MONTHS_DAYS[app_core.current_month-1] + (app_core.current_month == 2 and app_core.current_year % 4 == 0)#Add one day to February (29) if year is leap
+    _, max_month_day = monthrange(app_core.current_year, app_core.current_month)
 
     if raw_transaction_day == "" or raw_transaction_value == "":
         return WindowsRegistry.Messages.empty_fields.exec()

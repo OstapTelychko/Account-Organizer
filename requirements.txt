@@ -1,4 +1,4 @@
-﻿alembic==1.15.2
+alembic==1.17.0
 altgraph==0.17.4
 certifi==2025.4.26
 charset-normalizer==3.4.2

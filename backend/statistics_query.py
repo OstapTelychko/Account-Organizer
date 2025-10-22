@@ -1,12 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from sqlalchemy.sql import func as sql_func
-from sqlalchemy import and_
+from sqlalchemy import and_, extract
+from datetime import date
 
 from backend.models import Transaction
+from GeneralTools.Utils import generate_month_range
 
 if TYPE_CHECKING:
+    from PySide6.QtCore import QDate
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
+    from sqlalchemy.engine import Row
+    from typing import Sequence
 
 
 
@@ -33,9 +38,10 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                total = session.query(sql_func.sum(Transaction.value)).filter_by(
-                    category_id=category_id, year=year, month=month
-                ).scalar()
+                total = session.query(sql_func.sum(Transaction.value)).filter(and_(
+                    Transaction.date.between(*generate_month_range(year, month)),
+                    Transaction.category_id==category_id
+                )).scalar()
                 return float(total) if total else 0
     
 
@@ -49,14 +55,13 @@ class StatisticsQuery:
                 `month` : (int) - Month to filter transactions.
             Returns
             -------
-                `list[float]` - List of total sums of transactions for each specified category, month, and year.
+                `list[float]` - List of total sums of transactions for each specified category, month and year.
         """
 
         with self.session_factory() as session:
             with session.begin():
-                sums = session.query(Transaction.category_id, Transaction.month, sql_func.sum(Transaction.value)).filter(
-                    Transaction.year == year,
-                    Transaction.month == month,
+                sums:Sequence[Row[tuple[int, float]]] = session.query(Transaction.category_id, sql_func.sum(Transaction.value)).filter(
+                    Transaction.date.between(*generate_month_range(year, month)),
                     Transaction.category_id.in_(categories_id)
                 ).group_by(Transaction.category_id).all()
 
@@ -64,8 +69,9 @@ class StatisticsQuery:
                 for index, category_id in enumerate(categories_id):
                     for s in sums:
                         if s[0] == category_id:
-                            result[index] = float(s[2]) if s[2] else 0.0
+                            result[index] = float(s[1]) if s[1] else 0.0
                 return result
+
 
     def get_categories_monthly_transactions_sum_by_months(self, categories_id: list[int], year:int, months: list[int]) -> dict[int, list[float]]:
         """Get the sum of transactions for multiple categories over multiple months in a given year.
@@ -82,13 +88,16 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                sums = session.query(Transaction.category_id, Transaction.month, sql_func.sum(Transaction.value)).filter(
-                    Transaction.year == year,
-                    Transaction.month.in_(months),
-                    Transaction.category_id.in_(categories_id)
-                ).group_by(Transaction.category_id, Transaction.month).all()
+                sums:Sequence[Row[tuple[int, int, float]]] = session.query(
+                    Transaction.category_id,
+                    extract('month', Transaction.date),
+                    sql_func.sum(Transaction.value)).filter(and_(
+                        extract('year', Transaction.date) == year,
+                        extract('month', Transaction.date).in_(months),
+                        Transaction.category_id.in_(categories_id))
+                    ).group_by(Transaction.category_id, extract('month', Transaction.date)).all()
 
-                result = {}
+                result:dict[int, list[float]] = {}
                 for category_id in categories_id:
                     result[category_id] = [0.0]
                     for s in sums:
@@ -113,9 +122,10 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                min_value = session.query(sql_func.min(Transaction.value)).filter_by(
-                    category_id=category_id, year=year, month=month
-                ).scalar()
+                min_value = session.query(sql_func.min(Transaction.value)).filter(and_(
+                    Transaction.date.between(*generate_month_range(year, month)),
+                    Transaction.category_id==category_id
+                )).scalar()
                 return float(min_value) if min_value else 0
     
 
@@ -134,9 +144,10 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                max_value = session.query(sql_func.max(Transaction.value)).filter_by(
-                    category_id=category_id, year=year, month=month
-                ).scalar()
+                max_value = session.query(sql_func.max(Transaction.value)).filter(and_(
+                    Transaction.date.between(*generate_month_range(year, month)),
+                    Transaction.category_id==category_id
+                )).scalar()
                 return float(max_value) if max_value else 0
     
 
@@ -156,17 +167,21 @@ class StatisticsQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                return session.query(Transaction).filter_by(category_id=category_id, year=year, month=month, value=value).all()
-    
+                return session.query(Transaction).filter(and_(
+                    Transaction.date.between(*generate_month_range(year, month)),
+                    Transaction.value==value,
+                    Transaction.category_id==category_id)
+                ).all()
 
-    def get_transactions_by_range(self, category_ids:list[int], from_date:int, to_date:int) -> list[Transaction]:
+
+    def get_transactions_by_range(self, category_ids:list[int], from_date:date, to_date:date) -> list[Transaction]:
         """Get transactions for specific categories within a date range.
         
             Arguments
             ---------
                 `category_ids` : (list[int]) - List of category IDs to filter transactions.
-                `from_date` : (int) - Start date in YYYYMMDD format.
-                `to_date` : (int) - End date in YYYYMMDD format.
+                `from_date` : (date) - Start date.
+                `to_date` : (date) - End date.
             Returns
             -------
                 `list[Transaction]` - List of transactions for the specified categories and date range.
@@ -176,5 +191,5 @@ class StatisticsQuery:
             with session.begin():
                 return session.query(Transaction).filter(and_(
                     Transaction.category_id.in_(category_ids),
-                    Transaction.year*1000 + Transaction.month*100 + Transaction.day >= from_date,
-                    Transaction.year*1000 + Transaction.month*100 + Transaction.day <= to_date,)).all()
+                    Transaction.date.between(from_date, to_date)
+                )).all()
