@@ -5,6 +5,7 @@ from datetime import date
 from calendar import monthrange
 from collections import defaultdict, Counter
 from PySide6.QtWidgets import QPushButton
+from textwrap import dedent
 
 from languages import LanguageStructure
 from project_configuration import CATEGORY_TYPE
@@ -626,9 +627,6 @@ def show_custom_range_statistics_view() -> int:
     date_difference = date(to_date.year(), to_date.month(), to_date.day()) - date(from_date.year(), from_date.month(), from_date.day()) 
     days_amount = date_difference.days
 
-    from_date_number = from_date.year()*1000 + from_date.month()*100 + from_date.day()
-    to_date_number = to_date.year()*1000 + to_date.month()*100 + to_date.day()
-
     Incomes_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
     Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
 
@@ -698,6 +696,21 @@ def show_custom_range_statistics_view() -> int:
         )
         add_total_statistics(Expenses_categories_total_values, [17,20], WindowsRegistry.CustomRangeStatisticsView.statistics_list)
     
+    def add_transaction_to_transactions_list(transaction:Transaction) -> None:
+        day = transaction.date.day                
+        month = transaction.date.month
+        year = transaction.date.year
+        item_text = dedent(f"""
+        <table width="100%">
+            <tr>
+                <td width="15%">{day:02}/{month:02}/{year}</td>
+                <td width="20%" align="right">{transaction.value}</td>
+                <td width="65%" align="center">{transaction.name}</td>
+            </tr>
+        </table>
+        """)
+        WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(item_text)
+        
     #Transactions list
     if len(Incomes_categories_transactions):
         WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
@@ -707,13 +720,7 @@ def show_custom_range_statistics_view() -> int:
             WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("<br/>"+category.name+"<br/>")
 
             for transaction in category_transactions:
-                day = transaction.date.day                
-                month = transaction.date.month
-                year = transaction.date.year
-
-                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
-                    f"{day:02}/{month:02}/{year}\t{transaction.value}\t{transaction.name}"
-                )
+                add_transaction_to_transactions_list(transaction)
     
     if len(Expenses_categories_transactions):
         WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
@@ -723,13 +730,7 @@ def show_custom_range_statistics_view() -> int:
             WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("<br/>"+category.name+"<br/>")
 
             for transaction in category_transactions:
-                day = transaction.date.day                
-                month = transaction.date.month
-                year = transaction.date.year
+                add_transaction_to_transactions_list(transaction)
 
-                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
-                    f"{day:02}/{month:02}/{year}\t{transaction.value}\t{transaction.name}"
-                )
-        
     logger.debug(f"Custom range statistics window is shown. From date: {from_date} To date: {to_date}")
     return WindowsRegistry.CustomRangeStatisticsView.exec()

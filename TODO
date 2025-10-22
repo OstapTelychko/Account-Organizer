@@ -16,9 +16,17 @@ Updates to existing features:
 Project life improvements:
   ☐ empty @don't-touch
   ☐ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF @started(25-10-20 22:11)
+  ☐ remove account_id from Category table and add AccountCategoryAssociation table to follow 3NF
+  ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
+  ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
 
 Bugs:
   ☐ empty @don't-touch
+
+Release:
+  ☐ empty @don't-touch
+  ☐ test release 1.2.2 on windows
+  ☐ release 1.2.2
 
 Archive:
   ✔ create issue for mypy which stopped working with sub_window.py after import of AppCore as reference use issue 17195 @started(25-10-13 22:49) @done(25-10-13 23:50) @lasted(1h1m35s) @project(Bugs)

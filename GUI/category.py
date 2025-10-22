@@ -31,8 +31,7 @@ def load_transactions_into_category_table(category_data:CustomTableWidget, trans
 
         Arguments
         -------
-            `category_data` (CustomTableWidget): Table widget to load transactions into
-
+            `category_data` (CustomTableWidget): Table widget to load transactions into<br>
             `transactions` (list[Transaction]): List of transactions to load into the table
     """
 
@@ -137,10 +136,9 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     
     if len(transactions) > 0: #Check if transactions are in db
         load_transactions_into_category_table(category_data, transactions)
-
+    category_total = round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)
     category_total_value.setText(
-        f"{LanguageStructure.Categories.get_translation(10)}\
-        {round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)}"
+        f"{LanguageStructure.Categories.get_translation(10)}{category_total}"
     )
     category_data.setSortingEnabled(True)
 
