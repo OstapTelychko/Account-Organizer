@@ -8,7 +8,7 @@ from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
 from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY,\
-DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE, APP_HASHES_DIRECTORY
+DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE, APP_HASHES_DIRECTORY, CACHE_DIRECTORY
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.backup import Backup
@@ -119,6 +119,10 @@ class AppCore:
             os.makedirs(APP_HASHES_DIRECTORY)
             logger.info("App hashes directory created")
 
+        if not os.path.exists(CACHE_DIRECTORY):
+            os.makedirs(CACHE_DIRECTORY)
+            logger.info("Cache directory created")
+            
         self.load_backups()
         logger.info("Backups loaded")
         logger.info("__BREAK_LINE__")

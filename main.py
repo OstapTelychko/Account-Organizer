@@ -36,7 +36,6 @@ from project_configuration import FORBIDDEN_CALCULATOR_WORDS, APP_NAME
 from languages import LanguageStructure
 from backend.db_controller import DBController
 
-from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.user_config import UserConfig
@@ -45,26 +44,6 @@ from AppObjects.logger import get_logger
 from GUI.gui_constants import app
 from GUI.theme import switch_theme, load_theme
 
-from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics,\
-    show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list,\
-    remove_all_categories_from_statistics_list
-from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics,\
-    copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
-
-from AppManagement.language import load_language, change_language_during_add_account
-from AppManagement.balance import load_account_balance
-from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
-    rename_category,  activate_categories, show_change_category_position, change_category_position
-from AppManagement.transaction import transaction_data_handler
-from AppManagement.date import next_month, previous_month, next_year, previous_year
-from AppManagement.account import show_add_user_window, add_account, remove_account,\
-    show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
-from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup,\
-    open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
-from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
-from AppManagement.AppUpdate.check_for_update import check_for_updates
-
-from tests.init_tests import test_main
 
 max_possible_length = len(setproctitle.getproctitle())
 setproctitle.setproctitle(APP_NAME[:max_possible_length])
@@ -73,6 +52,8 @@ logger = get_logger(__name__)
 
 def calculate_expression() -> None:
     """Calculate the expression from the mini calculator input field"""
+
+    from AppObjects.windows_registry import WindowsRegistry
 
     expression = WindowsRegistry.MainWindow.mini_calculator_text.text()
 
@@ -150,8 +131,8 @@ def main(test_mode:bool=False) -> None:
         load_account_balance()
         load_language(app_core.config.language)
 
-        
         if not test_mode:
+            from AppManagement.AppUpdate.check_for_update import check_for_updates
             QTimer.singleShot(200, check_for_updates)
 
     
@@ -170,13 +151,32 @@ def main(test_mode:bool=False) -> None:
 
 
     app_core.start_session()
+    load_theme()
+
+    from AppObjects.windows_registry import WindowsRegistry
+    from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics,\
+    show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list,\
+    remove_all_categories_from_statistics_list
+    from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics,\
+    copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
+
+    from AppManagement.language import load_language, change_language_during_add_account
+    from AppManagement.balance import load_account_balance
+    from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
+        rename_category,  activate_categories, show_change_category_position, change_category_position
+    from AppManagement.transaction import transaction_data_handler
+    from AppManagement.date import next_month, previous_month, next_year, previous_year
+    from AppManagement.account import show_add_user_window, add_account, remove_account,\
+        show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
+    from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup,\
+        open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
+    from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
 
     #Set main window for instance guard
     app_core.instance_guard.main_window = WindowsRegistry.MainWindow
     # Ensure the safe exit when the application exits
     app.aboutToQuit.connect(AppCore.instance().end_session)
 
-    load_theme()
 
     #Set current month and year
     WindowsRegistry.MainWindow.current_year.setText(str(app_core.current_year))
@@ -299,6 +299,7 @@ if __name__ == "__main__":
     parser.add_argument("--test", action="store_true")
 
     if parser.parse_args().test:
+        from tests.init_tests import test_main
         test_main(main)
     else:
         main()
