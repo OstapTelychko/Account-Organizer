@@ -1,17 +1,15 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from sys import platform
+import os
 import ctypes
 
+from typing import TYPE_CHECKING
+from sys import platform
 from PySide6.QtGui import QIcon
-from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped] #I don't want to write a stub for this library
 
-from project_configuration import THEME_DIRECTORY
 
+from project_configuration import THEME_DIRECTORY, DARK_THEME_CACHE_FILE, LIGHT_THEME_CACHE_FILE
 from AppObjects.app_core import AppCore
-from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
-
 from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
 
 if TYPE_CHECKING:
@@ -19,8 +17,9 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
+DARK_THEME = ""
 DARK_THEME_ICON = QIcon(f"{THEME_DIRECTORY}/Dark theme.png")
-DARK_THEME = load_stylesheet("dark")+"""
+DARK_THEME_EXTRA = """
 .category{
     background-color:rgb(42, 42, 42);
     border-radius:10px;
@@ -83,9 +82,9 @@ DARK_THEME = load_stylesheet("dark")+"""
 }
 """
 
-
+LIGHT_THEME = ""
 LIGHT_THEME_ICON = QIcon(f"{THEME_DIRECTORY}/Light theme.png")
-LIGHT_THEME = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})+"""
+LIGHT_THEME_EXTRA = """
 .category{
     background-color:rgb(100, 120, 100);
     border-radius:15px;
@@ -167,45 +166,80 @@ def switch_theme() -> None:
     app_core = AppCore.instance()
     if app_core.config.theme == "Dark":
         app.setStyleSheet(LIGHT_THEME)
-        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
+        icon_theme = LIGHT_THEME_ICON
         app_core.config.theme = "Light"
 
         if platform == "win32":
-            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
+            theme_value = ctypes.c_uint(0)
         logger.info("Theme switched to Light")
 
-    elif app_core.config.theme == "Light":
+    else:
         app.setStyleSheet(DARK_THEME)
-        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
+        icon_theme = DARK_THEME_ICON
         app_core.config.theme = "Dark"
 
         if platform == "win32":
-            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(2))
+            theme_value = ctypes.c_uint(2)
         logger.info("Theme switched to Dark")
+
+    from AppObjects.windows_registry import WindowsRegistry
+    if platform == "win32":
+        set_theme_mode_on_window(WindowsRegistry.MainWindow, theme_value) # pyright: ignore[reportPossiblyUnboundVariable]
+    WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(icon_theme)
 
     app_core.config.update_user_config()
 
 
 def load_theme() -> None:
     """Load theme from user config."""
+    global DARK_THEME, LIGHT_THEME
 
     logger.info("Loading theme")
+    if not os.path.exists(DARK_THEME_CACHE_FILE) or not os.path.exists(LIGHT_THEME_CACHE_FILE):
+        from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped] #I don't want to write a stub for this library
+
+        with open(DARK_THEME_CACHE_FILE, "w") as f:
+            dark_theme = load_stylesheet("dark")
+            f.write(dark_theme)
+            DARK_THEME = dark_theme
+
+        with open(LIGHT_THEME_CACHE_FILE, "w") as f:
+            light_theme = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})
+            f.write(light_theme)
+            LIGHT_THEME = light_theme
+        logger.info(f"Themes cached to {DARK_THEME_CACHE_FILE} and {LIGHT_THEME_CACHE_FILE}")
+    else:
+        with open(DARK_THEME_CACHE_FILE, "r") as f:
+            DARK_THEME = f.read()
+
+        with open(LIGHT_THEME_CACHE_FILE, "r") as f:
+            LIGHT_THEME = f.read()
+        logger.info(f"Themes loaded from cache files {DARK_THEME_CACHE_FILE} and {LIGHT_THEME_CACHE_FILE}")
+        
+    DARK_THEME += DARK_THEME_EXTRA
+    LIGHT_THEME += LIGHT_THEME_EXTRA
+
     app_core = AppCore.instance()
     if app_core.config.theme == "Dark":
         app.setStyleSheet(DARK_THEME)
-        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(DARK_THEME_ICON)
+        icon_theme = DARK_THEME_ICON
 
         if platform == "win32":
-            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(2))
+            theme_value = ctypes.c_uint(2)
         logger.info("Dark theme loaded")
-            
-    if app_core.config.theme == "Light":
+
+    else:
         app.setStyleSheet(LIGHT_THEME)
-        WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(LIGHT_THEME_ICON)
+        icon_theme = LIGHT_THEME_ICON
 
         if platform == "win32":
-            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
+            theme_value = ctypes.c_uint(0)
         logger.info("Light theme loaded")
+
+    from AppObjects.windows_registry import WindowsRegistry
+    if platform == "win32":
+            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
+    WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(icon_theme)
 
 
 if platform == "win32":

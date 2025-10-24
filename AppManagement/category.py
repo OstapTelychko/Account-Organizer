@@ -1,5 +1,4 @@
 from functools import partial
-from PySide6.QtCore import Qt
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -7,11 +6,7 @@ from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import CATEGORY_TYPE
 from languages import LanguageStructure
-
-from GUI.gui_constants import ALIGNMENT
 from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table
-
-from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 
 from AppManagement.information_message import show_information_message
 from AppManagement.balance import calculate_current_balance
