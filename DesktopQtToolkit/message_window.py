@@ -24,8 +24,7 @@ class MessageWindow(QMessageBox):
             message_windows_container:dict[int, MessageWindow],
             type_confirm:bool,
             message_icon:QMessageBox.Icon | QPixmap,
-            title:str,
-            window_icon:QIcon
+            title:str
         ) -> None:
         super().__init__(main_window)
         self.main_window = main_window
@@ -44,8 +43,6 @@ class MessageWindow(QMessageBox):
             self.setIconPixmap(message_icon)
         else:
             self.setIcon(message_icon)
-
-        self.setWindowIcon(window_icon)
     
 
     def exec(self) -> int:

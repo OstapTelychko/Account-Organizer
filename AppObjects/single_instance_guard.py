@@ -32,7 +32,7 @@ class SingleInstanceGuard(QObject, metaclass=QSingleton):
         # Attempt to connect to the server (to existing instance)
         self.client_socket.connectToHost(APP_HOST, APP_PORT)
 
-        if self.client_socket.waitForConnected(1000):
+        if self.client_socket.waitForConnected(100):
             self.client_socket.write(b"RAISE_WINDOW")
             self.client_socket.flush()
             self.client_socket.waitForBytesWritten()
