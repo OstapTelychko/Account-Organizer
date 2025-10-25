@@ -2,6 +2,8 @@ New features:
   ☐ empty @don't-touch
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
+  ☐ replace BASIC_FONT with some better one that will look good on both windows and linux
+  ☐ fix issue with weird looking buttons on windows
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -24,7 +26,7 @@ Bugs:
 
 Release:
   ☐ empty @don't-touch
-  ☐ test release 1.2.2 on windows
+  ☐ test release 1.2.2 on windows @started(25-10-26 00:26)
   ☐ release 1.2.2
 
 Archive:

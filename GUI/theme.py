@@ -238,7 +238,7 @@ def load_theme() -> None:
 
     from AppObjects.windows_registry import WindowsRegistry
     if platform == "win32":
-            set_theme_mode_on_window(WindowsRegistry.MainWindow, ctypes.c_uint(0))
+            set_theme_mode_on_window(WindowsRegistry.MainWindow, theme_value) # pyright: ignore[reportPossiblyUnboundVariable]
     WindowsRegistry.SettingsWindow.switch_themes_button.setIcon(icon_theme)
 
 
