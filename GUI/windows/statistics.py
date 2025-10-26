@@ -146,7 +146,7 @@ class QuarterlyStatistics(SubWindow):
 
             quarter_label = QLabel()
             quarter_label.setFont(BASIC_FONT)
-            quarter_label.setContentsMargins(0,50,0,0)
+            quarter_label.setContentsMargins(0,30,0,0)
             self.statistics_layout.addWidget(quarter_label,alignment=ALIGNMENT.AlignBottom)
 
             self.quarter_window = QWidget()
@@ -207,6 +207,7 @@ class QuarterlyStatistics(SubWindow):
         self.window_scroll.setWidgetResizable(True)
         self.window_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.window_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.window_scroll.setMinimumSize(1100, 700)
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)
