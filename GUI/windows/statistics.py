@@ -115,6 +115,7 @@ class QuarterlyStatistics(SubWindow):
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
+        self.setUpdatesEnabled(False)
         self.setStyleSheet(""" 
         QListWidget::item:hover,
         QListWidget::item:disabled:hover,
@@ -145,7 +146,7 @@ class QuarterlyStatistics(SubWindow):
 
             quarter_label = QLabel()
             quarter_label.setFont(BASIC_FONT)
-            quarter_label.setContentsMargins(0,50,0,0)
+            quarter_label.setContentsMargins(0,30,0,0)
             self.statistics_layout.addWidget(quarter_label,alignment=ALIGNMENT.AlignBottom)
 
             self.quarter_window = QWidget()
@@ -186,10 +187,10 @@ class QuarterlyStatistics(SubWindow):
             self.quarter_window.setLayout(quarter_layout)
 
             self.quarter_scroll = HorizontalScrollArea()
+            self.quarter_scroll.setStyleSheet("QScrollArea{border:none}")
             self.quarter_scroll.setWidget(self.quarter_window)
             self.quarter_scroll.setWidgetResizable(True)
             self.quarter_scroll.setMinimumHeight(350)
-            self.quarter_scroll.setStyleSheet("QScrollArea{border:none}")
             self.statistics_layout.addWidget(self.quarter_scroll)
 
         self.statistics = StatisticsView(self.quarters_statistics_list)
@@ -201,17 +202,19 @@ class QuarterlyStatistics(SubWindow):
 
         self.statistics_window.setLayout(self.statistics_layout)
         self.window_scroll = QScrollArea()
+        self.window_scroll.setStyleSheet("QScrollArea{border:none}")
         self.window_scroll.setWidget(self.statistics_window)
         self.window_scroll.setWidgetResizable(True)
         self.window_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.window_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        self.window_scroll.setStyleSheet("QScrollArea{border:none}")
+        self.window_scroll.setMinimumSize(1100, 700)
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)
         self.main_layout.addWidget(self.window_scroll)
 
         self.window_container.setLayout(self.main_layout)
+        self.setUpdatesEnabled(True)
 
 
 class YearlyStatistics(SubWindow):
@@ -281,11 +284,11 @@ class YearlyStatistics(SubWindow):
         self.statistics_window.setLayout(self.statistics_window_layout)
 
         self.statistics_scroll = QScrollArea()
+        self.statistics_scroll.setStyleSheet("QScrollArea{border:none}")
         self.statistics_scroll.setWidget(self.statistics_window)
         self.statistics_scroll.setWidgetResizable(True)
         self.statistics_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.statistics_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.statistics_scroll.setStyleSheet("QScrollArea{border:none}")
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)

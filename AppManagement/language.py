@@ -12,8 +12,8 @@ from languages import LanguageStructure
 
 logger = get_logger(__name__)
 
-def change_language() -> None:
-    """Change language of the application. It changes the text of all widgets in the application."""
+def change_language_for_startup() -> None:
+    """Change language during application startup. Until app fully loads these windows and widgets have to be translated."""
 
     app_core = AppCore.instance()
     WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(app_core.config.language))
@@ -21,6 +21,7 @@ def change_language() -> None:
     WindowsRegistry.MainWindow.account_current_balance.setText(
         f"{LanguageStructure.MainWindow.get_translation(0)}{round(app_core.current_balance, 2)}"
     )
+
     WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(1, LanguageStructure.MainWindow.get_translation(2))
@@ -29,15 +30,19 @@ def change_language() -> None:
     WindowsRegistry.MainWindow.statistics.setText(LanguageStructure.Statistics.get_translation(0))
     WindowsRegistry.MainWindow.mini_calculator_label.setText(LanguageStructure.MiniCalculator.get_translation(0))
 
+
+def change_language() -> None:
+    """Change language of the application. It changes the text of all widgets in the application."""
+
+    app_core = AppCore.instance()
+
     WindowsRegistry.SettingsWindow.setWindowTitle(LanguageStructure.Settings.get_translation(0))
     WindowsRegistry.SettingsWindow.delete_account.setText(LanguageStructure.Account.get_translation(0))
     WindowsRegistry.SettingsWindow.add_account.setText(LanguageStructure.Account.get_translation(1))
     WindowsRegistry.SettingsWindow.rename_account.setText(LanguageStructure.Account.get_translation(2))
     WindowsRegistry.SettingsWindow.switch_account.setText(LanguageStructure.Account.get_translation(6))
-    Incomes = WindowsRegistry.SettingsWindow.total_income.text().split(":")[1].replace(" ","")
-    WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(Incomes))
-    Expenses = WindowsRegistry.SettingsWindow.total_expense.text().split(":")[1].replace(" ","")
-    WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(Expenses))
+    WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(app_core.current_total_income))
+    WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(app_core.current_total_expenses))
     WindowsRegistry.SettingsWindow.account_created_date.setText(
         LanguageStructure.Settings.get_translation(1)
         + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S"))
@@ -167,10 +172,6 @@ def change_language() -> None:
         app_core.categories[category].total_value_label.setText(
             LanguageStructure.Categories.get_translation(10) + total_value
         )
-    
-    WindowsRegistry.MainWindow.account_current_balance.setText(
-        LanguageStructure.MainWindow.get_translation(0)+str(app_core.current_balance)
-    )
 
     WindowsRegistry.BackupManagementWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(0))
     WindowsRegistry.BackupManagementWindow.backups_table.setHorizontalHeaderLabels(
@@ -288,5 +289,6 @@ def load_language(language:str|int) -> None:
     else:
         app_core.config.language = language
     app_core.config.update_user_config()
+    change_language_for_startup()
     change_language()
     logger.info(f"Language {app_core.config.language} loaded")
