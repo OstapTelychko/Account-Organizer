@@ -26,9 +26,9 @@ Bugs:
 
 Release:
   ☐ empty @don't-touch
-  ☐ release 1.2.2
 
 Archive:
+  ✔ release 1.2.2 @started(25-10-26 17:31) @done(25-10-26 17:53) @lasted(22m32s) @project(Release)
   ✔ test release 1.2.2 on windows @started(25-10-26 00:26) @done(25-10-26 17:23) @lasted(17h57m36s) @project(Release)
   ✔ optimize app startup time by cashing theme load (for example using pickle) to avoid even importing qdarktheme and loading stylesheet on each app start @started(25-10-24 18:22) @done(25-10-24 22:37) @lasted(4h15m21s) @project(Project life improvements)
   ✔ replace year, month, and day columns in transactions table with a single date column, create separate table ObjectPosition, and create table CategoryType to follow 3NF @started(25-10-20 22:11) @done(25-10-23 00:39) @lasted(2d2h28m13s) @project(Project life improvements)
