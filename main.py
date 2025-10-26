@@ -160,7 +160,7 @@ def main(test_mode:bool=False) -> None:
     from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics,\
     copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
-    from AppManagement.language import load_language, change_language_during_add_account
+    from AppManagement.language import load_language, change_language_during_add_account, change_language_for_startup
     from AppManagement.balance import load_account_balance
     from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
         rename_category,  activate_categories, show_change_category_position, change_category_position
@@ -183,16 +183,6 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
 
     #Connect buttons to functions
-    #Settings
-    WindowsRegistry.MainWindow.settings.clicked.connect(WindowsRegistry.SettingsWindow.exec)
-    WindowsRegistry.SettingsWindow.switch_themes_button.clicked.connect(switch_theme)
-    WindowsRegistry.SettingsWindow.languages.currentIndexChanged.connect(load_language)
-    WindowsRegistry.SettingsWindow.add_account.clicked.connect(show_add_user_window)
-    WindowsRegistry.SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
-    WindowsRegistry.SettingsWindow.switch_account.clicked.connect(WindowsRegistry.SwitchAccountWindow.exec)
-    WindowsRegistry.SettingsWindow.backup_management.clicked.connect(WindowsRegistry.BackupManagementWindow.exec)
-    WindowsRegistry.SettingsWindow.shortcuts_management.clicked.connect(WindowsRegistry.ShortcutsWindow.exec)
-
     #Activate mini calculator
     WindowsRegistry.MainWindow.calculate.clicked.connect(calculate_expression)
 
@@ -291,6 +281,17 @@ def main(test_mode:bool=False) -> None:
     )
     WindowsRegistry.AutoBackupWindow.save.clicked.connect(save_auto_backup_settings)
 
+    change_language_for_startup()
+    #Settings
+    WindowsRegistry.MainWindow.settings.clicked.connect(WindowsRegistry.SettingsWindow.exec)
+    WindowsRegistry.SettingsWindow.switch_themes_button.clicked.connect(switch_theme)
+    WindowsRegistry.SettingsWindow.languages.currentIndexChanged.connect(load_language)
+    WindowsRegistry.SettingsWindow.add_account.clicked.connect(show_add_user_window)
+    WindowsRegistry.SettingsWindow.rename_account.clicked.connect(show_rename_account_window)
+    WindowsRegistry.SettingsWindow.switch_account.clicked.connect(WindowsRegistry.SwitchAccountWindow.exec)
+    WindowsRegistry.SettingsWindow.backup_management.clicked.connect(WindowsRegistry.BackupManagementWindow.exec)
+    WindowsRegistry.SettingsWindow.shortcuts_management.clicked.connect(WindowsRegistry.ShortcutsWindow.exec)
+    
     QTimer.singleShot(50, post_show_setup)
 
 
