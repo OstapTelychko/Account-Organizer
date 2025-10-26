@@ -31,6 +31,7 @@ path_exists = os.path.exists
 def create_single_backup(backup:Backup, app_core:AppCore, update_version:str) -> str:
     """Creates a copy of the backup and upgrades it version but doesn't upgrade the database schema."""
 
+    logger.debug(f"Creating backup for migration: {backup.db_file_path}")
     updated_backup_file_path = os.path.join(UPDATE_BACKUPS_DIRECTORY, f"Accounts_{backup.timestamp}_{update_version}.sqlite")
     app_core.db.backup_query.create_backup_based_on_external_db(backup.db_file_path, updated_backup_file_path)
     logger.debug(f"Created backup: {updated_backup_file_path}")
@@ -45,6 +46,7 @@ def migrate_single_backup(backup_path:str, app_core:AppCore) -> str:
         alembic_config.set_main_option("script_location", os.path.join(UPDATE_APP_DIRECTORY, "alembic"))
 
         engine = create_engine(f"sqlite:///{backup_path}")
+        logger.debug(f"Migrating backup: {backup_path}")
         try:
             if not app_core.db.db_up_to_date(alembic_config, engine):
                 command.upgrade(alembic_config, "head")
@@ -106,13 +108,10 @@ def prepare_update() -> None:
         executor.submit(create_single_backup, backup, app_core, update_version): backup for backup in app_core.backups.values()}
         updated_backups_paths = [future.result() for future in backup_futures]
     
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        path_futures = {
-        executor.submit(migrate_single_backup, backup_path, app_core): backup_path for backup_path in updated_backups_paths}
-        for future in concurrent.futures.as_completed(path_futures):
-            future.result()
-            upgraded_backups += 1
-            WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setValue(upgraded_backups)
+    for backup_path in updated_backups_paths:
+        migrate_single_backup(backup_path, app_core)
+        upgraded_backups += 1
+        WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setValue(upgraded_backups)
     logger.info("Backups created and migrated")
     
     logger.info("Move legacy backups to update directory")
