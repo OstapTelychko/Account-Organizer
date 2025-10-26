@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 class MessageWindow(QMessageBox):
     """This class is used to create a message window that can be used to display messages to the user.
     It inherits from QMessageBox and adds some additional functionality."""
-    
+
+    _MSG_ICON_CACHE:dict[QMessageBox.Icon, QPixmap] = {}#On windows for some reason QPixmap icons assignment works way faster than setting Icon directly
+
+
     def __init__(
             self,
             main_window:QWidget,
@@ -42,7 +45,12 @@ class MessageWindow(QMessageBox):
         if isinstance(message_icon, QPixmap):
             self.setIconPixmap(message_icon)
         else:
-            self.setIcon(message_icon)
+            if message_icon not in MessageWindow._MSG_ICON_CACHE:
+                self.setIcon(message_icon)
+                icon_pixmap = self.iconPixmap()
+                MessageWindow._MSG_ICON_CACHE[message_icon] = icon_pixmap
+            else:
+                self.setIconPixmap(MessageWindow._MSG_ICON_CACHE[message_icon])
     
 
     def exec(self) -> int:
