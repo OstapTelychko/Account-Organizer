@@ -4,6 +4,8 @@ New features:
   ☐ add option to change account position in switch account window
   ☐ replace BASIC_FONT with some better one that will look good on both windows and linux
   ☐ fix issue with weird looking buttons on windows
+  ☐ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction
+  ☐ add search for transaction by name, value or date in categories 
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -23,6 +25,7 @@ Project life improvements:
 
 Bugs:
   ☐ empty @don't-touch
+  ☐ fix bug with copying statistics (convert html to text)
 
 Release:
   ☐ empty @don't-touch
