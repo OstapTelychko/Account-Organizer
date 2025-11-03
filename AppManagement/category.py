@@ -177,6 +177,10 @@ def remove_category() -> None:
     del app_core.categories[category_id]
     logger.debug(f"Category {category_name} removed")
 
+    for category_id in app_core.categories:
+        category = app_core.db.category_query.get_category_by_id(category_id)
+        app_core.categories[category_id].position = category.position
+
     calculate_current_balance()
     reset_focused_category()
     show_information_message(LanguageStructure.Categories.get_translation(7))
