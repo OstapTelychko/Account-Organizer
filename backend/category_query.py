@@ -116,25 +116,6 @@ class CategoryQuery:
                 )
 
 
-    def remove_position(self, category_id:int) -> None:
-        """Remove the position of a category in the database.
-
-            Arguments
-            ---------
-                `category_id` : (int) - ID of the category to remove.
-        """
-
-        with self.session_factory() as session:
-            with session.begin():
-                category = session.query(Category).filter_by(id=category_id).first()
-
-                if category:
-                    session.query(Category).filter(Category.position > category.position).update(
-                        {Category.position: Category.position - 1}, synchronize_session=False)
-                else:
-                    logger.error(f"Category with ID {category_id} not found.")
-
-
     def get_category(self, name:str, category_type:str) -> Category|None:
         """Get a category by its name and type.
 
@@ -158,8 +139,29 @@ class CategoryQuery:
                 else:
                     logger.error(f"Category with name {name} and type {category_type} not found. Although it should be there.")
                     return None
-            
     
+    
+    def get_category_by_id(self, category_id:int) -> Category:
+        """Get a category by its ID.
+
+            Arguments
+            ---------
+                `category_id` : (int) - ID of the category to get.
+            Returns
+            -------
+                `Category` - The category object if found, raises Exception otherwise.
+        """
+
+        with self.session_factory() as session:
+            with session.begin():
+                category = session.query(Category).filter_by(id=category_id).first()
+
+                if category:
+                    return category
+                else:
+                    logger.error(f"Category with ID {category_id} not found. Although it should be there.")
+                    raise RuntimeError(f"Category with ID {category_id} not found. Although it should be there.")
+                
 
     def get_all_categories(self) -> list[Category]:
         """Get all categories from the database.
@@ -198,7 +200,19 @@ class CategoryQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                self.remove_position(category_id)
-                session.query(Category).filter_by(id=category_id).delete(False)
+                category = session.query(Category).filter_by(id=category_id).first()
+
+                if category:
+                    session.query(Category).filter(and_(
+                        Category.position > category.position,
+                        Category.account_id == self.account_id,
+                        Category.category_type == category.category_type
+                        )).update(
+                            {Category.position: Category.position - 1}, synchronize_session=False)
+                    session.delete(category)
+                else:
+                    logger.error(f"Category with ID {category_id} not found.")
+                    raise RuntimeError(f"Category with ID {category_id} not found.")
+
 
             session.execute(text("VACUUM"))

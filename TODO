@@ -26,6 +26,7 @@ Project life improvements:
 Bugs:
   ☐ empty @don't-touch
   ☐ fix bug with copying statistics (convert html to text)
+  ☐ fix bug with changing category position that sometimes leads to two categories having the same position @started(25-11-03 23:07)
 
 Release:
   ☐ empty @don't-touch
