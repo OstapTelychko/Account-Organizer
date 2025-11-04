@@ -5,8 +5,9 @@ from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import CATEGORY_TYPE
 from AppManagement.information_message import show_information_message
 from languages import LanguageStructure
-
 from GUI.gui_constants import app
+from GeneralTools.html_to_text import html_to_text
+
 
 
 
@@ -59,7 +60,7 @@ def copy_monthly_statistics() -> None:
         for row in range(statistics.count()):
             result += f"{statistics.item(row).text()}\n"
         
-        app.clipboard().setText(result)
+        app.clipboard().setText(html_to_text(result))
         logger.info(f"Monthly statistics copied | {app_core.current_year}-{app_core.current_month}")
         show_information_message(LanguageStructure.Statistics.get_translation(29))
 
@@ -73,7 +74,7 @@ def copy_quarterly_statistics() -> None:
         result = ""
 
         for quarter in statistics.quarters:
-            result += f"{quarter.label.text()}\n\n"
+            result += f"\n{quarter.label.text():=^50}\n"
 
             total_quarter_statistics = quarter.total_quarter_statistics
             result += f"{total_quarter_statistics.label.text()}\n\n"
@@ -82,13 +83,12 @@ def copy_quarterly_statistics() -> None:
             result += "\n\n"
 
             for month in quarter.months:
-                result += f"{month.label.text()}\n"
+                result += f"{month.label.text():-^50}\n"
                 for row in range(month.data.count()):
                     result += f"{month.data.item(row).text()}\n"
                 result += "\n\n"
-            result+= "\n\n\n"
         
-        app.clipboard().setText(result)
+        app.clipboard().setText(html_to_text(result))
         logger.info(f"Quarterly statistics copied | {AppCore.instance().current_year}")
         show_information_message(LanguageStructure.Statistics.get_translation(31))
 
@@ -102,18 +102,16 @@ def copy_yearly_statistics() -> None:
         result = ""
 
         total_yearly_statistics = statistics.total_year_statistics
-        result += f"{total_yearly_statistics.label.text()}\n"
+        result += f"{total_yearly_statistics.label.text():=^50}\n"
         for row in range(total_yearly_statistics.data.count()):
             result += f"{total_yearly_statistics.data.item(row).text()}\n"
-        result += "\n\n\n"
 
         for month in statistics.months:
-            result += f"{month.label.text()}\n"
+            result += f"\n{month.label.text():-^50}\n"
             for row in range(month.data.count()):
                 result += f"{month.data.item(row).text()}\n"
-            result += "\n\n\n"
 
-        app.clipboard().setText(result)
+        app.clipboard().setText(html_to_text(result))
         logger.info(f"Yearly statistics copied | {AppCore.instance().current_year}")
         show_information_message(LanguageStructure.Statistics.get_translation(33))
 
@@ -127,9 +125,9 @@ def copy_custom_range_statistics() -> None:
         result = ""
 
         for row in range(statistics.count()):
-            result += f"{statistics.item(row).text()}\n"
-        
-        app.clipboard().setText(result)
+            result += statistics.item(row).text()
+
+        app.clipboard().setText(html_to_text(result))
         show_information_message(LanguageStructure.Statistics.get_translation(36))
 
 
@@ -143,8 +141,8 @@ def copy_custom_range_transactions() -> None:
         result = ""
 
         for row in range(transactions.count()):
-            result += f"{transactions.item(row).text()}\n"
+            result += transactions.item(row).text()
         
-        app.clipboard().setText(result)
+        app.clipboard().setText(html_to_text(result))
         logger.info(f"Transactions for custom range copied")
         show_information_message(LanguageStructure.Statistics.get_translation(38))
