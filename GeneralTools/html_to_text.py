@@ -99,7 +99,7 @@ def html_to_text(html: str) -> str:
     """
 
     if not isinstance(html, str):
-        raise TypeError("Input must be a string.")
+        raise TypeError(f"Input must be a string. Got {type(html)} instead.")
     
     html_parser = HTMLToTextParser()
     html_parser.feed(html)

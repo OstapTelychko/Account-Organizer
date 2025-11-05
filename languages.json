@@ -196,7 +196,8 @@
                 "35": "Copy statistics",
                 "36": "Statistics has been copied",
                 "37": "Copy transactions",
-                "38": "Transactions have been copied"
+                "38": "Transactions have been copied",
+                "39": "(No transactions)"
             },
 
             "Update":{
@@ -446,7 +447,8 @@
                 "35": "Скопіювати статистику",
                 "36": "Статистика була скопійована",
                 "37": "Скопіювати транзакції",
-                "38": "Транзакції були скопійовані"
+                "38": "Транзакції були скопійовані",
+                "39": "(Відсутні транзакції)"
             },
 
             "Update":{
@@ -693,7 +695,8 @@
                 "35": "Kopiować statystykę",
                 "36": "Statystyka jest skopiowana",
                 "37": "Kopiować transakcje",
-                "38": "Transakcje są skopiowane"
+                "38": "Transakcje są skopiowane",
+                "39": "(Brak transakcji)"
             },
 
             "Update":{
