@@ -25,12 +25,12 @@ Project life improvements:
 
 Bugs:
   ☐ empty @don't-touch
-  ☐ fix bug with copying statistics (convert html to text) @started(25-11-04 21:57)
 
 Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ fix bug with copying statistics (convert html to text) @started(25-11-04 21:57) @done(25-11-05 23:13) @lasted(1d1h16m30s) @project(Bugs)
   ✔ fix bug with changing category position that sometimes leads to two categories having the same position @started(25-11-03 23:07) @done(25-11-04 00:34) @lasted(1h27m13s) @project(Bugs)
   ✔ release 1.2.2 @started(25-10-26 17:31) @done(25-10-26 17:53) @lasted(22m32s) @project(Release)
   ✔ test release 1.2.2 on windows @started(25-10-26 00:26) @done(25-10-26 17:23) @lasted(17h57m36s) @project(Release)
