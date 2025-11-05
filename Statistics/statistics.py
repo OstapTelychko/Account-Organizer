@@ -710,27 +710,29 @@ def show_custom_range_statistics_view() -> int:
         </table>
         """)
         WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(item_text)
-        
+    
+    def add_category_to_statistics(categories_transactions:dict[Category, list[Transaction]]) -> None:
+        for category, category_transactions in categories_transactions.items():
+            if len(category_transactions) == 0:
+                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
+                    f"<br/>{category.name} {LanguageStructure.Statistics.get_translation(39)}<br/>"
+                )
+            else:
+                WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(f"<br/>{category.name}<br/>")
+                for transaction in category_transactions:
+                    add_transaction_to_transactions_list(transaction)
     #Transactions list
     if len(Incomes_categories_transactions):
         WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
-            LanguageStructure.MainWindow.get_translation(1)+"<br/><br/>"
+            LanguageStructure.MainWindow.get_translation(1)+"<br/>"
         )
-        for category, category_transactions in Incomes_categories_transactions.items():
-            WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("<br/>"+category.name+"<br/>")
-
-            for transaction in category_transactions:
-                add_transaction_to_transactions_list(transaction)
+        add_category_to_statistics(Incomes_categories_transactions)
     
     if len(Expenses_categories_transactions):
         WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem(
-            "<br/><br/><br/>"+LanguageStructure.MainWindow.get_translation(2)+"<br/><br/>"
+            "<br/><br/>"+LanguageStructure.MainWindow.get_translation(2)+"<br/>"
         )
-        for category, category_transactions in Expenses_categories_transactions.items():
-            WindowsRegistry.CustomRangeStatisticsView.transactions_list.addItem("<br/>"+category.name+"<br/>")
-
-            for transaction in category_transactions:
-                add_transaction_to_transactions_list(transaction)
+        add_category_to_statistics(Expenses_categories_transactions)
 
     logger.debug(f"Custom range statistics window is shown. From date: {from_date} To date: {to_date}")
     return WindowsRegistry.CustomRangeStatisticsView.exec()

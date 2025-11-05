@@ -377,10 +377,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         )
                     
                     expected_transactions = [
-                        f"{self.translated_incomes}<br/><br/>",
+                        f"{self.translated_incomes}<br/>",
                         f"<br/>{self.income_category.name}<br/>",
                         *self.generate_custom_range_statistics_transactions(1000.0, "Test income transaction"),
-                        f"<br/><br/><br/>{self.translated_expenses}<br/><br/>",
+                        f"<br/><br/>{self.translated_expenses}<br/>",
                         f"<br/>{self.expenses_category.name}<br/>",
                         *self.generate_custom_range_statistics_transactions(1000.0, "Test expenses transaction")
                     ]
