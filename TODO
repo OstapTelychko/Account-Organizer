@@ -5,7 +5,7 @@ New features:
   ☐ replace BASIC_FONT with some better one that will look good on both windows and linux
   ☐ fix issue with weird looking buttons on windows
   ☐ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction
-  ☐ add search for transaction by name, value or date in categories 
+  ☐ add search for transaction by name, value or date in categories @started(25-11-09 22:18)
 	
 Updates to existing features:
   ☐ empty @don't-touch

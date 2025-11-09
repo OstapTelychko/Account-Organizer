@@ -37,7 +37,8 @@ from PySide6.QtGui import QIcon, QFont
 
 from project_configuration import GENERAL_ICONS_DIRECTORY
 from DesktopQtToolkit.qsingleton import QSingleton
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS,\
+BIG_BASIC_FONT
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
@@ -77,7 +78,7 @@ class MainWindow(QWidget, metaclass=QSingleton):
 
         #Account balance and settings
         self.account_current_balance = QLabel("Balance: 0")
-        self.account_current_balance.setFont(QFont("C059 [urw]",pointSize=15))
+        self.account_current_balance.setFont(BIG_BASIC_FONT)
 
         self.settings = QToolButton()
         self.settings.setIcon(QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "Settings icon.png")))
@@ -181,10 +182,7 @@ class MainWindow(QWidget, metaclass=QSingleton):
         self.mini_calculator_text.setMinimumWidth(400)
 
         self.calculate = create_button("=",(100,40))
-
-        self.calculate_font = QFont(BASIC_FONT)
-        self.calculate_font.setPointSize(BASIC_FONT.pointSize()+6)
-        self.calculate.setFont(self.calculate_font)
+        self.calculate.setFont(BIG_BASIC_FONT)
         
         self.window_bottom.addStretch(1)
         self.window_bottom.addWidget(self.statistics)

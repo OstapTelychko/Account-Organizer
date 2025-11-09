@@ -33,5 +33,7 @@ FOCUSED_SHADOW_EFFECT_ARGUMENTS = {"blurRadius":20, "xOffset":0, "yOffset":0, "c
 
 if platform == "linux":
     BASIC_FONT = QFont("C059 [urw]", pointSize=12)
+    BIG_BASIC_FONT = QFont("C059 [urw]", pointSize=15)
 else:#Windows
     BASIC_FONT = QFont("Georgia", pointSize=12)
+    BIG_BASIC_FONT = QFont("Georgia", pointSize=15)
