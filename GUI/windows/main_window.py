@@ -174,6 +174,7 @@ class MainWindow(QWidget, metaclass=QSingleton):
 
         self.window_bottom = QHBoxLayout()
         self.statistics = create_button("Statistics",(160,40))
+        self.search = create_button("Search",(100,40))
 
         self.mini_calculator_label = QLabel("Mini-calculator")
         self.mini_calculator_label.setFont(BASIC_FONT)
@@ -186,6 +187,7 @@ class MainWindow(QWidget, metaclass=QSingleton):
         
         self.window_bottom.addStretch(1)
         self.window_bottom.addWidget(self.statistics)
+        self.window_bottom.addWidget(self.search)
         self.window_bottom.addStretch(5)
         self.window_bottom.addWidget(self.mini_calculator_label)
         self.window_bottom.addWidget(self.mini_calculator_text)

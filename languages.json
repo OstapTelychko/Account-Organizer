@@ -205,6 +205,14 @@
                 "1": "Update progress",
                 "2": "Downloading update (%update_size% MB)",
                 "3": "Upgrading backups"
+            },
+            "Search":{
+                "0":"Search",
+                "1":"Search",
+                "2": "Transaction name",
+                "3": "Transaction value",
+                "4": "Month",
+                "5": "Year"
             }
         },
 
@@ -456,6 +464,14 @@
                 "1": "Прогрес оновлення",
                 "2": "Завантаження оновлення (%update_size% МБ)",
                 "3": "Оновлення баз даних"
+            },
+            "Search":{
+                "0":"Пошук",
+                "1":"Пошук",
+                "2": "Назва транзакції",
+                "3": "Значення транзакції",
+                "4": "Місяць",
+                "5": "Рік"
             }
         },
 
@@ -704,6 +720,14 @@
                 "1": "Postęp aktualizacji",
                 "2": "Pobieranie aktualizacji (%update_size% MB)",
                 "3": "Aktualizacja baz danych"
+            },
+            "Search":{
+                "0":"Szukaj",
+                "1": "Wyszukiwanie",
+                "2": "Nazwa transakcji",
+                "3": "Wartość transakcji",
+                "4": "Miesiąc",
+                "5": "Rok"
             }
         },
 

@@ -1,15 +1,13 @@
 from __future__ import annotations
 from typing import NamedTuple, TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QGraphicsDropShadowEffect,\
-    QDateEdit
-from PySide6.QtCore import Qt, QDate
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QGraphicsDropShadowEffect
+from PySide6.QtCore import Qt
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.create_date_input import create_date_input
 from DesktopQtToolkit.list_widget import CustomListWidget
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
-
-from project_configuration import QCALENDAR_DATE_FORMAT
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
 
@@ -412,15 +410,9 @@ class CustomRangeStatistics(SubWindow):
         self.categories_lists_layout.addWidget(self.incomes_categories_list_scroll)
         self.categories_lists_layout.addWidget(self.expenses_categories_list_scroll)
 
-        self.from_date = QDateEdit()
-        self.from_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
-        self.from_date.setCalendarPopup(True)
-        self.from_date.setDate(QDate.currentDate())
+        self.from_date = create_date_input()
 
-        self.to_date = QDateEdit()
-        self.to_date.setDisplayFormat(QCALENDAR_DATE_FORMAT)
-        self.to_date.setCalendarPopup(True)
-        self.to_date.setDate(QDate.currentDate())
+        self.to_date = create_date_input()
 
         self.date_inputs_layout = QHBoxLayout()
         self.date_inputs_layout.setSpacing(20)

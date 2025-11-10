@@ -28,6 +28,7 @@ def change_language_for_startup() -> None:
     WindowsRegistry.MainWindow.add_incomes_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.add_expenses_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.statistics.setText(LanguageStructure.Statistics.get_translation(0))
+    WindowsRegistry.MainWindow.search.setText(LanguageStructure.Search.get_translation(0))
     WindowsRegistry.MainWindow.mini_calculator_label.setText(LanguageStructure.MiniCalculator.get_translation(0))
 
 
@@ -249,6 +250,14 @@ def change_language() -> None:
         shortcut.shortcut_description.setText(LanguageStructure.ShortcutsDescriptions.get_translation(index))
         shortcut.reset_shortcut.setText(LanguageStructure.GeneralManagement.get_translation(11))
     WindowsRegistry.ShortcutsWindow.save_shortcuts.setText(LanguageStructure.GeneralManagement.get_translation(6))
+
+    WindowsRegistry.SearchWindow.setWindowTitle(LanguageStructure.Search.get_translation(1))
+    WindowsRegistry.SearchWindow.search.setText(LanguageStructure.Search.get_translation(0))
+    WindowsRegistry.SearchWindow.search_name.setPlaceholderText(LanguageStructure.Search.get_translation(2))
+    WindowsRegistry.SearchWindow.search_value.setPlaceholderText(LanguageStructure.Search.get_translation(3))
+    WindowsRegistry.SearchWindow.select_month_range_button.setText(LanguageStructure.Search.get_translation(4))
+    WindowsRegistry.SearchWindow.select_year_range_button.setText(LanguageStructure.Search.get_translation(5))
+
 
  
 def change_language_during_add_account(language:int | str) -> None:

@@ -186,6 +186,9 @@ def main(test_mode:bool=False) -> None:
     #Activate mini calculator
     WindowsRegistry.MainWindow.calculate.clicked.connect(calculate_expression)
 
+    #Search
+    WindowsRegistry.MainWindow.search.clicked.connect(WindowsRegistry.SearchWindow.exec)
+
     #Statistics
     WindowsRegistry.MainWindow.statistics.clicked.connect(WindowsRegistry.StatisticsWindow.exec)
     WindowsRegistry.StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
