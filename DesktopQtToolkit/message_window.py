@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QMessageBox, QWidget
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QTimer
@@ -9,8 +8,6 @@ from sys import platform
 from GUI.gui_constants import DWMWA_USE_IMMERSIVE_DARK_MODE
 from AppObjects.app_core import AppCore
 
-if TYPE_CHECKING:
-    from PySide6.QtGui import QIcon
 
 
 

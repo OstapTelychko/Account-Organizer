@@ -33,7 +33,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLab
     QGraphicsDropShadowEffect
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon, QFont
+from PySide6.QtGui import QIcon
 
 from project_configuration import GENERAL_ICONS_DIRECTORY
 from DesktopQtToolkit.qsingleton import QSingleton

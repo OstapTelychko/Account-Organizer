@@ -63,7 +63,7 @@ def change_language() -> None:
     WindowsRegistry.RenameAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(2))
 
     WindowsRegistry.SwitchAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(6))
-    for account, account_switch_widget in zip(app_core.accounts_list, app_core.account_switch_widgets):
+    for account, account_switch_widget in zip(app_core.accounts_list, WindowsRegistry.SwitchAccountWindow.account_switch_widgets):
         account_switch_widget.account_balance_label.setText(
             f"{LanguageStructure.MainWindow.get_translation(0)}{round(account.current_balance, 2)}"
 )

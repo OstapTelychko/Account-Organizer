@@ -122,13 +122,13 @@ def load_accounts() -> None:
             account_switch_widget.switch_button.setDisabled(True)
 
         WindowsRegistry.SwitchAccountWindow.accounts_layout.addWidget(account_switch_widget.account_widget, alignment=ALIGN_V_CENTER)
-        app_core.account_switch_widgets.append(account_switch_widget)
+        WindowsRegistry.SwitchAccountWindow.account_switch_widgets.append(account_switch_widget)
  
 
 def clear_accounts_layout() -> None:
     """Clear account switch widgets. Remove all widgets from layout and clear account switch widgets list."""
 
-    AppCore.instance().account_switch_widgets.clear()
+    WindowsRegistry.SwitchAccountWindow.account_switch_widgets.clear()
     while WindowsRegistry.SwitchAccountWindow.accounts_layout.count() > 0:
         widget = WindowsRegistry.SwitchAccountWindow.accounts_layout.itemAt(0).widget()
         if widget:
@@ -150,7 +150,7 @@ def switch_account(name:str) -> None:
     WindowsRegistry.Messages.load_account_question.exec()
 
     if WindowsRegistry.Messages.load_account_question.clickedButton() == WindowsRegistry.Messages.load_account_question.ok_button:
-        for widget in AppCore.instance().account_switch_widgets:
+        for widget in WindowsRegistry.SwitchAccountWindow.account_switch_widgets:
             if widget.account_name_label.text() == name:
                 widget.switch_button.setDisabled(True)
             else:
@@ -175,7 +175,7 @@ def remove_account() -> None:
 
         if len(app_core.accounts_list) != 0:
             next_name = app_core.accounts_list[0].name
-            for widget in app_core.account_switch_widgets:
+            for widget in WindowsRegistry.SwitchAccountWindow.account_switch_widgets:
                 if widget.account_name_label.text() == next_name:
                     widget.switch_button.setDisabled(True)
 

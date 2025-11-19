@@ -151,6 +151,8 @@ class SwitchAccountWindow(SubWindow):
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
+        self.account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
+        
         self.accounts_layout = QHBoxLayout()
         self.accounts_layout.setSpacing(50)
 
