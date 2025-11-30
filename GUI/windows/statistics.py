@@ -10,6 +10,7 @@ from DesktopQtToolkit.list_widget import CustomListWidget
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.ComplexWidgets.categories_select_by_type import CategoriesSelectionByType
 
 if TYPE_CHECKING:
     from PySide6.QtCore import QEvent
@@ -338,80 +339,8 @@ class CustomRangeStatistics(SubWindow):
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
 
-        self.selected_categories_data:dict[int, tuple[Category, str]] = {}
-
-        self.selected_categories_list = CustomListWidget()
-        self.selected_categories_list.setMinimumWidth(400)
-        self.selected_categories_list.setMinimumHeight(225)
-
-        self.add_all_incomes_categories = create_button("Add all", (150, 40))
-        self.remove_all_incomes_categories = create_button("Remove all", (150, 40))
-
-        self.incomes_buttons_layout = QHBoxLayout()
-        self.incomes_buttons_layout.addWidget(self.add_all_incomes_categories, alignment=ALIGN_H_CENTER)
-        self.incomes_buttons_layout.addWidget(self.remove_all_incomes_categories, alignment=ALIGN_H_CENTER)
-
-        self.incomes_categories_list_layout = QVBoxLayout()
-        self.incomes_categories_list_layout.setSpacing(20)
-        self.incomes_categories_list_layout.setContentsMargins(10, 10, 20, 10)
-
-        self.incomes_categories_layout = QVBoxLayout()
-        self.incomes_categories_layout.addLayout(self.incomes_buttons_layout)
-        self.incomes_categories_layout.addLayout(self.incomes_categories_list_layout)
-
-        self.incomes_categories_list_window = QWidget()
-        self.incomes_categories_list_window.setLayout(self.incomes_categories_layout)
-
-        self.incomes_categories_list_scroll = QScrollArea()
-        self.incomes_categories_list_scroll.setWidget(self.incomes_categories_list_window)
-        self.incomes_categories_list_scroll.setWidgetResizable(True)
-        self.incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.incomes_categories_list_scroll.setMinimumHeight(350)
-        self.incomes_categories_list_scroll.setMaximumHeight(350)
-        self.incomes_categories_list_scroll.setMinimumWidth(530)
-        self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
-        self.incomes_categories_list_scroll.setProperty("class", "wrapper")
-        self.incomes_categories_list_scroll.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
-        )
-
-        self.add_all_expenses_categories = create_button("Add all", (150, 40))
-        self.remove_all_expenses_categories = create_button("Remove all", (150, 40))
-
-        self.expenses_buttons_layout = QHBoxLayout()
-        self.expenses_buttons_layout.addWidget(self.add_all_expenses_categories, alignment=ALIGN_H_CENTER)
-        self.expenses_buttons_layout.addWidget(self.remove_all_expenses_categories, alignment=ALIGN_H_CENTER)
-
-        self.expenses_categories_list_layout = QVBoxLayout()
-        self.expenses_categories_list_layout.setSpacing(20)
-        self.expenses_categories_list_layout.setContentsMargins(10, 10, 20, 10)
-
-        self.expenses_categories_layout = QVBoxLayout()
-        self.expenses_categories_layout.addLayout(self.expenses_buttons_layout)
-        self.expenses_categories_layout.addLayout(self.expenses_categories_list_layout)
-
-        self.expenses_categories_list_window = QWidget()
-        self.expenses_categories_list_window.setLayout(self.expenses_categories_layout)
-        
-        self.expenses_categories_list_scroll = QScrollArea()
-        self.expenses_categories_list_scroll.setWidget(self.expenses_categories_list_window)
-        self.expenses_categories_list_scroll.setWidgetResizable(True)
-        self.expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.expenses_categories_list_scroll.setMinimumHeight(350)
-        self.expenses_categories_list_scroll.setMaximumHeight(350)
-        self.expenses_categories_list_scroll.setMinimumWidth(530)
-        self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
-        self.expenses_categories_list_scroll.setProperty("class", "wrapper")
-        self.expenses_categories_list_scroll.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
-        )
-
-        self.categories_lists_layout = QHBoxLayout()
-        self.categories_lists_layout.addWidget(self.incomes_categories_list_scroll)
-        self.categories_lists_layout.addWidget(self.expenses_categories_list_scroll)
-
+        self.categories_selection = CategoriesSelectionByType()
         self.from_date = create_date_input()
-
         self.to_date = create_date_input()
 
         self.date_inputs_layout = QHBoxLayout()
@@ -427,8 +356,7 @@ class CustomRangeStatistics(SubWindow):
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(30)
         self.main_layout.addLayout(self.window_menu_layout)
-        self.main_layout.addWidget(self.selected_categories_list, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-        self.main_layout.addLayout(self.categories_lists_layout)
+        self.main_layout.addWidget(self.categories_selection)
         self.main_layout.addLayout(self.date_inputs_layout)
         self.main_layout.addWidget(self.show_statistics, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
         self.main_layout.setContentsMargins(30, 10, 30, 20)

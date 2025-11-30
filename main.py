@@ -155,8 +155,7 @@ def main(test_mode:bool=False) -> None:
 
     from AppObjects.windows_registry import WindowsRegistry
     from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics,\
-    show_custom_range_statistics_window, show_custom_range_statistics_view, add_all_categories_to_statistics_list,\
-    remove_all_categories_from_statistics_list
+    show_custom_range_statistics_window, show_custom_range_statistics_view
     from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics,\
     copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
@@ -199,24 +198,8 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.QuarterlyStatistics.copy_statistics.clicked.connect(copy_quarterly_statistics)
     WindowsRegistry.YearlyStatistics.copy_statistics.clicked.connect(copy_yearly_statistics)
     WindowsRegistry.CustomRangeStatistics.show_statistics.clicked.connect(show_custom_range_statistics_view)
-    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.clicked.connect(
-        partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories)
-    )
-    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.clicked.connect(
-        partial(add_all_categories_to_statistics_list, WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories)
-    )
-    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.clicked.connect(
-        partial(
-            remove_all_categories_from_statistics_list,
-            WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories
-        )
-    )
-    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.clicked.connect(
-        partial(
-            remove_all_categories_from_statistics_list,
-            WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories
-        )
-    )
+
+
     WindowsRegistry.CustomRangeStatisticsView.copy_statistics.clicked.connect(copy_custom_range_statistics)
     WindowsRegistry.CustomRangeStatisticsView.copy_transactions.clicked.connect(copy_custom_range_transactions)
     

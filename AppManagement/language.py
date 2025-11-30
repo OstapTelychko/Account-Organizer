@@ -131,16 +131,16 @@ def change_language() -> None:
     
     WindowsRegistry.CustomRangeStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(34))
     WindowsRegistry.CustomRangeStatistics.show_statistics.setText(LanguageStructure.Statistics.get_translation(0))
-    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.setText(
+    WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_incomes_categories.setText(
         LanguageStructure.GeneralManagement.get_translation(9)
     )
-    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.setText(
+    WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_expenses_categories.setText(
         LanguageStructure.GeneralManagement.get_translation(9)
     )
-    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.setText(
+    WindowsRegistry.CustomRangeStatistics.categories_selection.remove_all_incomes_categories.setText(
         LanguageStructure.GeneralManagement.get_translation(10)
     )
-    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.setText(
+    WindowsRegistry.CustomRangeStatistics.categories_selection.remove_all_expenses_categories.setText(
         LanguageStructure.GeneralManagement.get_translation(10)
     )
     WindowsRegistry.CustomRangeStatisticsView.setWindowTitle(
