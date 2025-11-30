@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QWidget, QGridLayout
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QGridLayout
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
@@ -9,6 +9,7 @@ from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 from DesktopQtToolkit.list_widget import CustomListWidget
 
 from GUI.gui_constants import ALIGN_H_CENTER
+from GUI.ComplexWidgets.categories_select_by_type import CategoriesSelectionByType
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -41,20 +42,30 @@ class SearchWindow(SubWindow):
         self.select_year_range_button = create_button("Year", (100, 40))
 
         self.date_range_layout = QGridLayout()
-        self.date_range_layout.addWidget(self.select_month_range_button, 0, 0)
-        self.date_range_layout.addWidget(self.select_year_range_button, 0, 1)
+        self.date_range_layout.addWidget(self.select_month_range_button, 0, 0, alignment=ALIGN_H_CENTER)
+        self.date_range_layout.addWidget(self.select_year_range_button, 0, 1, alignment=ALIGN_H_CENTER)
         self.date_range_layout.addWidget(self.search_from_date, 1, 0)
         self.date_range_layout.addWidget(self.search_to_date, 1, 1)
 
         self.date_range_wrapper = create_wrapper_widget(self.date_range_layout)
 
+        self.categories_selection = CategoriesSelectionByType()
+        self.categories_selection.setHidden(True)
+        self.categories_selection_button = create_button("Categories", (150, 40))
+
+
         self.search_parameters_layout = QHBoxLayout()
         self.search_parameters_layout.addLayout(self.transactions_parameters_layout)
         self.search_parameters_layout.addSpacing(20)
-        self.search_parameters_layout.addWidget(self.date_range_wrapper)
+        self.search_parameters_layout.addWidget(self.date_range_wrapper, alignment=ALIGN_H_CENTER)
+        self.search_parameters_layout.addSpacing(20)
+        self.search_parameters_layout.addWidget(self.categories_selection_button)
 
+        self.search_parameters_wrapper_layout = QVBoxLayout()
+        self.search_parameters_wrapper_layout.addLayout(self.search_parameters_layout)
+        self.search_parameters_wrapper_layout.addWidget(self.categories_selection, alignment=ALIGN_H_CENTER)
 
-        self.search_parameters_wrapper = create_wrapper_widget(self.search_parameters_layout)
+        self.search_parameters_wrapper = create_wrapper_widget(self.search_parameters_wrapper_layout)
 
         self.search = create_button("Search", (100, 40))
 
@@ -68,3 +79,16 @@ class SearchWindow(SubWindow):
         self.main_layout.addWidget(self.transactions_list)
 
         self.window_container.setLayout(self.main_layout)
+        self.setMinimumSize(1100, 850)
+
+        self.categories_selection_button.clicked.connect(self.toggle_categories_selection)
+
+
+    def toggle_categories_selection(self) -> None:
+        """Show/hide categories selection widget."""
+        if self.categories_selection.isHidden():
+            self.categories_selection.setHidden(False)
+            self.transactions_list.setHidden(True)
+        else:
+            self.categories_selection.setHidden(True)
+            self.transactions_list.setHidden(False)

@@ -62,7 +62,7 @@ class CategoriesSelectionByType(QWidget):
         self.incomes_buttons_layout.addWidget(self.remove_all_incomes_categories, alignment=ALIGN_H_CENTER)
 
         self.incomes_categories_list_layout = QVBoxLayout()
-        self.incomes_categories_list_layout.setSpacing(20)
+        self.incomes_categories_list_layout.setSpacing(15)
         self.incomes_categories_list_layout.setContentsMargins(10, 10, 20, 10)
 
         self.incomes_categories_layout = QVBoxLayout()
@@ -76,9 +76,9 @@ class CategoriesSelectionByType(QWidget):
         self.incomes_categories_list_scroll.setWidget(self.incomes_categories_list_window)
         self.incomes_categories_list_scroll.setWidgetResizable(True)
         self.incomes_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.incomes_categories_list_scroll.setMinimumHeight(350)
-        self.incomes_categories_list_scroll.setMaximumHeight(350)
-        self.incomes_categories_list_scroll.setMinimumWidth(530)
+        self.incomes_categories_list_scroll.setMinimumHeight(300)
+        self.incomes_categories_list_scroll.setMaximumHeight(300)
+        self.incomes_categories_list_scroll.setMinimumWidth(500)
         self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.incomes_categories_list_scroll.setProperty("class", "wrapper")
         self.incomes_categories_list_scroll.setGraphicsEffect(
@@ -93,7 +93,7 @@ class CategoriesSelectionByType(QWidget):
         self.expenses_buttons_layout.addWidget(self.remove_all_expenses_categories, alignment=ALIGN_H_CENTER)
 
         self.expenses_categories_list_layout = QVBoxLayout()
-        self.expenses_categories_list_layout.setSpacing(20)
+        self.expenses_categories_list_layout.setSpacing(15)
         self.expenses_categories_list_layout.setContentsMargins(10, 10, 20, 10)
 
         self.expenses_categories_layout = QVBoxLayout()
@@ -107,9 +107,9 @@ class CategoriesSelectionByType(QWidget):
         self.expenses_categories_list_scroll.setWidget(self.expenses_categories_list_window)
         self.expenses_categories_list_scroll.setWidgetResizable(True)
         self.expenses_categories_list_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.expenses_categories_list_scroll.setMinimumHeight(350)
-        self.expenses_categories_list_scroll.setMaximumHeight(350)
-        self.expenses_categories_list_scroll.setMinimumWidth(530)
+        self.expenses_categories_list_scroll.setMinimumHeight(300)
+        self.expenses_categories_list_scroll.setMaximumHeight(300)
+        self.expenses_categories_list_scroll.setMinimumWidth(500)
         self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.expenses_categories_list_scroll.setProperty("class", "wrapper")
         self.expenses_categories_list_scroll.setGraphicsEffect(
@@ -280,7 +280,7 @@ class CategoriesSelectionByType(QWidget):
         Adds categories to respective lists based on their type and allows selection.
 
         Args:
-            categories (dict[int, Category]): A dictionary of categories to be added.
+            categories (list[Category]): A list of categories to be added.
         """
 
         #Remove previous categories

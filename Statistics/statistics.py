@@ -461,7 +461,7 @@ def show_yearly_statistics() -> int:
 def show_custom_range_statistics_window() -> None:
     """This method is used to show the custom range statistics window. Where parameters like from and to date are set."""
 
-    categories = sorted(AppCore.instance().categories.values(), key=lambda category: category.type)
+    categories = list(AppCore.instance().categories.values())
     WindowsRegistry.CustomRangeStatistics.categories_selection.add_categories_to_selection(categories)
     
     WindowsRegistry.StatisticsWindow.done(1)

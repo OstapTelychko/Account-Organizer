@@ -170,6 +170,7 @@ def main(test_mode:bool=False) -> None:
     from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup,\
         open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
     from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
+    from AppManagement.search import show_search_window
 
     #Set main window for instance guard
     app_core.instance_guard.main_window = WindowsRegistry.MainWindow
@@ -186,7 +187,7 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.MainWindow.calculate.clicked.connect(calculate_expression)
 
     #Search
-    WindowsRegistry.MainWindow.search.clicked.connect(WindowsRegistry.SearchWindow.exec)
+    WindowsRegistry.MainWindow.search.clicked.connect(show_search_window)
 
     #Statistics
     WindowsRegistry.MainWindow.statistics.clicked.connect(WindowsRegistry.StatisticsWindow.exec)
