@@ -131,16 +131,8 @@ def change_language() -> None:
     
     WindowsRegistry.CustomRangeStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(34))
     WindowsRegistry.CustomRangeStatistics.show_statistics.setText(LanguageStructure.Statistics.get_translation(0))
-    WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_incomes_categories.setText(
-        LanguageStructure.GeneralManagement.get_translation(9)
-    )
-    WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_expenses_categories.setText(
-        LanguageStructure.GeneralManagement.get_translation(9)
-    )
-    WindowsRegistry.CustomRangeStatistics.categories_selection.remove_all_incomes_categories.setText(
-        LanguageStructure.GeneralManagement.get_translation(10)
-    )
-    WindowsRegistry.CustomRangeStatistics.categories_selection.remove_all_expenses_categories.setText(
+    WindowsRegistry.CustomRangeStatistics.categories_selection.set_translation_to_add_and_remove_all_categories_buttons(
+        LanguageStructure.GeneralManagement.get_translation(9),
         LanguageStructure.GeneralManagement.get_translation(10)
     )
     WindowsRegistry.CustomRangeStatisticsView.setWindowTitle(
@@ -257,6 +249,11 @@ def change_language() -> None:
     WindowsRegistry.SearchWindow.search_value.setPlaceholderText(LanguageStructure.Search.get_translation(3))
     WindowsRegistry.SearchWindow.select_month_range_button.setText(LanguageStructure.Search.get_translation(4))
     WindowsRegistry.SearchWindow.select_year_range_button.setText(LanguageStructure.Search.get_translation(5))
+    WindowsRegistry.SearchWindow.categories_selection_button.setText(LanguageStructure.Search.get_translation(6))
+    WindowsRegistry.SearchWindow.categories_selection.set_translation_to_add_and_remove_all_categories_buttons(
+        LanguageStructure.GeneralManagement.get_translation(9),
+        LanguageStructure.GeneralManagement.get_translation(10)
+    )
 
 
  

@@ -63,6 +63,7 @@ class ShortcutsWindow(SubWindow):
         self.select_next_transaction_shortcut = self.ShortcutWidget()
         self.delete_transaction_shortcut = self.ShortcutWidget()
         self.edit_transaction_shortcut = self.ShortcutWidget()
+        self.open_search_shortcut = self.ShortcutWidget()
         
         self.shortcuts_layout = QVBoxLayout()
         self.shortcuts_layout.addWidget(self.close_current_window_shortcut)
@@ -80,6 +81,7 @@ class ShortcutsWindow(SubWindow):
         self.shortcuts_layout.addWidget(self.select_next_transaction_shortcut)
         self.shortcuts_layout.addWidget(self.delete_transaction_shortcut)
         self.shortcuts_layout.addWidget(self.edit_transaction_shortcut)
+        self.shortcuts_layout.addWidget(self.open_search_shortcut)
 
         self.shortcuts_container = QWidget()
         self.shortcuts_container.setLayout(self.shortcuts_layout)

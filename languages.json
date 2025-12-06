@@ -134,7 +134,8 @@
                         "11":"<b>Select previous transaction</b>",
                         "12":"<b>Select next transaction</b>",
                         "13":"<b>Delete selected transaction</b>",
-                        "14":"<b>Edit selected transaction</b>"
+                        "14":"<b>Edit selected transaction</b>",
+                        "15":"<b>Open search window</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -152,7 +153,8 @@
                         "11":"Select previous transaction. Category have to be focused",
                         "12":"Select next transaction. Category have to be focused",
                         "13":"Delete selected transaction. Transaction have to be selected",
-                        "14":"Edit selected transaction. Transaction have to be selected"
+                        "14":"Edit selected transaction. Transaction have to be selected",
+                        "15":"Opens window to search transactions"
                     }
                 }
             },
@@ -212,7 +214,8 @@
                 "2": "Transaction name",
                 "3": "Transaction value",
                 "4": "Month",
-                "5": "Year"
+                "5": "Year",
+                "6": "Categories"
             }
         },
 
@@ -391,7 +394,8 @@
                         "11":"<b>Вибрати попередню транзакцію</b>",
                         "12":"<b>Вибрати наступну транзакцію</b>",
                         "13":"<b>Видалити вибрану транзакцію</b>",
-                        "14":"<b>Редагувати вибрану транзакцію</b>"
+                        "14":"<b>Редагувати вибрану транзакцію</b>",
+                        "15":"<b>Відкрити вікно пошуку</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -409,7 +413,8 @@
                         "11":"Вибрати попередню транзакцію. Категорія повинна бути сфокусована",
                         "12":"Вибрати наступну транзакцію. Категорія повинна бути сфокусована",
                         "13":"Видалити вибрану транзакцію. Транзакція повинна бути вибрана",
-                        "14":"Редагувати вибрану транзакцію. Транзакція повинна бути вибрана"
+                        "14":"Редагувати вибрану транзакцію. Транзакція повинна бути вибрана",
+                        "15":"Відкриває вікно для пошуку транзакцій"
                     }
 
                 }
@@ -471,7 +476,8 @@
                 "2": "Назва транзакції",
                 "3": "Значення транзакції",
                 "4": "Місяць",
-                "5": "Рік"
+                "5": "Рік",
+                "6": "Категорії"
             }
         },
 
@@ -649,7 +655,8 @@
                         "11":"<b>Wybierz poprzednią transakcję</b>",
                         "12":"<b>Wybierz następną transakcję</b>",
                         "13":"<b>Usunąć wybraną transakcję</b>",
-                        "14":"<b>Edytować wybraną transakcję</b>"
+                        "14":"<b>Edytować wybraną transakcję</b>",
+                        "15":"<b>Otworzyć okno wyszukiwania</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -667,7 +674,8 @@
                         "11":"Wybierze poprzednią transakcję. Kategoria musi być sfokusowana",
                         "12":"Wybierze następną transakcję. Kategoria musi być sfokusowana",
                         "13":"Usunie wybraną transakcję. Transakcja musi być wybrana",
-                        "14":"Edytuje wybraną transakcję. Transakcja musi być wybrana"
+                        "14":"Edytuje wybraną transakcję. Transakcja musi być wybrana",
+                        "15":"Otworzy okno do wyszukiwania transakcji"
                     }
                 }
             },
@@ -727,7 +735,8 @@
                 "2": "Nazwa transakcji",
                 "3": "Wartość transakcji",
                 "4": "Miesiąc",
-                "5": "Rok"
+                "5": "Rok",
+                "6": "Kategorie"
             }
         },
 

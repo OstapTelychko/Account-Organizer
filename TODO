@@ -15,7 +15,7 @@ Updates to existing features:
   ☐ block closing update progress window if update in progress
   ☐ show attempts of downloading zip files in update progress window
   ☐ add recommended backups and legacy backups amount to messages
-  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative 
+  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
   
 Project life improvements:
   ☐ empty @don't-touch
@@ -23,6 +23,7 @@ Project life improvements:
   ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
   ☐ create tests for search transactions
+  ☐ add tests for searching transactions and shortcut to open search window
 
 Bugs:
   ☐ empty @don't-touch

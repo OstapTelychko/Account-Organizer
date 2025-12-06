@@ -312,3 +312,12 @@ class CategoriesSelectionByType(QWidget):
             category_item.add_category_button.clicked.connect(partial(
                 self.add_category_to_statistics_list,
                 category, category_type_translate, category_item.remove_category_button, category_item.add_category_button))
+    
+
+    def set_translation_to_add_and_remove_all_categories_buttons(self, add_text:str, remove_text:str) -> None:
+        """Set translated text to add and remove all categories buttons."""
+
+        self.add_all_expenses_categories.setText(add_text)
+        self.add_all_incomes_categories.setText(add_text)
+        self.remove_all_expenses_categories.setText(remove_text)
+        self.remove_all_incomes_categories.setText(remove_text)
