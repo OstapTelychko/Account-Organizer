@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QGridLayout
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
-from DesktopQtToolkit.create_date_input import create_date_input
 from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 from DesktopQtToolkit.list_widget import CustomListWidget
 
 from GUI.gui_constants import ALIGN_H_CENTER
 from GUI.ComplexWidgets.categories_select_by_type import CategoriesSelectionByType
+from GUI.ComplexWidgets.date_selection import DateSelection
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -21,7 +21,6 @@ class SearchWindow(SubWindow):
 
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)
-
 
         self.search_name = QLineEdit()
         self.search_name.setMinimumWidth(180)
@@ -35,29 +34,16 @@ class SearchWindow(SubWindow):
         self.transactions_parameters_layout.addWidget(self.search_name)
         self.transactions_parameters_layout.addWidget(self.search_value)
 
-        self.search_from_date = create_date_input()
-        self.search_to_date = create_date_input()
-
-        self.select_month_range_button = create_button("Month", (100, 40))
-        self.select_year_range_button = create_button("Year", (100, 40))
-
-        self.date_range_layout = QGridLayout()
-        self.date_range_layout.addWidget(self.select_month_range_button, 0, 0, alignment=ALIGN_H_CENTER)
-        self.date_range_layout.addWidget(self.select_year_range_button, 0, 1, alignment=ALIGN_H_CENTER)
-        self.date_range_layout.addWidget(self.search_from_date, 1, 0)
-        self.date_range_layout.addWidget(self.search_to_date, 1, 1)
-
-        self.date_range_wrapper = create_wrapper_widget(self.date_range_layout)
+        self.date_selection = DateSelection()
 
         self.categories_selection = CategoriesSelectionByType()
         self.categories_selection.setHidden(True)
         self.categories_selection_button = create_button("Categories", (150, 40))
 
-
         self.search_parameters_layout = QHBoxLayout()
         self.search_parameters_layout.addLayout(self.transactions_parameters_layout)
         self.search_parameters_layout.addSpacing(20)
-        self.search_parameters_layout.addWidget(self.date_range_wrapper, alignment=ALIGN_H_CENTER)
+        self.search_parameters_layout.addWidget(self.date_selection, alignment=ALIGN_H_CENTER)
         self.search_parameters_layout.addSpacing(20)
         self.search_parameters_layout.addWidget(self.categories_selection_button)
 

@@ -170,7 +170,7 @@ def main(test_mode:bool=False) -> None:
     from AppManagement.backup_management import load_backups, create_backup, remove_backup, load_backup,\
         open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
     from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
-    from AppManagement.search import show_search_window
+    from AppManagement.search import show_search_window, perform_search
 
     #Set main window for instance guard
     app_core.instance_guard.main_window = WindowsRegistry.MainWindow
@@ -278,6 +278,9 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.SettingsWindow.switch_account.clicked.connect(WindowsRegistry.SwitchAccountWindow.exec)
     WindowsRegistry.SettingsWindow.backup_management.clicked.connect(WindowsRegistry.BackupManagementWindow.exec)
     WindowsRegistry.SettingsWindow.shortcuts_management.clicked.connect(WindowsRegistry.ShortcutsWindow.exec)
+
+    #Search
+    WindowsRegistry.SearchWindow.search.clicked.connect(perform_search)
     
     QTimer.singleShot(50, post_show_setup)
 

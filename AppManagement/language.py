@@ -247,8 +247,8 @@ def change_language() -> None:
     WindowsRegistry.SearchWindow.search.setText(LanguageStructure.Search.get_translation(0))
     WindowsRegistry.SearchWindow.search_name.setPlaceholderText(LanguageStructure.Search.get_translation(2))
     WindowsRegistry.SearchWindow.search_value.setPlaceholderText(LanguageStructure.Search.get_translation(3))
-    WindowsRegistry.SearchWindow.select_month_range_button.setText(LanguageStructure.Search.get_translation(4))
-    WindowsRegistry.SearchWindow.select_year_range_button.setText(LanguageStructure.Search.get_translation(5))
+    WindowsRegistry.SearchWindow.date_selection.select_month_range_button.setText(LanguageStructure.Search.get_translation(4))
+    WindowsRegistry.SearchWindow.date_selection.select_year_range_button.setText(LanguageStructure.Search.get_translation(5))
     WindowsRegistry.SearchWindow.categories_selection_button.setText(LanguageStructure.Search.get_translation(6))
     WindowsRegistry.SearchWindow.categories_selection.set_translation_to_add_and_remove_all_categories_buttons(
         LanguageStructure.GeneralManagement.get_translation(9),
