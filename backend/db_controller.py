@@ -19,6 +19,7 @@ from backend.category_query import CategoryQuery
 from backend.transaction_query import TransactionQuery
 from backend.backup_query import BackupQuery
 from backend.statistics_query import StatisticsQuery
+from backend.search_query import SearchQuery
 
 if TYPE_CHECKING:
     from sqlalchemy import Engine
@@ -77,6 +78,7 @@ class DBController():
         self.transaction_query = TransactionQuery(self.session_factory)
         self.backup_query = BackupQuery(self.session_factory, self.engine)
         self.statistics_query = StatisticsQuery(self.session_factory)
+        self.search_query = SearchQuery(self.session_factory)
 
         logger.info("Db session created")
 

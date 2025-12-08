@@ -1,15 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QComboBox
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 from DesktopQtToolkit.list_widget import CustomListWidget
+from DesktopQtToolkit.strict_double_validator import StrictDoubleValidator
 
-from GUI.gui_constants import ALIGN_H_CENTER
+from GUI.gui_constants import ALIGN_H_CENTER, BASIC_FONT
 from GUI.ComplexWidgets.categories_select_by_type import CategoriesSelectionByType
 from GUI.ComplexWidgets.date_selection import DateSelection
+
+from project_configuration import MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -26,13 +29,23 @@ class SearchWindow(SubWindow):
         self.search_name.setMinimumWidth(180)
         self.search_name.setPlaceholderText("Transaction name")
 
+        self.value_operands = QComboBox()
+        self.value_operands.setMinimumWidth(60)
+        self.value_operands.addItems(["=", "!=", "<", ">", "<=", ">="])
+        self.value_operands.setFont(BASIC_FONT)
+
         self.search_value = QLineEdit()
         self.search_value.setMinimumWidth(180)
         self.search_value.setPlaceholderText("Transaction value")
+        self.search_value.setValidator(StrictDoubleValidator(MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, 2))
+
+        self.value_layout = QHBoxLayout()
+        self.value_layout.addWidget(self.value_operands)
+        self.value_layout.addWidget(self.search_value)
 
         self.transactions_parameters_layout = QVBoxLayout()
         self.transactions_parameters_layout.addWidget(self.search_name)
-        self.transactions_parameters_layout.addWidget(self.search_value)
+        self.transactions_parameters_layout.addLayout(self.value_layout)
 
         self.date_selection = DateSelection()
 
@@ -54,6 +67,7 @@ class SearchWindow(SubWindow):
         self.search_parameters_wrapper = create_wrapper_widget(self.search_parameters_wrapper_layout)
 
         self.search = create_button("Search", (100, 40))
+        self.search.setDefault(True)
 
         self.transactions_list = CustomListWidget()
 
