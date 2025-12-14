@@ -5,7 +5,6 @@ New features:
   ☐ replace BASIC_FONT with some better one that will look good on both windows and linux
   ☐ fix issue with weird looking buttons on windows
   ☐ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction
-  ☐ add search for transaction by name, value or date in categories 
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -15,13 +14,15 @@ Updates to existing features:
   ☐ block closing update progress window if update in progress
   ☐ show attempts of downloading zip files in update progress window
   ☐ add recommended backups and legacy backups amount to messages
-  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative 
+  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
   
 Project life improvements:
   ☐ empty @don't-touch
   ☐ remove account_id from Category table and add AccountCategoryAssociation table to follow 3NF
   ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
+  ☐ create tests for search transactions
+  ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes
 
 Bugs:
   ☐ empty @don't-touch
@@ -30,6 +31,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ add search for transaction by name, value or date in categories @started(25-11-09 22:18) @done(25-12-15 00:19) @lasted(5w2h1m15s) @project(New features)
   ✔ fix bug with copying statistics (convert html to text) @started(25-11-04 21:57) @done(25-11-05 23:13) @lasted(1d1h16m30s) @project(Bugs)
   ✔ fix bug with changing category position that sometimes leads to two categories having the same position @started(25-11-03 23:07) @done(25-11-04 00:34) @lasted(1h27m13s) @project(Bugs)
   ✔ release 1.2.2 @started(25-10-26 17:31) @done(25-10-26 17:53) @lasted(22m32s) @project(Release)

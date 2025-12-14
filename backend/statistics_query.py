@@ -8,7 +8,6 @@ from backend.models import Transaction
 from GeneralTools.Utils import generate_month_range
 
 if TYPE_CHECKING:
-    from PySide6.QtCore import QDate
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
     from sqlalchemy.engine import Row
     from typing import Sequence

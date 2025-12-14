@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     
     from backend.models import Account
     from backend.db_controller import DBController
-    from GUI.windows.account import SwitchAccountWindow
     from AppObjects.category import Category
 
 
@@ -63,8 +62,6 @@ class AppCore:
         self.categories:dict[int, Category] = {}
         self.focused_income_category:Category | None
         self.focused_expense_category:Category | None
-
-        self.account_switch_widgets:list[SwitchAccountWindow.AccountSwitchWidget] = []
 
         self.db = db_controller
         self.backups:dict[str, Backup] = {}

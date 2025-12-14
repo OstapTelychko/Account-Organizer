@@ -13,6 +13,7 @@ from GUI.windows.transaction import TransactionManagementWindow
 from GUI.windows.update_progress import UpdateProgressWindow
 from GUI.windows.information_message import InformationMessage
 from GUI.windows.shortcuts import ShortcutsWindow
+from GUI.windows.search import SearchWindow
 
 
 
@@ -59,3 +60,4 @@ class WindowsRegistry:
     ])
 
     ShortcutsWindow = ShortcutsWindow(MainWindow, MainWindow.sub_windows)
+    SearchWindow = SearchWindow(MainWindow, MainWindow.sub_windows)

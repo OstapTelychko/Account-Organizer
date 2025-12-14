@@ -42,11 +42,12 @@ class ShortcutsManager:
             WindowsRegistry.ShortcutsWindow.select_previous_transaction_shortcut: 11,
             WindowsRegistry.ShortcutsWindow.select_next_transaction_shortcut: 12,
             WindowsRegistry.ShortcutsWindow.delete_transaction_shortcut: 13,
-            WindowsRegistry.ShortcutsWindow.edit_transaction_shortcut: 14
+            WindowsRegistry.ShortcutsWindow.edit_transaction_shortcut: 14,
+            WindowsRegistry.ShortcutsWindow.open_search_shortcut: 15
         }
 
         self.user_config = user_config
-        self.default_shortcuts_values = user_config.shortcuts
+        self.default_shortcuts_values = user_config.default_shortcuts_values
 
         self.shortcut_widget_to_default_values = {
             WindowsRegistry.ShortcutsWindow.close_current_window_shortcut: (
@@ -108,6 +109,10 @@ class ShortcutsManager:
             WindowsRegistry.ShortcutsWindow.edit_transaction_shortcut: (
                 self.default_shortcuts_values[user_config.ShortcutId.EDIT_TRANSACTION],
                 user_config.ShortcutId.EDIT_TRANSACTION
+            ),
+            WindowsRegistry.ShortcutsWindow.open_search_shortcut: (
+                self.default_shortcuts_values[user_config.ShortcutId.OPEN_SEARCH],
+                user_config.ShortcutId.OPEN_SEARCH
             )
         }
 

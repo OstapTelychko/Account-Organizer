@@ -333,9 +333,9 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             def _select_custom_range() -> None:
                 """Select custom range and click show statistics button."""
 
-                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories)
-                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories)
-                
+                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_incomes_categories)
+                self.click_on_widget(WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_expenses_categories)
+
                 WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(app_core.current_year, 1, 1))
                 WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(app_core.current_year, 6, 1))
 

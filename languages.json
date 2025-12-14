@@ -134,7 +134,8 @@
                         "11":"<b>Select previous transaction</b>",
                         "12":"<b>Select next transaction</b>",
                         "13":"<b>Delete selected transaction</b>",
-                        "14":"<b>Edit selected transaction</b>"
+                        "14":"<b>Edit selected transaction</b>",
+                        "15":"<b>Open search window</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -152,7 +153,8 @@
                         "11":"Select previous transaction. Category have to be focused",
                         "12":"Select next transaction. Category have to be focused",
                         "13":"Delete selected transaction. Transaction have to be selected",
-                        "14":"Edit selected transaction. Transaction have to be selected"
+                        "14":"Edit selected transaction. Transaction have to be selected",
+                        "15":"Opens window to search transactions"
                     }
                 }
             },
@@ -205,6 +207,15 @@
                 "1": "Update progress",
                 "2": "Downloading update (%update_size% MB)",
                 "3": "Upgrading backups"
+            },
+            "Search":{
+                "0":"Search",
+                "1":"Search",
+                "2": "Transaction name",
+                "3": "Transaction value",
+                "4": "Month",
+                "5": "Year",
+                "6": "Categories"
             }
         },
 
@@ -242,7 +253,8 @@
             "30": "<span style='color:red'>No internet connection.</span> Check connection and try again",
             "31": "Failed to check for updates. <span style='color:dodgerblue'>Check connection</span> and try again",
             "32": "Update is successfully <span style='color:dodgerblue'>applied</span>. App will restart now",
-            "33": "Keystroke <span style='color:dodgerblue'>`%keystroke_value%`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key"
+            "33": "Keystroke <span style='color:dodgerblue'>`%keystroke_value%`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key",
+            "34": "You have to fill at least transaction name or value to perform search"
         }
             
     },
@@ -383,7 +395,8 @@
                         "11":"<b>Вибрати попередню транзакцію</b>",
                         "12":"<b>Вибрати наступну транзакцію</b>",
                         "13":"<b>Видалити вибрану транзакцію</b>",
-                        "14":"<b>Редагувати вибрану транзакцію</b>"
+                        "14":"<b>Редагувати вибрану транзакцію</b>",
+                        "15":"<b>Відкрити вікно пошуку</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -401,7 +414,8 @@
                         "11":"Вибрати попередню транзакцію. Категорія повинна бути сфокусована",
                         "12":"Вибрати наступну транзакцію. Категорія повинна бути сфокусована",
                         "13":"Видалити вибрану транзакцію. Транзакція повинна бути вибрана",
-                        "14":"Редагувати вибрану транзакцію. Транзакція повинна бути вибрана"
+                        "14":"Редагувати вибрану транзакцію. Транзакція повинна бути вибрана",
+                        "15":"Відкриває вікно для пошуку транзакцій"
                     }
 
                 }
@@ -456,6 +470,15 @@
                 "1": "Прогрес оновлення",
                 "2": "Завантаження оновлення (%update_size% МБ)",
                 "3": "Оновлення баз даних"
+            },
+            "Search":{
+                "0":"Пошук",
+                "1":"Пошук",
+                "2": "Назва транзакції",
+                "3": "Значення транзакції",
+                "4": "Місяць",
+                "5": "Рік",
+                "6": "Категорії"
             }
         },
 
@@ -493,7 +516,8 @@
             "30": "<span style='color:red'>Немає з'єднання з інтернетом</span>. Перевірте з'єднання та спробуйте знову",
             "31": "Не вдалося перевірити на наявність оновлень. <span style='color:dodgerblue'>Перевірте з'єднання</span> та спробуйте знову",
             "32": "Оновлення успішно <span style='color:dodgerblue'>застосовано</span>. Додаток зараз перезапуститься",
-            "33": "Комбінація клавіш <span style='color:dodgerblue'>`%keystroke_value%`</span> - вже <span style='color:dodgerblue'>призначена до іншого сполучення клавіш</span>. Будь ласка, виберіть іншу клавішу"
+            "33": "Комбінація клавіш <span style='color:dodgerblue'>`%keystroke_value%`</span> - вже <span style='color:dodgerblue'>призначена до іншого сполучення клавіш</span>. Будь ласка, виберіть іншу клавішу",
+            "34": "Ви повинні заповнити принаймні назву або значення транзакції, щоб виконати пошук"
         }
     },
     
@@ -633,7 +657,8 @@
                         "11":"<b>Wybierz poprzednią transakcję</b>",
                         "12":"<b>Wybierz następną transakcję</b>",
                         "13":"<b>Usunąć wybraną transakcję</b>",
-                        "14":"<b>Edytować wybraną transakcję</b>"
+                        "14":"<b>Edytować wybraną transakcję</b>",
+                        "15":"<b>Otworzyć okno wyszukiwania</b>"
                     },
 
                     "Shortcuts descriptions":{
@@ -651,7 +676,8 @@
                         "11":"Wybierze poprzednią transakcję. Kategoria musi być sfokusowana",
                         "12":"Wybierze następną transakcję. Kategoria musi być sfokusowana",
                         "13":"Usunie wybraną transakcję. Transakcja musi być wybrana",
-                        "14":"Edytuje wybraną transakcję. Transakcja musi być wybrana"
+                        "14":"Edytuje wybraną transakcję. Transakcja musi być wybrana",
+                        "15":"Otworzy okno do wyszukiwania transakcji"
                     }
                 }
             },
@@ -704,6 +730,15 @@
                 "1": "Postęp aktualizacji",
                 "2": "Pobieranie aktualizacji (%update_size% MB)",
                 "3": "Aktualizacja baz danych"
+            },
+            "Search":{
+                "0":"Szukaj",
+                "1": "Wyszukiwanie",
+                "2": "Nazwa transakcji",
+                "3": "Wartość transakcji",
+                "4": "Miesiąc",
+                "5": "Rok",
+                "6": "Kategorie"
             }
         },
 
@@ -741,7 +776,8 @@
             "30": "<span style='color:red'>Brak połączenia z internetem</span>. Sprawdź połączenie i spróbuj ponownie",
             "31": "Nie udało się sprawdzić dostępności aktualizacji. <span style='color:dodgerblue'>Sprawdź połączenie</span> i spróbuj ponownie",
             "32": "Aktualizacja została pomyślnie <span style='color:dodgerblue'>zastosowana</span>. Aplikacja zostanie teraz ponownie uruchomiona",
-            "33": "Skrót <span style='color:dodgerblue'>`%keystroke_value%`</span> jest już <span style='color:dodgerblue'>przypisany do innego skrótu</span>. Proszę wybrać inny klawisz"
+            "33": "Skrót <span style='color:dodgerblue'>`%keystroke_value%`</span> jest już <span style='color:dodgerblue'>przypisany do innego skrótu</span>. Proszę wybrać inny klawisz",
+            "34": "Musisz wypełnić przynajmniej nazwę lub wartość transakcji, aby wykonać wyszukiwanie"
         }
     }
 }

@@ -1,5 +1,5 @@
 from html.parser import HTMLParser
-from typing import Literal
+from typing import Literal, cast
 
 NEW_LINE_TAG = "br"
 TAGS_TO_REMOVE = ("span",)
@@ -8,9 +8,9 @@ ALIGNMENTS = Literal['left', 'center', 'right']
 
 
 class HTMLToTextParser(HTMLParser):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.text_parts = []
+        self.text_parts:list[str] = []
         self.max_line_width = 50
 
         #Handle table tag (transaction)
@@ -20,11 +20,11 @@ class HTMLToTextParser(HTMLParser):
 
         self.table_row_cells:list[dict[str, str|int]] = []
         self.table_cell_data = ""
-        self.table_cell_width = 0
+        self.table_cell_width = ""
         self.table_cell_align:ALIGNMENTS = 'left'
 
 
-    def handle_starttag(self, tag: str, attrs: list) -> None:
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if tag == NEW_LINE_TAG:
             self.text_parts.append("\n")
         elif tag == "table":
@@ -37,8 +37,14 @@ class HTMLToTextParser(HTMLParser):
 
             attr_dict = dict(attrs)
             self.table_cell_data = ""
-            self.table_cell_width = attr_dict["width"].strip('%')
-            self.table_cell_align = attr_dict.get("align", "left")
+
+            width = attr_dict["width"]
+            if not width:
+                raise ValueError(f"Table cell width must be in percentage. Got {width} instead.")
+            self.table_cell_width = width.strip('%')
+
+            align = attr_dict.get("align", "left")
+            self.table_cell_align = cast(ALIGNMENTS, align)
 
 
     def handle_data(self, data: str) -> None:

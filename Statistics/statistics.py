@@ -1,20 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypeAlias, cast
-from functools import partial
-from datetime import date
+from datetime import date, timedelta
 from calendar import monthrange
 from collections import defaultdict, Counter
-from PySide6.QtWidgets import QPushButton
 from textwrap import dedent
 
 from languages import LanguageStructure
-from project_configuration import CATEGORY_TYPE
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from GUI.gui_constants import ALIGN_V_CENTER
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QListWidget
@@ -465,147 +461,11 @@ def show_yearly_statistics() -> int:
 def show_custom_range_statistics_window() -> None:
     """This method is used to show the custom range statistics window. Where parameters like from and to date are set."""
 
-    #Remove previous categories
-    while WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count():
-        WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.takeAt(0).widget().setParent(None)#type: ignore[call-overload] #MyPy doesn't recognize that None works as detaching method
-
-    while WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count():
-        WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.takeAt(0).widget().setParent(None)#type: ignore[call-overload]
-
-    WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
-    WindowsRegistry.CustomRangeStatistics.selected_categories_data.clear()
-
-    categories = sorted(AppCore.instance().categories.values(), key=lambda category: category.type)
-
-    for category in categories:
-        category_item = WindowsRegistry.CustomRangeStatistics.CategoryItem(
-            category.name,
-            LanguageStructure.GeneralManagement.get_translation(0),
-            LanguageStructure.GeneralManagement.get_translation(1)
-        )
-
-        if category.type == CATEGORY_TYPE[0]:#Income
-            category_type_translate = LanguageStructure.MainWindow.get_translation(1)
-            WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.addWidget(category_item.category_wrapper,
-                                                                                           alignment=ALIGN_V_CENTER)
-        else:
-            category_type_translate = LanguageStructure.MainWindow.get_translation(2)
-            WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.addWidget(category_item.category_wrapper,
-                                                                                           alignment=ALIGN_V_CENTER)
-
-        category_item.remove_category_button.clicked.connect(partial(
-            remove_category_from_statistics_list,
-            category, category_item.add_category_button, category_item.remove_category_button))
-        category_item.add_category_button.clicked.connect(partial(
-            add_category_to_statistics_list,
-            category, category_type_translate, category_item.remove_category_button, category_item.add_category_button))
+    categories = list(AppCore.instance().categories.values())
+    WindowsRegistry.CustomRangeStatistics.categories_selection.add_categories_to_selection(categories)
     
     WindowsRegistry.StatisticsWindow.done(1)
     WindowsRegistry.CustomRangeStatistics.exec()
-
-
-def add_category_to_statistics_list(category:Category, category_type_translate:str, remove_button:QPushButton, add_button:QPushButton) -> None:
-    """Add category to the custom range statistics list
-
-        Arguments
-        ---------
-            `category` (Category): category to add to selected categories
-            `category_type_translate` (str): translated category type
-            `remove_button` (QPushButton): enable button to remove category
-            `add_button` (QPushButton): disable button to add category
-    """
-
-    #Reset selected categories
-    WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
-
-    WindowsRegistry.CustomRangeStatistics.selected_categories_data[category.id] = (category, category_type_translate)
-
-    selected_categories = WindowsRegistry.CustomRangeStatistics.selected_categories_data
-
-    for iteration, selected_category in enumerate(selected_categories):
-        WindowsRegistry.CustomRangeStatistics.selected_categories_list.addItem(
-            f"{iteration+1}. {selected_categories[selected_category][0].name} ({selected_categories[selected_category][1]})"
-        )
-    remove_button.setDisabled(False)
-    add_button.setDisabled(True)
-
-
-def add_all_categories_to_statistics_list(sender_button:QPushButton) -> None:
-    """Add all categories to the custom range statistics list
-
-        Arguments
-        ---------
-            `sender_button` (QPushButton): button that was clicked
-    """
-
-    if sender_button is WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories:
-        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count()):
-            category_wrapper = WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
-
-            for widget in category_wrapper.children():
-                if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(1):
-                    widget.click()
-
-    elif sender_button is WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories:
-        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count()):
-            category_wrapper = WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
-
-            for widget in category_wrapper.children():
-                if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(1):
-                    widget.click()
-
-
-def remove_category_from_statistics_list(category:Category, add_button:QPushButton, remove_button:QPushButton) -> None:
-    """Remove category from the custom range statistics list
-
-        Arguments
-        ---------
-            `category` (Category): category to remove from selected categories
-            `add_button` (QPushButton): enable button to add category
-            `remove_button` (QPushButton): disable button to remove category
-    """
-
-    #Reset selected categories
-    WindowsRegistry.CustomRangeStatistics.selected_categories_list.clear()
-    del WindowsRegistry.CustomRangeStatistics.selected_categories_data[category.id]
-
-    selected_categories = WindowsRegistry.CustomRangeStatistics.selected_categories_data
-
-    for iteration, selected_category in enumerate(selected_categories):
-        WindowsRegistry.CustomRangeStatistics.selected_categories_list.addItem(
-            f"{iteration+1}. {selected_categories[selected_category][0].name} ({selected_categories[selected_category][1]})"
-        )
-    remove_button.setDisabled(True)
-    add_button.setDisabled(False)
-
-
-def remove_all_categories_from_statistics_list(sender_button:QPushButton) -> None:
-    """Remove all categories from the custom range statistics list
-
-        Arguments
-        ---------
-            `sender_button` (QPushButton): button that was clicked
-    """
-
-    if sender_button is WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories:
-        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.count()):
-            category_wrapper = WindowsRegistry.CustomRangeStatistics.incomes_categories_list_layout.itemAt(
-                category_wrapper_index
-            ).widget()
-
-            for widget in category_wrapper.children():
-                if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(0):
-                    widget.click()
-    
-    elif sender_button is WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories:
-        for category_wrapper_index in range(WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.count()):
-            category_wrapper = WindowsRegistry.CustomRangeStatistics.expenses_categories_list_layout.itemAt(
-                category_wrapper_index
-            ).widget()
-
-            for widget in category_wrapper.children():
-                if isinstance(widget, QPushButton) and widget.text() == LanguageStructure.GeneralManagement.get_translation(0):
-                    widget.click()
 
 
 def show_custom_range_statistics_view() -> int:
@@ -621,14 +481,14 @@ def show_custom_range_statistics_view() -> int:
     if from_date.daysTo(to_date) <= 0:
         return WindowsRegistry.Messages.wrong_date.exec()
     
-    if len(WindowsRegistry.CustomRangeStatistics.selected_categories_data) == 0:
+    if len(WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data) == 0:
         return WindowsRegistry.Messages.no_selected_category.exec()
-    
-    date_difference = date(to_date.year(), to_date.month(), to_date.day()) - date(from_date.year(), from_date.month(), from_date.day()) 
+
+    date_difference:timedelta = cast(date, to_date.toPython()) - cast(date, from_date.toPython()) # pyright: ignore[reportOperatorIssue]
     days_amount = date_difference.days
 
-    Incomes_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Incomes"]
-    Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.selected_categories_data.values() if category[0].type == "Expenses"]
+    Incomes_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data.values() if category[0].type == "Incomes"]
+    Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data.values() if category[0].type == "Expenses"]
 
     all_transactions = AppCore.instance().db.statistics_query.get_transactions_by_range(
         list(map(lambda category: category.id, Incomes_categories+Expenses_categories)),

@@ -28,6 +28,7 @@ def change_language_for_startup() -> None:
     WindowsRegistry.MainWindow.add_incomes_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.add_expenses_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.statistics.setText(LanguageStructure.Statistics.get_translation(0))
+    WindowsRegistry.MainWindow.search.setText(LanguageStructure.Search.get_translation(0))
     WindowsRegistry.MainWindow.mini_calculator_label.setText(LanguageStructure.MiniCalculator.get_translation(0))
 
 
@@ -62,7 +63,7 @@ def change_language() -> None:
     WindowsRegistry.RenameAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(2))
 
     WindowsRegistry.SwitchAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(6))
-    for account, account_switch_widget in zip(app_core.accounts_list, app_core.account_switch_widgets):
+    for account, account_switch_widget in zip(app_core.accounts_list, WindowsRegistry.SwitchAccountWindow.account_switch_widgets):
         account_switch_widget.account_balance_label.setText(
             f"{LanguageStructure.MainWindow.get_translation(0)}{round(account.current_balance, 2)}"
 )
@@ -130,16 +131,8 @@ def change_language() -> None:
     
     WindowsRegistry.CustomRangeStatistics.setWindowTitle(LanguageStructure.Statistics.get_translation(34))
     WindowsRegistry.CustomRangeStatistics.show_statistics.setText(LanguageStructure.Statistics.get_translation(0))
-    WindowsRegistry.CustomRangeStatistics.add_all_incomes_categories.setText(
-        LanguageStructure.GeneralManagement.get_translation(9)
-    )
-    WindowsRegistry.CustomRangeStatistics.add_all_expenses_categories.setText(
-        LanguageStructure.GeneralManagement.get_translation(9)
-    )
-    WindowsRegistry.CustomRangeStatistics.remove_all_incomes_categories.setText(
-        LanguageStructure.GeneralManagement.get_translation(10)
-    )
-    WindowsRegistry.CustomRangeStatistics.remove_all_expenses_categories.setText(
+    WindowsRegistry.CustomRangeStatistics.categories_selection.set_translation_to_add_and_remove_all_categories_buttons(
+        LanguageStructure.GeneralManagement.get_translation(9),
         LanguageStructure.GeneralManagement.get_translation(10)
     )
     WindowsRegistry.CustomRangeStatisticsView.setWindowTitle(
@@ -249,6 +242,19 @@ def change_language() -> None:
         shortcut.shortcut_description.setText(LanguageStructure.ShortcutsDescriptions.get_translation(index))
         shortcut.reset_shortcut.setText(LanguageStructure.GeneralManagement.get_translation(11))
     WindowsRegistry.ShortcutsWindow.save_shortcuts.setText(LanguageStructure.GeneralManagement.get_translation(6))
+
+    WindowsRegistry.SearchWindow.setWindowTitle(LanguageStructure.Search.get_translation(1))
+    WindowsRegistry.SearchWindow.search.setText(LanguageStructure.Search.get_translation(0))
+    WindowsRegistry.SearchWindow.search_name.setPlaceholderText(LanguageStructure.Search.get_translation(2))
+    WindowsRegistry.SearchWindow.search_value.setPlaceholderText(LanguageStructure.Search.get_translation(3))
+    WindowsRegistry.SearchWindow.date_selection.select_month_range_button.setText(LanguageStructure.Search.get_translation(4))
+    WindowsRegistry.SearchWindow.date_selection.select_year_range_button.setText(LanguageStructure.Search.get_translation(5))
+    WindowsRegistry.SearchWindow.categories_selection_button.setText(LanguageStructure.Search.get_translation(6))
+    WindowsRegistry.SearchWindow.categories_selection.set_translation_to_add_and_remove_all_categories_buttons(
+        LanguageStructure.GeneralManagement.get_translation(9),
+        LanguageStructure.GeneralManagement.get_translation(10)
+    )
+
 
  
 def change_language_during_add_account(language:int | str) -> None:

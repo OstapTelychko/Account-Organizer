@@ -133,3 +133,6 @@ class Messages(metaclass=QSingleton):
         self.shortcut_already_used = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
         )
+        self.empty_search_fields = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )

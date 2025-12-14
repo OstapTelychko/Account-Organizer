@@ -66,7 +66,8 @@ class LanguageCategory:
         
         translation = translations_category.get(translation_index)
         if translation is None:
-            logger.debug(f"Translation not found for {self.path()} - {translation_index}")
+            logger.error(f"Translation not found for {self.path()} - {translation_index} language: {app_core.config.language}")
+            raise KeyError(f"Translation not found for {self.path()} - {translation_index} language: {app_core.config.language}")
 
         return str(translation)
 
@@ -106,6 +107,7 @@ class LanguageStructure():
 
     Statistics = Windows.add_subcategory("Statistics")
     Update = Windows.add_subcategory("Update")
+    Search = Windows.add_subcategory("Search")
 
     Messages = LanguageCategory("Messages")
 

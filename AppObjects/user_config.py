@@ -50,6 +50,7 @@ class UserConfig:
         SELECT_NEXT_TRANSACTION = "Select_next_transaction"
         DELETE_TRANSACTION = "Delete_transaction"
         EDIT_TRANSACTION = "Edit_transaction"
+        OPEN_SEARCH = "Open_search"
     
 
     def __init__(self, test_mode:bool = False) -> None:
@@ -64,7 +65,7 @@ class UserConfig:
         self.auto_backup_removal_enabled:bool = True
         self.update_channel:str = UserConfig.UpdateChannel.RELEASE.value
 
-        self.shortcuts = {
+        self.default_shortcuts_values = {
             UserConfig.ShortcutId.CLOSE_CURRENT_WINDOW:"X",
             UserConfig.ShortcutId.OPEN_SETTINGS:"S",
             UserConfig.ShortcutId.OPEN_STATISTICS:"A",
@@ -79,7 +80,11 @@ class UserConfig:
             UserConfig.ShortcutId.SELECT_PREVIOUS_TRANSACTION:"Up",
             UserConfig.ShortcutId.SELECT_NEXT_TRANSACTION:"Down",
             UserConfig.ShortcutId.DELETE_TRANSACTION:"D",
-            UserConfig.ShortcutId.EDIT_TRANSACTION:"C"
+            UserConfig.ShortcutId.EDIT_TRANSACTION:"C",
+            UserConfig.ShortcutId.OPEN_SEARCH:"F"
+        }
+        self.shortcuts = {
+            **self.default_shortcuts_values
         }
 
 
