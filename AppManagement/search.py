@@ -3,8 +3,13 @@ from datetime import date
 
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
+from AppObjects.logger import get_logger
+
+from languages import LanguageStructure
+from project_configuration import CATEGORY_TYPE
 
 
+logger = get_logger(__name__)
 
 def show_search_window() -> None:
     """Show search window."""
@@ -38,7 +43,11 @@ def perform_search() -> None | int:
     WindowsRegistry.SearchWindow.categories_selection.setHidden(True)
     WindowsRegistry.SearchWindow.transactions_list.setHidden(False)
     WindowsRegistry.SearchWindow.transactions_list.clear()
-
+    
+    logger.debug(
+        f"Performing search with name: {search_name}, value: {search_value} operand: {search_value_operand},"
+        f" from_date: {from_date}, to_date: {to_date}, categories_id: {categories_id}"
+    )
     app_core = AppCore.instance()
     transactions = app_core.db.search_query.search_transactions(
         name_substring=search_name,
@@ -48,4 +57,22 @@ def perform_search() -> None | int:
         to_date=to_date,
         categories_id=categories_id
     )
-    WindowsRegistry.SearchWindow.transactions_list.addItems(map(str, transactions))
+    logger.debug(f"Found {len(transactions)} transactions matching search criteria")
+
+    for transaction in transactions:
+        transaction_name = transaction.name
+        if transaction_name == "":
+            transaction_name = LanguageStructure.Statistics.get_translation(12)
+        
+        category = app_core.categories[transaction.category_id]
+        category_name = category.name
+        if category.type == CATEGORY_TYPE[0]:
+            transaction_color = "rgb(0,205,0)"
+        else:
+            transaction_color = "rgb(205,0,0)"
+
+        WindowsRegistry.SearchWindow.transactions_list.addItem(
+            f"<b style='color:{transaction_color}'>{transaction_name}</b> ({category_name}) <br>"
+            f"Date: <b>{transaction.date}</b>  Value: <b>{transaction.value}</b>"
+        )
+    return None

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
-from PySide6.QtGui import QTextDocument, QPainter, QAbstractTextDocumentLayout
+from PySide6.QtGui import QTextDocument, QPainter, QAbstractTextDocumentLayout, QPalette
 from PySide6.QtCore import Qt, QSize, QPersistentModelIndex, QModelIndex
 
 
@@ -11,10 +11,6 @@ class QRichTextDelegate(QStyledItemDelegate):
     """
     Item delegate that renders item DisplayRole data as Qt rich text (HTML fragment).
     Use for QListWidget / QTableWidget / any QAbstractItemView to get <span>, <b>, colors, etc.
-    """
-
-    CSS_RESET = """
-        * { margin: 0; padding: 0; line-height: 1; background-color: rgb(255, 0, 0)}
     """
 
     def paint(self, painter:QPainter, option:QStyleOptionViewItem, index:QModelIndex | QPersistentModelIndex) -> None:
@@ -34,6 +30,9 @@ class QRichTextDelegate(QStyledItemDelegate):
         painter.save()
         painter.translate(option.rect.topLeft())#type:ignore[attr-defined] 
         context = QAbstractTextDocumentLayout.PaintContext()
+        # Set the text color in the paint context
+        context.palette.setColor(QPalette.ColorRole.Text, option.palette.color(QPalette.ColorRole.Text))#type:ignore[attr-defined]
+        
         doc.documentLayout().draw(painter, context)
         painter.restore()
 

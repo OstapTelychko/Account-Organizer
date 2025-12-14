@@ -24,6 +24,7 @@ Project life improvements:
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
   ☐ create tests for search transactions
   ☐ add tests for searching transactions and shortcut to open search window
+  ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes
 
 Bugs:
   ☐ empty @don't-touch

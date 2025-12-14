@@ -1,12 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from sqlalchemy import and_
+from sqlalchemy import func
 from datetime import date
 
 from backend.models import Transaction
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
+    from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
+    from typing import Any, Callable
 
 
 
@@ -18,7 +20,7 @@ class SearchQuery:
         self.session_factory = session_factory
         self.account_id:int
 
-        self.values_operands = {
+        self.values_operands: dict[str, Callable[[Any, Any], BinaryExpression[Any]]] = {
             "=": lambda field, value: field == value,
             "!=": lambda field, value: field != value,
             "<": lambda field, value: field < value,
@@ -53,14 +55,24 @@ class SearchQuery:
             Transaction.category_id.in_(categories_id)
         ]
 
-        if name_substring:
-            filters.append(Transaction.name.ilike(f"%{name_substring}%"))
-        
+        order_by:list[ColumnElement[Any]] = []
         if value:
             operand_func = self.values_operands[value_operand]
             filters.append(operand_func(Transaction.value, value))
+            if value_operand in (">=", ">"):
+                order_by.append(Transaction.value.asc())
+            elif value_operand in ("<=", "<", "!="):
+                order_by.append(Transaction.value.desc())
+
+        if name_substring:
+            filters.append(Transaction.name.ilike(f"%{name_substring}%"))
+            name_substring = name_substring.lower()
+            order_by.extend([
+                func.instr(func.lower(Transaction.name), name_substring),
+                Transaction.name#type:ignore[list-item] #just name is valid here for ordering
+            ])       
 
         with self.session_factory() as session:
             with session.begin():
-                query = session.query(Transaction).filter(*filters)
+                query = session.query(Transaction).filter(*filters).order_by(*order_by)
                 return query.all()
