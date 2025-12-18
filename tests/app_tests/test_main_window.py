@@ -27,7 +27,8 @@ class TestMainWindow(OutOfScopeTestCase):
         test_windows_open:dict[SubWindow, QPushButton | QToolButton] = {
             WindowsRegistry.SettingsWindow:WindowsRegistry.MainWindow.settings,
             WindowsRegistry.StatisticsWindow:WindowsRegistry.MainWindow.statistics,
-            WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category
+            WindowsRegistry.AddCategoryWindow:WindowsRegistry.MainWindow.add_incomes_category,
+            WindowsRegistry.SearchWindow:WindowsRegistry.MainWindow.search
         }
 
         for window, open_window_button in test_windows_open.items():
