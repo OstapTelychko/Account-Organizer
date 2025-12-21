@@ -46,6 +46,7 @@ class CategoriesSelectionByType(QWidget):
         super().__init__()
 
         self.selected_categories_data:dict[int, tuple[Category, str]] = {}
+        self.categories:dict[int, CategoriesSelectionByType.CategoryItem] = {}
 
         self.selected_categories_list = CustomListWidget()
         self.selected_categories_list.setMinimumWidth(400)
@@ -292,6 +293,7 @@ class CategoriesSelectionByType(QWidget):
                 LanguageStructure.GeneralManagement.get_translation(0),
                 LanguageStructure.GeneralManagement.get_translation(1)
             )
+            self.categories[category.id] = category_item
 
             if category.type == CATEGORY_TYPE[0]:#Income
                 category_type_translate = LanguageStructure.MainWindow.get_translation(1)

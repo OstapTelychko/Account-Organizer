@@ -23,6 +23,7 @@ Project life improvements:
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
   ☐ create tests for search transactions @started(25-12-18 23:03)
   ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes
+  ☐ switch to pytest framework for tests instead of unittest
 
 Bugs:
   ☐ empty @don't-touch

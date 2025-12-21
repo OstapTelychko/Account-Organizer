@@ -226,5 +226,80 @@ class TestSearch(DBTestCase):
         for search_name, operand, search_value, message in parm_list_for_expected_not_to_be_found:
             with self.subTest(search_name=search_name, operand=operand, search_value=search_value, message=message):
                 perform_search_sub_test(search_name, operand, search_value, message, False)
+    
+
+    def test_04_perform_search_with_different_categories_selected(self) -> None:
+        """
+        Tests searching for transactions with different categories selected.
+        """
+
+
+        params = [
+            (
+                [self.income_category.id],
+                self.income_category.name,
+                self.test_income_transaction_name,
+                True,
+                "only income category selected"
+            ),
+            (
+                [self.expenses_category.id],
+                self.expenses_category.name,
+                self.test_expenses_transaction_name,
+                True,
+                "only expenses category selected"
+            ),
+            (
+                [self.income_category.id],
+                self.expenses_category.name,
+                self.test_expenses_transaction_name,
+                False,
+                "only income category selected but searching for transaction in expenses category"
+            ),
+            (
+                [self.expenses_category.id],
+                self.income_category.name,
+                self.test_income_transaction_name,
+                False,
+                "only expenses category selected but searching for transaction in income category"
+            ),
+        ]
+
+        for category_ids, category_name, transaction_name, expected_to_be_found, message in params:
+            with self.subTest(
+                category_ids=category_ids,
+                category_name=category_name,
+                transaction_name=transaction_name,
+                expected_to_be_found=expected_to_be_found,
+                message=message
+                ):
+                def perform_search() -> None:
+                    "Performs the search operation and validates the results."
+
+                    self.click_on_widget(WindowsRegistry.SearchWindow.categories_selection_button)
+                    self.click_on_widget(WindowsRegistry.SearchWindow.categories_selection.remove_all_expenses_categories)
+                    self.click_on_widget(WindowsRegistry.SearchWindow.categories_selection.remove_all_incomes_categories)
+
+                    for category_id in category_ids:
+                        category_item = WindowsRegistry.SearchWindow.categories_selection.categories[category_id]
+                        self.click_on_widget(category_item.add_category_button)
+                    
+                    result = self.fill_search_fields_and_perform_search(search_name=transaction_name)
+                    transaction_pattern = self.transaction_regex % (transaction_name, category_name)
+                    if expected_to_be_found:
+                        self.assertRegexpMatches(
+                            result, transaction_pattern,
+                            f"Transaction with name {transaction_name} not found in search results"
+                            f" when {message}"
+                        )
+                    else:
+                        self.assertNotRegexpMatches(
+                            result, transaction_pattern,
+                            f"Transaction with name {transaction_name} found in search results"
+                            f" when {message}"
+                        )
+                    WindowsRegistry.SearchWindow.done(0)
+                self.open_search_window(perform_search)
+
 
 
