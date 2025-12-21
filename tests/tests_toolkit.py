@@ -242,13 +242,13 @@ class DBTestCase(DefaultTestCase):
 
             app_core.db.transaction_query.add_transaction(
                 self.income_category.id,
-                date(app_core.current_year, app_core.current_month, 1),
+                date(app_core.current_year, app_core.current_month, date.today().day),
                 1000,
                 self.test_income_transaction_name
             )
             app_core.db.transaction_query.add_transaction(
                 self.expenses_category.id,
-                date(app_core.current_year, app_core.current_month, 1),
+                date(app_core.current_year, app_core.current_month, date.today().day),
                 1000,
                 self.test_expenses_transaction_name
             )

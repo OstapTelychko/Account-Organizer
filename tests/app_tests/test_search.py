@@ -1,8 +1,12 @@
 from __future__ import annotations
 from typing import Callable
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QDate
+from datetime import date
+import random
+
 from tests.tests_toolkit import DBTestCase
 from AppObjects.windows_registry import WindowsRegistry
+from AppObjects.app_core import AppCore
 
 
 
@@ -31,33 +35,196 @@ class TestSearch(DBTestCase):
 
         QTimer.singleShot(10, func)
         self.click_on_widget(WindowsRegistry.MainWindow.search)
+    
 
-
-    def test_01_search_transactions_with_value_above_one(self) -> None:
+    def fill_search_fields_and_perform_search(
+            self,
+            search_name:str="",
+            search_value:str="",
+            operand:str="=",
+            date_range:str|tuple[QDate, QDate]="month"
+        ) -> str:
         """
-        Tests searching for transactions with a value above '1'. Which should result in all transactions being found.
+        Fills the search fields and performs the search.
+
+        Arguments:
+            search_name: The name to search for.
+            search_value: The value to search for.
+            operand: The operand to use for the value comparison.
+            date_range: The date range to search within. Can be "month", "year", or a tuple of start and end dates.
+
+        Returns the search results as a string.
         """
 
-        def perform_search() -> None:
-            "Performs the search operation and validates the results."
+        WindowsRegistry.SearchWindow.search_name.setText(search_name)
+        WindowsRegistry.SearchWindow.search_value.setText(search_value)
+        WindowsRegistry.SearchWindow.value_operands.setCurrentText(operand)
+        if isinstance(date_range, str):
+            if date_range == "month":
+                self.click_on_widget(WindowsRegistry.SearchWindow.date_selection.select_month_range_button)
+            elif date_range == "year":
+                self.click_on_widget(WindowsRegistry.SearchWindow.date_selection.select_year_range_button)
+        else:
+            WindowsRegistry.SearchWindow.date_selection.search_from_date.setDate(date_range[0])
+            WindowsRegistry.SearchWindow.date_selection.search_to_date.setDate(date_range[1])
+        self.click_on_widget(WindowsRegistry.SearchWindow.search)
+        return self.get_search_result()
+    
 
-            WindowsRegistry.SearchWindow.search_value.setText("1")
-            WindowsRegistry.SearchWindow.value_operands.setCurrentText(">")
-            self.click_on_widget(WindowsRegistry.SearchWindow.date_selection.select_month_range_button)
-            self.click_on_widget(WindowsRegistry.SearchWindow.search)
-            result = self.get_search_result()
+    def test_01_perform_search_where_transaction_expected_to_be_found(self) -> None:
+        """
+        Tests searching for transactions with a different values and operands where transactions are expected to be found.
+        """
 
-            income_transaction_pattern = self.transaction_regex % (self.test_income_transaction_name, self.income_category.name)
-            self.assertRegexpMatches(
-                result, income_transaction_pattern,
-                f"Income transaction with name {self.test_income_transaction_name} not found in search results"
-                f" when attempting to search for transactions with value above 1")
-            expenses_transaction_pattern = self.transaction_regex % (self.test_expenses_transaction_name, self.expenses_category.name)
-            self.assertRegexpMatches(
-                result, expenses_transaction_pattern,
-                f"Expenses transaction with name {self.test_expenses_transaction_name} not found in search results"
-                f" when attempting to search for transactions with value above 1")
-            WindowsRegistry.SearchWindow.done(0)
-            
-        self.open_search_window(perform_search)
+        #Two transaction are created before test execution with values 1000 each.
+        params = [
+            ("1", ">", "value is above 1"),
+            ("1000", ">=", "value is above or equal to 1000"),
+            ("1000", "=", "value is below 1000"),
+            ("5000", "<=", "value is below or equal to 5000"),
+            ("4000", "<", "value is below 4000"),
+            ("999", "!=", "value is not equal to 999"),
+        ]
+        for search_value, operand, message in params:
+            with self.subTest(search_value=search_value, operand=operand, message=message):
+                def perform_search() -> None:
+                    "Performs the search operation and validates the results."
+
+                    result = self.fill_search_fields_and_perform_search(search_value=search_value, operand=operand)
+                    income_transaction_pattern = self.transaction_regex % (self.test_income_transaction_name, self.income_category.name)
+
+                    self.assertRegexpMatches(
+                        result, income_transaction_pattern,
+                        f"Income transaction with name {self.test_income_transaction_name} not found in search results"
+                        f" when attempting to search for transactions where {message}")
+                    expenses_transaction_pattern = self.transaction_regex % (self.test_expenses_transaction_name, self.expenses_category.name)
+                    self.assertRegexpMatches(
+                        result, expenses_transaction_pattern,
+                        f"Expense transaction with name {self.test_expenses_transaction_name} not found in search results"
+                        f" when attempting to search for transactions where {message}")
+                    WindowsRegistry.SearchWindow.done(0)
+                    
+                self.open_search_window(perform_search)
+    
+
+    def test_02_perform_search_where_transaction_expected_not_to_be_found(self) -> None:
+        """
+        Tests searching for transactions with a different values and operands where transactions are not expected to be found.
+        """
+
+        #Two transaction are created before test execution with values 1000 each.
+        params = [
+            ("5000", ">", "value is above 5000"),
+            ("1500", ">=", "value is above or equal to 1500"),
+            ("500", "=", "value is equal to 500"),
+            ("500", "<=", "value is below or equal to 500"),
+            ("1", "<", "value is below 1"),
+            ("1000", "!=", "value is not equal to 1000"),
+        ]
+        for search_value, operand, message in params:
+            with self.subTest(search_value=search_value, operand=operand, message=message):
+                def perform_search() -> None:
+                    "Performs the search operation and validates the results."
+
+                    result = self.fill_search_fields_and_perform_search(search_value=search_value, operand=operand)
+                    income_transaction_pattern = self.transaction_regex % (self.test_income_transaction_name, self.income_category.name)
+
+                    self.assertNotRegexpMatches(
+                        result, income_transaction_pattern,
+                        f"Income transaction with name {self.test_income_transaction_name} found in search results"
+                        f" when attempting to search for transactions where {message}")
+                    expenses_transaction_pattern = self.transaction_regex % (self.test_expenses_transaction_name, self.expenses_category.name)
+                    self.assertNotRegexpMatches(
+                        result, expenses_transaction_pattern,
+                        f"Expense transaction with name {self.test_expenses_transaction_name} found in search results"
+                        f" when attempting to search for transactions where {message}")
+                    WindowsRegistry.SearchWindow.done(0)
+                    
+                self.open_search_window(perform_search)
+    
+
+    def test_03_perform_search_on_newly_added_transaction(self) -> None:
+        """
+        Tests searching for a newly added transaction.
+        Executing conditions where the new transaction is expected to be found or not found.
+        """
+
+        new_transaction_name = "New Test Transaction"
+        new_transaction_value = random.randint(1100, 10000)
+
+     
+        app_core = AppCore.instance()
+        app_core.db.transaction_query.add_transaction(
+            self.income_category.id,
+            date.today(),
+            new_transaction_value,
+            new_transaction_name
+        )
+
+        #Conditions when new created transaction is expected to be found in search results.
+        parm_list_for_expected_to_be_found = [
+            ("", "=", str(new_transaction_value), "value equals to new transaction value"),
+            (new_transaction_name[:4], "=", str(new_transaction_value), "name starts with first 4 characters of new transaction name"),
+            (new_transaction_name, "=", str(new_transaction_value), "name equals to new transaction name"),
+            (new_transaction_name[:-4], ">=", str(new_transaction_value), "name starts with last 4 characters of new transaction name"),
+            (new_transaction_name, ">", "", "name equals to new transaction name and value is greater than empty string"),
+            (new_transaction_name, "<", "", "name equals to new transaction name and value is less than empty string"),
+            ("", ">", "1", "value is greater than 1"),
+            ("", "<", str(new_transaction_value + 1000), "value is less than new transaction value plus 1000"),
+        ]
+
+        #Conditions when new created transaction is not expected to be found in search results.
+        parm_list_for_expected_not_to_be_found = [
+            ("", "!=", str(new_transaction_value), "value is not equal to new transaction value"),
+            (new_transaction_name + "XYZ", "=", str(new_transaction_value), "name is different than new transaction name"),
+            (
+                new_transaction_name, "<=",
+                str(new_transaction_value - 1),
+                "name equals to new transaction name and value is less than or equal to new transaction value minus 1"
+            ),
+            (
+                new_transaction_name,
+                ">=",
+                str(new_transaction_value + 1),
+                "name equals to new transaction name and value is greater than or equal to new transaction value plus 1"
+            ),
+            ("", "<", "1", "value is less than 1"),
+            ("", ">", str(new_transaction_value + 1000), "value is greater than new transaction value plus 1000"),
+        ]
+        new_transaction_pattern = self.transaction_regex % (new_transaction_name, self.income_category.name)
+
+        def perform_search_sub_test(search_name:str, operand:str, search_value:str, message:str, expected_to_be_found:bool) -> None:
+            def perform_search() -> None:
+                    "Performs the search operation and validates the results."
+
+                    result = self.fill_search_fields_and_perform_search(
+                        search_name=search_name,
+                        search_value=search_value,
+                        operand=operand
+                    )
+
+                    if expected_to_be_found:
+                        self.assertRegexpMatches(
+                            result, new_transaction_pattern,
+                            f"Newly added transaction with name {new_transaction_name} and value {new_transaction_value} "
+                            f"not found in search results. Searched where {message}"
+                        )
+                    else:
+                        self.assertNotRegexpMatches(
+                            result, new_transaction_pattern,
+                            f"Newly added transaction with name {new_transaction_name} and value {new_transaction_value} "
+                            f"found in search results. Searched where {message}"
+                        )
+                    WindowsRegistry.SearchWindow.done(0)
+
+            self.open_search_window(perform_search)
+
+        for search_name, operand, search_value, message in parm_list_for_expected_to_be_found:
+            with self.subTest(search_name=search_name, operand=operand, search_value=search_value, message=message):
+                perform_search_sub_test(search_name, operand, search_value, message, True)
+
+        for search_name, operand, search_value, message in parm_list_for_expected_not_to_be_found:
+            with self.subTest(search_name=search_name, operand=operand, search_value=search_value, message=message):
+                perform_search_sub_test(search_name, operand, search_value, message, False)
+
 
