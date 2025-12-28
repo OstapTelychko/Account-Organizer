@@ -81,7 +81,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
                 {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut."
             )
             
-        QTimer.singleShot(200, self.catch_failure(_check_switch))
+        QTimer.singleShot(100, self.catch_failure(_check_switch))
         QTest.keySequence(
             WindowsRegistry.MainWindow,
             QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]))
@@ -100,7 +100,7 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
                 {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]} shortcut."
             )
             
-        QTimer.singleShot(200, self.catch_failure(_check_switch))
+        QTimer.singleShot(100, self.catch_failure(_check_switch))
         QTest.keySequence(
             WindowsRegistry.MainWindow,
             QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]))
