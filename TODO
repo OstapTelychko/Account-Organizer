@@ -21,7 +21,6 @@ Project life improvements:
   ☐ remove account_id from Category table and add AccountCategoryAssociation table to follow 3NF
   ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
-  ☐ create tests for search transactions @started(25-12-18 23:03)
   ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes
   ☐ switch to pytest framework for tests instead of unittest
 
@@ -32,6 +31,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ create tests for search transactions @started(25-12-18 23:03) @done(25-12-28 16:55) @lasted(1w2d17h52m26s) @project(Project life improvements)
   ✔ add search for transaction by name, value or date in categories @started(25-11-09 22:18) @done(25-12-15 00:19) @lasted(5w2h1m15s) @project(New features)
   ✔ fix bug with copying statistics (convert html to text) @started(25-11-04 21:57) @done(25-11-05 23:13) @lasted(1d1h16m30s) @project(Bugs)
   ✔ fix bug with changing category position that sometimes leads to two categories having the same position @started(25-11-03 23:07) @done(25-11-04 00:34) @lasted(1h27m13s) @project(Bugs)
