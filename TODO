@@ -26,6 +26,7 @@ Project life improvements:
 
 Bugs:
   ☐ empty @don't-touch
+  ☐ analyze and find why some backups are lost after update
 
 Release:
   ☐ empty @don't-touch
