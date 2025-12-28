@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Callable
+from typing import Callable, cast
 from PySide6.QtCore import QTimer, QDate
 from datetime import date
 import random
@@ -233,7 +233,8 @@ class TestSearch(DBTestCase):
         Tests searching for transactions with different categories selected.
         """
 
-
+        #Conditions for different categories selected.
+        #category_ids, category_name, transaction_name, expected_to_be_found, message
         params = [
             (
                 [self.income_category.id],
@@ -300,6 +301,144 @@ class TestSearch(DBTestCase):
                         )
                     WindowsRegistry.SearchWindow.done(0)
                 self.open_search_window(perform_search)
+    
+
+    def test_05_perform_search_within_different_date_ranges(self) -> None:
+        """
+        Tests searching for transactions within different date ranges.
+        """
+
+        db = AppCore.instance().db
+
+        ten_days_ago = QDate.currentDate().addDays(-10)
+        ten_days_ago_transaction_name = "Transaction created Ten Days Ago"
+        db.transaction_query.add_transaction(
+            self.income_category.id, cast(date, ten_days_ago.toPython()), 1000,
+            ten_days_ago_transaction_name
+        )
+
+        four_months_ago = QDate.currentDate().addMonths(-4)
+        four_months_ago_transaction_name = "Transaction created Four Months Ago"
+        db.transaction_query.add_transaction(
+            self.expenses_category.id, cast(date, four_months_ago.toPython()), 500,
+            four_months_ago_transaction_name
+        )
+        
+        today = QDate.currentDate()
+        eight_months_ago = QDate.currentDate().addMonths(-8)
+        eight_months_ago_transaction_name = "Transaction created Eight Months Ago"
+        db.transaction_query.add_transaction(
+            self.income_category.id, cast(date, eight_months_ago.toPython()), 2000,
+            eight_months_ago_transaction_name
+        )
 
 
+        #Conditions for different date ranges.
+        #date_range, transaction_name, operand, search_value, expected_to_be_found, category_name, message
+        params = [
+            (
+                "month", self.test_income_transaction_name, ">=", 100, True, self.income_category.name,
+                "selected current month range with value >= 100"
+            ),
+            (
+                "month", self.test_income_transaction_name, "=", 1000, True, self.income_category.name,
+                "selected current month range with value = 1000"
+            ),
+            (
+                "year", self.test_income_transaction_name, ">=", 100, True, self.income_category.name,
+                "selected year range with value >= 100"
+            ),
+            (
+                "year", self.test_income_transaction_name, "=", 1000, True, self.income_category.name,
+                "selected year range with value = 1000"
+            ),
+            (
+                "month", "XYZ", ">=", 100, False, self.income_category.name,
+                "selected current month range with value >= 100"
+            ),
+            (
+                "month", "XYZ", "=", 1000, False, self.income_category.name,
+                "selected current month range with value = 1000"
+            ),
+            (
+                "year", "XYZ", ">=", 100, False, self.expenses_category.name,
+                "selected year range with value >= 100"
+            ),
+            (
+                "year", "XYZ", "=", 1000, False, self.expenses_category.name,
+                "selected year range with value = 1000"
+            ),
+            (
+                (ten_days_ago, today), ten_days_ago_transaction_name, "=", 1000, True, self.income_category.name,
+                "selected date range covering last ten days with value = 1000"
+            ),
+            (
+                (four_months_ago, today), four_months_ago_transaction_name, "=", 500, True, self.expenses_category.name,
+                "selected date range covering last four months with value = 500"
+            ),
+            (
+                (four_months_ago, today), ten_days_ago_transaction_name, "=", 1000, True, self.income_category.name,
+                "selected date range covering last four months with value = 1000"
+            ),
+            (
+                (eight_months_ago, today), eight_months_ago_transaction_name, "=", 2000, True, self.income_category.name,
+                "selected date range covering last eight months with value = 2000"
+            ),
+            (
+                (eight_months_ago, today), four_months_ago_transaction_name, "=", 500, True, self.expenses_category.name,
+                "selected date range covering last eight months with value = 500"
+            ),
+            (
+                (eight_months_ago, today), eight_months_ago_transaction_name, "=", 2000, True, self.income_category.name,
+                "selected date range covering last eight months with value = 2000"
+            ),
+            (
+                (four_months_ago, today), eight_months_ago_transaction_name, "=", 2000, False, self.income_category.name,
+                "selected date range covering last four months with value = 2000"
+            ),
+            (
+                (ten_days_ago, today), four_months_ago_transaction_name, "=", 500, False, self.expenses_category.name,
+                "selected date range covering last ten days with value = 500"
+            ),
+            (
+                "month", eight_months_ago_transaction_name, "=", 2000, False, self.income_category.name,
+                "selected current month range with value = 2000"
+            ),
+        ]
+
+        for date_range, transaction_name, operand, search_value, expected_to_be_found, category_name, message in params:
+            with self.subTest(
+                date_range=date_range,
+                transaction_name=transaction_name,
+                operand=operand,
+                search_value=search_value,
+                expected_to_be_found=expected_to_be_found,
+                category_name=category_name,
+                message=message
+                ):
+                def perform_search() -> None:
+                    "Performs the search operation and validates the results."
+
+                    result = self.fill_search_fields_and_perform_search(
+                        search_name=transaction_name,
+                        operand=operand,
+                        search_value=str(search_value),
+                        date_range=date_range
+                    )
+                    transaction_pattern = self.transaction_regex % (transaction_name, category_name)
+                    if expected_to_be_found:
+                        self.assertRegexpMatches(
+                            result, transaction_pattern,
+                            f"Transaction with name {transaction_name} not found in search results"
+                            f" when {message}"
+                        )
+                    else:
+                        self.assertNotRegexpMatches(
+                            result, transaction_pattern,
+                            f"Transaction with name {transaction_name} found in search results"
+                            f" when {message}"
+                        )
+                    WindowsRegistry.SearchWindow.done(0)
+                self.open_search_window(perform_search)
+                        
 
