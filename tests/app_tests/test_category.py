@@ -1,4 +1,6 @@
 from PySide6.QtCore import QTimer
+from datetime import date
+
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from languages import LanguageStructure
@@ -175,7 +177,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                         transaction_type = "expenses"
 
                     expected_transactions = f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
-                    expected_transactions += f"0\t1000.0\t\t1\tTest {transaction_type} transaction\n"
+                    expected_transactions += f"0\t1000.0\t\t{date.today().day}\tTest {transaction_type} transaction\n"
 
                     self.assertEqual(
                         expected_transactions, app.clipboard().text(),

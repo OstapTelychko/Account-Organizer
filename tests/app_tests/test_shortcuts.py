@@ -50,7 +50,8 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         open_some_window_shortcuts:dict[str, SubWindow] = {
             app_core.config.ShortcutId.OPEN_SETTINGS:WindowsRegistry.SettingsWindow,
             app_core.config.ShortcutId.OPEN_STATISTICS:WindowsRegistry.StatisticsWindow,
-            app_core.config.ShortcutId.SWITCH_ACCOUNT:WindowsRegistry.SwitchAccountWindow
+            app_core.config.ShortcutId.SWITCH_ACCOUNT:WindowsRegistry.SwitchAccountWindow,
+            app_core.config.ShortcutId.OPEN_SEARCH:WindowsRegistry.SearchWindow,
         }
         for shortcut_id, window in open_some_window_shortcuts.items():
             

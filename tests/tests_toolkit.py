@@ -195,6 +195,10 @@ class DBTestCase(DefaultTestCase):
 
         self.income_category:Category
         self.expenses_category:Category
+        self.test_income_transaction_name = "Test income transaction"
+        self.test_expenses_transaction_name = "Test expenses transaction"
+        self.test_income_category_name = "Test income category"
+        self.test_expenses_category_name = "Test expenses category"
 
 
     def __init_subclass__(cls) -> None:
@@ -224,12 +228,11 @@ class DBTestCase(DefaultTestCase):
         def wrapper(self:DBTestCase) -> None:
             os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
 
-            app_core.db.category_query.create_category("Test income category", "Incomes", 0)
-            app_core.db.category_query.create_category("Test expenses category", "Expenses", 0)
+            app_core.db.category_query.create_category(self.test_income_category_name, "Incomes", 0)
+            app_core.db.category_query.create_category(self.test_expenses_category_name, "Expenses", 0)
             
-            new_income_category = app_core.db.category_query.get_category("Test income category", "Incomes")
-            new_expenses_category = app_core.db.category_query.get_category("Test expenses category", "Expenses")
-
+            new_income_category = app_core.db.category_query.get_category(self.test_income_category_name, "Incomes")
+            new_expenses_category = app_core.db.category_query.get_category(self.test_expenses_category_name, "Expenses")
             if new_income_category is None or new_expenses_category is None:
                 logger.error("Just created categories not found in the database")
                 raise ValueError("Just created categories not found in the database")
@@ -239,15 +242,15 @@ class DBTestCase(DefaultTestCase):
 
             app_core.db.transaction_query.add_transaction(
                 self.income_category.id,
-                date(app_core.current_year, app_core.current_month, 1),
+                date(app_core.current_year, app_core.current_month, date.today().day),
                 1000,
-                "Test income transaction"
+                self.test_income_transaction_name
             )
             app_core.db.transaction_query.add_transaction(
                 self.expenses_category.id,
-                date(app_core.current_year, app_core.current_month, 1),
+                date(app_core.current_year, app_core.current_month, date.today().day),
                 1000,
-                "Test expenses transaction"
+                self.test_expenses_transaction_name
             )
 
             app_core.categories[self.income_category.id] = load_category(
