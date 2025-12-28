@@ -1,0 +1,27 @@
+This file describes the release process for Account Organizer.
+
+== Release Process ==
+
+Pre-release steps:
+1. execute appropriate commands from 'pyinstaller commands.txt' to build app for Linux (terminal have to located in project root folder)
+2. run ./dist/main/main file with '--test' argument
+2.1 Add account window will appear, fill account name with 'test' and balance with '0', then click 'Add' button
+2.2 Verify that all tests passed
+3. Rebuild app again
+
+Release steps:
+4. goto GitHub releases page and create pre-release with appropriate version number
+4.1 edit 'app version.txt' file in dist/linux_update.zip/app version.txt to match version number
+4.2 upload 'Account_Organizer_linux_setup.zip', 'linux_update.zip' (all files are located in ./dist/ folder),
+    if PySide6 was updated upload also 'Linux_PySide6.zip' otherwise copy 'Linux_PySide6.zip' from previous release and upload it
+4.3 Publish pre-release
+5. redo version edit in 'app version.txt' file in dist/linux_update.zip/app version.txt and run app
+5.1 copy database with user data 'Accounts.sqlite' to ./dist/main/_internal/ folder
+5.2 after loading user account close app
+5.3 set Update_channel = "prerelease" in dist/main/_internal/User_configuration.toml
+5.4 run app again and verify that update process passed and new feature works as expected
+6. Repeat following steps for Windows except step 2 and 3 (tests have to be run only once on dev environment)
+
+Post-release steps:
+7. goto GitHub releases page and edit pre-release to mark it as stable release
+8. update app_version.txt file in project root folder to match released version
