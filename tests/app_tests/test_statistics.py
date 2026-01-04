@@ -62,7 +62,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
     def generate_custom_range_statistics_transactions(self, transaction_value: float, transaction_name: str) -> list[str]:
         result = []
         for month in range(1, 7):
-            day = 1
+            day = date.today().day
             year = AppCore.instance().current_year
             item_text = dedent(f"""
             <table width="100%">
@@ -318,13 +318,15 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         """Test showing custom range statistics."""
 
         app_core = AppCore.instance()
+        day = date.today().day
         for month in range(1, 7):
             if month != app_core.current_month:
+                year = app_core.current_year
                 app_core.db.transaction_query.add_transaction(
-                    self.income_category.id, date(app_core.current_year, month, 1), 1000, "Test income transaction"
+                    self.income_category.id, date(year, month, day), 1000, "Test income transaction"
                 )
                 app_core.db.transaction_query.add_transaction(
-                    self.expenses_category.id, date(app_core.current_year, month, 1), 1000, "Test expenses transaction"
+                    self.expenses_category.id, date(year, month, day), 1000, "Test expenses transaction"
                 )
         
         def _open_custom_range_statistics_window() -> None:
@@ -336,8 +338,8 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 self.click_on_widget(WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_incomes_categories)
                 self.click_on_widget(WindowsRegistry.CustomRangeStatistics.categories_selection.add_all_expenses_categories)
 
-                WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(app_core.current_year, 1, 1))
-                WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(app_core.current_year, 6, 1))
+                WindowsRegistry.CustomRangeStatistics.from_date.setDate(QDate(app_core.current_year, 1, day))
+                WindowsRegistry.CustomRangeStatistics.to_date.setDate(QDate(app_core.current_year, 6, day))
 
                 def _check_custom_range_statistics() -> None:
                     """Check if custom range statistics are correct."""

@@ -96,7 +96,7 @@ def prepare_update() -> None:
         logger.debug("Changed main file permissions")
 
     with open(os.path.join(UPDATE_APP_DIRECTORY, VERSION_FILE_NAME)) as version_file:
-        update_version = version_file.read()
+        update_version = version_file.read().strip()
 
     WindowsRegistry.UpdateProgressWindow.backups_upgrade_progress.setRange(0, len(app_core.backups))
     upgraded_backups = 0
