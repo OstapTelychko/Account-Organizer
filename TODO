@@ -10,7 +10,7 @@ Updates to existing features:
   ☐ empty @don't-touch
   ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time.
   ☐ add message window for failed update download
-  ☐ block closing update progress window if update in progress
+  ☐ block closing update progress window if update in progress @started(26-01-17 22:36)
   ☐ show attempts of downloading zip files in update progress window
   ☐ add recommended backups and legacy backups amount to messages
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative

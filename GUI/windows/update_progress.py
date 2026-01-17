@@ -86,6 +86,7 @@ class UpdateProgressWindow(SubWindow):
         self.update_stages_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.main_layout = QVBoxLayout()
+        self.close_window.hide()
         self.main_layout.addLayout(self.window_menu_layout)
         self.main_layout.addWidget(self.update_progress_title, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.main_layout.addWidget(self.update_stages_scroll)
