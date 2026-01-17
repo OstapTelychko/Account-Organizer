@@ -6,7 +6,6 @@ from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
-from project_configuration import CATEGORY_TYPE
 from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
 
 from AppObjects.app_core import AppCore

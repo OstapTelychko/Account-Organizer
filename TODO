@@ -21,7 +21,7 @@ Project life improvements:
   ☐ remove account_id from Category table and add AccountCategoryAssociation table to follow 3NF
   ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
-  ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes
+  ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes @started(26-01-17 18:43)
   ☐ switch to pytest framework for tests instead of unittest
 
 Bugs:

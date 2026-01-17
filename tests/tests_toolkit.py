@@ -21,7 +21,7 @@ from PySide6.QtCore import QEventLoop, QTimer, QObject, Signal
 from PySide6.QtWidgets import QPushButton, QToolButton, QCheckBox
 
 from backend.models import Category, Transaction, Account
-from project_configuration import CATEGORY_TYPE, TEST_BACKUPS_DIRECTORY
+from project_configuration import TEST_BACKUPS_DIRECTORY, CategoryType
 from AppManagement.category import activate_categories, remove_categories_from_list
 from AppManagement.backup_management import remove_backup
 from GUI.category import load_category
@@ -173,8 +173,7 @@ class DefaultTestCase(TestCase):
         """
 
         app_core = AppCore.instance()
-        income_categories = [category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[0]]
-        expense_categories = [category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[1]]
+        income_categories, expense_categories = app_core.get_income_and_expense_categories()
 
         return income_categories, expense_categories
 
@@ -286,7 +285,7 @@ class DBTestCase(DefaultTestCase):
                 `category` : (GUICategory) - Category to select tab.
         """
 
-        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(CategoryType.get_index(category.type))
     
 
     def remove_all_backups(self) -> None:

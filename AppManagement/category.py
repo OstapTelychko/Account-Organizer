@@ -4,7 +4,7 @@ from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CategoryType
 from languages import LanguageStructure
 from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table
 
@@ -58,7 +58,7 @@ def create_category() -> int:
     """
 
     app_core = AppCore.instance()
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
     category_name = WindowsRegistry.AddCategoryWindow.category_name.text().strip()
 
     if category_name == "":
@@ -139,7 +139,7 @@ def show_category_settings(category_name:str) -> None:
         ---------
         `category_name` : (str) Name of the category to show settings for.
     """
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
     if AppCore.instance().db.category_query.category_exists(category_name, category_type):
         WindowsRegistry.CategorySettingsWindow.setWindowTitle(category_name)
         WindowsRegistry.CategorySettingsWindow.exec()
@@ -158,7 +158,7 @@ def remove_category() -> None:
     if not WindowsRegistry.Messages.delete_category_confirmation.clickedButton() == WindowsRegistry.Messages.delete_category_confirmation.ok_button:
         return
     
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
     category = app_core.db.category_query.get_category(category_name, category_type)
     if category is None:
         logger.error(f"Category {category_name} not found. Category can't be removed.")
@@ -200,7 +200,7 @@ def rename_category() -> int:
     app_core = AppCore.instance()
     new_category_name = WindowsRegistry.RenameCategoryWindow.new_category_name.text().strip()
     current_name = WindowsRegistry.RenameCategoryWindow.windowTitle()
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
 
     if app_core.db.category_query.category_exists(new_category_name, category_type):
         return WindowsRegistry.Messages.category_exists.exec()
@@ -240,7 +240,7 @@ def show_change_category_position(category_name:str) -> None:
     """
 
     app_core = AppCore.instance()
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
     selected_category = app_core.db.category_query.get_category(category_name, category_type)
     if selected_category is None:
         logger.error(f"Category {category_name} not found. Category position can't be changed.")
@@ -271,7 +271,7 @@ def change_category_position() -> int:
     """
 
     app_core = AppCore.instance()
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
     category_name = WindowsRegistry.ChangeCategoryPositionWindow.preview_category_name.text()
     category = app_core.db.category_query.get_category(category_name, category_type)
 
@@ -337,8 +337,7 @@ def reset_focused_category() -> None:
     """Reset focused category. It sets the focused income and expense categories to the first category of their type."""
 
     app_core = AppCore.instance()
-    income_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[0]])
-    expense_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[1]])
+    income_categories, expense_categories = app_core.get_income_and_expense_categories()
 
     if len(income_categories) != 0:
         app_core.focused_income_category = income_categories[0]
