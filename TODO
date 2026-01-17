@@ -21,7 +21,6 @@ Project life improvements:
   ☐ remove account_id from Category table and add AccountCategoryAssociation table to follow 3NF
   ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
-  ☐ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes @started(26-01-17 18:43)
   ☐ switch to pytest framework for tests instead of unittest
 
 Bugs:
@@ -31,6 +30,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes @started(26-01-17 18:43) @done(26-01-17 19:31) @lasted(48m35s) @project(Project life improvements)
   ✔ analyze and find out why some backups are lost after update @started(26-01-04 19:56) @done(26-01-04 21:25) @lasted(1h29m27s) @project(Bugs)
   ✔ create wiki for release procedure and release 1.3.0 @started(25-12-28 17:02) @done(25-12-28 19:10) @lasted(2h8m54s) @project(Release)
   ✔ create tests for search transactions @started(25-12-18 23:03) @done(25-12-28 16:55) @lasted(1w2d17h52m26s) @project(Project life improvements)
