@@ -206,7 +206,8 @@
                 "0": "Update",
                 "1": "Update progress",
                 "2": "Downloading update (%update_size% MB)",
-                "3": "Upgrading backups"
+                "3": "Upgrading backups",
+                "4": "Downloading GUI library (%gui_library_size% MB)"
             },
             "Search":{
                 "0":"Search",
@@ -469,7 +470,8 @@
                 "0": "Оновлення",
                 "1": "Прогрес оновлення",
                 "2": "Завантаження оновлення (%update_size% МБ)",
-                "3": "Оновлення баз даних"
+                "3": "Оновлення баз даних",
+                "4": "Завантаження графічної бібліотеки (%gui_library_size% МБ)"
             },
             "Search":{
                 "0":"Пошук",
@@ -729,7 +731,8 @@
                 "0": "Aktualizacja",
                 "1": "Postęp aktualizacji",
                 "2": "Pobieranie aktualizacji (%update_size% MB)",
-                "3": "Aktualizacja baz danych"
+                "3": "Aktualizacja baz danych",
+                "4": "Pobieranie biblioteki graficznej (%gui_library_size% MB)"
             },
             "Search":{
                 "0":"Szukaj",

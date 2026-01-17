@@ -285,7 +285,9 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
         `attempt`: (int) - The current attempt number for downloading the update.
     """
 
-    WindowsRegistry.UpdateProgressWindow.download_label.setText(LanguageStructure.Update.get_translation(2).replace("%update_size%", str(round(update_zip_size/1024/1024, 2))))
+    WindowsRegistry.UpdateProgressWindow.download_label.setText(
+        LanguageStructure.Update.get_translation(2).replace(r"%update_size%", str(round(update_zip_size/1024/1024, 2)))
+    )
         
     download_response = req.get(update_zip_download_url, stream=True, timeout=15)
     download_response.raise_for_status()
@@ -335,6 +337,10 @@ def download_gui_library_zip(gui_zip_download_url: str, gui_zip_download_name: s
         raise HTTPError(f"Failed to download gui library zip: status code {download_response.status_code} expected 200")
 
     download_size = 0
+
+    WindowsRegistry.UpdateProgressWindow.download_label.setText(
+        LanguageStructure.Update.get_translation(4).replace(r"%gui_library_size%", str(round(gui_zip_size/1024/1024, 2)))
+    )
 
     logger.info(f"Saving GUI library on disk. Attempt {attempt}")
     with open(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name), "wb") as file:

@@ -9,7 +9,6 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time.
-  ☐ add progress bar for downloading gui library zip file
   ☐ add message window for failed update download
   ☐ block closing update progress window if update in progress
   ☐ show attempts of downloading zip files in update progress window
@@ -30,6 +29,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ add progress bar for downloading gui library zip file @started(26-01-17 22:10) @done(26-01-17 22:29) @lasted(19m54s) @project(Updates to existing features)
   ✔ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes @started(26-01-17 18:43) @done(26-01-17 19:31) @lasted(48m35s) @project(Project life improvements)
   ✔ analyze and find out why some backups are lost after update @started(26-01-04 19:56) @done(26-01-04 21:25) @lasted(1h29m27s) @project(Bugs)
   ✔ create wiki for release procedure and release 1.3.0 @started(25-12-28 17:02) @done(25-12-28 19:10) @lasted(2h8m54s) @project(Release)
