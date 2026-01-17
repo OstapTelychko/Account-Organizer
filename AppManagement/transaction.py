@@ -12,7 +12,7 @@ from AppObjects.windows_registry import WindowsRegistry
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 
 from languages import LanguageStructure
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CategoryType
 from AppManagement.balance import update_account_balance
 
 if TYPE_CHECKING:
@@ -77,7 +77,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             old_value = float(category_data.item(row,2).text()) # type: ignore[reportOptionalMemberAccess, unused-ignore]
             values_difference = transaction_value - old_value
 
-            if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
+            if CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()) == CategoryType.Income:
                 app_core.current_total_income += values_difference
                 app_core.current_balance += values_difference
             else:
@@ -131,7 +131,7 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
         transaction_name
     )
 
-    if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
+    if CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()) == CategoryType.Income:
         app_core.current_total_income = round(app_core.current_total_income + transaction_value, 2)
         app_core.current_balance = round(app_core.current_balance + transaction_value, 2)
     else:
@@ -172,7 +172,7 @@ def transaction_data_handler() -> int:
     raw_transaction_value = WindowsRegistry.TransactionManagementWindow.transaction_value.text()
 
     app_core = AppCore.instance()
-    category_type = CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
     category = app_core.db.category_query.get_category(
         WindowsRegistry.TransactionManagementWindow.windowTitle(), category_type
     )
@@ -255,7 +255,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
 
         update_category_total_value(category_id)
 
-        if CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()] == "Incomes":
+        if CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()) == CategoryType.Income:
             app_core.current_total_income -= transaction_value
             app_core.current_balance -= transaction_value
         else:

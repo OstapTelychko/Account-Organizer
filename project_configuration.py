@@ -103,7 +103,6 @@ MIN_RECOMMENDED_LEGACY_BACKUPS = 2
 MAX_RECOMMENDED_LEGACY_BACKUPS = 5
 BACKUPS_DATE_FORMAT = "%d-%m-%Y_%H-%M-%S"
 
-CATEGORY_TYPE = {0:"Incomes",1:"Expenses"}
 FORBIDDEN_CALCULATOR_WORDS = [
     "import","def","for","while","open","del","__",
     "with","exit","raise","print","range","quit","class","try",
@@ -122,3 +121,28 @@ INFORMATION_MESSAGE_STEPS = INFORMATION_MESSAGE_DURATION / INFORMATION_MESSAGE_S
 MAX_BACKUPS_VALIDATOR_REGEX = r"^[1-9][0-9]{0,2}|1000$"
 MAX_LEGACY_BACKUPS_VALIDATOR_REGEX = r"^(?:[1-9]|[1-9]\d|100)$"
 TRANSACTION_DAY_REGEX = r"^([1-9]|[12][0-9]|3[01])$"
+
+
+class CategoryType:
+    Income = "Incomes"
+    Expense = "Expenses"
+    
+
+    @staticmethod
+    def get(index: int) -> str:
+        if index == 0:
+            return CategoryType.Income
+        elif index == 1:
+            return CategoryType.Expense
+        else:
+            raise ValueError("Invalid category type index")
+    
+
+    @staticmethod
+    def get_index(category_type: str) -> int:
+        if category_type == CategoryType.Income:
+            return 0
+        elif category_type == CategoryType.Expense:
+            return 1
+        else:
+            raise ValueError("Invalid category type string")

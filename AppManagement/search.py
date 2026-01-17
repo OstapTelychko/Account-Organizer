@@ -6,7 +6,7 @@ from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 
 from languages import LanguageStructure
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CategoryType
 
 
 logger = get_logger(__name__)
@@ -66,7 +66,7 @@ def perform_search() -> None | int:
         
         category = app_core.categories[transaction.category_id]
         category_name = category.name
-        if category.type == CATEGORY_TYPE[0]:
+        if category.type == CategoryType.Income:
             transaction_color = "rgb(0,205,0)"
         else:
             transaction_color = "rgb(205,0,0)"

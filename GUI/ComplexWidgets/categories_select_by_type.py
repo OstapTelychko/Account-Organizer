@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from GUI.gui_constants import ALIGN_H_CENTER, ALIGNMENT, SHADOW_EFFECT_ARGUMENTS, ALIGN_V_CENTER
 from languages import LanguageStructure
 from AppObjects.category import Category
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CategoryType
 
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
@@ -128,14 +128,14 @@ class CategoriesSelectionByType(QWidget):
         self.setLayout(self.main_layout)
 
         self.add_all_incomes_categories.clicked.connect(partial(
-            self.add_all_categories_to_statistics_list, CATEGORY_TYPE[0]))
+            self.add_all_categories_to_statistics_list, CategoryType.Income))
         self.add_all_expenses_categories.clicked.connect(partial(
-            self.add_all_categories_to_statistics_list, CATEGORY_TYPE[1]))
+            self.add_all_categories_to_statistics_list, CategoryType.Expense))
         
         self.remove_all_incomes_categories.clicked.connect(partial(
-            self.remove_all_categories_from_statistics_list, CATEGORY_TYPE[0]))
+            self.remove_all_categories_from_statistics_list, CategoryType.Income))
         self.remove_all_expenses_categories.clicked.connect(partial(
-            self.remove_all_categories_from_statistics_list, CATEGORY_TYPE[1]))
+            self.remove_all_categories_from_statistics_list, CategoryType.Expense))
 
 
     def update_selected_categories(self, selected_categories:dict[int, tuple[Category, str]]) -> None:
@@ -190,7 +190,7 @@ class CategoriesSelectionByType(QWidget):
 
         add_text = LanguageStructure.GeneralManagement.get_translation(1)
 
-        if categories_type == CATEGORY_TYPE[0]:
+        if categories_type == CategoryType.Income:
             for category_wrapper_index in range(self.incomes_categories_list_layout.count()):
                 category_wrapper = self.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
 
@@ -198,7 +198,7 @@ class CategoriesSelectionByType(QWidget):
                     if isinstance(widget, QPushButton) and widget.text() == add_text:
                         widget.click()
 
-        elif categories_type == CATEGORY_TYPE[1]:
+        elif categories_type == CategoryType.Expense:
             for category_wrapper_index in range(self.expenses_categories_list_layout.count()):
                 category_wrapper = self.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
 
@@ -240,7 +240,7 @@ class CategoriesSelectionByType(QWidget):
 
         remove_text = LanguageStructure.GeneralManagement.get_translation(0)
 
-        if categories_type == CATEGORY_TYPE[0]:
+        if categories_type == CategoryType.Income:
             for category_wrapper_index in range(self.incomes_categories_list_layout.count()):
                 category_wrapper = self.incomes_categories_list_layout.itemAt(
                     category_wrapper_index
@@ -250,7 +250,7 @@ class CategoriesSelectionByType(QWidget):
                     if isinstance(widget, QPushButton) and widget.text() == remove_text:
                         widget.click()
 
-        elif categories_type == CATEGORY_TYPE[1]:
+        elif categories_type == CategoryType.Expense:
             for category_wrapper_index in range(self.expenses_categories_list_layout.count()):
                 category_wrapper = self.expenses_categories_list_layout.itemAt(
                     category_wrapper_index
@@ -295,7 +295,7 @@ class CategoriesSelectionByType(QWidget):
             )
             self.categories[category.id] = category_item
 
-            if category.type == CATEGORY_TYPE[0]:#Income
+            if category.type == CategoryType.Income:
                 category_type_translate = LanguageStructure.MainWindow.get_translation(1)
                 self.incomes_categories_list_layout.addWidget(
                     category_item.category_wrapper,

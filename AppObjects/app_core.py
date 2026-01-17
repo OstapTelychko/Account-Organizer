@@ -8,7 +8,8 @@ from PySide6.QtCore import QProcess
 from PySide6.QtWidgets import QApplication
 
 from project_configuration import USER_CONF_PATH, APP_DIRECTORY, BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY,\
-DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE, APP_HASHES_DIRECTORY, CACHE_DIRECTORY, VERSION_FILE_NAME
+DEVELOPMENT_MODE, ERROR_LOG_FILE, ERROR_LOG_START_MESSAGE, APP_HASHES_DIRECTORY, CACHE_DIRECTORY, VERSION_FILE_NAME,\
+CategoryType
 
 from AppObjects.single_instance_guard import SingleInstanceGuard
 from AppObjects.backup import Backup
@@ -180,4 +181,12 @@ class AppCore:
         else:
             QProcess.startDetached(sys.executable, sys.argv[1:])#First argument in argv is the path to the executable, the second is the list of arguments
         QApplication.quit()
+    
+
+    def get_income_and_expense_categories(self) -> tuple[list[Category], list[Category]]:
+        """Get income and expense categories as two separate lists."""
+
+        income_categories = [category for category in self.categories.values() if category.type == CategoryType.Income]
+        expense_categories = [category for category in self.categories.values() if category.type == CategoryType.Expense]
+        return income_categories, expense_categories
         

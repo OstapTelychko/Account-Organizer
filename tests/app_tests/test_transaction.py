@@ -1,7 +1,7 @@
 from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CategoryType
 from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
@@ -67,7 +67,7 @@ class TestTransaction(DBTestCase, OutOfScopeTestCase):
 
         app_core = AppCore.instance()
         for category in app_core.categories.values():
-            WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(next(index for index, category_type in CATEGORY_TYPE.items() if category.type == category_type))
+            WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(CategoryType.get_index(category.type))
             category.table_data.selectRow(0)
 
             def _update_transaction() -> None:

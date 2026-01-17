@@ -2,7 +2,7 @@ from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
 
-from project_configuration import CATEGORY_TYPE
+from project_configuration import CategoryType
 from AppManagement.information_message import show_information_message
 from languages import LanguageStructure
 from GUI.gui_constants import app
@@ -22,7 +22,7 @@ def copy_monthly_transactions() -> None:
         WindowsRegistry.CategorySettingsWindow.copy_transactions.setEnabled(False)
         category_name = WindowsRegistry.CategorySettingsWindow.windowTitle()
         category = app_core.db.category_query.get_category(
-            category_name, CATEGORY_TYPE[WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()]
+            category_name, CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
         )
         if category is None:
             logger.error(f"Category {category_name} not found monthly transactions haven't been copied")

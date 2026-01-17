@@ -6,7 +6,6 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
-from project_configuration import CATEGORY_TYPE
 from GUI.gui_constants import FOCUSED_SHADOW_EFFECT_ARGUMENTS
 
 
@@ -19,8 +18,7 @@ def move_to_next_category() -> None:
     """Move focus to the next category in the list of categories."""
 
     app_core = AppCore.instance()
-    income_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[0]])
-    expense_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[1]])
+    income_categories, expense_categories = app_core.get_income_and_expense_categories()
 
     if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
         if len(income_categories) > 1:
@@ -57,8 +55,7 @@ def move_to_previous_category() -> None:
     """Move focus to the previous category in the list of categories."""
 
     app_core = AppCore.instance()
-    income_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[0]])
-    expense_categories = list([category for category in app_core.categories.values() if category.type == CATEGORY_TYPE[1]])
+    income_categories, expense_categories = app_core.get_income_and_expense_categories()
 
     if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
         if len(income_categories) > 1:
