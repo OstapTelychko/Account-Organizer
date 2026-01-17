@@ -9,7 +9,7 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time.
-  ☐ add progress bar for downloading gui library zip file
+  ☐ add progress bar for downloading gui library zip file @started(26-01-17 22:10)
   ☐ add message window for failed update download
   ☐ block closing update progress window if update in progress
   ☐ show attempts of downloading zip files in update progress window

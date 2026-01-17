@@ -18,7 +18,10 @@ class UpdateProgressWindow(SubWindow):
 
         self.update_progress_title = QLabel("Update progress")
 
-        self.download_label = QLabel("")
+        self.download_label = QLabel()
+        self.download_label.setWordWrap(True)
+        self.download_label.setMinimumHeight(50)
+
         self.download_progress = QProgressBar()
         self.download_progress.setRange(0, 100)
 
