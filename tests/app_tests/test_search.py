@@ -335,7 +335,7 @@ class TestSearch(DBTestCase):
 
         #Conditions for different date ranges.
         #date_range, transaction_name, operand, search_value, expected_to_be_found, category_name, message
-        params = [
+        params:list[tuple[str|tuple[QDate, QDate], str, str, int, bool, str, str]] = [
             (
                 "month", self.test_income_transaction_name, ">=", 100, True, self.income_category.name,
                 "selected current month range with value >= 100"
