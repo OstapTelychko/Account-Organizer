@@ -761,6 +761,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
 
         app_core = AppCore.instance()
         init_max_backups = app_core.config.max_backups
+        new_max_backups = MIN_RECOMMENDED_BACKUPS + 1
 
         def _check_no_change() -> None:
             """Check if no change is made to max backups amount after clicking save without changing anything"""
@@ -831,17 +832,17 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 """Check if max backups amount is changed correctly"""
 
                 self.assertEqual(
-                3, app_core.config.max_backups,
-                f"Expected max backups amount in session is 3 returned {app_core.config.max_backups}")
+                new_max_backups, app_core.config.max_backups,
+                f"Expected max backups amount in session is {new_max_backups} returned {app_core.config.max_backups}")
 
                 app_core.config.load_user_config()
                 self.assertEqual(
-                3, app_core.config.max_backups,
-                f"Expected max backups amount in user config is 3 returned {app_core.config.max_backups}")
+                new_max_backups, app_core.config.max_backups,
+                f"Expected max backups amount in user config is {new_max_backups} returned {app_core.config.max_backups}")
                 
                 self.assertNotEqual(
-                    -1, WindowsRegistry.AutoBackupWindow.max_backups_label.text().find("3"),
-                    f"Expected max backups amount in label is 3 returned \
+                    -1, WindowsRegistry.AutoBackupWindow.max_backups_label.text().find(str(new_max_backups)),
+                    f"Expected max backups amount in label is {new_max_backups} returned \
                     {WindowsRegistry.AutoBackupWindow.max_backups_label.text()}"
                 )
 
@@ -851,7 +852,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
             
             qsleep(500)
             QTimer.singleShot(200, self.catch_failure(_check_max_backups_change))
-            WindowsRegistry.AutoBackupWindow.max_backups.setText("3")
+            WindowsRegistry.AutoBackupWindow.max_backups.setText(str(new_max_backups))
             self.click_on_widget(WindowsRegistry.AutoBackupWindow.save)
 
         self.open_auto_backup_window(_try_to_change_max_backups)
