@@ -304,16 +304,23 @@ def save_auto_backup_settings() -> None:
         app_core.config.auto_backup_removal_enabled = True
 
     raw_new_max_backups = WindowsRegistry.AutoBackupWindow.max_backups.text()
+    backup_type = LanguageStructure.BackupManagement.get_translation(21)
     if raw_new_max_backups:
         if app_core.config.auto_backup_removal_enabled:
             new_max_backups = int(raw_new_max_backups)
 
             if new_max_backups < MIN_RECOMMENDED_BACKUPS:
+                WindowsRegistry.Messages.below_recommended_min_backups.setText(
+                    LanguageStructure.Messages.get_translation(21).replace(r"%backup_type%", backup_type)
+                )
                 WindowsRegistry.Messages.below_recommended_min_backups.exec()
                 if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
                     return
             
             elif new_max_backups > MAX_RECOMMENDED_BACKUPS:
+                WindowsRegistry.Messages.above_recommended_max_backups.setText(
+                    LanguageStructure.Messages.get_translation(25).replace(r"%backup_type%", backup_type)
+                )
                 WindowsRegistry.Messages.above_recommended_max_backups.exec()
                 if WindowsRegistry.Messages.above_recommended_max_backups.clickedButton() != WindowsRegistry.Messages.above_recommended_max_backups.ok_button:
                     return
@@ -327,16 +334,23 @@ def save_auto_backup_settings() -> None:
             WindowsRegistry.Messages.auto_removal_disabled.exec()
 
     raw_new_max_legacy_backups = WindowsRegistry.AutoBackupWindow.max_legacy_backups.text()
+    backup_type = LanguageStructure.BackupManagement.get_translation(22)
     if raw_new_max_legacy_backups:
         if app_core.config.auto_backup_removal_enabled:
             new_max_legacy_backups = int(raw_new_max_legacy_backups)
 
             if new_max_legacy_backups < MIN_RECOMMENDED_LEGACY_BACKUPS:
+                WindowsRegistry.Messages.below_recommended_min_backups.setText(
+                    LanguageStructure.Messages.get_translation(21).replace(r"%backup_type%", backup_type)
+                )
                 WindowsRegistry.Messages.below_recommended_min_backups.exec()
                 if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
                     return
             
             elif new_max_legacy_backups > MAX_RECOMMENDED_LEGACY_BACKUPS:
+                WindowsRegistry.Messages.above_recommended_max_backups.setText(
+                    LanguageStructure.Messages.get_translation(25).replace(r"%backup_type%", backup_type)
+                )
                 WindowsRegistry.Messages.above_recommended_max_backups.exec()
                 if WindowsRegistry.Messages.above_recommended_max_backups.clickedButton() != WindowsRegistry.Messages.above_recommended_max_backups.ok_button:
                     return
