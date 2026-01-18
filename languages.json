@@ -255,7 +255,8 @@
             "31": "Failed to check for updates. <span style='color:dodgerblue'>Check connection</span> and try again",
             "32": "Update is successfully <span style='color:dodgerblue'>applied</span>. App will restart now",
             "33": "Keystroke <span style='color:dodgerblue'>`%keystroke_value%`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key",
-            "34": "You have to fill at least transaction name or value to perform search"
+            "34": "You have to fill at least transaction name or value to perform search",
+            "35": "Failed to download update. Try again later. More info in %error_log% file"
         }
             
     },
@@ -519,7 +520,8 @@
             "31": "Не вдалося перевірити на наявність оновлень. <span style='color:dodgerblue'>Перевірте з'єднання</span> та спробуйте знову",
             "32": "Оновлення успішно <span style='color:dodgerblue'>застосовано</span>. Додаток зараз перезапуститься",
             "33": "Комбінація клавіш <span style='color:dodgerblue'>`%keystroke_value%`</span> - вже <span style='color:dodgerblue'>призначена до іншого сполучення клавіш</span>. Будь ласка, виберіть іншу клавішу",
-            "34": "Ви повинні заповнити принаймні назву або значення транзакції, щоб виконати пошук"
+            "34": "Ви повинні заповнити принаймні назву або значення транзакції, щоб виконати пошук",
+            "35": "Не вдалось завантажити оновлення. Спробуйте пізніше. Більше інформації у файлі %error_log%"
         }
     },
     
@@ -780,7 +782,8 @@
             "31": "Nie udało się sprawdzić dostępności aktualizacji. <span style='color:dodgerblue'>Sprawdź połączenie</span> i spróbuj ponownie",
             "32": "Aktualizacja została pomyślnie <span style='color:dodgerblue'>zastosowana</span>. Aplikacja zostanie teraz ponownie uruchomiona",
             "33": "Skrót <span style='color:dodgerblue'>`%keystroke_value%`</span> jest już <span style='color:dodgerblue'>przypisany do innego skrótu</span>. Proszę wybrać inny klawisz",
-            "34": "Musisz wypełnić przynajmniej nazwę lub wartość transakcji, aby wykonać wyszukiwanie"
+            "34": "Musisz wypełnić przynajmniej nazwę lub wartość transakcji, aby wykonać wyszukiwanie",
+            "35": "Nie udało się pobrać aktualizacji. Spróbuj później. Więcej informacji w pliku %error_log%"
         }
     }
 }
