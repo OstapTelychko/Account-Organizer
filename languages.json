@@ -205,9 +205,9 @@
             "Update":{
                 "0": "Update",
                 "1": "Update progress",
-                "2": "Downloading update (%update_size% MB)",
+                "2": "Downloading update (%update_size% MB) Attempt %current_attempt% of %max_attempts%",
                 "3": "Upgrading backups",
-                "4": "Downloading GUI library (%gui_library_size% MB)"
+                "4": "Downloading GUI library (%gui_library_size% MB) Attempt %current_attempt% of %max_attempts%"
             },
             "Search":{
                 "0":"Search",
@@ -469,9 +469,9 @@
             "Update":{
                 "0": "Оновлення",
                 "1": "Прогрес оновлення",
-                "2": "Завантаження оновлення (%update_size% МБ)",
+                "2": "Завантаження оновлення (%update_size% МБ) Спроба %current_attempt% з %max_attempts%",
                 "3": "Оновлення баз даних",
-                "4": "Завантаження графічної бібліотеки (%gui_library_size% МБ)"
+                "4": "Завантаження графічної бібліотеки (%gui_library_size% МБ) Спроба %current_attempt% з %max_attempts%"
             },
             "Search":{
                 "0":"Пошук",
@@ -730,9 +730,9 @@
             "Update":{
                 "0": "Aktualizacja",
                 "1": "Postęp aktualizacji",
-                "2": "Pobieranie aktualizacji (%update_size% MB)",
+                "2": "Pobieranie aktualizacji (%update_size% MB) Próba %current_attempt% z %max_attempts%",
                 "3": "Aktualizacja baz danych",
-                "4": "Pobieranie biblioteki graficznej (%gui_library_size% MB)"
+                "4": "Pobieranie biblioteki graficznej (%gui_library_size% MB) Próba %current_attempt% z %max_attempts%"
             },
             "Search":{
                 "0":"Szukaj",
