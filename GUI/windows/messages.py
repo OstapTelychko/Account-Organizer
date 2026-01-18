@@ -136,3 +136,6 @@ class Messages(metaclass=QSingleton):
         self.empty_search_fields = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
         )
+        self.failed_update_download = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Critical, APP_NAME
+        )

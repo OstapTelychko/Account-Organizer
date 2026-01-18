@@ -1,5 +1,6 @@
 from PySide6.QtCore import QTimer, QObject, Signal
 import threading
+
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -10,6 +11,8 @@ from AppManagement.AppUpdate.prepare_update import prepare_update
 from AppManagement.AppUpdate.apply_update import apply_update
 
 from AppAnnotations.update_annotations import RELEASE
+from languages import LanguageStructure
+from project_configuration import ERROR_LOG_FILE
 
 logger = get_logger(__name__)
 
@@ -32,9 +35,16 @@ def handle_latest_version(latest_version: tuple[str, RELEASE] | None) -> None:
             return
 
         logger.info(f"Latest version: {version} | Current version: {app_core.app_version}")
+        failed_download_text = LanguageStructure.Messages.get_translation(35).replace(r"%error_log%", ERROR_LOG_FILE)
+        WindowsRegistry.Messages.failed_update_download.setText(failed_download_text)
         WindowsRegistry.Messages.update_available.exec()
+
         if WindowsRegistry.Messages.update_available.clickedButton() == WindowsRegistry.Messages.update_available.ok_button:
             
+            def end_update_with_failure() -> None:
+                WindowsRegistry.UpdateProgressWindow.done(1)
+                WindowsRegistry.Messages.failed_update_download.exec()
+
             def _run_update() -> None:
                 logger.info("Running update")
                 try:
@@ -44,13 +54,13 @@ def handle_latest_version(latest_version: tuple[str, RELEASE] | None) -> None:
                         apply_update()
                     else:
                         logger.error("Failed to download latest update")
-                        WindowsRegistry.UpdateProgressWindow.done(1)
+                        end_update_with_failure()
                 except FailedToDownloadUpdateZipError:
                     logger.error("Failed to download latest update zip. Closing update window")
-                    WindowsRegistry.UpdateProgressWindow.done(1)
+                    end_update_with_failure()
                 except FailedToDownloadGUILibraryZipError:
                     logger.error("Failed to download latest GUI library zip. Closing update window")
-                    WindowsRegistry.UpdateProgressWindow.done(1)       
+                    end_update_with_failure()
 
             QTimer.singleShot(150, _run_update)
             WindowsRegistry.UpdateProgressWindow.exec()
