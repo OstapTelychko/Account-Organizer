@@ -10,7 +10,6 @@ Updates to existing features:
   ☐ empty @don't-touch
   ☐ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time.
   ☐ add message window for failed update download
-  ☐ show attempts of downloading zip files in update progress window @started(26-01-18 13:20)
   ☐ add recommended backups and legacy backups amount to messages
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
   
@@ -28,6 +27,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ show attempts of downloading zip files in update progress window @started(26-01-18 13:20) @done(26-01-18 14:17) @lasted(57m18s) @project(Updates to existing features)
   ✔ block closing update progress window if update in progress @started(26-01-17 22:36) @done(26-01-17 23:02) @lasted(26m28s) @project(Updates to existing features)
   ✔ add progress bar for downloading gui library zip file @started(26-01-17 22:10) @done(26-01-17 22:29) @lasted(19m54s) @project(Updates to existing features)
   ✔ replace all CATEGORY_TYPE usages with CategoryType enum class to avoid using indexes @started(26-01-17 18:43) @done(26-01-17 19:31) @lasted(48m35s) @project(Project life improvements)
