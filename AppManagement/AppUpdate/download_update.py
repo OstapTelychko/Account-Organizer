@@ -7,13 +7,14 @@ from sys import platform
 from zipfile import ZipFile, ZIP_DEFLATED
 
 import requests as req
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, ConnectionError
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry #type: ignore[import-not-found]
 
 from languages import LanguageStructure
 from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL,\
 WINDOWS_GUI_LIBRARY_ZIP, LINUX_GUI_LIBRARY_ZIP, CHUNK_SIZE_FOR_DOWNLOADING, ATTEMPTS_TO_DOWNLOAD_ZIP, GUI_LIBRARY_HASH_FILE_PATH, UPDATE_APP_DIRECTORY
+from GeneralTools.Utils import convert_to_megabytes
 
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
@@ -283,12 +284,7 @@ def download_update_zip(update_zip_download_url: str, update_zip_download_name: 
         `update_zip_size`: (int) - The size of the update zip file in bytes.
 
         `attempt`: (int) - The current attempt number for downloading the update.
-    """
-
-    WindowsRegistry.UpdateProgressWindow.download_label.setText(
-        LanguageStructure.Update.get_translation(2).replace(r"%update_size%", str(round(update_zip_size/1024/1024, 2)))
-    )
-        
+    """ 
     download_response = req.get(update_zip_download_url, stream=True, timeout=15)
     download_response.raise_for_status()
 
@@ -337,10 +333,6 @@ def download_gui_library_zip(gui_zip_download_url: str, gui_zip_download_name: s
         raise HTTPError(f"Failed to download gui library zip: status code {download_response.status_code} expected 200")
 
     download_size = 0
-
-    WindowsRegistry.UpdateProgressWindow.download_label.setText(
-        LanguageStructure.Update.get_translation(4).replace(r"%gui_library_size%", str(round(gui_zip_size/1024/1024, 2)))
-    )
 
     logger.info(f"Saving GUI library on disk. Attempt {attempt}")
     with open(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name), "wb") as file:
@@ -396,9 +388,26 @@ def download_latest_update(release: RELEASE) -> bool:
                         GUI zip download name: {gui_zip_download_name},
                         GUI zip hash: {gui_zip_hash}""")
         return False
+    
+    def check_update_download_fail() -> None:
+        """Checks if update zip download failed"""
+        if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
+            logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+            raise FailedToDownloadUpdateZipError(f"Failed to download update zip. After {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
 
     for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
-        download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
+        WindowsRegistry.UpdateProgressWindow.download_label.setText(
+            LanguageStructure.Update.get_translation(2)
+            .replace(r"%update_size%", str(convert_to_megabytes(update_zip_size)))
+            .replace(r"%current_attempt%", str(attempt))
+            .replace(r"%max_attempts%", str(ATTEMPTS_TO_DOWNLOAD_ZIP))
+        )
+        try:
+            download_update_zip(update_zip_download_url, update_zip_download_name, update_zip_size, attempt)
+        except ConnectionError as e:
+            logger.warning(f"Failed to download update zip due to connection error: {e}. Retrying...")
+            check_update_download_fail()
+            continue
 
         current_update_zip_hash = generate_file_256hash(f"{UPDATE_DIRECTORY}/{update_zip_download_name}")
         if current_update_zip_hash == update_zip_hash:
@@ -406,9 +415,8 @@ def download_latest_update(release: RELEASE) -> bool:
             break
         else:
             logger.warning(f"Update zip hash does not match: Remote: {update_zip_hash} | Current: {current_update_zip_hash}. Retrying download...")
-            if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
-                logger.error(f"Failed to download update zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
-                raise FailedToDownloadUpdateZipError(f"Failed to download update zip. After {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+            check_update_download_fail()
+            
 
     if os.path.exists(GUI_LIBRARY_HASH_FILE_PATH):
         logger.debug("Retrieving GUI library hash...")
@@ -417,26 +425,42 @@ def download_latest_update(release: RELEASE) -> bool:
     else:
         logger.debug("GUI library hash file does not exist. GUI library will be downloaded.")
         current_gui_library_hash = ""
+    
+    def check_gui_library_download_fail() -> None:
+        """Checks if GUI library zip download failed"""
+        if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
+            logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+            raise FailedToDownloadGUILibraryZipError(f"Failed to download GUI library zip. After {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
         
     if current_gui_library_hash != gui_zip_hash:
         logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Downloading GUI library zip...")
 
         for attempt in range(1, ATTEMPTS_TO_DOWNLOAD_ZIP+1):
-            download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
+            WindowsRegistry.UpdateProgressWindow.download_label.setText(
+                LanguageStructure.Update.get_translation(4)
+                .replace(r"%gui_library_size%", str(convert_to_megabytes(gui_zip_size)))
+                .replace(r"%current_attempt%", str(attempt))
+                .replace(r"%max_attempts%", str(ATTEMPTS_TO_DOWNLOAD_ZIP))
+            )
+
+            try:
+                download_gui_library_zip(gui_zip_download_url, gui_zip_download_name, gui_zip_size, attempt)
+            except ConnectionError as e:
+                logger.warning(f"Failed to download GUI library zip due to connection error: {e}. Retrying...")
+                check_gui_library_download_fail()
+                continue
 
             current_gui_library_hash = generate_file_256hash(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
             if current_gui_library_hash == gui_zip_hash:
                 logger.info(f"GUI library zip hash matches: {gui_zip_hash}")
                 os.remove(os.path.join(UPDATE_APP_DIRECTORY, gui_zip_download_name))
+                
                 # Save the hash to the GUI library hash file
                 with open(GUI_LIBRARY_HASH_FILE_PATH, "w") as hash_file:
                     hash_file.write(current_gui_library_hash)
-
                 break
             else:
                 logger.warning(f"GUI library zip hash does not match: Remote: {gui_zip_hash} | Current: {current_gui_library_hash}. Retrying download...")
-                if attempt == ATTEMPTS_TO_DOWNLOAD_ZIP:
-                    logger.error(f"Failed to download GUI library zip after {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
-                    raise FailedToDownloadGUILibraryZipError(f"Failed to download GUI library zip. After {ATTEMPTS_TO_DOWNLOAD_ZIP} attempts.")
+                check_gui_library_download_fail()
 
     return True

@@ -15,3 +15,14 @@ def generate_month_range(year:int, month:int) -> tuple[date, date]:
     start_date = date(year, month, 1)
     end_date = date(year, month, last_day)
     return start_date, end_date
+
+
+def convert_to_megabytes(size_in_bytes:int, decimals:int = 2) -> float:
+    """Convert size from bytes to megabytes.
+
+        Arguments
+        ---------
+            `size_in_bytes` : (int) - Size in bytes to convert.
+    """
+    size_in_megabytes = round(size_in_bytes / (1024 * 1024), decimals)
+    return size_in_megabytes
