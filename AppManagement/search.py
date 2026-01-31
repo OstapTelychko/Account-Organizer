@@ -75,4 +75,28 @@ def perform_search() -> None | int:
             f"<b style='color:{transaction_color}'>{transaction_name}</b> ({category_name}) <br>"
             f"Date: <b>{transaction.date}</b>  Value: <b>{transaction.value}</b>"
         )
+
+    transaction_amount = len(transactions)
+    income_transactions_sum = sum(
+        transaction.value for transaction in transactions if app_core.categories[transaction.category_id].type == CategoryType.Income
+    )
+    expense_transactions_sum = sum(
+        transaction.value for transaction in transactions if app_core.categories[transaction.category_id].type == CategoryType.Expense
+    )
+
+    income_transactions_sum = round(income_transactions_sum, 2) or LanguageStructure.GeneralManagement.get_translation(12)
+    expense_transactions_sum = round(expense_transactions_sum, 2) or LanguageStructure.GeneralManagement.get_translation(12)
+
+    WindowsRegistry.SearchWindow.transaction_amount.setText(
+        LanguageStructure.Search.get_translation(7).replace("%transaction_amount%", str(transaction_amount))
+    )
+
+    WindowsRegistry.SearchWindow.income_transactions_sum.setText(
+        LanguageStructure.Search.get_translation(8).replace(r"%income_sum%", f"{income_transactions_sum}")
+    )
+    
+    WindowsRegistry.SearchWindow.expense_transactions_sum.setText(
+        LanguageStructure.Search.get_translation(9).replace(r"%expense_sum%", f"{expense_transactions_sum}")
+    )
+
     return None

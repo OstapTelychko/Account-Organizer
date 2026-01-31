@@ -27,7 +27,8 @@
             "8":"Load",
             "9":"Add all",
             "10":"Remove all",
-            "11":"Reset"
+            "11":"Reset",
+            "12":"—"
         },
 
         "Windows":{
@@ -218,7 +219,10 @@
                 "3": "Transaction value",
                 "4": "Month",
                 "5": "Year",
-                "6": "Categories"
+                "6": "Categories",
+                "7": "Transactions found: %transaction_amount%",
+                "8": "Income sum: %income_sum%",
+                "9": "Expense sum: %expense_sum%"
             }
         },
 
@@ -291,7 +295,8 @@
             "8":"Завантажити",
             "9":"Додати всі",
             "10":"Видалити всі",
-            "11":"Скинути"
+            "11":"Скинути",
+            "12":"—"
         },
 
         "Windows":{
@@ -485,7 +490,10 @@
                 "3": "Значення транзакції",
                 "4": "Місяць",
                 "5": "Рік",
-                "6": "Категорії"
+                "6": "Категорії",
+                "7": "Знайдено транзакцій: %transaction_amount%",
+                "8": "Сума доходів: %income_sum%",
+                "9": "Сума витрат: %expense_sum%"
             }
         },
 
@@ -557,7 +565,8 @@
             "8": "Załaduj",
             "9": "Dodać wszystkie",
             "10": "Usunąć wszystkie",
-            "11": "Resetować"
+            "11": "Resetować",
+            "12": "—"
         },
 
         "Windows":{
@@ -749,7 +758,10 @@
                 "3": "Wartość transakcji",
                 "4": "Miesiąc",
                 "5": "Rok",
-                "6": "Kategorie"
+                "6": "Kategorie",
+                "7": "Znaleziono transakcji: %transaction_amount%",
+                "8": "Suma dochodów: %income_sum%",
+                "9": "Suma wydatków: %expense_sum%"
             }
         },
 

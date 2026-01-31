@@ -9,6 +9,8 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
+  ☐ add summary of incomes and expenses for all transactions in search window and simple text search across search results @started(26-01-31 21:10)
+  ☐ extend monthly statistics to show summary for each category
   
 Project life improvements:
   ☐ empty @don't-touch
