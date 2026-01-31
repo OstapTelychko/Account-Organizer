@@ -7,6 +7,7 @@ from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 from DesktopQtToolkit.list_widget import CustomListWidget
 from DesktopQtToolkit.strict_double_validator import StrictDoubleValidator
+from DesktopQtToolkit.default_label import DefaultLabel 
 
 from GUI.gui_constants import ALIGN_H_CENTER, BASIC_FONT
 from GUI.ComplexWidgets.categories_select_by_type import CategoriesSelectionByType
@@ -71,12 +72,26 @@ class SearchWindow(SubWindow):
 
         self.transactions_list = CustomListWidget()
 
+        self.transaction_amount = DefaultLabel("Transactions found: 0")
+        self.income_transactions_sum = DefaultLabel("Income sum: 0.00")
+        self.expense_transactions_sum = DefaultLabel("Expense sum: 0.00")
+
+        self.statistics_bar_layout = QHBoxLayout()
+        self.statistics_bar_layout.addWidget(self.transaction_amount)
+        self.statistics_bar_layout.addWidget(self.income_transactions_sum)
+        self.statistics_bar_layout.addWidget(self.expense_transactions_sum)
+
+        self.search_results_wrapper_layout = QVBoxLayout()
+        self.search_results_wrapper_layout.addLayout(self.statistics_bar_layout)
+        self.search_results_wrapper_layout.addWidget(self.transactions_list)
+        self.search_results_wrapper = create_wrapper_widget(self.search_results_wrapper_layout)
+
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)
         self.main_layout.addWidget(self.search_parameters_wrapper)
         self.main_layout.addWidget(self.search, alignment=ALIGN_H_CENTER)
         self.main_layout.addSpacing(40)
-        self.main_layout.addWidget(self.transactions_list)
+        self.main_layout.addWidget(self.search_results_wrapper)
 
         self.window_container.setLayout(self.main_layout)
         self.setMinimumSize(1100, 850)

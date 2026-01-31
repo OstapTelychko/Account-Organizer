@@ -1,8 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import random
+
 from datetime import date
 from PySide6.QtCore import QTimer, QDate
-from calendar import monthrange
+from calendar import monthrange, isleap
 from textwrap import dedent
 
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
@@ -59,10 +61,11 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             f"Test expenses transaction - 1000.0",]
     
 
-    def generate_custom_range_statistics_transactions(self, transaction_value: float, transaction_name: str) -> list[str]:
+    def generate_custom_range_statistics_transactions(self, transaction_value: float, transaction_name: str, day: int = 0) -> list[str]:
         result = []
         for month in range(1, 7):
-            day = date.today().day
+            if day == 0:
+                day = date.today().day
             year = AppCore.instance().current_year
             item_text = dedent(f"""
             <table width="100%">
@@ -318,7 +321,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         """Test showing custom range statistics."""
 
         app_core = AppCore.instance()
-        day = date.today().day
+        day = random.randint(1, 28 + isleap(app_core.current_year))
         for month in range(1, 7):
             if month != app_core.current_month:
                 year = app_core.current_year
@@ -327,6 +330,19 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 )
                 app_core.db.transaction_query.add_transaction(
                     self.expenses_category.id, date(year, month, day), 1000, "Test expenses transaction"
+                )
+            else:
+                app_core.db.transaction_query.update_transaction(
+                    self.income_transaction.id,
+                    self.test_income_transaction_name,
+                    day,
+                    self.income_transaction.value,
+                )
+                app_core.db.transaction_query.update_transaction(
+                    self.expenses_transaction.id,
+                    self.test_expenses_transaction_name,
+                    day,
+                    self.expenses_transaction.value,
                 )
         
         def _open_custom_range_statistics_window() -> None:
@@ -381,10 +397,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     expected_transactions = [
                         f"{self.translated_incomes}<br/>",
                         f"<br/>{self.income_category.name}<br/>",
-                        *self.generate_custom_range_statistics_transactions(1000.0, "Test income transaction"),
+                        *self.generate_custom_range_statistics_transactions(1000.0, "Test income transaction", day),
                         f"<br/><br/>{self.translated_expenses}<br/>",
                         f"<br/>{self.expenses_category.name}<br/>",
-                        *self.generate_custom_range_statistics_transactions(1000.0, "Test expenses transaction")
+                        *self.generate_custom_range_statistics_transactions(1000.0, "Test expenses transaction", day)
                     ]
 
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.transactions_list

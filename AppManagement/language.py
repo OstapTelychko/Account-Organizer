@@ -254,6 +254,21 @@ def change_language() -> None:
         LanguageStructure.GeneralManagement.get_translation(9),
         LanguageStructure.GeneralManagement.get_translation(10)
     )
+    WindowsRegistry.SearchWindow.transaction_amount.setText(
+        LanguageStructure.Search.get_translation(7).replace(
+            "%transaction_amount%", LanguageStructure.GeneralManagement.get_translation(12)
+        )
+    )
+    WindowsRegistry.SearchWindow.income_transactions_sum.setText(
+        LanguageStructure.Search.get_translation(8).replace(
+            r"%income_sum%", LanguageStructure.GeneralManagement.get_translation(12)
+        )
+    )
+    WindowsRegistry.SearchWindow.expense_transactions_sum.setText(
+        LanguageStructure.Search.get_translation(9).replace(
+            r"%expense_sum%", LanguageStructure.GeneralManagement.get_translation(12)
+        )
+    )
 
 
  
