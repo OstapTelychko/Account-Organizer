@@ -193,7 +193,10 @@ class DBTestCase(DefaultTestCase):
         super().__init__(methodName)
 
         self.income_category:Category
+        self.income_transaction:Transaction
         self.expenses_category:Category
+        self.expenses_transaction:Transaction
+
         self.test_income_transaction_name = "Test income transaction"
         self.test_expenses_transaction_name = "Test expenses transaction"
         self.test_income_category_name = "Test income category"
@@ -239,13 +242,13 @@ class DBTestCase(DefaultTestCase):
             self.income_category = new_income_category
             self.expenses_category = new_expenses_category
 
-            app_core.db.transaction_query.add_transaction(
+            self.income_transaction = app_core.db.transaction_query.add_transaction(
                 self.income_category.id,
                 date(app_core.current_year, app_core.current_month, date.today().day),
                 1000,
                 self.test_income_transaction_name
             )
-            app_core.db.transaction_query.add_transaction(
+            self.expenses_transaction = app_core.db.transaction_query.add_transaction(
                 self.expenses_category.id,
                 date(app_core.current_year, app_core.current_month, date.today().day),
                 1000,

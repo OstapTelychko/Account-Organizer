@@ -674,7 +674,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
         app_core = AppCore.instance()
         app_core.config.auto_backup_status = app_core.config.AutoBackupStatus.MONTHLY.value
         date_now = datetime.now()
-        date_minus_30_days = date_now - timedelta(days=30)
+        date_minus_31_days = date_now - timedelta(days=31)
 
         def _prepare_auto_monthly_backup() -> None:
             """Create fresh backup with current date"""
@@ -720,7 +720,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 qsleep(500)
                 
                 backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
-                backup.timestamp = date_minus_30_days.strftime(BACKUPS_DATE_FORMAT)
+                backup.timestamp = date_minus_31_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
                     """After mocking backup timestamp check if second backup is created"""
