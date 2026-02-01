@@ -3,9 +3,9 @@ from sys import argv, platform
 
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QColor, QFont
+from PySide6.QtGui import QIcon, QColor, QFont, QFontDatabase
 
-from project_configuration import APP_NAME, GENERAL_ICONS_DIRECTORY
+from project_configuration import APP_NAME, GENERAL_ICONS_DIRECTORY, REGULAR_FONT_PATH, BOLD_FONT_PATH
 
 
 app = QApplication(argv)
@@ -31,9 +31,16 @@ NO_INTERNET_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "no internet conn
 SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
 FOCUSED_SHADOW_EFFECT_ARGUMENTS = {"blurRadius":20, "xOffset":0, "yOffset":0, "color":QColor(70, 120, 255)}
 
-if platform == "linux":
-    BASIC_FONT = QFont("C059 [urw]", pointSize=12)
-    BIG_BASIC_FONT = QFont("C059 [urw]", pointSize=15)
-else:#Windows
-    BASIC_FONT = QFont("Georgia", pointSize=12)
-    BIG_BASIC_FONT = QFont("Georgia", pointSize=15)
+regular_id = QFontDatabase.addApplicationFont(REGULAR_FONT_PATH)
+bold_id = QFontDatabase.addApplicationFont(BOLD_FONT_PATH)
+if regular_id != -1 and bold_id != -1:
+    font_family = QFontDatabase.applicationFontFamilies(regular_id)[0]
+    BASIC_FONT = QFont(font_family, pointSize=12)
+    BIG_BASIC_FONT = QFont(font_family, pointSize=15)
+else:
+    if platform == "linux":
+        BASIC_FONT = QFont("C059 [urw]", pointSize=12)
+        BIG_BASIC_FONT = QFont("C059 [urw]", pointSize=15)
+    else:#Windows
+        BASIC_FONT = QFont("Georgia", pointSize=12)
+        BIG_BASIC_FONT = QFont("Georgia", pointSize=15)

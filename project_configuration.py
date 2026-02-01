@@ -31,6 +31,10 @@ TRANSACTIONS_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "Transactions")
 THEME_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "Theme")
 GENERAL_ICONS_DIRECTORY = os.path.join(IMAGES_DIRECTORY, "General Icons")
 
+FONTS_DIRECTORY = os.path.join(APP_DIRECTORY, "Fonts")
+REGULAR_FONT_PATH = os.path.join(FONTS_DIRECTORY, "Roboto-Regular.ttf")
+BOLD_FONT_PATH = os.path.join(FONTS_DIRECTORY, "Roboto-Bold.ttf")
+
 USER_CONF_PATH = os.path.join(APP_DIRECTORY, "User_configuration.toml")
 TEST_USER_CONF_PATH = os.path.join(APP_DIRECTORY, "test_User_configuration.toml")
 DB_PATH = f"sqlite:///{APP_DIRECTORY}Accounts.sqlite"
