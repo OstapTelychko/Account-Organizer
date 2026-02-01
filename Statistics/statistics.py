@@ -267,11 +267,22 @@ def add_month_statistics(
             `current_month` (int): month to add statistics
     """
 
+    def add_categories_months_sum(categories:dict[int, float]) -> None:
+        """Add categories months sum to the list
+
+            Arguments
+            ---------
+                `categories` (dict): categories to add months sum
+        """
+        month_statistics.addItem(f"<br/>{LanguageStructure.Search.get_translation(6)}")
+        for category_id, total_value in categories.items():
+            month_statistics.addItem(f"{AppCore.instance().categories[category_id].name} - {total_value}")
+
     Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)
     Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)
 
-    total_income = round(sum([Incomes_statistic[4][total_value] for total_value in Incomes_statistic[4]]), 2)
-    total_expense = round(sum([Expenses_statistic[4][total_value] for total_value in Expenses_statistic[4]]), 2)
+    total_income = round(sum([Incomes_statistic[4][category_id] for category_id in Incomes_statistic[4]]), 2)
+    total_expense = round(sum([Expenses_statistic[4][category_id] for category_id in Expenses_statistic[4]]), 2)
     _, days_amount = monthrange(AppCore.instance().current_year, current_month)
 
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(4)}{total_income}")
@@ -284,9 +295,11 @@ def add_month_statistics(
 
     month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
     add_statistic(month_statistics, Incomes_statistic, [9,10,13,14,11,15])
+    add_categories_months_sum(Incomes_statistic[4])
+
     month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
     add_statistic(month_statistics, Expenses_statistic, [17,18,20,21,19,22])
-
+    add_categories_months_sum(Expenses_statistic[4])
 
 def show_monthly_statistics() -> int:
     """This method is used to show the monthly statistics window."""
