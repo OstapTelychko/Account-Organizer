@@ -214,7 +214,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                 WindowsRegistry.QuarterlyStatistics.done(1)
             
-            QTimer.singleShot(100, self.catch_failure(_check_quarterly_statistics))
+            QTimer.singleShot(200, self.catch_failure(_check_quarterly_statistics))
             self.click_on_widget(WindowsRegistry.StatisticsWindow.quarterly_statistics)
         
         self.open_statistics_window(_open_quarterly_statistics_window)

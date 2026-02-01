@@ -2,7 +2,7 @@ New features:
   ☐ empty @don't-touch
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
-  ☐ replace BASIC_FONT with some better one that will look good on both windows and linux
+  ☐ replace BASIC_FONT with some better one that will look good on both windows and linux @started(26-02-01 19:31)
   ☐ fix issue with weird looking buttons on windows
   ☐ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction
 	
