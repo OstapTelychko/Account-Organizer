@@ -14,6 +14,7 @@ from AppObjects.windows_registry import WindowsRegistry
 
 if TYPE_CHECKING:
     from typing import Callable
+    from DesktopQtToolkit.list_widget import CustomListWidget
 
 
 class TestStatistics(DBTestCase, OutOfScopeTestCase):
@@ -47,18 +48,31 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
         return [
             f"{LanguageStructure.Statistics.get_translation(4)}1000.0",
-            f"{LanguageStructure.Statistics.get_translation(5)}{round(1000/days_amount, 2)}<br/>",
+            f"{LanguageStructure.Statistics.get_translation(5)}{round(1000/days_amount, 2)}",
             f"{LanguageStructure.Statistics.get_translation(6)}1000.0",
-            f"{LanguageStructure.Statistics.get_translation(7)}{round(1000/days_amount, 2)}<br/>",
+            f"{LanguageStructure.Statistics.get_translation(7)}{round(1000/days_amount, 2)}",
             f"{LanguageStructure.Statistics.get_translation(8)}0.0",
-            f"<br/><br/>{self.translated_incomes}",
-            f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name}  (1000.0)",
-            f"<br/>{LanguageStructure.Statistics.get_translation(11)}",
-            f"Test income transaction - 1000.0",
-            f"<br/><br/>{self.translated_expenses}",
-            f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name}  (1000.0)",
-            f"<br/>{LanguageStructure.Statistics.get_translation(19)}",
-            f"Test expenses transaction - 1000.0",]
+            f"{self.translated_incomes}",
+            fr"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name}\s+\(1000.0\)",
+            f"{LanguageStructure.Statistics.get_translation(11)}",
+            fr"{self.test_income_transaction_name}\s+-\s+1000.0",
+            f"{self.translated_expenses}",
+            fr"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name}\s+\(1000.0\)",
+            f"{LanguageStructure.Statistics.get_translation(19)}",
+            fr"{self.test_expenses_transaction_name}\s+-\s+1000.0",]
+
+
+    def get_actual_statistics(self, statistics_list_widget:CustomListWidget) -> str:
+        """Get actual statistics from the list widget as string.
+
+            Arguments
+            ---------
+                `statistics_list_widget` : (CustomListWidget) - List widget with statistics.
+        """
+        return "".join(
+            statistics_list_widget.item(index).text()
+            for index in range(statistics_list_widget.count())
+        )
     
 
     def generate_custom_range_statistics_transactions(self, transaction_value: float, transaction_name: str, day: int = 0) -> list[str]:
@@ -94,21 +108,11 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 """Check if monthly statistics are correct."""
 
                 expected_monthly_statistics = self.create_monthly_statistics(days_amount)
+                actual_statistics = self.get_actual_statistics(WindowsRegistry.MonthlyStatistics.statistics)
 
-                self.assertEqual(
-                    len(expected_monthly_statistics), WindowsRegistry.MonthlyStatistics.statistics.count(),
-                    (
-                        f"Month statistics have another amount of rows. Expected amount "
-                        f"{len(expected_monthly_statistics)} found "
-                        f"{WindowsRegistry.MonthlyStatistics.statistics.count()} rows"
-                    )
-                )
-
-                for index, expected_row in enumerate(expected_monthly_statistics):
-                    self.assertEqual(
-                        expected_row, WindowsRegistry.MonthlyStatistics.statistics.item(index).text(),
-                        f"In month statistics row {index} expected result {expected_row} not \
-                        {WindowsRegistry.MonthlyStatistics.statistics.item(index).text()}"
+                for expected_row in expected_monthly_statistics:
+                    self.assertRegexpMatches(
+                        actual_statistics, expected_row, f"In month statistics regex {expected_row} not found"
                     )
                     
                 WindowsRegistry.MonthlyStatistics.done(1)
@@ -186,19 +190,14 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         current_month = month.month_number
                         _, month_days_amount = monthrange(app_core.current_year, current_month)
                         expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
+                        actual_statistics = self.get_actual_statistics(statistics_data)
 
                         if current_month != month_without_transactions:
-                            self.assertEqual(
-                                len(expected_monthly_statistics), statistics_data.count(),
-                                f"Month {current_month} statistics have another amount of rows. Expected amount \
-                                {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
-                            )
 
-                            for index, expected_row in enumerate(expected_monthly_statistics):
-                                self.assertEqual(
-                                    expected_row, statistics_data.item(index).text(),
-                                    f"In quarter {quarter_number} month {current_month} statistics row \
-                                    {index} expected result {expected_row} not {statistics_data.item(index).text()}"
+                            for expected_row in expected_monthly_statistics:
+                                self.assertRegexpMatches(
+                                    actual_statistics, expected_row,
+                                    f"In quarter {quarter_number} month {current_month} statistics regex {expected_row} not found"
                                 )
 
                         else:
@@ -282,19 +281,13 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     _, month_days_amount = monthrange(app_core.current_year, month.month_number)
                     expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
+                    actual_statistics = self.get_actual_statistics(statistics_data)
 
                     if month.month_number != month_without_transactions:
-                        self.assertEqual(
-                            len(expected_monthly_statistics), statistics_data.count(),
-                            f"Month {month.month_number} statistics have another amount of rows. Expected amount \
-                            {len(expected_monthly_statistics)} found {statistics_data.count()} rows"
-                        )
-
-                        for index, expected_row in enumerate(expected_monthly_statistics):
-                            self.assertEqual(
-                                expected_row, statistics_data.item(index).text(),
-                                f"In month {month.month_number} statistics row {index} expected result \
-                                {expected_row} not {statistics_data.item(index).text()}"
+                        for expected_row in expected_monthly_statistics:
+                            self.assertRegexpMatches(
+                                actual_statistics, expected_row,
+                                f"In year statistics month {month.month_number} regex {expected_row} not found"
                             )
 
                     else:

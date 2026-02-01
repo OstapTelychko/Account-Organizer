@@ -9,7 +9,6 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
-  ☐ extend monthly statistics to show summary for each category
   
 Project life improvements:
   ☐ empty @don't-touch
@@ -25,6 +24,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ extend monthly statistics to show summary for each category @started(26-02-01 14:53) @done(26-02-01 16:10) @lasted(1h17m7s) @project(Updates to existing features)
   ✔ add summary of incomes and expenses for all transactions in search window and simple text search across search results @started(26-01-31 21:10) @done(26-01-31 23:49) @lasted(2h39m45s) @project(Updates to existing features)
   ✔ add recommended backups and legacy backups amount to messages @started(26-01-18 20:10) @done(26-01-18 20:38) @lasted(28m31s) @project(Updates to existing features)
   ✔ Improve the clarity of the 'recommended backups amount exceeded' message, especially when both legacy and regular backup limits have been modified at same time. @started(26-01-18 19:08) @done(26-01-18 20:08) @lasted(1h15s) @project(Updates to existing features)
