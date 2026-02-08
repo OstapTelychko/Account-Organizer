@@ -9,6 +9,7 @@ class DefaultLabel(QLabel):
     def __init__(self, text:str="", set_light_text: bool = False) -> None:
         super().__init__(text)
         self.setFont(BASIC_FONT)
+        self.setWordWrap(True)
 
         if set_light_text:
             self.setProperty("class", "light-text")

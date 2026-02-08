@@ -139,3 +139,7 @@ class Messages(metaclass=QSingleton):
         self.failed_update_download = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Critical, APP_NAME
         )
+
+        self.min_validation_value_bigger_than_max = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )

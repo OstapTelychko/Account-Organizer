@@ -2,7 +2,7 @@ from GUI.windows.main_window import MainWindow
 from GUI.windows.account import AddAccountWindow, RenameAccountWindow, SwitchAccountWindow
 from GUI.windows.backup_management import BackupManagementWindow, AutoBackupWindow
 from GUI.windows.category import CategorySettingsWindow, AddCategoryWindow, ChangeCategoryPositionWindow,\
-RenameCategoryWindow
+RenameCategoryWindow, AnomalousTransactionValuesWindow
 
 from GUI.windows.messages import Messages
 from GUI.windows.settings import SettingsWindow
@@ -34,6 +34,7 @@ class WindowsRegistry:
     AddCategoryWindow = AddCategoryWindow(MainWindow, MainWindow.sub_windows)
     ChangeCategoryPositionWindow = ChangeCategoryPositionWindow(MainWindow, MainWindow.sub_windows)
     RenameCategoryWindow = RenameCategoryWindow(MainWindow, MainWindow.sub_windows)
+    AnomalousTransactionValuesWindow = AnomalousTransactionValuesWindow(MainWindow, MainWindow.sub_windows)
 
     Messages = Messages(MainWindow, MainWindow.message_windows)
 

@@ -9,6 +9,16 @@ class StrictDoubleValidator(QDoubleValidator):
         This validator ensures that the input is a valid double and falls within the specified range.
     """
 
+    def check_value_bounds(self, value:str) -> bool:
+        """Check if the value is within the specified bounds."""
+        try:
+            value_float = float(value)
+        except ValueError:
+            return True# If the value is not a valid float, we consider it's intermediate state for example input is 1. and user is still typing
+        
+        return self.bottom() < value_float < self.top()
+
+
     def validate(self, input_str:str, pos:int) -> tuple[QValidator.State, str, int]:
         result = super().validate(input_str, pos)
         # Cast is needed because mypy doesn't know the return type of super().validate
@@ -19,19 +29,19 @@ class StrictDoubleValidator(QDoubleValidator):
                 return QValidator.State.Intermediate, input_str, pos
             
             if input_str.find(".") != -1:
-                decimal_part = input_str.split(".")[1]
-                if len(decimal_part) > self.decimals() or not decimal_part.isdigit() and len(decimal_part) > 0:
+                digit, decimal = input_str.split(".")
+                if len(decimal) > self.decimals() or not decimal.isdigit() and len(decimal) > 0 or digit == "":
+                    return QValidator.State.Invalid, input_str, pos
+                
+                if not self.check_value_bounds(input_str):
                     return QValidator.State.Invalid, input_str, pos
                 
                 return QValidator.State.Intermediate, input_str, pos
             
-            value = float(input_str)
-            
         except ValueError:
             return QValidator.State.Invalid, input_str, pos
         
-        # Instead of a potential Intermediate state, we return Invalid
-        if not self.bottom() < value < self.top():
+        if not self.check_value_bounds(input_str):
             return QValidator.State.Invalid, input_str, pos
         
         return state, input_str, pos

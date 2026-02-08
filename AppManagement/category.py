@@ -342,3 +342,18 @@ def reset_focused_category() -> None:
         app_core.focused_expense_category = expense_categories[0]
     else:
         app_core.focused_expense_category = None
+
+
+def save_anomalous_transaction_values_settings() -> int | None:
+    """Save anomalous transaction values settings. It saves the settings to the database and shows a confirmation message."""
+
+    app_core = AppCore.instance()
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    min_value_text = WindowsRegistry.AnomalousTransactionValuesWindow.min_value.text()
+    max_value_text = WindowsRegistry.AnomalousTransactionValuesWindow.max_value.text()
+
+    min_value = float(min_value_text) if min_value_text != "" else 0
+    max_value = float(max_value_text) if max_value_text != "" else 0
+
+    if not (max_value == 0 or min_value == 0) and min_value >= max_value:
+        return WindowsRegistry.Messages.min_validation_value_bigger_than_max.exec()
