@@ -255,24 +255,13 @@ class DBTestCase(DefaultTestCase):
                 self.test_expenses_transaction_name
             )
 
-            app_core.categories[self.income_category.id] = load_category(
-                self.income_category.category_type,
-                self.income_category.name,
-                app_core.db,
-                self.income_category.id,
-                0,
-                app_core.current_year,
-                app_core.current_month
-            )
-            app_core.categories[self.expenses_category.id] = load_category(
-                self.expenses_category.category_type,
-                self.expenses_category.name,
-                app_core.db,
-                self.expenses_category.id,
-                0,
-                app_core.current_year,
-                app_core.current_month
-            )
+            for category in [self.income_category, self.expenses_category]:
+                app_core.categories[category.id] = load_category(
+                    category,
+                    app_core.db,
+                    app_core.current_year,
+                    app_core.current_month
+                )
             activate_categories()
 
             return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)

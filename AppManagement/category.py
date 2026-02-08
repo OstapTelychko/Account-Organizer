@@ -78,11 +78,8 @@ def create_category() -> int:
     
     category_id = category.id 
     app_core.categories[category_id] = load_category(
-        category_type,
-        category_name,
+        category,
         app_core.db,
-        category_id,
-        position,
         app_core.current_year,
         app_core.current_month
     )
@@ -120,11 +117,8 @@ def load_categories() -> None:
     app_core = AppCore.instance()
     for category in app_core.db.category_query.get_all_categories():
         app_core.categories[category.id] = load_category(
-            category.category_type,
-            category.name,
+            category,
             app_core.db,
-            category.id,
-            category.position,
             app_core.current_year,
             app_core.current_month
         )

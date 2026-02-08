@@ -156,11 +156,8 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             raise ValueError("Just created category not found in the database")
 
         app_core.categories[new_category.id] = expected_focused_category = load_category(
-            new_category.category_type,
-            new_category.name,
+            new_category,
             app_core.db,
-            new_category.id,
-            0,
             app_core.current_year,
             app_core.current_month
         )
@@ -196,11 +193,8 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             raise ValueError("Just created category not found in the database")
 
         app_core.categories[new_category.id] = load_category(
-            new_category.category_type,
-            new_category.name,
+            new_category,
             app_core.db,
-            new_category.id,
-            0,
             app_core.current_year,
             app_core.current_month
         )

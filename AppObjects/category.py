@@ -20,6 +20,8 @@ class Category:
             type:str,
             name:str,
             position:int,
+            transaction_min_value:float|None,
+            transaction_max_value:float|None,
 
             total_value_label:QLabel,
             name_label:QLabel,
@@ -35,6 +37,8 @@ class Category:
         self.type = type
         self.name = name
         self.position = position
+        self.transaction_min_value = transaction_min_value
+        self.transaction_max_value = transaction_max_value
 
         self.total_value_label = total_value_label
         self.name_label = name_label
