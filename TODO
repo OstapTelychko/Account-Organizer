@@ -16,6 +16,8 @@ Project life improvements:
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
   ☐ switch to pytest framework for tests instead of unittest
   ☐ cleanup requirements.txt by removing fixed versions wherever possible
+  ☐ updated SubWindow to automatically add main_layout to window_container and window_menu_layout to main_layout
+  ☐ removed word 'Window' for all windows in WindowsRegistry
 
 Bugs:
   ☐ empty @don't-touch
