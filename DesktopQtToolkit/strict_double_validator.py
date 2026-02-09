@@ -30,7 +30,7 @@ class StrictDoubleValidator(QDoubleValidator):
             
             if input_str.find(".") != -1:
                 digit, decimal = input_str.split(".")
-                if len(decimal) > self.decimals() or not decimal.isdigit() and len(decimal) > 0 or digit == "":
+                if len(decimal) > self.decimals() or not decimal.isdigit() and len(decimal) > 0 or digit == "" or not digit.isdigit():
                     return QValidator.State.Invalid, input_str, pos
                 
                 if not self.check_value_bounds(input_str):

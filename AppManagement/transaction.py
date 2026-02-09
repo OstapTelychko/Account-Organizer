@@ -14,6 +14,7 @@ from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 from languages import LanguageStructure
 from project_configuration import CategoryType
 from AppManagement.balance import update_account_balance
+from project_configuration import MAX_TRANSACTION_VALUE
 
 if TYPE_CHECKING:
     from DesktopQtToolkit.table_widget import CustomTableWidget
@@ -198,6 +199,17 @@ def transaction_data_handler() -> int:
         return WindowsRegistry.Messages.day_out_range.exec()
 
     transaction_value = float(raw_transaction_value)
+
+    min_value = category.transaction_min_value if category.transaction_min_value is not None else 0
+    max_value = category.transaction_max_value if category.transaction_max_value is not None else 0
+    if min_value != 0 and transaction_value < min_value or max_value != 0 and transaction_value > max_value:
+        WindowsRegistry.Messages.transaction_value_anomalous.setText(
+            LanguageStructure.Messages.get_translation(37)
+            .replace("%transaction_value%", str(transaction_value))
+            .replace("%min_value%", str(min_value))
+            .replace("%max_value%", str(max_value or MAX_TRANSACTION_VALUE))
+        )
+        return WindowsRegistry.Messages.transaction_value_anomalous.exec()
 
     if WindowsRegistry.TransactionManagementWindow.button.text() == LanguageStructure.GeneralManagement.get_translation(5): #Update 
         transaction_id = WindowsRegistry.TransactionManagementWindow.transaction_id

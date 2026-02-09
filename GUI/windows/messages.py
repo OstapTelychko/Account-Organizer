@@ -143,3 +143,6 @@ class Messages(metaclass=QSingleton):
         self.min_validation_value_bigger_than_max = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
         )
+        self.transaction_value_anomalous = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )

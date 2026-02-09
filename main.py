@@ -163,7 +163,7 @@ def main(test_mode:bool=False) -> None:
     from AppManagement.balance import load_account_balance
     from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
         rename_category,  activate_categories, show_change_category_position, change_category_position, \
-        save_anomalous_transaction_values_settings
+        save_anomalous_transaction_values_settings, show_anomalous_transaction_values_settings
     from AppManagement.transaction import transaction_data_handler
     from AppManagement.date import next_month, previous_month, next_year, previous_year
     from AppManagement.account import show_add_user_window, add_account, remove_account,\
@@ -213,10 +213,7 @@ def main(test_mode:bool=False) -> None:
     )
     WindowsRegistry.CategorySettingsWindow.copy_transactions.clicked.connect(copy_monthly_transactions)
     WindowsRegistry.CategorySettingsWindow.transactions_anomalous_values.clicked.connect(
-        lambda: (
-            WindowsRegistry.AnomalousTransactionValuesWindow.setWindowTitle(WindowsRegistry.CategorySettingsWindow.windowTitle()),# type: ignore[func-returns-value]
-            WindowsRegistry.AnomalousTransactionValuesWindow.exec()
-        )
+        show_anomalous_transaction_values_settings
     )
     WindowsRegistry.RenameCategoryWindow.button.clicked.connect(rename_category)
     WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
