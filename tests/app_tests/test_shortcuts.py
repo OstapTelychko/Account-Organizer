@@ -7,6 +7,7 @@ from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from AppManagement.category import reset_focused_category, activate_categories
 from GUI.category import load_category
+from project_configuration import CategoryType
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
@@ -149,8 +150,8 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         """Test focusing on next category with shortcut."""        
 
         app_core = AppCore.instance()
-        app_core.db.category_query.create_category("Second test category", "Incomes", 1)
-        new_category = app_core.db.category_query.get_category("Second test category", "Incomes")
+        app_core.db.category_query.create_category("Second test category", CategoryType.Income, 1)
+        new_category = app_core.db.category_query.get_category("Second test category", CategoryType.Income)
         if new_category is None:
             logger.error("Just created category not found in the database")
             raise ValueError("Just created category not found in the database")
@@ -186,8 +187,8 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         """Test focusing on previous category with shortcut."""        
 
         app_core = AppCore.instance()
-        app_core.db.category_query.create_category("Second test category", "Incomes", 1)
-        new_category = app_core.db.category_query.get_category("Second test category", "Incomes")
+        app_core.db.category_query.create_category("Second test category", CategoryType.Income, 1)
+        new_category = app_core.db.category_query.get_category("Second test category", CategoryType.Income)
         if new_category is None:
             logger.error("Just created category not found in the database")
             raise ValueError("Just created category not found in the database")

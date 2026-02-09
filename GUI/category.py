@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolBu
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
-from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY
+from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY, CategoryType
 from languages import LanguageStructure
 from AppObjects.category import Category
 from AppObjects.windows_registry import WindowsRegistry
@@ -156,7 +156,7 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
 
     category_window.setLayout(category_layout)
 
-    if category.category_type == "Incomes":
+    if category.category_type == CategoryType.Income:
         WindowsRegistry.MainWindow.Incomes_window_layout.addWidget(category_window)
     else:
         WindowsRegistry.MainWindow.Expenses_window_layout.addWidget(category_window)

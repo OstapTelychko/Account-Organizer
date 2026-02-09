@@ -323,3 +323,11 @@ class CategoriesSelectionByType(QWidget):
         self.add_all_incomes_categories.setText(add_text)
         self.remove_all_expenses_categories.setText(remove_text)
         self.remove_all_incomes_categories.setText(remove_text)
+    
+
+    def get_selected_income_and_expense_categories(self) -> tuple[list[Category], list[Category]]:
+        """Get selected income and expense categories as two separate lists."""
+
+        income_categories = [category for category, _ in self.selected_categories_data.values() if category.type == CategoryType.Income]
+        expense_categories = [category for category, _ in self.selected_categories_data.values() if category.type == CategoryType.Expense]
+        return income_categories, expense_categories

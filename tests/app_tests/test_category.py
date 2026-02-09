@@ -7,6 +7,7 @@ from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
 from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
+from project_configuration import CategoryType
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
@@ -31,7 +32,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test incomes creation category")))
         self.click_on_widget(WindowsRegistry.MainWindow.add_incomes_category)
         self.assertTrue(
-            app_core.db.category_query.category_exists("Test incomes creation category", "Incomes"),
+            app_core.db.category_query.category_exists("Test incomes creation category", CategoryType.Income),
             "Incomes category hasn't been created"
         )
 
@@ -39,7 +40,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         self.click_on_widget(WindowsRegistry.MainWindow.add_expenses_category)
         self.assertTrue(
-            app_core.db.category_query.category_exists("Test expenses creation category", "Expenses"),
+            app_core.db.category_query.category_exists("Test expenses creation category", CategoryType.Expense),
             "Expenses category hasn't been created"
         )
         
@@ -69,11 +70,11 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             self.click_on_widget(category.settings)
 
         self.assertFalse(
-            app_core.db.category_query.category_exists(income_category_name, "Incomes"),
+            app_core.db.category_query.category_exists(income_category_name, CategoryType.Income),
             "Income category hasn't been deleted"
         )
         self.assertFalse(
-            app_core.db.category_query.category_exists(expenses_category_name, "Expenses"),
+            app_core.db.category_query.category_exists(expenses_category_name, CategoryType.Expense),
             "Expense category hasn't been deleted"
         )
 
@@ -120,8 +121,8 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         """Test changing category position in the application."""
 
         app_core = AppCore.instance()
-        app_core.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
-        app_core.db.category_query.create_category("Second "+self.expenses_category.name, "Expenses", 1)
+        app_core.db.category_query.create_category("Second "+self.income_category.name, CategoryType.Income, 1)
+        app_core.db.category_query.create_category("Second "+self.expenses_category.name, CategoryType.Expense, 1)
 
         for category in app_core.categories.copy().values():
             self.select_correct_tab(category)
@@ -141,10 +142,10 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_open_settings))
             self.click_on_widget(category.settings)
         
-        income_category = app_core.db.category_query.get_category(self.income_category.name, "Incomes")
-        second_income_category = app_core.db.category_query.get_category("Second "+self.income_category.name, "Incomes")
-        expenses_category = app_core.db.category_query.get_category(self.expenses_category.name, "Expenses")
-        second_expenses_category = app_core.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses")
+        income_category = app_core.db.category_query.get_category(self.income_category.name, CategoryType.Income)
+        second_income_category = app_core.db.category_query.get_category("Second "+self.income_category.name, CategoryType.Income)
+        expenses_category = app_core.db.category_query.get_category(self.expenses_category.name, CategoryType.Expense)
+        second_expenses_category = app_core.db.category_query.get_category("Second "+self.expenses_category.name, CategoryType.Expense)
 
         if income_category is None or second_income_category is None or expenses_category is None or second_expenses_category is None:
             logger.error("Just created categories not found in the database")
@@ -170,7 +171,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                 def _check_copied_transactions() -> None:
                     """Check if transactions are copied to the clipboard."""
 
-                    if category.type == "Incomes":
+                    if category.type == CategoryType.Income:
                         transaction_type = "income"
                     else:
                         transaction_type = "expenses"

@@ -307,9 +307,8 @@ def show_monthly_statistics() -> int:
     app_core = AppCore.instance()
     WindowsRegistry.MonthlyStatistics.setWindowTitle(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MonthlyStatistics.statistics.clear()
-
-    Incomes_categories = [category for category in app_core.categories if app_core.categories[category].type == "Incomes"]
-    Expenses_categories = [category for category in app_core.categories if app_core.categories[category].type == "Expenses"]
+    app_core.get_income_and_expense_categories()
+    Incomes_categories, Expenses_categories = app_core.get_income_and_expense_categories_as_ids()
 
     if len(app_core.categories) < 2 or len(Incomes_categories) < 1 or len(Expenses_categories) < 1:
         return WindowsRegistry.Messages.no_category.exec()
@@ -341,8 +340,7 @@ def show_quarterly_statistics() -> int:
         for month in quarter.months:
             month.data.clear()
 
-    Incomes_categories = [category for category in app_core.categories if app_core.categories[category].type == "Incomes"]
-    Expenses_categories = [category for category in app_core.categories if app_core.categories[category].type == "Expenses"]
+    Incomes_categories, Expenses_categories = app_core.get_income_and_expense_categories_as_ids()
 
     if len(app_core.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
         return WindowsRegistry.Messages.no_category.exec()
@@ -412,9 +410,7 @@ def show_yearly_statistics() -> int:
     for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
         ymonth.data.clear()
     
-    Incomes_categories = [category for category in app_core.categories if app_core.categories[category].type == "Incomes"]
-    Expenses_categories = [category for category in app_core.categories if app_core.categories[category].type == "Expenses"]
-
+    Incomes_categories, Expenses_categories = app_core.get_income_and_expense_categories_as_ids()
     if len(app_core.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
         return WindowsRegistry.Messages.no_category.exec()
     
@@ -500,8 +496,7 @@ def show_custom_range_statistics_view() -> int:
     date_difference:timedelta = cast(date, to_date.toPython()) - cast(date, from_date.toPython()) # pyright: ignore[reportOperatorIssue]
     days_amount = date_difference.days
 
-    Incomes_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data.values() if category[0].type == "Incomes"]
-    Expenses_categories = [category[0] for category in WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data.values() if category[0].type == "Expenses"]
+    Incomes_categories, Expenses_categories = WindowsRegistry.CustomRangeStatistics.categories_selection.get_selected_income_and_expense_categories()
 
     all_transactions = AppCore.instance().db.statistics_query.get_transactions_by_range(
         list(map(lambda category: category.id, Incomes_categories+Expenses_categories)),
