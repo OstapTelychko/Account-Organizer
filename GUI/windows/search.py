@@ -51,6 +51,10 @@ class SearchWindow(SubWindow):
         self.date_selection = DateSelection()
 
         self.categories_selection = CategoriesSelectionByType()
+        self.categories_selection.expenses_categories_list_scroll.setMinimumHeight(230)
+        self.categories_selection.expenses_categories_list_scroll.setMaximumHeight(230)
+        self.categories_selection.incomes_categories_list_scroll.setMinimumHeight(230)
+        self.categories_selection.incomes_categories_list_scroll.setMaximumHeight(230)
         self.categories_selection.setHidden(True)
         self.categories_selection_button = create_button("Categories", (150, 40))
 
