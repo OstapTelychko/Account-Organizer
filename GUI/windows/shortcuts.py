@@ -84,6 +84,7 @@ class ShortcutsWindow(SubWindow):
         self.shortcuts_layout.addWidget(self.open_search_shortcut)
 
         self.shortcuts_container = QWidget()
+        self.shortcuts_container.setProperty("class", "wrapper")
         self.shortcuts_container.setLayout(self.shortcuts_layout)
 
         self.shortcuts_scroll = QScrollArea()

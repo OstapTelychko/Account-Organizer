@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QListWidget, QGraphicsDropShadowEffect, QScroller
+from PySide6.QtCore import Qt
 
 from GUI.gui_constants import BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
 from DesktopQtToolkit.qrich_text_delegate import QRichTextDelegate
@@ -29,6 +30,7 @@ class CustomListWidget(QListWidget):
         self.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
         self.verticalScrollBar().setSingleStep(12)
         QScroller.grabGesture(self.viewport(), QScroller.ScrollerGestureType.LeftMouseButtonGesture)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     
 
     def wheelEvent(self, event:QWheelEvent) -> None:
