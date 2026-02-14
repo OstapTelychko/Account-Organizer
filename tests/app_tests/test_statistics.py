@@ -111,7 +111,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 actual_statistics = self.get_actual_statistics(WindowsRegistry.MonthlyStatistics.statistics)
 
                 for expected_row in expected_monthly_statistics:
-                    self.assertRegexpMatches(
+                    self.assertRegex(
                         actual_statistics, expected_row, f"In month statistics regex {expected_row} not found"
                     )
                     
@@ -195,7 +195,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         if current_month != month_without_transactions:
 
                             for expected_row in expected_monthly_statistics:
-                                self.assertRegexpMatches(
+                                self.assertRegex(
                                     actual_statistics, expected_row,
                                     f"In quarter {quarter_number} month {current_month} statistics regex {expected_row} not found"
                                 )
@@ -285,7 +285,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     if month.month_number != month_without_transactions:
                         for expected_row in expected_monthly_statistics:
-                            self.assertRegexpMatches(
+                            self.assertRegex(
                                 actual_statistics, expected_row,
                                 f"In year statistics month {month.month_number} regex {expected_row} not found"
                             )
