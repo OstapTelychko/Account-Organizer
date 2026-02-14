@@ -72,6 +72,7 @@ class CategoriesSelectionByType(QWidget):
 
         self.incomes_categories_list_window = QWidget()
         self.incomes_categories_list_window.setLayout(self.incomes_categories_layout)
+        self.incomes_categories_list_window.setProperty("class", "wrapper")
 
         self.incomes_categories_list_scroll = QScrollArea()
         self.incomes_categories_list_scroll.setWidget(self.incomes_categories_list_window)
@@ -103,6 +104,7 @@ class CategoriesSelectionByType(QWidget):
 
         self.expenses_categories_list_window = QWidget()
         self.expenses_categories_list_window.setLayout(self.expenses_categories_layout)
+        self.expenses_categories_list_window.setProperty("class", "wrapper")
         
         self.expenses_categories_list_scroll = QScrollArea()
         self.expenses_categories_list_scroll.setWidget(self.expenses_categories_list_window)

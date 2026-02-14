@@ -15,6 +15,10 @@ Project life improvements:
   ☐ improve statistics tests to make sure they cover all edge cases so that re-check on previous versions won't be needed
   ☐ improve tests by checking some values (like strings or labels) using regular expressions to make tests less fragile to changes in formatting
   ☐ switch to pytest framework for tests instead of unittest
+  ☐ cleanup requirements.txt by removing fixed versions wherever possible
+  ☐ updated SubWindow to automatically add main_layout to window_container and window_menu_layout to main_layout
+  ☐ removed word 'Window' for all windows in WindowsRegistry
+  ☐ test project on python3.13 @started(26-02-14 22:47)
 
 Bugs:
   ☐ empty @don't-touch
