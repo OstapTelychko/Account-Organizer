@@ -132,7 +132,7 @@ def clear_accounts_layout() -> None:
     while WindowsRegistry.SwitchAccountWindow.accounts_layout.count() > 0:
         widget = WindowsRegistry.SwitchAccountWindow.accounts_layout.itemAt(0).widget()
         if widget:
-            widget.setParent(None) #type: ignore[call-overload] #Mypy doesn't understand that setParent can be None
+            widget.setParent(None)
 
 
 def switch_account(name:str) -> None:

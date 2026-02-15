@@ -11,6 +11,7 @@ from project_configuration import TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUP
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
+from DesktopQtToolkit.Utils import get_table_widget_item
 
 from AppManagement.backup_management import auto_backup
 
@@ -540,7 +541,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -631,7 +632,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -719,7 +720,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
                 backup.timestamp = date_minus_31_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:

@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import cast
-from PySide6.QtWidgets import QGraphicsDropShadowEffect
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
-from GUI.gui_constants import FOCUSED_SHADOW_EFFECT_ARGUMENTS
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 
     
@@ -29,10 +28,11 @@ def move_to_next_category() -> None:
             current_index = income_categories.index(app_core.focused_income_category)
             next_index = (current_index + 1) % len(income_categories)
 
-            app_core.focused_income_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
+            app_core.focused_income_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
             app_core.focused_income_category = income_categories[next_index]
             app_core.focused_income_category.table_data.setGraphicsEffect(
-                QGraphicsDropShadowEffect(app_core.focused_income_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+                DefaultDropShadowEffect(app_core.focused_income_category.table_data, focused=True)
+            )
             WindowsRegistry.MainWindow.Incomes_scroll.ensureWidgetVisible(app_core.focused_income_category.table_data, 300)
     
     elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
@@ -44,10 +44,11 @@ def move_to_next_category() -> None:
             current_index = expense_categories.index(app_core.focused_expense_category)
             next_index = (current_index + 1) % len(expense_categories)
 
-            app_core.focused_expense_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
+            app_core.focused_expense_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
             app_core.focused_expense_category = expense_categories[next_index]
             app_core.focused_expense_category.table_data.setGraphicsEffect(
-                QGraphicsDropShadowEffect(app_core.focused_expense_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+                DefaultDropShadowEffect(app_core.focused_expense_category.table_data, focused=True)
+            )
             WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(app_core.focused_expense_category.table_data, 300)
 
 
@@ -66,10 +67,10 @@ def move_to_previous_category() -> None:
             current_index = income_categories.index(app_core.focused_income_category)
             previous_index = (current_index - 1) % len(income_categories)
 
-            app_core.focused_income_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
+            app_core.focused_income_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
             app_core.focused_income_category = income_categories[previous_index]
             app_core.focused_income_category.table_data.setGraphicsEffect(
-                QGraphicsDropShadowEffect(app_core.focused_income_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+                DefaultDropShadowEffect(app_core.focused_income_category.table_data, focused=True))
             WindowsRegistry.MainWindow.Incomes_scroll.ensureWidgetVisible(app_core.focused_income_category.table_data, 300)
     
     elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
@@ -81,10 +82,10 @@ def move_to_previous_category() -> None:
             current_index = expense_categories.index(app_core.focused_expense_category)
             previous_index = (current_index - 1) % len(expense_categories)
 
-            app_core.focused_expense_category.table_data.setGraphicsEffect(cast(QGraphicsDropShadowEffect, None))
+            app_core.focused_expense_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
             app_core.focused_expense_category = expense_categories[previous_index]
             app_core.focused_expense_category.table_data.setGraphicsEffect(
-                QGraphicsDropShadowEffect(app_core.focused_expense_category.table_data,**FOCUSED_SHADOW_EFFECT_ARGUMENTS))
+                DefaultDropShadowEffect(app_core.focused_expense_category.table_data, focused=True))
             WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(app_core.focused_expense_category.table_data, 300)
 
 

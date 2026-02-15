@@ -2,8 +2,7 @@ from __future__ import annotations
 import os
 
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView,\
-    QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
@@ -15,8 +14,9 @@ from backend.models import Transaction, Category as CategoryModel
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, BASIC_FONT
 
 if TYPE_CHECKING:
     from backend.db_controller import DBController
@@ -76,7 +76,7 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
     category_window.setMaximumWidth(1000)
     category_window.setProperty("class", "category")
     category_window.setContentsMargins(10, 0, 10, 0)
-    category_window.setGraphicsEffect(QGraphicsDropShadowEffect(category_window, **SHADOW_EFFECT_ARGUMENTS))
+    category_window.setGraphicsEffect(DefaultDropShadowEffect(category_window))
 
     category_layout = QVBoxLayout()
 
