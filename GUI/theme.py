@@ -18,25 +18,19 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 STYLES_FOR_BOTH_THEMES = """
-QScrollBar:vertical, QScrollBar:horizontal {
-    background: rgb(43, 43, 43);       /* Track background color */   
-    border-radius: 5px;        
-    margin: 0px 0px 0px 0px;   /* Margins to hide buttons if desired */
-}
-
 QScrollBar:vertical {
-    max-width: 14px;            /* Minimum width of the scrollbar */
-    min-width: 14px; 
+    max-width: 12px;            /* Minimum width of the scrollbar */
+    min-width: 12px; 
 }
 
 QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
     background-color: rgb(92, 92, 92); /* Default handle color */
-    margin:3.5px;
+    margin:2.5px;
 }
 
 QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
     background-color: rgb(120, 120, 120); /* Lighter on hover */
-    margin:3px;
+    margin:2px;
 }
 
 QScrollBar::handle:vertical:pressed, QScrollBar::handle:horizontal:pressed {
@@ -44,8 +38,8 @@ QScrollBar::handle:vertical:pressed, QScrollBar::handle:horizontal:pressed {
 }
 
 QScrollBar:horizontal {
-    max-height: 14px;            /* Minimum height of the scrollbar */
-    min-height: 14px;    
+    max-height: 12px;            /* Minimum height of the scrollbar */
+    min-height: 12px;    
 }
 
 QLabel,QToolButton,QCheckBox{
@@ -120,11 +114,21 @@ DARK_THEME_EXTRA = """
 .backups_table{
     background-color:rgb(45, 45, 45)
 }
+
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: rgb(43, 43, 43);       /* Track background color */   
+    border-radius: 5px;        
+    margin: 0px 0px 0px 0px;   /* Margins to hide buttons if desired */
+}
 """
 
 LIGHT_THEME = ""
 LIGHT_THEME_ICON = QIcon(f"{THEME_DIRECTORY}/Light theme.png")
 LIGHT_THEME_EXTRA = """
+QWidget{
+    color:rgb(25, 26, 27);
+}
+
 .category{
     background-color:rgb(100, 120, 100);
     border-radius:15px;
@@ -196,6 +200,12 @@ LIGHT_THEME_EXTRA = """
 .button:hover, .button:focus:hover, .button:active:hover, .button:default:hover, 
 .close_window:hover, .close_window:active:hover, .close_window:focus:hover, .close_window:default:hover{
     background-color:rgb(90, 120, 90);
+}
+
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: rgb(193, 193, 193);       /* Track background color */   
+    border-radius: 5px;        
+    margin: 0px 0px 0px 0px;   /* Margins to hide buttons if desired */
 }
 """
 
