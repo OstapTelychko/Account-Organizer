@@ -7,6 +7,7 @@ from PySide6.QtCore import QTimer, Qt
 
 from languages import LanguageStructure
 from DesktopQtToolkit.table_widget import CustomTableWidgetItem
+from DesktopQtToolkit.Utils import get_table_widget_item
 from project_configuration import BACKUPS_DIRECTORY, TEST_BACKUPS_DIRECTORY, MIN_RECOMMENDED_BACKUPS, MAX_RECOMMENDED_BACKUPS,\
 DB_FILE_PATH, TEST_DB_FILE_PATH, MIN_RECOMMENDED_LEGACY_BACKUPS, MAX_RECOMMENDED_LEGACY_BACKUPS, BACKUPS_DATE_FORMAT
 from backend.db_controller import DBController
@@ -103,7 +104,7 @@ def remove_backup() -> int:
             return 0
     
     row = selected_items[0].row()
-    backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, since the row is selected
+    backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, row, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, since the row is selected
 
 
     del app_core.backups[str(id(backup))]
@@ -127,7 +128,7 @@ def load_backup() -> int:
         return WindowsRegistry.Messages.only_one_row.exec()
 
     row = selected_items[0].row()
-    backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(row, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, since the row is selected
+    backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, row, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, since the row is selected
 
     if backup.app_version != app_core.app_version:
         return WindowsRegistry.Messages.different_app_version.exec()
@@ -170,7 +171,7 @@ def auto_backup() -> None:
         create_backup()
         return
     
-    backup = app_core.backups[WindowsRegistry.BackupManagementWindow.backups_table.item(0, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] # I already check if amount of backups is 0
+    backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] # type: ignore[reportOptionalMemberAccess, unused-ignore] # I already check if amount of backups is 0
     backup_date = datetime.strptime(backup.timestamp, BACKUPS_DATE_FORMAT)
     current_date = datetime.now()
 

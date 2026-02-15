@@ -254,7 +254,7 @@ def show_change_category_position(category_name:str) -> None:
     while WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.count():
         widget = WindowsRegistry.ChangeCategoryPositionWindow.categories_list_layout.takeAt(0).widget()
         if widget:
-            widget.setParent(None) #type: ignore[call-overload] #Mypy doesn't know that None just means that the widget will be deleted
+            widget.setParent(None)
     
 
     for category_id, category in app_core.categories.items():

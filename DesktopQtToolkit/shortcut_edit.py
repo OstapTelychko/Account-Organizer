@@ -34,7 +34,7 @@ class ShortcutCaptureEdit(QLineEdit):
         key = event.key()
             
         if key:
-            sequence = QKeySequence(modifiers | QKey(key))#type: ignore[operator] #Mypy doesn't allow the | operator for KeyboardModifier and Key
+            sequence = QKeySequence(modifiers | QKey(key))
             self.key_sequence = sequence
             display_text = sequence.toString()
                 

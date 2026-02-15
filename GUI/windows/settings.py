@@ -2,16 +2,16 @@ from __future__ import annotations
 import os
 
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QGraphicsDropShadowEffect, QLabel, QVBoxLayout,\
-    QGridLayout
+from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QLabel, QVBoxLayout, QGridLayout
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
-from GUI.gui_constants import ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.gui_constants import ALIGN_H_CENTER, ALIGN_V_CENTER, ICON_SIZE, BASIC_FONT
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -35,7 +35,7 @@ class SettingsWindow(SubWindow):
             self.section_wrapper = QWidget()
             self.section_wrapper.setProperty("class", "wrapper")
             self.section_wrapper.setGraphicsEffect(
-                QGraphicsDropShadowEffect(self.section_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+                DefaultDropShadowEffect(self.section_wrapper)
             )
             self.section_wrapper.setLayout(self.section_layout)
 

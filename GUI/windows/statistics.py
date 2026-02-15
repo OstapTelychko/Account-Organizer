@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import NamedTuple, TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea
 from PySide6.QtCore import Qt
 
 from DesktopQtToolkit.sub_window import SubWindow
@@ -8,8 +8,9 @@ from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.create_date_input import create_date_input
 from DesktopQtToolkit.list_widget import CustomListWidget
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, SHADOW_EFFECT_ARGUMENTS, BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT
 from GUI.ComplexWidgets.categories_select_by_type import CategoriesSelectionByType
 
 if TYPE_CHECKING:
@@ -38,7 +39,7 @@ class StatisticsWindow(SubWindow):
         self.statistics_wrapper = QWidget()
         self.statistics_wrapper.setLayout(self.statistics_wrapper_layout)
         self.statistics_wrapper.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.statistics_wrapper)
         )
         self.statistics_wrapper.setProperty("class", "wrapper")
 
@@ -54,7 +55,7 @@ class StatisticsWindow(SubWindow):
         self.custom_statistics_wrapper.setLayout(self.custom_statistics_wrapper_layout)
         self.custom_statistics_wrapper.setProperty("class", "wrapper")
         self.custom_statistics_wrapper.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.custom_statistics_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.custom_statistics_wrapper)
         )
 
         self.main_layout = QVBoxLayout()
@@ -332,7 +333,7 @@ class CustomRangeStatistics(SubWindow):
             self.category_wrapper.setLayout(self.category_layout)
             self.category_wrapper.setProperty("class", "category_list_item")
             self.category_wrapper.setGraphicsEffect(
-                QGraphicsDropShadowEffect(self.category_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+                DefaultDropShadowEffect(self.category_wrapper)
             )
 
 

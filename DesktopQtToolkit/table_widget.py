@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, overload, Any
 from PySide6.QtWidgets import QTableWidget, QApplication, QTableWidgetItem
 from PySide6.QtCore import Qt
+from DesktopQtToolkit.Utils import get_table_widget_item
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
@@ -34,7 +35,7 @@ class CustomTableWidget(QTableWidget):
             copy_text = ''
             max_column = copied_cells[-1].column()
             for cell in copied_cells:
-                copy_text += self.item(cell.row(), cell.column()).text() #type: ignore[reportOptionalMemberAccess, unused-ignore] #We access only the cells that are selected
+                copy_text = get_table_widget_item(self, cell.row(), cell.column()).text()
                 if cell.column() == max_column:
                     copy_text += '\n'
                 else:
@@ -72,7 +73,10 @@ class CustomTableWidgetItem(QTableWidgetItem):
         super().__init__(*args, **kwargs)
     
 
-    def __lt__(self, other:CustomTableWidgetItem) -> bool:
+    def __lt__(self, other:object) -> bool:
+        if not isinstance(other, QTableWidgetItem):
+            raise TypeError(f"Cannot compare CustomTableWidgetItem with {type(other)}")
+        
         try:
             return float(self.data(Qt.ItemDataRole.EditRole)) < float(other.data(Qt.ItemDataRole.EditRole))
         except ValueError:

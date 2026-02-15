@@ -141,7 +141,7 @@ class ShortcutsManager:
         for shortcut in self.active_shortcuts:
             shortcut.setEnabled(False)
             shortcut.activated.disconnect()
-            shortcut.setParent(None) #type: ignore[arg-type] #Mypy doesn't accept None as valid parent
+            shortcut.setParent(None)
             
         self.active_shortcuts.clear()
     

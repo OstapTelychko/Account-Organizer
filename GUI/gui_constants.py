@@ -28,8 +28,6 @@ app.setWindowIcon(APP_ICON)
 APP_UPGRADE_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "App upgrade icon.svg")).pixmap(64, 64)
 NO_INTERNET_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "no internet connection.png")).pixmap(64, 64)
 
-SHADOW_EFFECT_ARGUMENTS = {"blurRadius":15, "xOffset":0, "yOffset":0, "color":QColor(0, 0, 0)}
-FOCUSED_SHADOW_EFFECT_ARGUMENTS = {"blurRadius":20, "xOffset":0, "yOffset":0, "color":QColor(70, 120, 255)}
 
 regular_id = QFontDatabase.addApplicationFont(REGULAR_FONT_PATH)
 bold_id = QFontDatabase.addApplicationFont(BOLD_FONT_PATH)

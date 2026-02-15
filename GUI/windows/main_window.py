@@ -29,20 +29,19 @@ SOFTWARE.
 
 import os
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton,QSizePolicy,\
-    QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QTabWidget, QToolButton, QSizePolicy
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 
 from project_configuration import GENERAL_ICONS_DIRECTORY
 from DesktopQtToolkit.qsingleton import QSingleton
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS,\
-BIG_BASIC_FONT
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ICON_SIZE, APP_ICON, BASIC_FONT, BIG_BASIC_FONT
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QMoveEvent
@@ -119,7 +118,7 @@ class MainWindow(QWidget, metaclass=QSingleton):
         self.Date_management_wrapper = QWidget()
         self.Date_management_wrapper.setProperty("class", "wrapper")
         self.Date_management_wrapper.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.Date_management_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.Date_management_wrapper)
         )
         self.Date_management_wrapper.setLayout(self.Date_management_layout)
 
