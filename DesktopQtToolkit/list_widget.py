@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QListWidget, QGraphicsDropShadowEffect, QScroller
+from PySide6.QtWidgets import QListWidget, QScroller
+from PySide6.QtCore import Qt
 
-from GUI.gui_constants import BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import BASIC_FONT
 from DesktopQtToolkit.qrich_text_delegate import QRichTextDelegate
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
@@ -23,12 +25,13 @@ class CustomListWidget(QListWidget):
         self.setSpacing(0)
 
         self.setWordWrap(True)
-        self.setGraphicsEffect(QGraphicsDropShadowEffect(self, **SHADOW_EFFECT_ARGUMENTS))
+        self.setGraphicsEffect(DefaultDropShadowEffect(self))
         self.setItemDelegate(QRichTextDelegate(self))
 
         self.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
         self.verticalScrollBar().setSingleStep(12)
         QScroller.grabGesture(self.viewport(), QScroller.ScrollerGestureType.LeftMouseButtonGesture)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     
 
     def wheelEvent(self, event:QWheelEvent) -> None:

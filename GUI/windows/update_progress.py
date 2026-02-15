@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QWidget, QScrollArea, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QWidget, QScrollArea
 from PySide6.QtCore import Qt
 
 from DesktopQtToolkit.sub_window import SubWindow
-from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -33,7 +33,7 @@ class UpdateProgressWindow(SubWindow):
         self.download_wrapper.setLayout(self.download_layout)
         self.download_wrapper.setProperty("class", "wrapper")
         self.download_wrapper.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.download_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.download_wrapper)
         )
         self.download_wrapper.setFixedWidth(300)
 
@@ -50,7 +50,7 @@ class UpdateProgressWindow(SubWindow):
         self.backups_upgrade_wrapper.setLayout(self.backups_upgrade_layout)
         self.backups_upgrade_wrapper.setProperty("class", "wrapper")
         self.backups_upgrade_wrapper.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.backups_upgrade_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.backups_upgrade_wrapper)
         )
         self.backups_upgrade_wrapper.setFixedWidth(300)
 
@@ -66,7 +66,7 @@ class UpdateProgressWindow(SubWindow):
         self.apply_update_wrapper.setLayout(self.apply_update_layout)
         self.apply_update_wrapper.setProperty("class", "wrapper")
         self.apply_update_wrapper.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.apply_update_wrapper, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.apply_update_wrapper)
         )
         self.apply_update_wrapper.setFixedWidth(300)
 

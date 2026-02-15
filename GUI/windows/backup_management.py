@@ -1,15 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QHeaderView, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QSizePolicy,\
-    QGraphicsDropShadowEffect, QCheckBox, QLineEdit
+    QCheckBox, QLineEdit
 from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtCore import QRegularExpression
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.table_widget import CustomTableWidget
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
-from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENTS, ALIGNMENT, ALIGN_V_CENTER
+from GUI.gui_constants import BASIC_FONT, ALIGN_H_CENTER, ALIGNMENT, ALIGN_V_CENTER
 
 from project_configuration import MAX_BACKUPS_VALIDATOR_REGEX, MAX_LEGACY_BACKUPS_VALIDATOR_REGEX
 
@@ -53,7 +54,7 @@ class BackupManagementWindow(SubWindow):
         self.backups_wrapper = QWidget()
         self.backups_wrapper.setProperty("class", "wrapper")
         self.backups_wrapper.setLayout(self.backups_layout)
-        self.backups_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.backups_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.backups_wrapper.setGraphicsEffect(DefaultDropShadowEffect(self.backups_wrapper))
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.window_menu_layout)
@@ -77,11 +78,13 @@ class AutoBackupWindow(SubWindow):
         self.status_wrapper = QWidget()
         self.status_wrapper.setProperty("class", "wrapper")
         self.status_wrapper.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        self.status_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.status_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.status_wrapper.setGraphicsEffect(DefaultDropShadowEffect(self.status_wrapper))
 
-        self.status_wrapper.setLayout(QVBoxLayout())
-        self.status_wrapper.layout().addWidget(self.current_status) # type: ignore[reportOptionalMemberAccess, unused-ignore] #This layout is added above, so it will return it
-        self.status_wrapper.layout().setContentsMargins(20, 20, 20, 20) # type: ignore[reportOptionalMemberAccess, unused-ignore] 
+        self.status_wrapper_layout = QVBoxLayout()
+        self.status_wrapper_layout.addWidget(self.current_status)
+        self.status_wrapper_layout.setContentsMargins(20, 20, 20, 20)
+
+        self.status_wrapper.setLayout(self.status_wrapper_layout)
 
         self.monthly = QCheckBox("Monthly")
         self.monthly.setFont(BASIC_FONT)
@@ -108,7 +111,7 @@ class AutoBackupWindow(SubWindow):
         self.auto_backup_status_wrapper = QWidget()
         self.auto_backup_status_wrapper.setProperty("class", "wrapper")
         self.auto_backup_status_wrapper.setLayout(self.backup_status_layout)
-        self.auto_backup_status_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.auto_backup_status_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.auto_backup_status_wrapper.setGraphicsEffect(DefaultDropShadowEffect(self.auto_backup_status_wrapper))
 
         self.status_and_auto_backup_layout = QVBoxLayout()
         self.status_and_auto_backup_layout.addWidget(self.status_wrapper, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER, stretch=10)
@@ -152,7 +155,7 @@ class AutoBackupWindow(SubWindow):
         self.max_backups_wrapper = QWidget()
         self.max_backups_wrapper.setProperty("class", "wrapper")
         self.max_backups_wrapper.setLayout(self.max_backups_layout)
-        self.max_backups_wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(self.max_backups_wrapper, **SHADOW_EFFECT_ARGUMENTS))
+        self.max_backups_wrapper.setGraphicsEffect(DefaultDropShadowEffect(self.max_backups_wrapper))
 
         self.status_and_max_backup_layout = QHBoxLayout()
         self.status_and_max_backup_layout.addLayout(self.status_and_auto_backup_layout)

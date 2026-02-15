@@ -1,9 +1,8 @@
 from functools import partial
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QScrollArea, QGraphicsDropShadowEffect,\
-    QPushButton
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QScrollArea, QPushButton
 from PySide6.QtCore import Qt
 
-from GUI.gui_constants import ALIGN_H_CENTER, ALIGNMENT, SHADOW_EFFECT_ARGUMENTS, ALIGN_V_CENTER
+from GUI.gui_constants import ALIGN_H_CENTER, ALIGNMENT, ALIGN_V_CENTER
 from languages import LanguageStructure
 from AppObjects.category import Category
 from project_configuration import CategoryType
@@ -11,6 +10,8 @@ from project_configuration import CategoryType
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 from DesktopQtToolkit.list_widget import CustomListWidget
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
+from DesktopQtToolkit.Utils import get_widget_from_layout
 
 
 
@@ -72,6 +73,7 @@ class CategoriesSelectionByType(QWidget):
 
         self.incomes_categories_list_window = QWidget()
         self.incomes_categories_list_window.setLayout(self.incomes_categories_layout)
+        self.incomes_categories_list_window.setProperty("class", "wrapper")
 
         self.incomes_categories_list_scroll = QScrollArea()
         self.incomes_categories_list_scroll.setWidget(self.incomes_categories_list_window)
@@ -83,7 +85,7 @@ class CategoriesSelectionByType(QWidget):
         self.incomes_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.incomes_categories_list_scroll.setProperty("class", "wrapper")
         self.incomes_categories_list_scroll.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.incomes_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.incomes_categories_list_scroll)
         )
 
         self.add_all_expenses_categories = create_button("Add all", (150, 40))
@@ -103,6 +105,7 @@ class CategoriesSelectionByType(QWidget):
 
         self.expenses_categories_list_window = QWidget()
         self.expenses_categories_list_window.setLayout(self.expenses_categories_layout)
+        self.expenses_categories_list_window.setProperty("class", "wrapper")
         
         self.expenses_categories_list_scroll = QScrollArea()
         self.expenses_categories_list_scroll.setWidget(self.expenses_categories_list_window)
@@ -114,7 +117,7 @@ class CategoriesSelectionByType(QWidget):
         self.expenses_categories_list_scroll.setStyleSheet("""QScrollArea{border:none;}""")
         self.expenses_categories_list_scroll.setProperty("class", "wrapper")
         self.expenses_categories_list_scroll.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.expenses_categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.expenses_categories_list_scroll)
         )
 
         self.categories_lists_layout = QHBoxLayout()
@@ -192,7 +195,7 @@ class CategoriesSelectionByType(QWidget):
 
         if categories_type == CategoryType.Income:
             for category_wrapper_index in range(self.incomes_categories_list_layout.count()):
-                category_wrapper = self.incomes_categories_list_layout.itemAt(category_wrapper_index).widget()
+                category_wrapper = get_widget_from_layout(self.incomes_categories_list_layout, category_wrapper_index)
 
                 for widget in category_wrapper.children():
                     if isinstance(widget, QPushButton) and widget.text() == add_text:
@@ -200,7 +203,7 @@ class CategoriesSelectionByType(QWidget):
 
         elif categories_type == CategoryType.Expense:
             for category_wrapper_index in range(self.expenses_categories_list_layout.count()):
-                category_wrapper = self.expenses_categories_list_layout.itemAt(category_wrapper_index).widget()
+                category_wrapper = get_widget_from_layout(self.expenses_categories_list_layout, category_wrapper_index)
 
                 for widget in category_wrapper.children():
                     if isinstance(widget, QPushButton) and widget.text() == add_text:
@@ -242,9 +245,7 @@ class CategoriesSelectionByType(QWidget):
 
         if categories_type == CategoryType.Income:
             for category_wrapper_index in range(self.incomes_categories_list_layout.count()):
-                category_wrapper = self.incomes_categories_list_layout.itemAt(
-                    category_wrapper_index
-                ).widget()
+                category_wrapper = get_widget_from_layout(self.incomes_categories_list_layout, category_wrapper_index)
 
                 for widget in category_wrapper.children():
                     if isinstance(widget, QPushButton) and widget.text() == remove_text:
@@ -252,9 +253,7 @@ class CategoriesSelectionByType(QWidget):
 
         elif categories_type == CategoryType.Expense:
             for category_wrapper_index in range(self.expenses_categories_list_layout.count()):
-                category_wrapper = self.expenses_categories_list_layout.itemAt(
-                    category_wrapper_index
-                ).widget()
+                category_wrapper = get_widget_from_layout(self.expenses_categories_list_layout, category_wrapper_index)
 
                 for widget in category_wrapper.children():
                     if isinstance(widget, QPushButton) and widget.text() == remove_text:
@@ -267,10 +266,10 @@ class CategoriesSelectionByType(QWidget):
         """
 
         while self.incomes_categories_list_layout.count():
-            self.incomes_categories_list_layout.takeAt(0).widget().setParent(None)#type: ignore[call-overload] #MyPy doesn't recognize that None works as detaching method
+            get_widget_from_layout(self.incomes_categories_list_layout, 0).setParent(None)
 
         while self.expenses_categories_list_layout.count():
-            self.expenses_categories_list_layout.takeAt(0).widget().setParent(None)#type: ignore[call-overload]
+            get_widget_from_layout(self.expenses_categories_list_layout, 0).setParent(None)
 
         self.selected_categories_list.clear()
         self.selected_categories_data.clear()

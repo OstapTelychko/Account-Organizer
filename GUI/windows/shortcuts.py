@@ -1,13 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from PySide6.QtWidgets import QScrollArea, QVBoxLayout, QLabel, QHBoxLayout, QGraphicsDropShadowEffect, QWidget
+from PySide6.QtWidgets import QScrollArea, QVBoxLayout, QLabel, QHBoxLayout, QWidget
 from PySide6.QtCore import Qt
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.shortcut_edit import ShortcutCaptureEdit
-from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS, ALIGN_H_CENTER
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
+
+from GUI.gui_constants import ALIGN_H_CENTER
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -84,13 +86,14 @@ class ShortcutsWindow(SubWindow):
         self.shortcuts_layout.addWidget(self.open_search_shortcut)
 
         self.shortcuts_container = QWidget()
+        self.shortcuts_container.setProperty("class", "wrapper")
         self.shortcuts_container.setLayout(self.shortcuts_layout)
 
         self.shortcuts_scroll = QScrollArea()
         self.shortcuts_scroll.setWidget(self.shortcuts_container)
         self.shortcuts_scroll.setWidgetResizable(True)
         self.shortcuts_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.shortcuts_scroll.setGraphicsEffect(QGraphicsDropShadowEffect(self, **SHADOW_EFFECT_ARGUMENTS)) 
+        self.shortcuts_scroll.setGraphicsEffect(DefaultDropShadowEffect(self)) 
         self.shortcuts_scroll.setMinimumHeight(400)
         self.shortcuts_scroll.setMinimumWidth(450)
         self.shortcuts_scroll.setProperty("class", "wrapper")

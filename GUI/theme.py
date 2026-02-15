@@ -7,7 +7,7 @@ from sys import platform
 from PySide6.QtGui import QIcon
 
 
-from project_configuration import THEME_DIRECTORY, DARK_THEME_CACHE_FILE, LIGHT_THEME_CACHE_FILE
+from project_configuration import THEME_DIRECTORY
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from GUI.gui_constants import app, DWMWA_USE_IMMERSIVE_DARK_MODE
@@ -16,6 +16,40 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import QWidget
 
 logger = get_logger(__name__)
+
+STYLES_FOR_BOTH_THEMES = """
+QScrollBar:vertical {
+    max-width: 12px;            /* Minimum width of the scrollbar */
+    min-width: 12px; 
+}
+
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background-color: rgb(92, 92, 92); /* Default handle color */
+    margin:2.5px;
+}
+
+QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
+    background-color: rgb(120, 120, 120); /* Lighter on hover */
+    margin:2px;
+}
+
+QScrollBar::handle:vertical:pressed, QScrollBar::handle:horizontal:pressed {
+    background-color: rgb(144, 144, 144); /* Even lighter when dragging */
+}
+
+QScrollBar:horizontal {
+    max-height: 12px;            /* Minimum height of the scrollbar */
+    min-height: 12px;    
+}
+
+QLabel,QToolButton,QCheckBox{
+    background-color:transparent;
+}
+
+QTableWidget{
+    border:none;
+}
+"""
 
 DARK_THEME = ""
 DARK_THEME_ICON = QIcon(f"{THEME_DIRECTORY}/Dark theme.png")
@@ -80,11 +114,21 @@ DARK_THEME_EXTRA = """
 .backups_table{
     background-color:rgb(45, 45, 45)
 }
+
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: rgb(43, 43, 43);       /* Track background color */   
+    border-radius: 5px;        
+    margin: 0px 0px 0px 0px;   /* Margins to hide buttons if desired */
+}
 """
 
 LIGHT_THEME = ""
 LIGHT_THEME_ICON = QIcon(f"{THEME_DIRECTORY}/Light theme.png")
 LIGHT_THEME_EXTRA = """
+QWidget{
+    color:rgb(25, 26, 27);
+}
+
 .category{
     background-color:rgb(100, 120, 100);
     border-radius:15px;
@@ -157,6 +201,12 @@ LIGHT_THEME_EXTRA = """
 .close_window:hover, .close_window:active:hover, .close_window:focus:hover, .close_window:default:hover{
     background-color:rgb(90, 120, 90);
 }
+
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: rgb(193, 193, 193);       /* Track background color */   
+    border-radius: 5px;        
+    margin: 0px 0px 0px 0px;   /* Margins to hide buttons if desired */
+}
 """
 
 
@@ -195,29 +245,13 @@ def load_theme() -> None:
     global DARK_THEME, LIGHT_THEME
 
     logger.info("Loading theme")
-    if not os.path.exists(DARK_THEME_CACHE_FILE) or not os.path.exists(LIGHT_THEME_CACHE_FILE):
-        from qdarktheme._style_loader import load_stylesheet#type: ignore[import-untyped] #I don't want to write a stub for this library
+    from qdarktheme import load_stylesheet#type: ignore[import-untyped] #I don't want to write a stub for this library
 
-        with open(DARK_THEME_CACHE_FILE, "w") as f:
-            dark_theme = load_stylesheet("dark")
-            f.write(dark_theme)
-            DARK_THEME = dark_theme
-
-        with open(LIGHT_THEME_CACHE_FILE, "w") as f:
-            light_theme = load_stylesheet("light",custom_colors={"background":"#ebeef0","foreground":"#191a1b"})
-            f.write(light_theme)
-            LIGHT_THEME = light_theme
-        logger.info(f"Themes cached to {DARK_THEME_CACHE_FILE} and {LIGHT_THEME_CACHE_FILE}")
-    else:
-        with open(DARK_THEME_CACHE_FILE, "r") as f:
-            DARK_THEME = f.read()
-
-        with open(LIGHT_THEME_CACHE_FILE, "r") as f:
-            LIGHT_THEME = f.read()
-        logger.info(f"Themes loaded from cache files {DARK_THEME_CACHE_FILE} and {LIGHT_THEME_CACHE_FILE}")
+    DARK_THEME = load_stylesheet("dark")
+    LIGHT_THEME = load_stylesheet("light")
         
-    DARK_THEME += DARK_THEME_EXTRA
-    LIGHT_THEME += LIGHT_THEME_EXTRA
+    DARK_THEME += DARK_THEME_EXTRA + STYLES_FOR_BOTH_THEMES
+    LIGHT_THEME += LIGHT_THEME_EXTRA + STYLES_FOR_BOTH_THEMES
 
     app_core = AppCore.instance()
     if app_core.config.theme == "Dark":

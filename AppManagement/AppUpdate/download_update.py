@@ -9,7 +9,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 import requests as req
 from requests.exceptions import HTTPError, ConnectionError
 from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry #type: ignore[import-not-found]
+from urllib3.util.retry import Retry
 
 from languages import LanguageStructure
 from project_configuration import LATEST_RELEASE_URL, LINUX_UPDATE_ZIP, WINDOWS_UPDATE_ZIP, UPDATE_DIRECTORY, CHUNK_SIZE_FOR_FILE_HASHER, RELEASES_URL,\

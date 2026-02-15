@@ -1,15 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy,\
-    QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QScrollArea, QSizePolicy
 from PySide6.QtGui import QIntValidator
 from PySide6.QtCore import Qt
 
-
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -77,7 +76,7 @@ class ChangeCategoryPositionWindow(SubWindow):
         self.preview_category_container = QWidget()
         self.preview_category_container.setProperty("class", "category_list_item")
         self.preview_category_container.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.preview_category_container, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.preview_category_container)
         )
 
         self.preview_category_layout = QHBoxLayout()
@@ -111,7 +110,7 @@ class ChangeCategoryPositionWindow(SubWindow):
         self.categories_list_scroll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
         self.categories_list_scroll.setProperty("class", "wrapper")
         self.categories_list_scroll.setGraphicsEffect(
-            QGraphicsDropShadowEffect(self.categories_list_scroll, **SHADOW_EFFECT_ARGUMENTS)
+            DefaultDropShadowEffect(self.categories_list_scroll)
         )
 
         self.main_layout = QVBoxLayout()

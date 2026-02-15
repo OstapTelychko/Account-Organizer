@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypeVar, Generic
 from sys import platform
-from PySide6.QtWidgets import QDialog, QWidget, QLabel, QGraphicsDropShadowEffect, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QDialog, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QTimer, QRect, QByteArray
 
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICON, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, APP_ICON
 from DesktopQtToolkit.create_button import create_button
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 from AppObjects.app_core import AppCore
 
 if TYPE_CHECKING:
@@ -56,7 +57,7 @@ class SubWindow(QDialog, metaclass=SubWindowSingleton):
 
         self.window_container = QWidget()
         self.window_container.setProperty("class", "sub_window")
-        self.window_container.setGraphicsEffect(QGraphicsDropShadowEffect(self.window_container, **SHADOW_EFFECT_ARGUMENTS))
+        self.window_container.setGraphicsEffect(DefaultDropShadowEffect(self.window_container))
 
         self.size_animation = QPropertyAnimation(self.window_container, QByteArray(b"geometry"), self.window_container)
         self.size_animation.setDuration(100)
@@ -67,7 +68,7 @@ class SubWindow(QDialog, metaclass=SubWindowSingleton):
 
         self.close_window = create_button("X", (30, 30), "close_window")
         self.close_window.clicked.connect(lambda: self.done(1))
-        self.close_window.setGraphicsEffect(QGraphicsDropShadowEffect(self.close_window, **SHADOW_EFFECT_ARGUMENTS))
+        self.close_window.setGraphicsEffect(DefaultDropShadowEffect(self.close_window))
 
         self.sub_window_title = QLabel()
         self.sub_window_title.setContentsMargins(10, 5, 10, 5)

@@ -25,13 +25,13 @@ class QRichTextDelegate(QStyledItemDelegate):
         doc = QTextDocument()
         doc.setHtml(html)
         doc.setDocumentMargin(0)
-        doc.setTextWidth(option.rect.width())#type:ignore[attr-defined] # This attribute exists, but PySide6 types are incomplete.
+        doc.setTextWidth(option.rect.width())
 
         painter.save()
-        painter.translate(option.rect.topLeft())#type:ignore[attr-defined] 
+        painter.translate(option.rect.topLeft())
         context = QAbstractTextDocumentLayout.PaintContext()
         # Set the text color in the paint context
-        context.palette.setColor(QPalette.ColorRole.Text, option.palette.color(QPalette.ColorRole.Text))#type:ignore[attr-defined]
+        context.palette.setColor(QPalette.ColorRole.Text, option.palette.color(QPalette.ColorRole.Text))
         
         doc.documentLayout().draw(painter, context)
         painter.restore()
@@ -50,7 +50,7 @@ class QRichTextDelegate(QStyledItemDelegate):
 
         # Determine a working width: if option.rect.width() == 0 (first pass),
         # pick a reasonable fallback (e.g. 400) so multi-line text expands.
-        width = option.rect.width() if option.rect.width() > 0 else 400 #type:ignore[attr-defined] 
+        width = option.rect.width() if option.rect.width() > 0 else 400
         doc.setTextWidth(width)
 
         return QSize(int(width), int(doc.size().height()))

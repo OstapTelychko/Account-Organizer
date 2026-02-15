@@ -93,12 +93,12 @@ class TestSearch(DBTestCase):
                     result = self.fill_search_fields_and_perform_search(search_value=search_value, operand=operand)
                     income_transaction_pattern = self.transaction_regex % (self.test_income_transaction_name, self.income_category.name)
 
-                    self.assertRegexpMatches(
+                    self.assertRegex(
                         result, income_transaction_pattern,
                         f"Income transaction with name {self.test_income_transaction_name} not found in search results"
                         f" when attempting to search for transactions where {message}")
                     expenses_transaction_pattern = self.transaction_regex % (self.test_expenses_transaction_name, self.expenses_category.name)
-                    self.assertRegexpMatches(
+                    self.assertRegex(
                         result, expenses_transaction_pattern,
                         f"Expense transaction with name {self.test_expenses_transaction_name} not found in search results"
                         f" when attempting to search for transactions where {message}")
@@ -129,12 +129,12 @@ class TestSearch(DBTestCase):
                     result = self.fill_search_fields_and_perform_search(search_value=search_value, operand=operand)
                     income_transaction_pattern = self.transaction_regex % (self.test_income_transaction_name, self.income_category.name)
 
-                    self.assertNotRegexpMatches(
+                    self.assertNotRegex(
                         result, income_transaction_pattern,
                         f"Income transaction with name {self.test_income_transaction_name} found in search results"
                         f" when attempting to search for transactions where {message}")
                     expenses_transaction_pattern = self.transaction_regex % (self.test_expenses_transaction_name, self.expenses_category.name)
-                    self.assertNotRegexpMatches(
+                    self.assertNotRegex(
                         result, expenses_transaction_pattern,
                         f"Expense transaction with name {self.test_expenses_transaction_name} found in search results"
                         f" when attempting to search for transactions where {message}")
@@ -204,13 +204,13 @@ class TestSearch(DBTestCase):
                     )
 
                     if expected_to_be_found:
-                        self.assertRegexpMatches(
+                        self.assertRegex(
                             result, new_transaction_pattern,
                             f"Newly added transaction with name {new_transaction_name} and value {new_transaction_value} "
                             f"not found in search results. Searched where {message}"
                         )
                     else:
-                        self.assertNotRegexpMatches(
+                        self.assertNotRegex(
                             result, new_transaction_pattern,
                             f"Newly added transaction with name {new_transaction_name} and value {new_transaction_value} "
                             f"found in search results. Searched where {message}"
@@ -288,13 +288,13 @@ class TestSearch(DBTestCase):
                     result = self.fill_search_fields_and_perform_search(search_name=transaction_name)
                     transaction_pattern = self.transaction_regex % (transaction_name, category_name)
                     if expected_to_be_found:
-                        self.assertRegexpMatches(
+                        self.assertRegex(
                             result, transaction_pattern,
                             f"Transaction with name {transaction_name} not found in search results"
                             f" when {message}"
                         )
                     else:
-                        self.assertNotRegexpMatches(
+                        self.assertNotRegex(
                             result, transaction_pattern,
                             f"Transaction with name {transaction_name} found in search results"
                             f" when {message}"
@@ -427,13 +427,13 @@ class TestSearch(DBTestCase):
                     )
                     transaction_pattern = self.transaction_regex % (transaction_name, category_name)
                     if expected_to_be_found:
-                        self.assertRegexpMatches(
+                        self.assertRegex(
                             result, transaction_pattern,
                             f"Transaction with name {transaction_name} not found in search results"
                             f" when {message}"
                         )
                     else:
-                        self.assertNotRegexpMatches(
+                        self.assertNotRegex(
                             result, transaction_pattern,
                             f"Transaction with name {transaction_name} found in search results"
                             f" when {message}"

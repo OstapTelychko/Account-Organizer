@@ -2,16 +2,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import os
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QWidget, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox, QWidget
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT, SHADOW_EFFECT_ARGUMENTS
+from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER, ALIGN_V_CENTER, BASIC_FONT
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 
 if TYPE_CHECKING:
@@ -146,7 +147,7 @@ class SwitchAccountWindow(SubWindow):
             self.account_widget = QWidget()
             self.account_widget.setLayout(self.account_layout)
             self.account_widget.setProperty("class", "wrapper")
-            self.account_widget.setGraphicsEffect(QGraphicsDropShadowEffect(self.account_widget, **SHADOW_EFFECT_ARGUMENTS))
+            self.account_widget.setGraphicsEffect(DefaultDropShadowEffect(self.account_widget))
 
     def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
         super().__init__(main_window, sub_windows)

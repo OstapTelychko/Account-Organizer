@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QLayout, QWidget, QGraphicsDropShadowEffect
-from GUI.gui_constants import SHADOW_EFFECT_ARGUMENTS
+from PySide6.QtWidgets import QLayout, QWidget
+from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 
 
@@ -18,6 +18,6 @@ def create_wrapper_widget(layout:QLayout, css_class:str="wrapper") -> QWidget:
     wrapper = QWidget()
     wrapper.setProperty("class", css_class)
     wrapper.setLayout(layout)
-    wrapper.setGraphicsEffect(QGraphicsDropShadowEffect(wrapper, **SHADOW_EFFECT_ARGUMENTS))
+    wrapper.setGraphicsEffect(DefaultDropShadowEffect(wrapper))
 
     return wrapper
