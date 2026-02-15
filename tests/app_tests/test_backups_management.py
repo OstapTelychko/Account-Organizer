@@ -541,7 +541,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()]
                 backup.timestamp = date_minus_1_day.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -632,7 +632,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()]
                 backup.timestamp = date_minus_7_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:
@@ -720,7 +720,7 @@ class TestBackupsManagement(DBTestCase, OutOfScopeTestCase):
                 auto_backup()
                 qsleep(500)
                 
-                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()] #type: ignore[reportOptionalMemberAccess, unused-ignore] #This item is added above, so it will return it
+                backup = app_core.backups[get_table_widget_item(WindowsRegistry.BackupManagementWindow.backups_table, 0, 2).text()]
                 backup.timestamp = date_minus_31_days.strftime(BACKUPS_DATE_FORMAT)
 
                 def _check_second_backup_appearance() -> None:

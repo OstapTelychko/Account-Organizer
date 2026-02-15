@@ -90,7 +90,7 @@ def update_transaction(transaction_id:int, transaction_name:str, transaction_day
             app_core.current_total_income = round(app_core.current_total_income, 2)
             app_core.current_total_expenses = round(app_core.current_total_expenses, 2)
 
-            get_table_widget_item(category_data, row, 2).setText(str(transaction_value)) # type: ignore[reportOptionalMemberAccess, unused-ignore]
+            get_table_widget_item(category_data, row, 2).setText(str(transaction_value))
 
 
 def show_add_transaction_window(category_name:str) -> None:
@@ -254,7 +254,7 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
         return WindowsRegistry.Messages.unselected_row.exec()
     
     if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
-        transaction_id = int(get_table_widget_item(category_data, selected_row[0].row(), 3).text()) # type: ignore[reportOptionalMemberAccess, unused-ignore] #This will never be None, because row is selected
+        transaction_id = int(get_table_widget_item(category_data, selected_row[0].row(), 3).text())
     else:
         return WindowsRegistry.Messages.only_one_row.exec()
 
