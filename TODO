@@ -18,6 +18,7 @@ Project life improvements:
   ☐ cleanup requirements.txt by removing fixed versions wherever possible
   ☐ updated SubWindow to automatically add main_layout to window_container and window_menu_layout to main_layout
   ☐ removed word 'Window' for all windows in WindowsRegistry
+  ☐ replace QTimer.singleShot with method that will automatically be executed with self.catch_failure
 
 Bugs:
   ☐ empty @don't-touch

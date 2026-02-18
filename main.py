@@ -294,7 +294,9 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--test", action="store_true")
 
-    if parser.parse_args().test:
+    args, unknown = parser.parse_known_args()
+
+    if args.test:
         from tests.init_tests import test_main
         test_main(main)
     else:

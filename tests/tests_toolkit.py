@@ -267,6 +267,7 @@ class DBTestCase(DefaultTestCase):
                     app_core.current_month
                 )
             activate_categories()
+            qsleep(500)#Wait for the categories to be activated in the application
 
             return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)
         
