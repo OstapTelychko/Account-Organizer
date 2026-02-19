@@ -344,6 +344,27 @@ def reset_focused_category() -> None:
         app_core.focused_expense_category = None
 
 
+def show_anomalous_transaction_values_settings() -> None:
+    """Show anomalous transaction values settings. It shows the anomalous transaction values settings window."""
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.setWindowTitle(WindowsRegistry.CategorySettingsWindow.windowTitle())
+    category = AppCore.instance().db.category_query.get_category(
+        WindowsRegistry.CategorySettingsWindow.windowTitle(),
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    category_min_value = category.transaction_min_value
+    category_max_value = category.transaction_max_value
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.min_value.setText(
+        str(category_min_value) if category_min_value is not None else ""
+    )
+    WindowsRegistry.AnomalousTransactionValuesWindow.max_value.setText(
+        str(category_max_value) if category_max_value is not None else ""
+    )
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.exec()
+
+
 def save_anomalous_transaction_values_settings() -> None:
     """Save anomalous transaction values settings. It saves the settings to the database and shows a confirmation message."""
 
