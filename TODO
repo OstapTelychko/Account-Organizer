@@ -3,7 +3,6 @@ New features:
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
   ☐ fix issue with weird looking buttons on windows
-  ☐ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction @started(26-02-08 19:14)
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -27,6 +26,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction @started(26-02-08 19:14) @done(26-02-19 22:34) @lasted(1w4d3h20m50s) @project(New features)
   ✔ test project on python3.13 @started(26-02-14 22:47) @done(26-02-15 18:07) @lasted(19h20m54s) @project(Project life improvements)
   ✔ replace BASIC_FONT with some better one that will look good on both windows and linux @started(26-02-01 19:31) @done(26-02-01 20:23) @lasted(52m30s) @project(New features)
   ✔ extend monthly statistics to show summary for each category @started(26-02-01 14:53) @done(26-02-01 16:10) @lasted(1h17m7s) @project(Updates to existing features)
