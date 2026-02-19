@@ -1,7 +1,9 @@
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
 from AppObjects.windows_registry import WindowsRegistry
+
 from languages import LanguageStructure
+from project_configuration import CategoryType
 
 
 
@@ -16,11 +18,11 @@ def calculate_current_balance() -> None:
 
     for category in app_core.db.category_query.get_all_categories():
 
-        if category.category_type == "Incomes":
+        if category.category_type == CategoryType.Income:
             for transaction in app_core.db.transaction_query.get_all_transactions(category.id):
                 app_core.current_total_income += transaction.value
 
-        elif category.category_type == "Expenses":
+        elif category.category_type == CategoryType.Expense:
             for transaction in app_core.db.transaction_query.get_all_transactions(category.id):
                 app_core.current_total_expenses += transaction.value
     

@@ -189,4 +189,12 @@ class AppCore:
         income_categories = [category for category in self.categories.values() if category.type == CategoryType.Income]
         expense_categories = [category for category in self.categories.values() if category.type == CategoryType.Expense]
         return income_categories, expense_categories
+    
+
+    def get_income_and_expense_categories_as_ids(self) -> tuple[list[int], list[int]]:
+        """Get income and expense categories ids as two separate lists."""
+
+        income_categories_ids = [category.id for category in self.categories.values() if category.type == CategoryType.Income]
+        expense_categories_ids = [category.id for category in self.categories.values() if category.type == CategoryType.Expense]
+        return income_categories_ids, expense_categories_ids
         

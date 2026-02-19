@@ -7,6 +7,7 @@ from PySide6.QtCore import QTimer
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from AppManagement.category import reset_focused_category, activate_categories
 from GUI.category import load_category
+from project_configuration import CategoryType
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
@@ -20,6 +21,10 @@ logger = get_logger(__name__)
 
 class TestShortcuts(DBTestCase, OutOfScopeTestCase):
     """Test shortcuts in the application."""
+
+    def setUp(self) -> None:
+        reset_focused_category()
+        return super().setUp()
 
 
     def test_01_close_current_window(self) -> None:
@@ -149,18 +154,15 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         """Test focusing on next category with shortcut."""        
 
         app_core = AppCore.instance()
-        app_core.db.category_query.create_category("Second test category", "Incomes", 1)
-        new_category = app_core.db.category_query.get_category("Second test category", "Incomes")
+        app_core.db.category_query.create_category("Second test category", CategoryType.Income, 1)
+        new_category = app_core.db.category_query.get_category("Second test category", CategoryType.Income)
         if new_category is None:
             logger.error("Just created category not found in the database")
             raise ValueError("Just created category not found in the database")
 
         app_core.categories[new_category.id] = expected_focused_category = load_category(
-            new_category.category_type,
-            new_category.name,
+            new_category,
             app_core.db,
-            new_category.id,
-            0,
             app_core.current_year,
             app_core.current_month
         )
@@ -189,18 +191,15 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
         """Test focusing on previous category with shortcut."""        
 
         app_core = AppCore.instance()
-        app_core.db.category_query.create_category("Second test category", "Incomes", 1)
-        new_category = app_core.db.category_query.get_category("Second test category", "Incomes")
+        app_core.db.category_query.create_category("Second test category", CategoryType.Income, 1)
+        new_category = app_core.db.category_query.get_category("Second test category", CategoryType.Income)
         if new_category is None:
             logger.error("Just created category not found in the database")
             raise ValueError("Just created category not found in the database")
 
         app_core.categories[new_category.id] = load_category(
-            new_category.category_type,
-            new_category.name,
+            new_category,
             app_core.db,
-            new_category.id,
-            0,
             app_core.current_year,
             app_core.current_month
         )

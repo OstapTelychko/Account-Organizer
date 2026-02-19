@@ -78,11 +78,8 @@ def create_category() -> int:
     
     category_id = category.id 
     app_core.categories[category_id] = load_category(
-        category_type,
-        category_name,
+        category,
         app_core.db,
-        category_id,
-        position,
         app_core.current_year,
         app_core.current_month
     )
@@ -120,11 +117,8 @@ def load_categories() -> None:
     app_core = AppCore.instance()
     for category in app_core.db.category_query.get_all_categories():
         app_core.categories[category.id] = load_category(
-            category.category_type,
-            category.name,
+            category,
             app_core.db,
-            category.id,
-            category.position,
             app_core.current_year,
             app_core.current_month
         )
@@ -348,3 +342,51 @@ def reset_focused_category() -> None:
         app_core.focused_expense_category = expense_categories[0]
     else:
         app_core.focused_expense_category = None
+
+
+def show_anomalous_transaction_values_settings() -> None:
+    """Show anomalous transaction values settings. It shows the anomalous transaction values settings window."""
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.setWindowTitle(WindowsRegistry.CategorySettingsWindow.windowTitle())
+    category = AppCore.instance().db.category_query.get_category(
+        WindowsRegistry.CategorySettingsWindow.windowTitle(),
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    category_min_value = category.transaction_min_value
+    category_max_value = category.transaction_max_value
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.min_value.setText(
+        str(category_min_value) if category_min_value is not None else ""
+    )
+    WindowsRegistry.AnomalousTransactionValuesWindow.max_value.setText(
+        str(category_max_value) if category_max_value is not None else ""
+    )
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.exec()
+
+
+def save_anomalous_transaction_values_settings() -> None:
+    """Save anomalous transaction values settings. It saves the settings to the database and shows a confirmation message."""
+
+    app_core = AppCore.instance()
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    min_value_text = WindowsRegistry.AnomalousTransactionValuesWindow.min_value.text()
+    max_value_text = WindowsRegistry.AnomalousTransactionValuesWindow.max_value.text()
+    category = app_core.db.category_query.get_category(
+        WindowsRegistry.AnomalousTransactionValuesWindow.windowTitle(),
+        category_type
+    )
+
+    min_value = float(min_value_text) if min_value_text != "" else None
+    max_value = float(max_value_text) if max_value_text != "" else None
+
+    if not (max_value is None or min_value is None) and min_value >= max_value:
+        WindowsRegistry.Messages.min_validation_value_bigger_than_max.exec()
+        return
+    
+    app_core.db.category_query.set_anomalous_transaction_values(category.id, min_value, max_value)
+    logger.debug(f"Anomalous transaction values for category {category.name} set to min: {min_value}, max: {max_value}")
+
+    WindowsRegistry.AnomalousTransactionValuesWindow.done(1)
+    WindowsRegistry.CategorySettingsWindow.done(1)
+    show_information_message(LanguageStructure.CategoriesMessages.get_translation(1))

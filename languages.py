@@ -94,6 +94,7 @@ class LanguageStructure():
     Transactions = MainWindow.add_subcategory("Transactions")
     TransactionsMessages = Transactions.add_subcategory("Messages")
     Categories = MainWindow.add_subcategory("Categories")
+    CategoriesMessages = Categories.add_subcategory("Messages")
     MiniCalculator = MainWindow.add_subcategory("Mini calculator")
 
     Settings = Windows.add_subcategory("Settings")

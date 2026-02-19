@@ -230,11 +230,15 @@ class DBTestCase(DefaultTestCase):
         def wrapper(self:DBTestCase) -> None:
             os.makedirs(TEST_BACKUPS_DIRECTORY, exist_ok=True)
 
-            app_core.db.category_query.create_category(self.test_income_category_name, "Incomes", 0)
-            app_core.db.category_query.create_category(self.test_expenses_category_name, "Expenses", 0)
+            app_core.db.category_query.create_category(self.test_income_category_name, CategoryType.Income, 0)
+            app_core.db.category_query.create_category(self.test_expenses_category_name, CategoryType.Expense, 0)
             
-            new_income_category = app_core.db.category_query.get_category(self.test_income_category_name, "Incomes")
-            new_expenses_category = app_core.db.category_query.get_category(self.test_expenses_category_name, "Expenses")
+            new_income_category = app_core.db.category_query.get_category(
+                self.test_income_category_name, CategoryType.Income
+            )
+            new_expenses_category = app_core.db.category_query.get_category(
+                self.test_expenses_category_name, CategoryType.Expense
+            )
             if new_income_category is None or new_expenses_category is None:
                 logger.error("Just created categories not found in the database")
                 raise ValueError("Just created categories not found in the database")
@@ -255,25 +259,15 @@ class DBTestCase(DefaultTestCase):
                 self.test_expenses_transaction_name
             )
 
-            app_core.categories[self.income_category.id] = load_category(
-                self.income_category.category_type,
-                self.income_category.name,
-                app_core.db,
-                self.income_category.id,
-                0,
-                app_core.current_year,
-                app_core.current_month
-            )
-            app_core.categories[self.expenses_category.id] = load_category(
-                self.expenses_category.category_type,
-                self.expenses_category.name,
-                app_core.db,
-                self.expenses_category.id,
-                0,
-                app_core.current_year,
-                app_core.current_month
-            )
+            for category in [self.income_category, self.expenses_category]:
+                app_core.categories[category.id] = load_category(
+                    category,
+                    app_core.db,
+                    app_core.current_year,
+                    app_core.current_month
+                )
             activate_categories()
+            qsleep(500)#Wait for the categories to be activated in the application
 
             return func(self)#Looks like it should be self.func but since we are outside of the class, we have to do func(self)
         

@@ -53,7 +53,9 @@ class Category(Base):
         back_populates="category",
         cascade="all, delete, delete-orphan"
     )
-    
+
+    transaction_min_value: Mapped[float] = mapped_column(Float, nullable=True)
+    transaction_max_value: Mapped[float] = mapped_column(Float, nullable=True)
 
     def __repr__(self) -> str:
         return f"Name {self.name} type {self.category_type} account {self.account.name}"

@@ -1,5 +1,7 @@
-from PySide6.QtCore import QTimer
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from datetime import date
+from PySide6.QtCore import QTimer
 
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
@@ -7,16 +9,30 @@ from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
 from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
+from project_configuration import CategoryType
 
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
+
+if TYPE_CHECKING:
+    from typing import Callable
+    from AppObjects.category import Category as GUICategory
+    from DesktopQtToolkit.message_window import MessageWindow
 
 
 logger = get_logger(__name__)
 
 class TestCategory(DBTestCase, OutOfScopeTestCase):
     """Test category management in the application."""
+
+
+    def open_category_settings(self, category:GUICategory, func:Callable[[], None]) -> None:
+        """Open category settings window."""
+
+        QTimer.singleShot(100, self.catch_failure(func))
+        self.click_on_widget(category.settings)
+
 
     def test_1_category_creation(self) -> None:
         """Test adding category to the application."""
@@ -31,7 +47,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         QTimer.singleShot(100, self.catch_failure(lambda: _add_category("Test incomes creation category")))
         self.click_on_widget(WindowsRegistry.MainWindow.add_incomes_category)
         self.assertTrue(
-            app_core.db.category_query.category_exists("Test incomes creation category", "Incomes"),
+            app_core.db.category_query.category_exists("Test incomes creation category", CategoryType.Income),
             "Incomes category hasn't been created"
         )
 
@@ -39,7 +55,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         self.click_on_widget(WindowsRegistry.MainWindow.add_expenses_category)
         self.assertTrue(
-            app_core.db.category_query.category_exists("Test expenses creation category", "Expenses"),
+            app_core.db.category_query.category_exists("Test expenses creation category", CategoryType.Expense),
             "Expenses category hasn't been created"
         )
         
@@ -69,11 +85,11 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             self.click_on_widget(category.settings)
 
         self.assertFalse(
-            app_core.db.category_query.category_exists(income_category_name, "Incomes"),
+            app_core.db.category_query.category_exists(income_category_name, CategoryType.Income),
             "Income category hasn't been deleted"
         )
         self.assertFalse(
-            app_core.db.category_query.category_exists(expenses_category_name, "Expenses"),
+            app_core.db.category_query.category_exists(expenses_category_name, CategoryType.Expense),
             "Expense category hasn't been deleted"
         )
 
@@ -120,8 +136,8 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         """Test changing category position in the application."""
 
         app_core = AppCore.instance()
-        app_core.db.category_query.create_category("Second "+self.income_category.name, "Incomes", 1)
-        app_core.db.category_query.create_category("Second "+self.expenses_category.name, "Expenses", 1)
+        app_core.db.category_query.create_category("Second "+self.income_category.name, CategoryType.Income, 1)
+        app_core.db.category_query.create_category("Second "+self.expenses_category.name, CategoryType.Expense, 1)
 
         for category in app_core.categories.copy().values():
             self.select_correct_tab(category)
@@ -141,10 +157,10 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             QTimer.singleShot(100, self.catch_failure(_open_settings))
             self.click_on_widget(category.settings)
         
-        income_category = app_core.db.category_query.get_category(self.income_category.name, "Incomes")
-        second_income_category = app_core.db.category_query.get_category("Second "+self.income_category.name, "Incomes")
-        expenses_category = app_core.db.category_query.get_category(self.expenses_category.name, "Expenses")
-        second_expenses_category = app_core.db.category_query.get_category("Second "+self.expenses_category.name, "Expenses")
+        income_category = app_core.db.category_query.get_category(self.income_category.name, CategoryType.Income)
+        second_income_category = app_core.db.category_query.get_category("Second "+self.income_category.name, CategoryType.Income)
+        expenses_category = app_core.db.category_query.get_category(self.expenses_category.name, CategoryType.Expense)
+        second_expenses_category = app_core.db.category_query.get_category("Second "+self.expenses_category.name, CategoryType.Expense)
 
         if income_category is None or second_income_category is None or expenses_category is None or second_expenses_category is None:
             logger.error("Just created categories not found in the database")
@@ -170,7 +186,7 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
                 def _check_copied_transactions() -> None:
                     """Check if transactions are copied to the clipboard."""
 
-                    if category.type == "Incomes":
+                    if category.type == CategoryType.Income:
                         transaction_type = "income"
                     else:
                         transaction_type = "expenses"
@@ -206,4 +222,73 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
             qsleep(500)
 
         qsleep(1700)
+    
+
+    def test_6_save_category_anomalous_transactions_settings(self) -> None:
+        """Test category anomalous transactions settings saving."""
+        app_core = AppCore.instance()
+        category = app_core.categories[self.income_category.id]
+        self.select_correct_tab(category)
+        
+        # min value; max value; gui message; assertion error message
+        params: list[tuple[int|None, int|None, MessageWindow|None, str]] = [
+            (100, 1000, None, "Anomalous transaction values haven't been saved (min: 100, max: 10000)"),
+            (1000, 100, WindowsRegistry.Messages.min_validation_value_bigger_than_max,
+             "Message about min value bigger than max value hasn't been shown (min: 1000, max: 100)"
+            ),
+            (1000, 1000, WindowsRegistry.Messages.min_validation_value_bigger_than_max,
+             "Message about min value bigger than max value hasn't been shown (min: 1000, max: 1000)"
+            ),
+            (100, None, None, "Anomalous transaction values haven't been saved (min: 100, max: empty)"),
+            (None, 1000, None, "Anomalous transaction values haven't been saved (min: empty, max: 1000)"),
+            (None, None, None, "Anomalous transaction values haven't been saved (min: empty, max: empty)")
+        ]
+
+        for min_value, max_value, expected_message, error_message in params:
+            with self.subTest(
+                min_value=min_value, max_value=max_value, expected_message=expected_message, error_message=error_message
+                ):
+                
+                    def set_values() -> None:
+                        """Set min and max anomalous transaction values."""
+
+                        if not min_value:
+                            WindowsRegistry.AnomalousTransactionValuesWindow.min_value.clear()
+                        else:
+                            WindowsRegistry.AnomalousTransactionValuesWindow.min_value.setText(str(min_value))
+                        if not max_value:
+                            WindowsRegistry.AnomalousTransactionValuesWindow.max_value.clear()
+                        else:
+                            WindowsRegistry.AnomalousTransactionValuesWindow.max_value.setText(str(max_value))
+
+                        def check_message() -> None:
+                            """Check if expected message is shown."""
+
+                            if expected_message:
+                                message_was_visible = expected_message.isVisible()
+                                expected_message.ok_button.click()
+                                self.assertTrue(message_was_visible, error_message)
+                                WindowsRegistry.AnomalousTransactionValuesWindow.done(1)
+                                WindowsRegistry.CategorySettingsWindow.done(1)
+                            else:
+                                category_from_db = app_core.db.category_query.get_category_by_id(category.id)
+
+                                self.assertEqual(
+                                    (min_value, max_value),
+                                    (category_from_db.transaction_min_value, category_from_db.transaction_max_value),
+                                    error_message
+                                )
+                                
+                                self.assertTrue(
+                                    WindowsRegistry.AnomalousTransactionValuesWindow.isHidden(),
+                                    "Anomalous transaction values window hasn't been closed after saving valid values"
+                                )
+                        QTimer.singleShot(100, self.catch_failure(check_message))
+                        self.click_on_widget(WindowsRegistry.AnomalousTransactionValuesWindow.save_button)
+
+                    QTimer.singleShot(200, self.catch_failure(set_values))
+                    self.open_category_settings(category, lambda: self.click_on_widget(WindowsRegistry.CategorySettingsWindow.transactions_anomalous_values))
+                    qsleep(500)
+
+
 

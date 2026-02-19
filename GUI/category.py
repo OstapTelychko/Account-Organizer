@@ -6,11 +6,11 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolBu
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
 
-from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY
+from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY, CategoryType
 from languages import LanguageStructure
 from AppObjects.category import Category
 from AppObjects.windows_registry import WindowsRegistry
-from backend.models import Transaction
+from backend.models import Transaction, Category as CategoryModel
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
@@ -58,26 +58,15 @@ def load_transactions_into_category_table(category_data:CustomTableWidget, trans
         category_data.setItem(index, 3, transaction_id)
 
 
-def load_category(category_type:str, name:str, db:DBController, category_id:int, position:int, year:int, month:int) -> Category:
+def load_category(category:CategoryModel, db:DBController, year:int, month:int) -> Category:
     """Add category to user window
 
         Arguments
         -------
-            `type` (str): category type incomes or expenses
-
-            `name` (str): category name
-
-            `account` (str): account loads transactions by month from db
-
-            `category_id` (int): category id to identify the 
-            
-            `position` (int): category position to order categories
-
-            `year` (int): year of transactions
-
-            `month` (int): month of transactions
-
-            `Language` (str): Language for buttons and columns
+            `category` (CategoryModel): Category model object to load into the window<br>
+            `db` (DBController): Database controller to get transactions and statistics data<br>
+            `year` (int): Year of transactions to load<br>
+            `month` (int): Month of transactions to load
 
         Returns
         ------
@@ -94,7 +83,7 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
     category_total_value = QLabel("")
     category_total_value.setFont(BASIC_FONT)
 
-    category_name = QLabel(name)
+    category_name = QLabel(category.name)
     category_name.setFont(BASIC_FONT)
 
     category_settings = QToolButton()
@@ -132,11 +121,11 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
         LanguageStructure.Transactions.get_translation(2)
     ))
 
-    transactions = db.transaction_query.get_transactions_by_month(category_id, year, month)
+    transactions = db.transaction_query.get_transactions_by_month(category.id, year, month)
     
     if len(transactions) > 0: #Check if transactions are in db
         load_transactions_into_category_table(category_data, transactions)
-    category_total = round(db.statistics_query.get_monthly_transactions_sum(category_id, year, month), 2)
+    category_total = round(db.statistics_query.get_monthly_transactions_sum(category.id, year, month), 2)
     category_total_value.setText(
         f"{LanguageStructure.Categories.get_translation(10)}{category_total}"
     )
@@ -167,17 +156,19 @@ def load_category(category_type:str, name:str, db:DBController, category_id:int,
 
     category_window.setLayout(category_layout)
 
-    if category_type == "Incomes":
+    if category.category_type == CategoryType.Income:
         WindowsRegistry.MainWindow.Incomes_window_layout.addWidget(category_window)
     else:
         WindowsRegistry.MainWindow.Expenses_window_layout.addWidget(category_window)
 
 
     return Category(
-        category_id,
-        category_type,
-        name,
-        position,
+        category.id,
+        category.category_type,
+        category.name,
+        category.position,
+        category.transaction_min_value,
+        category.transaction_max_value,
 
         category_total_value,
         category_name,

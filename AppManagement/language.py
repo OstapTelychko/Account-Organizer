@@ -82,6 +82,9 @@ def change_language() -> None:
     WindowsRegistry.CategorySettingsWindow.change_category_position.setText(
         LanguageStructure.Categories.get_translation(9)
     )
+    WindowsRegistry.CategorySettingsWindow.transactions_anomalous_values.setText(
+        LanguageStructure.Categories.get_translation(11)
+    )
 
     WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.setText(
         LanguageStructure.GeneralManagement.get_translation(6)
@@ -91,6 +94,18 @@ def change_language() -> None:
         LanguageStructure.Categories.get_translation(3)
     )
     WindowsRegistry.RenameCategoryWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(2))
+    WindowsRegistry.AnomalousTransactionValuesWindow.save_button.setText(
+        LanguageStructure.GeneralManagement.get_translation(6)
+    )
+    WindowsRegistry.AnomalousTransactionValuesWindow.description_label.setText(
+        LanguageStructure.CategoriesMessages.get_translation(0)
+    )
+    WindowsRegistry.AnomalousTransactionValuesWindow.min_value.setPlaceholderText(
+        LanguageStructure.GeneralManagement.get_translation(13)
+    )
+    WindowsRegistry.AnomalousTransactionValuesWindow.max_value.setPlaceholderText(
+        LanguageStructure.GeneralManagement.get_translation(14)
+    )
 
     WindowsRegistry.TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(5))
     WindowsRegistry.TransactionManagementWindow.transaction_name.setPlaceholderText(

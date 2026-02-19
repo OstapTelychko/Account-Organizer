@@ -7,8 +7,12 @@ from PySide6.QtCore import Qt
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.create_button import create_button
 from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
+from DesktopQtToolkit.strict_double_validator import StrictDoubleValidator
+from DesktopQtToolkit.default_label import DefaultLabel
+from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER
+from project_configuration import MAX_TRANSACTION_VALUE, MIN_TRANSACTION_VALUE
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
@@ -24,6 +28,7 @@ class CategorySettingsWindow(SubWindow):
         self.delete_category = create_button("Delete category",(255,40))
         self.change_category_position = create_button("Change position", (255, 40))
         self.copy_transactions = create_button("Copy transactions",(275,40))
+        self.transactions_anomalous_values = create_button("Anomalous transaction values", (275, 40))
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(20)
@@ -32,6 +37,7 @@ class CategorySettingsWindow(SubWindow):
         self.main_layout.addWidget(self.delete_category, alignment=ALIGN_H_CENTER)
         self.main_layout.addWidget(self.change_category_position, alignment=ALIGN_H_CENTER)
         self.main_layout.addWidget(self.copy_transactions,alignment=ALIGN_H_CENTER)
+        self.main_layout.addWidget(self.transactions_anomalous_values, alignment=ALIGN_H_CENTER)
         self.main_layout.setContentsMargins(30, 10, 30, 20)
 
         self.window_container.setLayout(self.main_layout)
@@ -148,3 +154,37 @@ class RenameCategoryWindow(SubWindow):
 
         self.window_container.setLayout(self.main_layout)
         self.new_category_name.setFocus()
+
+
+class AnomalousTransactionValuesWindow(SubWindow):
+    """Represents Anomalous transaction values settings window structure."""
+
+    def __init__(self, main_window:MainWindow, sub_windows:dict[int, SubWindow]) -> None:
+        super().__init__(main_window, sub_windows)
+
+        self.description_label = DefaultLabel(set_light_text=True)
+        self.description_label.setMinimumSize(350, 200)
+        self.min_value = QLineEdit()
+        self.min_value.setValidator(StrictDoubleValidator(MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, 2))
+
+        self.max_value = QLineEdit()
+        self.max_value.setValidator(StrictDoubleValidator(MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, 2))
+
+        self.values_layout = QHBoxLayout()
+        self.values_layout.addWidget(self.min_value)
+        self.values_layout.addWidget(self.max_value)
+
+        self.wrapper_layout = QVBoxLayout()
+        self.wrapper_layout.addWidget(self.description_label)
+        self.wrapper_layout.addLayout(self.values_layout)
+        self.wrapper = create_wrapper_widget(self.wrapper_layout)
+
+        self.save_button = create_button("Save", (140, 30))
+        self.save_button.setDefault(True)
+
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(self.window_menu_layout)
+        self.main_layout.addWidget(self.wrapper, alignment=ALIGN_H_CENTER)
+        self.main_layout.addWidget(self.save_button, alignment=ALIGN_H_CENTER)
+
+        self.window_container.setLayout(self.main_layout)

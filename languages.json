@@ -28,7 +28,9 @@
             "9":"Add all",
             "10":"Remove all",
             "11":"Reset",
-            "12":"—"
+            "12":"—",
+            "13": "Minimum",
+            "14": "Maximum"
         },
 
         "Windows":{
@@ -58,7 +60,14 @@
                     "7": "Category has been removed",
                     "8": "Category has been created",
                     "9": "Change position",
-                    "10": "Total "
+                    "10": "Total ",
+                    "11": "Anomalous transaction values",
+
+                    "Messages":{
+                        "0":"Enter range of values for transaction to be considered as anomalous. If transaction value is outside this range, warning will be shown. If you set anomalous values to nothing, verification won't be performed.",
+                        "1":"Anomalous transaction values saved"
+                    }
+
                 },
 
                 "Mini calculator":{
@@ -262,7 +271,9 @@
             "32": "Update is successfully <span style='color:dodgerblue'>applied</span>. App will restart now",
             "33": "Keystroke <span style='color:dodgerblue'>`%keystroke_value%`</span> is already <span style='color:dodgerblue'>assigned to another shortcut</span>. Please choose another key",
             "34": "You have to fill at least transaction name or value to perform search",
-            "35": "Failed to download update. Try again later. More info in %error_log% file"
+            "35": "Failed to download update. Try again later. More info in %error_log% file",
+            "36": "Minimum value for validation can't be bigger or equal to maximum",
+            "37": "Transaction value <span style='color:dodgerblue'>%transaction_value%</span> is anomalous since it's outside of set range <span style='color:dodgerblue'>%min_value% - %max_value%</span>"
         }
             
     },
@@ -296,7 +307,9 @@
             "9":"Додати всі",
             "10":"Видалити всі",
             "11":"Скинути",
-            "12":"—"
+            "12":"—",
+            "13": "Мінімум",
+            "14": "Максимум"
         },
 
         "Windows":{
@@ -327,7 +340,13 @@
                     "7": "Категорія була видалена",
                     "8": "Категорія була створена",
                     "9": "Змінити позицію",
-                    "10": "Загалом "
+                    "10": "Загалом ",
+                    "11": "Аномальні значення транзакцій",
+
+                    "Messages":{
+                        "0": "Введіть діапазон значень, за межами якого транзакція буде вважатися аномальною. Якщо транзакція виявиться аномальною, буде показано попередження. Якщо аномальні значення пусті, перевірка не буде виконуватися.",
+                        "1": "Аномальні значення для транзакцій збережено"
+                    }
                 },
 
                 "Mini calculator":{
@@ -533,7 +552,9 @@
             "32": "Оновлення успішно <span style='color:dodgerblue'>застосовано</span>. Додаток зараз перезапуститься",
             "33": "Комбінація клавіш <span style='color:dodgerblue'>`%keystroke_value%`</span> - вже <span style='color:dodgerblue'>призначена до іншого сполучення клавіш</span>. Будь ласка, виберіть іншу клавішу",
             "34": "Ви повинні заповнити принаймні назву або значення транзакції, щоб виконати пошук",
-            "35": "Не вдалось завантажити оновлення. Спробуйте пізніше. Більше інформації у файлі %error_log%"
+            "35": "Не вдалось завантажити оновлення. Спробуйте пізніше. Більше інформації у файлі %error_log%",
+            "36": "Мінімальне значення для валідації не може бути більшим чи рівним максимальному",
+            "37": "Значення транзакції <span style='color:dodgerblue'>%transaction_value%</span> є аномальним, оскільки виходить за межі встановленого діапазону <span style='color:dodgerblue'>%min_value% - %max_value%</span>"
         }
     },
     
@@ -566,7 +587,9 @@
             "9": "Dodać wszystkie",
             "10": "Usunąć wszystkie",
             "11": "Resetować",
-            "12": "—"
+            "12": "—",
+            "13": "Minimum",
+            "14": "Maksimum"
         },
 
         "Windows":{
@@ -597,7 +620,13 @@
                     "7": "Kategoria usunięta",
                     "8": "Kategoria dodana",
                     "9": "Zmienić pozycję",
-                    "10": "Ogólnie "
+                    "10": "Ogólnie ",
+                    "11": "Anomalne wartości transakcji",
+
+                    "Messages":{
+                        "0": "Wprowadź zakres wartości transakcji, poza którym ona będzie uważana za anormalną. Jeżeli transakcja okaże się anomalna, będzie pokazane ostrzeżenie. Jeśli nie chcesz tej funkcji, pozostaw pola puste.",
+                        "1": "Anomalne wartości transakcji zostały zapisane"
+                    }
                 },
 
                 "Mini calculator":{
@@ -801,7 +830,9 @@
             "32": "Aktualizacja została pomyślnie <span style='color:dodgerblue'>zastosowana</span>. Aplikacja zostanie teraz ponownie uruchomiona",
             "33": "Skrót <span style='color:dodgerblue'>`%keystroke_value%`</span> jest już <span style='color:dodgerblue'>przypisany do innego skrótu</span>. Proszę wybrać inny klawisz",
             "34": "Musisz wypełnić przynajmniej nazwę lub wartość transakcji, aby wykonać wyszukiwanie",
-            "35": "Nie udało się pobrać aktualizacji. Spróbuj później. Więcej informacji w pliku %error_log%"
+            "35": "Nie udało się pobrać aktualizacji. Spróbuj później. Więcej informacji w pliku %error_log%",
+            "36": "Minimalna wartość dla walidacji nie może być większa lub równa maksymalnej",
+            "37": "Wartość transakcji <span style='color:dodgerblue'>%transaction_value%</span> jest anomalna, ponieważ jest poza ustawionym zakresem <span style='color:dodgerblue'>%min_value% - %max_value%</span>"
         }
     }
 }

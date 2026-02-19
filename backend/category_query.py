@@ -116,7 +116,7 @@ class CategoryQuery:
                 )
 
 
-    def get_category(self, name:str, category_type:str) -> Category|None:
+    def get_category(self, name:str, category_type:str) -> Category:
         """Get a category by its name and type.
 
             Arguments
@@ -125,7 +125,7 @@ class CategoryQuery:
                 `category_type` : (str) - Type of the category (income or expense).
             Returns
             -------
-                `Category` - The category object if found, None otherwise.
+                `Category` - The category object if found, raises Exception otherwise.
         """
 
         with self.session_factory() as session:
@@ -137,8 +137,9 @@ class CategoryQuery:
                 if category:
                     return category
                 else:
-                    logger.error(f"Category with name {name} and type {category_type} not found. Although it should be there.")
-                    return None
+                    raise RuntimeError(
+                        f"Category with name {name} and type {category_type} not found for account ID {self.account_id}."
+                    )
     
     
     def get_category_by_id(self, category_id:int) -> Category:
@@ -216,3 +217,24 @@ class CategoryQuery:
 
 
             session.execute(text("VACUUM"))
+    
+
+    def set_anomalous_transaction_values(self, category_id:int, min:float|None, max:float|None) -> None:
+        """Set the anomalous transaction values for a category.
+
+            Arguments
+            ---------
+                `category_id` : (int) - ID of the category to set the anomalous transaction values for.
+                `min` : (float) - Minimum value for anomalous transactions.
+                `max` : (float) - Maximum value for anomalous transactions.
+        """
+        
+        with self.session_factory() as session:
+            with session.begin():
+                session.query(Category).filter_by(id=category_id).update(
+                    {
+                        Category.transaction_min_value: min,
+                        Category.transaction_max_value: max
+                    },
+                    synchronize_session=False
+                )
