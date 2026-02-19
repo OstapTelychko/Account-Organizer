@@ -17,7 +17,7 @@ from AppObjects.logger import get_logger
 
 if TYPE_CHECKING:
     from typing import Callable
-    from GUI.category import Category as GUICategory
+    from AppObjects.category import Category as GUICategory
     from DesktopQtToolkit.message_window import MessageWindow
 
 

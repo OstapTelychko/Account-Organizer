@@ -22,6 +22,10 @@ logger = get_logger(__name__)
 class TestShortcuts(DBTestCase, OutOfScopeTestCase):
     """Test shortcuts in the application."""
 
+    def setUp(self) -> None:
+        reset_focused_category()
+        return super().setUp()
+
 
     def test_01_close_current_window(self) -> None:
         """Test closing current window with shortcut."""

@@ -1,4 +1,5 @@
 from PySide6.QtCore import QTimer
+from datetime import datetime
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from project_configuration import CategoryType
@@ -131,4 +132,57 @@ class TestTransaction(DBTestCase, OutOfScopeTestCase):
         )
 
         qsleep(500)
+    
+
+    def test_4_anomalous_transactions(self) -> None:
+        """Test adding anomalous transactions to the categories."""
+
+        app_core = AppCore.instance()
+        category = app_core.categories[self.income_category.id]
+        self.select_correct_tab(category)
+        day = datetime.now().day
+
+        #transaction value; min anomalous value; max anomalous value; error expected; error message
+        params = [
+            (500, 100, 10000, False, "Transaction with value (500) between min (100) and max (10000) anomalous values wasn't added"),
+            (500, 500, 1000, False, "Transaction with value (500) equal to min anomalous value (500) and lower than max anomalous value (1000) wasn't added"),
+            (500, 100, 500, False, "Transaction with value (500) equal to max anomalous value (500) and higher than min anomalous value (100) wasn't added"),
+            (500, 100, 400, True, "Warning wasn't shown for transaction with value (500) higher than max anomalous value (400)"),
+            (500, 600, 1000, True, "Warning wasn't shown for transaction with value (500) lower than min anomalous value (600)"),
+            (500, None, 1000, False, "Transaction with value (500) lower than max anomalous value (1000) and no min anomalous value wasn't added"),
+            (500, 1000, None, True, "Warning wasn't shown for transaction with value (500) higher than min anomalous value (1000) and no max anomalous value"),
+            (500, None, 400, True, "Warning wasn't shown for transaction with value (500) higher than max anomalous value (400) and no min anomalous value"),
+            (500, None, None, False, "Transaction with value (500) and with no min and max anomalous values set wasn't added")
+        ]
             
+        for value, min_anomalous_value, max_anomalous_value, error_expected, error_message in params:
+            with self.subTest(value=value, min_anomalous_value=min_anomalous_value, max_anomalous_value=max_anomalous_value):
+                app_core.db.category_query.set_anomalous_transaction_values(
+                    self.income_category.id, min_anomalous_value, max_anomalous_value
+                )
+                balance_before = app_core.db.account_query.get_account().current_balance
+
+                def set_values() -> None:
+                    WindowsRegistry.TransactionManagementWindow.transaction_day.setText(str(day))
+                    WindowsRegistry.TransactionManagementWindow.transaction_value.setText(str(value))
+
+                    def check_warning() -> None:
+                        if error_expected:
+                            self.assertTrue(
+                                WindowsRegistry.Messages.transaction_value_anomalous.isVisible(),
+                                error_message
+                            )
+                            WindowsRegistry.Messages.transaction_value_anomalous.ok_button.click()
+                            WindowsRegistry.TransactionManagementWindow.done(1)
+                        else:
+                            self.assertEqual(
+                                app_core.db.account_query.get_account().current_balance,
+                                balance_before + value,
+                                error_message
+                            )
+
+                    QTimer.singleShot(100, self.catch_failure(check_warning))
+                    self.click_on_widget(WindowsRegistry.TransactionManagementWindow.button)
+                QTimer.singleShot(100, self.catch_failure(set_values))
+                self.click_on_widget(category.add_transaction)
+                qsleep(500)
