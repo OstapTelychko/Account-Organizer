@@ -13,7 +13,6 @@ from DesktopQtToolkit.create_wrapper_widget import create_wrapper_widget
 
 from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER
 from project_configuration import MAX_TRANSACTION_VALUE, MIN_TRANSACTION_VALUE
-from GUI.gui_constants import ALIGNMENT, ALIGN_H_CENTER
 
 if TYPE_CHECKING:
     from GUI.windows.main_window import MainWindow
