@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Account Organizer"
-#define MyAppVersion "1.3.0"
+#define MyAppVersion "1.3.1"
 #define MyAppPublisher "Ostap Telychko"
 #define MyAppURL "https://github.com/OstapTelychko/Account-Organizer"
 #define MyAppExeName "main.exe"
@@ -33,12 +33,12 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\Ostap Telychko\Documents\Python\Projects\Account-Organizer\LICENSE.md
+LicenseFile=C:\Users\OstapTelychko\Documents\Python\Account-Organizer\LICENSE.md
 ; Remove the following line to run in administrative install mode (install for all users).
 PrivilegesRequired=lowest
 OutputDir=Account Organizer
 OutputBaseFilename=Account_Organizer_windows_setup
-SetupIconFile=C:\Users\Ostap Telychko\Documents\Python\Projects\Account-Organizer\dist\main\_internal\Images\General Icons\App icon.ico
+SetupIconFile=C:\Users\OstapTelychko\Documents\Python\Account-Organizer\dist\main\_internal\Images\General Icons\App icon.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -51,8 +51,8 @@ Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Ostap Telychko\Documents\Python\Projects\Account-Organizer\dist\main\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Ostap Telychko\Documents\Python\Projects\Account-Organizer\dist\main\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\OstapTelychko\Documents\Python\Account-Organizer\dist\main\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\OstapTelychko\Documents\Python\Account-Organizer\dist\main\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

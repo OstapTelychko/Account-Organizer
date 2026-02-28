@@ -93,7 +93,13 @@ def remove_backup() -> int:
     if len(selected_items) > 2 or selected_items[0].row() != selected_items[1].row():
         return WindowsRegistry.Messages.only_one_row.exec()
 
+
     if len(app_core.backups)-1 < MIN_RECOMMENDED_BACKUPS:
+        WindowsRegistry.Messages.below_recommended_min_backups.setText(
+            LanguageStructure.Messages.get_translation(21)
+            .replace(r"%backup_type%", LanguageStructure.BackupManagement.get_translation(21))
+            .replace(r"%min_backups%", str(MIN_RECOMMENDED_BACKUPS))
+        )
         WindowsRegistry.Messages.below_recommended_min_backups.exec()
         if WindowsRegistry.Messages.below_recommended_min_backups.clickedButton() != WindowsRegistry.Messages.below_recommended_min_backups.ok_button:
             return 0

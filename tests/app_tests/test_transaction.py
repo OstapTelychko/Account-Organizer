@@ -12,9 +12,11 @@ from AppObjects.windows_registry import WindowsRegistry
 class TestTransaction(DBTestCase, OutOfScopeTestCase):
     """Test transaction management in the application."""
 
+    TIMEOUT_SEC = 10
+
 
     def test_1_add_transaction(self) -> None:
-        """Test adding transaction to the application."""
+        """Test adding transaction to the application.""" 
 
         qsleep(500)
         def add_transaction_to_single_category() -> None:
