@@ -24,7 +24,7 @@ def show_search_window() -> None:
 def perform_search() -> None | int:
     """Perform search based on search window parameters."""
 
-    search_name = WindowsRegistry.SearchWindow.search_name.text()
+    search_name = WindowsRegistry.SearchWindow.search_name.text().strip()
     search_value_text = WindowsRegistry.SearchWindow.search_value.text()
     search_value = float(search_value_text) if search_value_text else None
     search_value_operand = WindowsRegistry.SearchWindow.value_operands.currentText()
@@ -36,6 +36,10 @@ def perform_search() -> None | int:
 
     if (to_date - from_date).days <= 0:
         return WindowsRegistry.Messages.wrong_date.exec()
+
+    if 0 < len(search_name) < 2:
+        WindowsRegistry.Messages.search_name_too_short.setText(LanguageStructure.Messages.get_translation(38))
+        return WindowsRegistry.Messages.search_name_too_short.exec()
     
     if not any([search_name, search_value]):
         return WindowsRegistry.Messages.empty_search_fields.exec()

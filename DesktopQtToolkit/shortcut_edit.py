@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from PySide6.QtWidgets import QLineEdit
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence
@@ -34,7 +34,8 @@ class ShortcutCaptureEdit(QLineEdit):
         key = event.key()
             
         if key:
-            sequence = QKeySequence(modifiers | QKey(key))
+            # combine modifier bits and key value for QKeySequence
+            sequence = QKeySequence(cast(int, modifiers) | key)
             self.key_sequence = sequence
             display_text = sequence.toString()
                 

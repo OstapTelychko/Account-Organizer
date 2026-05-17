@@ -2,6 +2,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 from PySide6.QtGui import QTextDocument, QPainter, QAbstractTextDocumentLayout, QPalette
 from PySide6.QtCore import Qt, QSize, QPersistentModelIndex, QModelIndex
+from typing import Any, cast
 
 
 
@@ -25,14 +26,14 @@ class QRichTextDelegate(QStyledItemDelegate):
         doc = QTextDocument()
         doc.setHtml(html)
         doc.setDocumentMargin(0)
-        doc.setTextWidth(option.rect.width())
+        doc.setTextWidth(cast(Any, option).rect.width())
 
         painter.save()
-        painter.translate(option.rect.topLeft())
+        painter.translate(cast(Any, option).rect.topLeft())
         context = QAbstractTextDocumentLayout.PaintContext()
-        # Set the text color in the paint context
-        context.palette.setColor(QPalette.ColorRole.Text, option.palette.color(QPalette.ColorRole.Text))
-        
+        # Set the text color in the paint context (use casts to satisfy type checker)
+        cast(Any, context).palette.setColor(QPalette.ColorRole.Text, cast(Any, option).palette.color(QPalette.ColorRole.Text))
+
         doc.documentLayout().draw(painter, context)
         painter.restore()
 
@@ -50,7 +51,7 @@ class QRichTextDelegate(QStyledItemDelegate):
 
         # Determine a working width: if option.rect.width() == 0 (first pass),
         # pick a reasonable fallback (e.g. 400) so multi-line text expands.
-        width = option.rect.width() if option.rect.width() > 0 else 400
+        width = cast(Any, option).rect.width() if cast(Any, option).rect.width() > 0 else 400
         doc.setTextWidth(width)
 
         return QSize(int(width), int(doc.size().height()))
