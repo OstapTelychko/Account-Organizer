@@ -273,7 +273,8 @@
             "34": "You have to fill at least transaction name or value to perform search",
             "35": "Failed to download update. Try again later. More info in %error_log% file",
             "36": "Minimum value for validation can't be bigger or equal to maximum",
-            "37": "Transaction value <span style='color:dodgerblue'>%transaction_value%</span> is anomalous since it's outside of set range <span style='color:dodgerblue'>%min_value% - %max_value%</span>"
+            "37": "Transaction value <span style='color:dodgerblue'>%transaction_value%</span> is anomalous since it's outside of set range <span style='color:dodgerblue'>%min_value% - %max_value%</span>",
+            "38": "Please type at least <span style='color:dodgerblue'>2 characters</span> to search by transaction name"
         }
             
     },
@@ -554,7 +555,8 @@
             "34": "Ви повинні заповнити принаймні назву або значення транзакції, щоб виконати пошук",
             "35": "Не вдалось завантажити оновлення. Спробуйте пізніше. Більше інформації у файлі %error_log%",
             "36": "Мінімальне значення для валідації не може бути більшим чи рівним максимальному",
-            "37": "Значення транзакції <span style='color:dodgerblue'>%transaction_value%</span> є аномальним, оскільки виходить за межі встановленого діапазону <span style='color:dodgerblue'>%min_value% - %max_value%</span>"
+            "37": "Значення транзакції <span style='color:dodgerblue'>%transaction_value%</span> є аномальним, оскільки виходить за межі встановленого діапазону <span style='color:dodgerblue'>%min_value% - %max_value%</span>",
+            "38": "Будь ласка, введіть щонайменше <span style='color:dodgerblue'>2 символи</span>, щоб шукати за назвою транзакції"
         }
     },
     
@@ -832,7 +834,8 @@
             "34": "Musisz wypełnić przynajmniej nazwę lub wartość transakcji, aby wykonać wyszukiwanie",
             "35": "Nie udało się pobrać aktualizacji. Spróbuj później. Więcej informacji w pliku %error_log%",
             "36": "Minimalna wartość dla walidacji nie może być większa lub równa maksymalnej",
-            "37": "Wartość transakcji <span style='color:dodgerblue'>%transaction_value%</span> jest anomalna, ponieważ jest poza ustawionym zakresem <span style='color:dodgerblue'>%min_value% - %max_value%</span>"
+            "37": "Wartość transakcji <span style='color:dodgerblue'>%transaction_value%</span> jest anomalna, ponieważ jest poza ustawionym zakresem <span style='color:dodgerblue'>%min_value% - %max_value%</span>",
+            "38": "Wpisz co najmniej <span style='color:dodgerblue'>2 znaki</span>, aby wyszukiwać po nazwie transakcji"
         }
     }
 }

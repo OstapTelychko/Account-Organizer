@@ -146,3 +146,6 @@ class Messages(metaclass=QSingleton):
         self.transaction_value_anomalous = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
         )
+        self.search_name_too_short = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Information, APP_NAME
+        )

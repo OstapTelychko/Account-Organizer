@@ -24,7 +24,7 @@ def show_search_window() -> None:
 def perform_search() -> None | int:
     """Perform search based on search window parameters."""
 
-    search_name = WindowsRegistry.SearchWindow.search_name.text()
+    search_name = WindowsRegistry.SearchWindow.search_name.text().strip()
     search_value_text = WindowsRegistry.SearchWindow.search_value.text()
     search_value = float(search_value_text) if search_value_text else None
     search_value_operand = WindowsRegistry.SearchWindow.value_operands.currentText()
@@ -34,15 +34,29 @@ def perform_search() -> None | int:
 
     categories_id = list(WindowsRegistry.SearchWindow.categories_selection.selected_categories_data.keys())
 
+    WindowsRegistry.SearchWindow.categories_selection.setHidden(True)
+    WindowsRegistry.SearchWindow.transactions_list.setHidden(False)
+
+    WindowsRegistry.SearchWindow.transactions_list.clear()
+    WindowsRegistry.SearchWindow.transaction_amount.setText(
+        LanguageStructure.Search.get_translation(7).replace("%transaction_amount%", str(0))
+    )
+    WindowsRegistry.SearchWindow.income_transactions_sum.setText(
+        LanguageStructure.Search.get_translation(8).replace(r"%income_sum%", LanguageStructure.GeneralManagement.get_translation(12))
+    )
+    WindowsRegistry.SearchWindow.expense_transactions_sum.setText(
+        LanguageStructure.Search.get_translation(9).replace(r"%expense_sum%", LanguageStructure.GeneralManagement.get_translation(12))
+    )
+
     if (to_date - from_date).days <= 0:
         return WindowsRegistry.Messages.wrong_date.exec()
+
+    if 0 < len(search_name) < 2:
+        return WindowsRegistry.Messages.search_name_too_short.exec()
     
     if not any([search_name, search_value]):
         return WindowsRegistry.Messages.empty_search_fields.exec()
     
-    WindowsRegistry.SearchWindow.categories_selection.setHidden(True)
-    WindowsRegistry.SearchWindow.transactions_list.setHidden(False)
-    WindowsRegistry.SearchWindow.transactions_list.clear()
     
     logger.debug(
         f"Performing search with name: {search_name}, value: {search_value} operand: {search_value_operand},"

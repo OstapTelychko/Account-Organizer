@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING
 from datetime import date
 from sqlalchemy import and_
 
-from backend.models import Transaction
+from backend.fts_utils import build_fts_ngram_text
+from backend.models import Transaction, TransactionsFTS
 from GeneralTools.Utils import generate_month_range
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ class TransactionQuery:
 
         with self.session_factory() as session:
             with session.begin():
+                session.query(TransactionsFTS).filter_by(rowid=transaction_id).delete(False)
                 session.query(Transaction).filter_by(id=transaction_id).delete(False)
             
 
@@ -54,6 +56,13 @@ class TransactionQuery:
                 transaction.date = date(transaction.date.year, transaction.date.month, day)
                 transaction.value = transaction_value
 
+                fts_row = session.get(TransactionsFTS, transaction_id)
+                fts_name = build_fts_ngram_text(transaction_name)
+                if fts_row is None:
+                    session.add(TransactionsFTS(rowid=transaction_id, name=fts_name))
+                else:
+                    fts_row.name = fts_name
+
 
     def add_transaction(self, category_id:int, date:date, value:float, name:str) -> Transaction:
         """Add a new transaction to the database.
@@ -70,6 +79,8 @@ class TransactionQuery:
             with session.begin():
                 transaction = Transaction(date=date, value=value, name=name, category_id=category_id)
                 session.add(transaction)
+                session.flush()
+                session.add(TransactionsFTS(rowid=transaction.id, name=build_fts_ngram_text(name)))
                 return transaction
 
 

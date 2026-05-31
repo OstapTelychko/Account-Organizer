@@ -83,4 +83,21 @@ class Transaction(Base):
         return f"{self.date}-{self.name} value:{self.value}"
     
 
+class TransactionsFTS(Base):
+    """Represents the FTS5 virtual table for full-text search on transaction names.
+    
+    This virtual table is kept in sync with the Transaction table via triggers.
+    It provides Unicode-aware, case-insensitive token-based search.
+    FTS5 virtual tables have an implicit 'rowid' that maps to the content table's content_rowid ('id').
+    """
+
+    __tablename__ = "transactions_fts"
+
+    rowid: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(String)
+
+    def __repr__(self) -> str:
+        return f"TransactionsFTS({self.rowid}, {self.name})"
+    
+
     
