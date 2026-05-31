@@ -38,9 +38,9 @@ class BackupManagementWindow(SubWindow):
         row.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         row.setFont(BASIC_FONT)
 
-        self.create_backup = create_button("Create backup", (215, 40))
-        self.delete_backup = create_button("Delete backup", (215, 40))
-        self.load_backup = create_button("Restore backup", (215, 40))
+        self.create_backup = create_button("Create backup", (245, 40))
+        self.delete_backup = create_button("Delete backup", (245, 40))
+        self.load_backup = create_button("Restore backup", (245, 40))
 
         self.buttons_layout = QHBoxLayout()
         self.buttons_layout.addWidget(self.create_backup, alignment=ALIGN_H_CENTER)

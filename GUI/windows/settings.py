@@ -76,8 +76,8 @@ class SettingsWindow(SubWindow):
         self.account_section.section_layout.addWidget(self.rename_account, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
         self.account_section.section_layout.addWidget(self.delete_account, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
 
-        self.backup_management = create_button("Database management", (220, 50))
-        self.auto_backup = create_button("Auto backup", (220, 40))
+        self.backup_management = create_button("Database management", (280, 50))
+        self.auto_backup = create_button("Auto backup", (280, 40))
         self.auto_backup_status = QLabel("Status monthly")
         self.auto_backup_status.setProperty("class", "light-text")
         self.auto_backup_status.setFont(BASIC_FONT)
