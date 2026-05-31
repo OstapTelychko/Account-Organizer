@@ -9,7 +9,6 @@ Updates to existing features:
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
   ☐ replace regular text search with fuzzy search
   ☐ add to quarter and year statistics average expense and income per month
-  ☐ check all translations for grammar and typos using ai
   
 Project life improvements:
   ☐ empty @don't-touch
@@ -31,6 +30,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ check all translations for grammar and typos using ai @started(26-05-31 21:49) @done(26-05-31 22:46) @lasted(57m13s) @project(Updates to existing features)
   ✔ fix issue with case sensitive search with cyrillic letters @started(26-05-17 19:06) @done(26-05-31 21:40) @lasted(2w2h34m28s) @project(Bugs)
   ✔ test release 1.3.1 on windows @started(26-02-22 17:38) @done(26-02-28 19:56) @lasted(6d2h18m27s) @project(Release)
   ✔ add anomaly detection for transactions that are way bigger than usual (user can set threshold in category settings) and show warning message when user tries to add such transaction @started(26-02-08 19:14) @done(26-02-19 22:34) @lasted(1w4d3h20m50s) @project(New features)
