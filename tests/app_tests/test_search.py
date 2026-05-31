@@ -442,3 +442,86 @@ class TestSearch(DBTestCase):
                 self.open_search_window(perform_search)
                         
 
+    def test_06_fts5_unicode_case_insensitive_and_ngrams(self) -> None:
+        """
+        Tests that FTS5 with n-grams is case-insensitive for non-ASCII characters
+        and supports substring matches (n-grams).
+        """
+
+        app_core = AppCore.instance()
+        transaction_name = "Більше"
+
+        # add transaction with mixed-case non-ASCII name
+        app_core.db.transaction_query.add_transaction(
+            self.income_category.id,
+            date(app_core.current_year, app_core.current_month, date.today().day),
+            1234,
+            transaction_name
+        )
+
+        transaction_pattern = self.transaction_regex % (transaction_name, self.income_category.name)
+
+        # helper to perform a search and assert presence/absence
+        def perform_search_and_assert(search_name:str, should_find:bool) -> None:
+            # If search_name is shorter than 2 chars the app shows a blocking message window.
+            # Schedule a click on its OK button so the modal is dismissed using QTimer.singleShot.
+            if len(search_name) < 2:
+                QTimer.singleShot(100, lambda: WindowsRegistry.Messages.search_name_too_short.ok_button.click())
+
+            def perform_search() -> None:
+                result = self.fill_search_fields_and_perform_search(search_name=search_name)
+                if should_find:
+                    self.assertRegex(result, transaction_pattern, f"Transaction '{transaction_name}' not found when searching for '{search_name}'")
+                else:
+                    self.assertNotRegex(result, transaction_pattern, f"Transaction '{transaction_name}' unexpectedly found when searching for '{search_name}'")
+                WindowsRegistry.SearchWindow.done(0)
+
+            self.open_search_window(perform_search)
+
+        # different casings should find the same transaction
+        perform_search_and_assert("більше", True)
+        perform_search_and_assert("БІЛЬШЕ", True)
+
+        # substring (n-gram) search should find the transaction
+        perform_search_and_assert("ільш", True)
+
+        # single character should not trigger DB search (UI guard requires >=2 chars)
+        perform_search_and_assert("б", False)
+
+
+    def test_07_fts5_ngrams_substring_match_examples(self) -> None:
+        """
+        Additional n-gram substring matching tests (middle-of-word matches).
+        """
+
+        app_core = AppCore.instance()
+        transaction_name = "Лікарства"
+
+        app_core.db.transaction_query.add_transaction(
+            self.expenses_category.id,
+            date(app_core.current_year, app_core.current_month, date.today().day),
+            500,
+            transaction_name
+        )
+
+        transaction_pattern = self.transaction_regex % (transaction_name, self.expenses_category.name)
+
+        def perform_search_and_assert(search_name:str, should_find:bool) -> None:
+            def perform_search() -> None:
+                result = self.fill_search_fields_and_perform_search(search_name=search_name)
+                if should_find:
+                    self.assertRegex(result, transaction_pattern, f"Transaction '{transaction_name}' not found when searching for '{search_name}'")
+                else:
+                    self.assertNotRegex(result, transaction_pattern, f"Transaction '{transaction_name}' unexpectedly found when searching for '{search_name}'")
+                WindowsRegistry.SearchWindow.done(0)
+
+            self.open_search_window(perform_search)
+
+        # substring in the middle
+        perform_search_and_assert("ікар", True)
+        # prefix of the word
+        perform_search_and_assert("Лік", True)
+        # suffix
+        perform_search_and_assert("ства", True)
+
+

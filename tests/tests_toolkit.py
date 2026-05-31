@@ -8,6 +8,7 @@ from traceback import format_exception
 from threading import Thread
 from time import sleep
 from datetime import date
+import calendar
 
 from colorama import init as colorama_init, Fore
 from pygments import highlight
@@ -247,17 +248,23 @@ class DBTestCase(DefaultTestCase):
             self.income_category = new_income_category
             self.expenses_category = new_expenses_category
 
+            # Use a valid day for the current app month (clamp to month's last day)
+            valid_day = min(
+                date.today().day,
+                calendar.monthrange(app_core.current_year, app_core.current_month)[1],
+            )
+
             self.income_transaction = app_core.db.transaction_query.add_transaction(
                 self.income_category.id,
-                date(app_core.current_year, app_core.current_month, date.today().day),
+                date(app_core.current_year, app_core.current_month, valid_day),
                 1000,
-                self.test_income_transaction_name
+                self.test_income_transaction_name,
             )
             self.expenses_transaction = app_core.db.transaction_query.add_transaction(
                 self.expenses_category.id,
-                date(app_core.current_year, app_core.current_month, date.today().day),
+                date(app_core.current_year, app_core.current_month, valid_day),
                 1000,
-                self.test_expenses_transaction_name
+                self.test_expenses_transaction_name,
             )
 
             for category in [self.income_category, self.expenses_category]:

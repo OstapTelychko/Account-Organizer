@@ -9,6 +9,7 @@ Updates to existing features:
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
   ☐ replace regular text search with fuzzy search
   ☐ add to quarter and year statistics average expense and income per month
+  ☐ check all translations for grammar and typos using ai
   
 Project life improvements:
   ☐ empty @don't-touch
@@ -25,6 +26,7 @@ Bugs:
   ☐ empty @don't-touch
   ☐ fix issue with not initialized ShortcutsManager when account doesn't exists
   ☐ fix issue with case sensitive search with cyrillic letters @started(26-05-17 19:06)
+  ☐ fix issue with erasing values for anomalous transactions values is almost impossible
 
 Release:
   ☐ empty @don't-touch
