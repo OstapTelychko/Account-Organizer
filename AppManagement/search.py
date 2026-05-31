@@ -52,7 +52,6 @@ def perform_search() -> None | int:
         return WindowsRegistry.Messages.wrong_date.exec()
 
     if 0 < len(search_name) < 2:
-        WindowsRegistry.Messages.search_name_too_short.setText(LanguageStructure.Messages.get_translation(38))
         return WindowsRegistry.Messages.search_name_too_short.exec()
     
     if not any([search_name, search_value]):

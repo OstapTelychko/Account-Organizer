@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import select, func, case, literal
 from datetime import date
 
-from backend.models import Transaction
+from backend.models import Transaction, TransactionsFTS
 from backend.fts_utils import build_fts_ngram_text
 
 if TYPE_CHECKING:
@@ -64,9 +64,6 @@ class SearchQuery:
         # Build base query using FTS5 if name_substring provided, otherwise plain query
         if name_substring:
             # Use FTS5 virtual table for Unicode-aware search (pure DB-side).
-            # Import here to avoid circular imports
-           
-            from backend.models import TransactionsFTS
             
             fts = TransactionsFTS.__table__
             fts_query = build_fts_ngram_text(name_substring)
