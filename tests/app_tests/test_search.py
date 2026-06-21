@@ -162,6 +162,7 @@ class TestSearch(DBTestCase):
         )
 
         #Conditions when new created transaction is expected to be found in search results.
+        transaction_name_with_slight_typos = new_transaction_name.replace(" ", "") + "xyz"
         parm_list_for_expected_to_be_found = [
             ("", "=", str(new_transaction_value), "value equals to new transaction value"),
             (new_transaction_name[:4], "=", str(new_transaction_value), "name starts with first 4 characters of new transaction name"),
@@ -171,12 +172,20 @@ class TestSearch(DBTestCase):
             (new_transaction_name, "<", "", "name equals to new transaction name and value is less than empty string"),
             ("", ">", "1", "value is greater than 1"),
             ("", "<", str(new_transaction_value + 1000), "value is less than new transaction value plus 1000"),
+            (
+                transaction_name_with_slight_typos, "=", str(new_transaction_value),
+                f"name ('{transaction_name_with_slight_typos}') is slightly different than new transaction name"
+            ),
         ]
 
         #Conditions when new created transaction is not expected to be found in search results.
+        transaction_name_with_strong_typos = "".join(new_transaction_name[::2])
         parm_list_for_expected_not_to_be_found = [
             ("", "!=", str(new_transaction_value), "value is not equal to new transaction value"),
-            (new_transaction_name + "XYZ", "=", str(new_transaction_value), "name is different than new transaction name"),
+            (
+                transaction_name_with_strong_typos, "=", str(new_transaction_value),
+                f"name ('{transaction_name_with_strong_typos}') is strongly different than new transaction name"
+            ),
             (
                 new_transaction_name, "<=",
                 str(new_transaction_value - 1),

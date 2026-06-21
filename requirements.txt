@@ -25,3 +25,4 @@ SQLAlchemy==2.0.40
 toml==0.10.2
 typing_extensions==4.13.2
 urllib3==2.4.0
+rapidfuzz==3.14.5
