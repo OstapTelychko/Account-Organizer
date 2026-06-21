@@ -7,7 +7,7 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
-  ☐ replace regular text search with fuzzy search
+  ☐ replace regular text search with fuzzy search @started(26-06-21 21:02)
   ☐ add to quarter and year statistics average expense and income per month
   
 Project life improvements:

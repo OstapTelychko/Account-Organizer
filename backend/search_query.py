@@ -1,14 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from sqlalchemy import select, func, case, literal
+from sqlalchemy import select
 from datetime import date
+from rapidfuzz import process, fuzz
 
 from backend.models import Transaction, TransactionsFTS
 from backend.fts_utils import build_fts_ngram_text
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
-    from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
+    from sqlalchemy.sql.elements import BinaryExpression
     from typing import Any, Callable
 
 
@@ -66,11 +67,14 @@ class SearchQuery:
             # Use FTS5 virtual table for Unicode-aware search (pure DB-side).
             
             fts = TransactionsFTS.__table__
-            fts_query = build_fts_ngram_text(name_substring)
+            fts_tokens = build_fts_ngram_text(name_substring).split()
+            fts_query = " OR ".join(f'"{token}"' for token in fts_tokens) if fts_tokens else ""
+
             stmt = select(Transaction).select_from(
                 Transaction.__table__.join(fts, fts.c.rowid == Transaction.__table__.c.id)
             )
-            stmt = stmt.where(fts.c.name.match(fts_query))
+            if fts_query:
+                stmt = stmt.where(fts.c.name.match(fts_query))
         else:
             stmt = select(Transaction)
 
@@ -91,18 +95,26 @@ class SearchQuery:
 
                 # SQLite's built-in case-insensitive functions and collations are
                 # ASCII-only in many builds and may not handle Unicode casefolding
-                # correctly. Therefore, we do Unicode-aware ordering in Python
-                # using str.casefold() and str.find() so prefix/position ranking works properly.
-                if name_substring:
+                # correctly. Therefore, we do Unicode-aware ranking and filtering in Python
+                # using RapidFuzz for typo tolerance and proper substring matching.
+                if name_substring and results:
                     search_query_casefolded = name_substring.casefold()
-                    MAX_POSITION_PENALTY = 10 ** 9
-
-                    def get_substring_position_rank(transaction: Transaction) -> int:
-                        transaction_name = transaction.name or ""
-                        transaction_name_casefolded = transaction_name.casefold()
-                        position = transaction_name_casefolded.find(search_query_casefolded)
-                        return position + 1 if position != -1 else MAX_POSITION_PENALTY
-
-                    results.sort(key=lambda transaction: (get_substring_position_rank(transaction), (transaction.name or "").casefold()))
+                    
+                    transaction_names = [(t.name or "").casefold() for t in results]
+                    
+                    extracted = process.extract(
+                        query=search_query_casefolded,
+                        choices=transaction_names,
+                        scorer=fuzz.WRatio,
+                        score_cutoff=85,  # Filters out candidates without typo-tolerant substring match
+                        limit=None
+                    )
+                    
+                    # 'extracted' returns Tuples of (matched_string, match_score, index)
+                    # Sort primarily by match score (highest first).
+                    # Secondary sort ensures stable tie-breaking.
+                    extracted.sort(key=lambda x: (-x[1], x[0]))
+                    
+                    results = [results[match_data[2]] for match_data in extracted]
 
                 return results
