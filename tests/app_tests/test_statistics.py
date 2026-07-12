@@ -201,8 +201,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     expected_total_quarterly_statistics = [
                         f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
+                        f"{LanguageStructure.Statistics.get_translation(25)}{round(total_income/3, 2)}",
                         f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                        f"{LanguageStructure.Statistics.get_translation(27)}{round(total_expense/3, 2)}",
                         f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                         f"<br/><br/>{self.translated_incomes}",

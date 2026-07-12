@@ -429,9 +429,11 @@ def show_quarterly_statistics() -> int:
         Total_statistic_list = quarter.total_quarter_statistics.data
 
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(4)+str(total_income))
+        Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(25)+str(round(total_income/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(5)+str(round(total_income/days_amount, 2))+"<br/>")
 
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(6)+str(total_expense))
+        Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(27)+str(round(total_expense/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(7)+str(round(total_expense/days_amount, 2))+"<br/>")
 
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(8)+str(round(total_income - total_expense, 2)))
