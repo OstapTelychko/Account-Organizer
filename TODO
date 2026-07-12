@@ -8,6 +8,7 @@ Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
   ☐ add to quarter and year statistics average expense and income per month
+  ☐ add to categories values in statistics brackets average per day and per month in quarter and year total statistics @started(26-07-12 21:52)
   
 Project life improvements:
   ☐ empty @don't-touch
