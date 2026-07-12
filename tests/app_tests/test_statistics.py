@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import random
+import re
 
 from datetime import date
 from PySide6.QtCore import QTimer, QDate
@@ -11,6 +12,8 @@ from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from languages import LanguageStructure
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
+from project_configuration import CategoryType
+from GeneralTools.html_to_text import html_to_text
 
 if TYPE_CHECKING:
     from typing import Callable
@@ -56,10 +59,43 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             fr"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name}\s+\(1000.0\)",
             f"{LanguageStructure.Statistics.get_translation(11)}",
             fr"{self.test_income_transaction_name}\s+-\s+1000.0",
+            re.escape(self.create_category_total_statistics(self.income_category.name, 1000.0, days_amount, 1, CategoryType.Income)),
             f"{self.translated_expenses}",
             fr"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name}\s+\(1000.0\)",
             f"{LanguageStructure.Statistics.get_translation(19)}",
-            fr"{self.test_expenses_transaction_name}\s+-\s+1000.0",]
+            fr"{self.test_expenses_transaction_name}\s+-\s+1000.0",
+            re.escape(self.create_category_total_statistics(self.expenses_category.name, 1000.0, days_amount, 1, CategoryType.Expense)),]
+
+
+    def create_category_total_statistics(
+            self,
+            category_name:str,
+            total_value:float,
+            days_amount:int,
+            months_amount:int,
+            average_color:str|None = None
+        ) -> str:
+        """Create expected category total statistics row with averages."""
+
+        if total_value == 0:
+            return f"{category_name} - {total_value}"
+
+        average_per_day = round(total_value / days_amount, 2)
+        if months_amount == 1:
+            return (
+                f"{category_name} - {total_value} "
+                f"({LanguageStructure.Statistics.get_translation(40)}{average_per_day})"
+            )
+
+        average_per_month = round(total_value / months_amount, 2)
+
+        average_per_day_text = f"{LanguageStructure.Statistics.get_translation(40)}{average_per_day}"
+        average_per_month_text = f"{LanguageStructure.Statistics.get_translation(41)}{average_per_month}"
+
+        return (
+            f"{category_name} - {total_value} "
+            f"({average_per_day_text}, {average_per_month_text})"
+        )
 
 
     def get_actual_statistics(self, statistics_list_widget:CustomListWidget) -> str:
@@ -73,6 +109,12 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             statistics_list_widget.item(index).text()
             for index in range(statistics_list_widget.count())
         )
+
+
+    def get_plain_statistics(self, statistics_list_widget:CustomListWidget) -> str:
+        """Get actual statistics converted to plain text like the clipboard copy helpers do."""
+
+        return html_to_text(self.get_actual_statistics(statistics_list_widget))
     
 
     def generate_custom_range_statistics_transactions(self, transaction_value: float, transaction_name: str, day: int = 0) -> list[str]:
@@ -108,7 +150,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                 """Check if monthly statistics are correct."""
 
                 expected_monthly_statistics = self.create_monthly_statistics(days_amount)
-                actual_statistics = self.get_actual_statistics(WindowsRegistry.MonthlyStatistics.statistics)
+                actual_statistics = self.get_plain_statistics(WindowsRegistry.MonthlyStatistics.statistics)
 
                 for expected_row in expected_monthly_statistics:
                     self.assertRegex(
@@ -159,16 +201,18 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     expected_total_quarterly_statistics = [
                         f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
+                        f"{LanguageStructure.Statistics.get_translation(25)}{round(total_income/3, 2)}",
                         f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                        f"{LanguageStructure.Statistics.get_translation(27)}{round(total_expense/3, 2)}",
                         f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}<br/>",
                         f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                         f"<br/><br/>{self.translated_incomes}",
                         f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
-                        f"{self.income_category.name} - {total_income}",
+                        self.create_category_total_statistics(self.income_category.name, total_income, days_amount, 3, CategoryType.Income),
                         f"<br/><br/>{self.translated_expenses}",
                         f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) <br/>",
-                        f"{self.expenses_category.name} - {total_expense}",]
+                        self.create_category_total_statistics(self.expenses_category.name, total_expense, days_amount, 3, CategoryType.Expense),]
 
                     statistics_data = quarter.total_quarter_statistics.data
                     self.assertEqual(
@@ -179,9 +223,9 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     for index, expected_row in enumerate(expected_total_quarterly_statistics):
                         self.assertEqual(
-                            expected_row, statistics_data.item(index).text(),
+                            html_to_text(expected_row), html_to_text(statistics_data.item(index).text()),
                             f"In quarterly statistics row {index} expected result {expected_row} not \
-                            {statistics_data.item(index).text()}"
+                            {html_to_text(statistics_data.item(index).text())}"
                         )
 
                     for month in quarter.months:
@@ -190,7 +234,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         current_month = month.month_number
                         _, month_days_amount = monthrange(app_core.current_year, current_month)
                         expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
-                        actual_statistics = self.get_actual_statistics(statistics_data)
+                        actual_statistics = self.get_plain_statistics(statistics_data)
 
                         if current_month != month_without_transactions:
 
@@ -257,10 +301,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                     f"<br/><br/>{self.translated_incomes}",
                     f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
-                    f"{self.income_category.name} - {total_income}",
+                    self.create_category_total_statistics(self.income_category.name, total_income, days_amount, 12, CategoryType.Income),
                     f"<br/><br/>{self.translated_expenses}",
                     f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) <br/>",
-                    f"{self.expenses_category.name} - {total_expense}"]
+                    self.create_category_total_statistics(self.expenses_category.name, total_expense, days_amount, 12, CategoryType.Expense)]
 
                 statistics_data = WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data
                 self.assertEqual(
@@ -271,9 +315,9 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                 for index, expected_row in enumerate(expected_yearly_statistics):
                     self.assertEqual(
-                        expected_row, statistics_data.item(index).text(),
+                        html_to_text(expected_row), html_to_text(statistics_data.item(index).text()),
                         f"In total year statistics row {index} expected result \
-                        {expected_row} not {statistics_data.item(index).text()}"
+                        {expected_row} not {html_to_text(statistics_data.item(index).text())}"
                     )
 
                 for month in WindowsRegistry.YearlyStatistics.statistics.months:
@@ -281,7 +325,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     _, month_days_amount = monthrange(app_core.current_year, month.month_number)
                     expected_monthly_statistics = self.create_monthly_statistics(month_days_amount)
-                    actual_statistics = self.get_actual_statistics(statistics_data)
+                    actual_statistics = self.get_plain_statistics(statistics_data)
 
                     if month.month_number != month_without_transactions:
                         for expected_row in expected_monthly_statistics:
@@ -366,10 +410,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         f"{LanguageStructure.Statistics.get_translation(8)}0.0",
                         f"<br/><br/>{self.translated_incomes}",
                         f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
-                        f"{self.income_category.name} - {total_income}",
+                        self.create_category_total_statistics(self.income_category.name, total_income, days_amount, 5, CategoryType.Income),
                         f"<br/><br/>{self.translated_expenses}",
                         f"{LanguageStructure.Statistics.get_translation(17)}{self.expenses_category.name} ({total_expense}) <br/>",
-                        f"{self.expenses_category.name} - {total_expense}"]
+                        self.create_category_total_statistics(self.expenses_category.name, total_expense, days_amount, 5, CategoryType.Expense)]
 
                     statistics_data = WindowsRegistry.CustomRangeStatisticsView.statistics_list
                     self.assertEqual(
@@ -381,10 +425,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
                     for index, expected_row in enumerate(expected_custom_range_statistics):
                         self.assertEqual(
-                            expected_row, statistics_data.item(index).text(),
+                            html_to_text(expected_row), html_to_text(statistics_data.item(index).text()),
                             f"In Custom range statistics (01/01/{app_core.current_year} - 01/06/{app_core.current_year}) \
                             statistics row {index} expected result {expected_row} not \
-                            {statistics_data.item(index).text()}"
+                            {html_to_text(statistics_data.item(index).text())}"
                         )
                     
                     expected_transactions = [
@@ -406,10 +450,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     self.maxDiff = None
                     for index, expected_row in enumerate(expected_transactions):
                         self.assertEqual(
-                            expected_row, statistics_data.item(index).text(),
+                            html_to_text(expected_row), html_to_text(statistics_data.item(index).text()),
                             f"In Custom range transactions list (01/01/{app_core.current_year} - 01/06/{app_core.current_year}) \
                             row {index} expected result {expected_row} not \
-                            {statistics_data.item(index).text()}"
+                            {html_to_text(statistics_data.item(index).text())}"
                         )
                     
                     WindowsRegistry.CustomRangeStatisticsView.done(1)

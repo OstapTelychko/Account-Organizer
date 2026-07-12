@@ -6,6 +6,7 @@ from collections import defaultdict, Counter
 from textwrap import dedent
 
 from languages import LanguageStructure
+from project_configuration import CategoryType
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -216,7 +217,48 @@ def add_statistic(statistic_list:QListWidget, statistic_data:tuple[
             _add_highest_and_lowest_transactions(category, statistic_data[2])
 
 
-def add_total_statistics(statistic:CategoriesTotalValues, words:list[int], total_statistics_list:QListWidget) -> None:
+def _format_category_total_value(
+        category_name:str,
+        total_value:float,
+        days_amount:int|None = None,
+        months_amount:int|None = None,
+        category_type:str|None = None
+    ) -> str:
+    """Format a category total row, adding averages only when requested and meaningful."""
+
+    if total_value == 0 or days_amount is None or months_amount is None:
+        return f"{category_name} - {total_value}"
+
+    average_per_day = round(total_value / days_amount, 2)
+    average_per_month = round(total_value / months_amount, 2)
+
+    average_per_day_text = f"{LanguageStructure.Statistics.get_translation(40)}"
+    average_per_month_text = f"{LanguageStructure.Statistics.get_translation(41)}"
+
+    color = "green" if category_type == CategoryType.Income else "red" 
+
+    average_per_day_text += f"<span style='color:{color}'>{average_per_day}</span>"
+    average_per_month_text += f"<span style='color:{color}'>{average_per_month}</span>"
+    if months_amount == 1:
+        average_text = f"({average_per_day_text})"
+    else:
+        average_text = f"({average_per_day_text}, {average_per_month_text})"
+
+
+    return (
+        f"{category_name} - <span style='color:{color}'>{total_value}</span> "
+        f"{average_text}"
+    )
+
+
+def add_total_statistics(
+        statistic:CategoriesTotalValues,
+        words:list[int],
+        total_statistics_list:QListWidget,
+        category_type:str,
+        days_amount:int|None = None,
+        months_amount:int|None = None,
+    ) -> None:
     """Add total statistics to the list
 
         Arguments
@@ -248,7 +290,15 @@ def add_total_statistics(statistic:CategoriesTotalValues, words:list[int], total
 
     sorted_categories = dict(sorted(statistic.items(), key=lambda category: category[1], reverse=True))
     for category, total_value in sorted_categories.items():
-        total_statistics_list.addItem(f"{app_core.categories[category].name} - {total_value}")
+        total_statistics_list.addItem(
+            _format_category_total_value(
+                app_core.categories[category].name,
+                total_value,
+                days_amount,
+                months_amount,
+                category_type,
+            )
+        )
 
 
 def add_month_statistics(
@@ -267,7 +317,7 @@ def add_month_statistics(
             `current_month` (int): month to add statistics
     """
 
-    def add_categories_months_sum(categories:dict[int, float]) -> None:
+    def add_categories_months_sum(categories:dict[int, float], category_type:str) -> None:
         """Add categories months sum to the list
 
             Arguments
@@ -276,7 +326,15 @@ def add_month_statistics(
         """
         month_statistics.addItem(f"<br/>{LanguageStructure.Search.get_translation(6)}")
         for category_id, total_value in categories.items():
-            month_statistics.addItem(f"{AppCore.instance().categories[category_id].name} - {total_value}")
+            month_statistics.addItem(
+                _format_category_total_value(
+                    AppCore.instance().categories[category_id].name,
+                    total_value,
+                    days_amount,
+                    1,
+                    category_type
+                )
+            )
 
     Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)
     Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)
@@ -295,11 +353,11 @@ def add_month_statistics(
 
     month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
     add_statistic(month_statistics, Incomes_statistic, [9,10,13,14,11,15])
-    add_categories_months_sum(Incomes_statistic[4])
+    add_categories_months_sum(Incomes_statistic[4], CategoryType.Income)
 
     month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
     add_statistic(month_statistics, Expenses_statistic, [17,18,20,21,19,22])
-    add_categories_months_sum(Expenses_statistic[4])
+    add_categories_months_sum(Expenses_statistic[4], CategoryType.Expense)
 
 def show_monthly_statistics() -> int:
     """This method is used to show the monthly statistics window."""
@@ -371,18 +429,34 @@ def show_quarterly_statistics() -> int:
         Total_statistic_list = quarter.total_quarter_statistics.data
 
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(4)+str(total_income))
+        Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(25)+str(round(total_income/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(5)+str(round(total_income/days_amount, 2))+"<br/>")
 
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(6)+str(total_expense))
+        Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(27)+str(round(total_expense/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(7)+str(round(total_expense/days_amount, 2))+"<br/>")
 
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(8)+str(round(total_income - total_expense, 2)))
 
         Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
-        add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list)
+        add_total_statistics(
+            Incomes_categories_total_values,
+            [9,13],
+            Total_statistic_list,
+            CategoryType.Income,
+            days_amount,
+            3,
+        )
 
         Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
-        add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list)
+        add_total_statistics(
+            Expenses_categories_total_values,
+            [17,20],
+            Total_statistic_list,
+            CategoryType.Expense,
+            days_amount,
+            3,
+        )
 
         #Months statistics
         for month in quarter.months:
@@ -446,10 +520,10 @@ def show_yearly_statistics() -> int:
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}")
 
     Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
-    add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list)
+    add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list, CategoryType.Income, days_amount, 12)
 
     Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
-    add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list)
+    add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, CategoryType.Expense, days_amount, 12 )
 
     for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
         Incomes_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
@@ -552,17 +626,18 @@ def show_custom_range_statistics_view() -> int:
         LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}"
     )
 
+    months = (to_date.year () - from_date.year()) * 12 + (to_date.month() - from_date.month())
     if len(Incomes_categories):
         WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
             "<br/><br/>"+LanguageStructure.MainWindow.get_translation(1)
         )
-        add_total_statistics(Incomes_categories_total_values, [9,13], WindowsRegistry.CustomRangeStatisticsView.statistics_list)
+        add_total_statistics(Incomes_categories_total_values, [9,13], WindowsRegistry.CustomRangeStatisticsView.statistics_list, CategoryType.Income, days_amount, months)
 
     if len(Expenses_categories):
         WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
             "<br/><br/>"+LanguageStructure.MainWindow.get_translation(2)
         )
-        add_total_statistics(Expenses_categories_total_values, [17,20], WindowsRegistry.CustomRangeStatisticsView.statistics_list)
+        add_total_statistics(Expenses_categories_total_values, [17,20], WindowsRegistry.CustomRangeStatisticsView.statistics_list, CategoryType.Expense, days_amount, months)
     
     def add_transaction_to_transactions_list(transaction:Transaction) -> None:
         day = transaction.date.day                

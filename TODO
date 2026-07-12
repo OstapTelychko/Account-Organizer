@@ -7,7 +7,6 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
-  ☐ add to quarter and year statistics average expense and income per month
   
 Project life improvements:
   ☐ empty @don't-touch
@@ -29,6 +28,8 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ add to quarter and year statistics average expense and income per month @started(26-07-13 00:40) @done(26-07-13 00:40) @lasted(22s) @project(Updates to existing features)
+  ✔ add to categories values in statistics brackets average per day and per month in quarter and year total statistics @started(26-07-12 21:52) @done(26-07-13 00:40) @lasted(2h48m21s) @project(Updates to existing features)
   ✔ replace regular text search with fuzzy search @started(26-06-21 21:02) @done(26-06-22 00:00) @lasted(2h58m53s) @project(Updates to existing features)
   ✔ check all translations for grammar and typos using ai @started(26-05-31 21:49) @done(26-05-31 22:46) @lasted(57m13s) @project(Updates to existing features)
   ✔ fix issue with case sensitive search with cyrillic letters @started(26-05-17 19:06) @done(26-05-31 21:40) @lasted(2w2h34m28s) @project(Bugs)
