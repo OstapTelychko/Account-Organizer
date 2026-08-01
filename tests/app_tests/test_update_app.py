@@ -961,7 +961,7 @@ class TestApplyUpdate(DBTestCase):
             self.mock_open.return_value.__enter__.return_value.write.assert_called_once()
             self.mock_popen.assert_called_once_with(
                 ["cmd", "/c", batch_path],
-                creationflags=subprocess.CREATE_NO_WINDOW
+                creationflags=subprocess.CREATE_NO_WINDOW#type: ignore
             )
             self.mock_qapplication_quit.assert_called_once()
     
