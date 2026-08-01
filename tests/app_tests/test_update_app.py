@@ -3,7 +3,9 @@ import os
 import shutil
 import itertools
 import time
+import subprocess
 
+from sys import platform
 from typing import TYPE_CHECKING
 from sqlalchemy import create_engine
 from alembic.config import Config
@@ -830,6 +832,15 @@ class TestApplyUpdate(DBTestCase):
 
         self.patched_rmtree = patch("AppManagement.AppUpdate.apply_update.shutil.rmtree", autospec=True)
         self.patched_move = patch("AppManagement.AppUpdate.apply_update.shutil.move", autospec=True)
+        self.patched_open = patch("AppManagement.AppUpdate.apply_update.open", new_callable=mock_open)
+        self.patched_popen = patch("AppManagement.AppUpdate.apply_update.subprocess.Popen", autospec=True)
+        self.patched_qapplication_quit = patch("AppManagement.AppUpdate.apply_update.QApplication.quit", autospec=True)
+        self.patched_move_new_version_to_internal = patch(
+            "AppManagement.AppUpdate.apply_update.move_new_version_to_internal",
+            autospec=True
+        )
+        self.patched_copy2 = patch("AppManagement.AppUpdate.apply_update.shutil.copy2", autospec=True)
+        self.patched_copytree = patch("AppManagement.AppUpdate.apply_update.shutil.copytree", autospec=True)
 
         self.patched_update_directory = patch(
             "AppManagement.AppUpdate.apply_update.UPDATE_DIRECTORY", new=TEST_UPDATE_DIRECTORY
@@ -846,6 +857,14 @@ class TestApplyUpdate(DBTestCase):
         self.patched_update_backups_directory = patch(
             "AppManagement.AppUpdate.apply_update.UPDATE_BACKUPS_DIRECTORY", new=TEST_UPDATE_BACKUPS_DIRECTORY
         )
+        self.patched_app_directory_development_false = patch(
+            "AppManagement.AppUpdate.apply_update.APP_DIRECTORY",
+            new=TEST_UPDATE_APP_DIRECTORY
+        )
+        self.patched_app_directory_development_true = patch(
+            "AppManagement.AppUpdate.apply_update.APP_DIRECTORY",
+            new=os.path.join(DEVELOPMENT_ROOT_DIRECTORY, "_internal")
+        )
 
         self.patched_disabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=False)
         self.patched_enabled_development_mode = patch("AppManagement.AppUpdate.apply_update.DEVELOPMENT_MODE", new=True)
@@ -857,12 +876,16 @@ class TestApplyUpdate(DBTestCase):
 
         self.mock_rmtree:MockedFunction = self.patched_rmtree.start()
         self.mock_move:MockedFunction = self.patched_move.start()
-
+        self.mock_open:MockedFunction = self.patched_open.start()
+        self.mock_popen:MockedFunction = self.patched_popen.start()
+        self.mock_qapplication_quit:MockedFunction = self.patched_qapplication_quit.start()
+        self.mock_move_new_version_to_internal:MockedFunction = self.patched_move_new_version_to_internal.start()
+        self.mock_copy2:MockedFunction = self.patched_copy2.start()
+        self.mock_copytree:MockedFunction = self.patched_copytree.start()
         self.patched_update_directory.start()
         self.patched_update_app_directory.start()
         self.patched_update_backups_directory.start()
         self.patched_backups_directory.start()
-
         return super().setUp()
     
 
@@ -871,7 +894,12 @@ class TestApplyUpdate(DBTestCase):
         self.patched_appcore.stop()
         self.patched_rmtree.stop()
         self.patched_move.stop()
-
+        self.patched_open.stop()
+        self.patched_popen.stop()
+        self.patched_qapplication_quit.stop()
+        self.patched_move_new_version_to_internal.stop()
+        self.patched_copy2.stop()
+        self.patched_copytree.stop()
         self.patched_update_directory.stop()
         self.patched_update_app_directory.stop()
         self.patched_update_backups_directory.stop()
@@ -903,9 +931,18 @@ class TestApplyUpdate(DBTestCase):
         QTimer.singleShot(150, lambda: self.click_on_widget(WindowsRegistry.Messages.update_finished.ok_button))
         apply_update()
         self.mock_close_connection.assert_called_once()
-        assert_any_call_with_details(self.mock_move, old_internal,
-                                     os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
-        assert_any_call_with_details(self.mock_move, TEST_UPDATE_APP_DIRECTORY, new_internal_destination)
+        if is_active_patch(self.patched_enabled_development_mode):
+            assert_any_call_with_details(self.mock_move, old_internal,
+                                         os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
+            assert_any_call_with_details(self.mock_move, TEST_UPDATE_APP_DIRECTORY, new_internal_destination)
+        elif platform == "win32":
+            assert_any_call_with_details(self.mock_copytree, old_internal,
+                                         os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"),
+                                         symlinks=True)#type: ignore
+            assert_any_call_with_details(self.mock_move_new_version_to_internal, old_internal, old_internal)
+        else:
+            assert_any_call_with_details(self.mock_move, old_internal, os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, "_internal"))
+            assert_any_call_with_details(self.mock_move, TEST_UPDATE_APP_DIRECTORY, new_internal_destination)
 
         assert_any_call_with_details(self.mock_rmtree, backups_directory)
         assert_any_call_with_details(self.mock_move, TEST_UPDATE_BACKUPS_DIRECTORY, root_directory)
@@ -914,7 +951,20 @@ class TestApplyUpdate(DBTestCase):
                                      os.path.join(PREVIOUS_VERSION_COPY_DIRECTORY, MAIN_EXECUTABLE))
         assert_any_call_with_details(self.mock_move, os.path.join(TEST_UPDATE_DIRECTORY, MAIN_EXECUTABLE),
                                      os.path.join(root_directory, MAIN_EXECUTABLE))
-        
+        if platform == "win32":
+            assert_any_call_with_details(self.mock_copy2, 
+                                         os.path.join(TEST_UPDATE_APP_DIRECTORY, "base_library.zip"),
+                                         os.path.normpath(os.path.join(ROOT_DIRECTORY, "_new_base_library.zip"))
+            )
+            batch_path = os.path.join(os.path.dirname(old_internal), "_replace_base_library.bat")
+            self.mock_open.assert_called_once_with(batch_path, "w")
+            self.mock_open.return_value.__enter__.return_value.write.assert_called_once()
+            self.mock_popen.assert_called_once_with(
+                ["cmd", "/c", batch_path],
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            self.mock_qapplication_quit.assert_called_once()
+    
         assert_any_call_with_details(self.mock_rmtree, TEST_UPDATE_DIRECTORY)
         self.assertFalse(
             WindowsRegistry.UpdateProgressWindow.isVisible(),
@@ -927,13 +977,15 @@ class TestApplyUpdate(DBTestCase):
         """Test apply update functionality. DEVELOPMENT_MODE is False."""
 
         self.patched_disabled_development_mode.start()
-        self.check_apply_update(APP_DIRECTORY, ROOT_DIRECTORY, TEST_BACKUPS_DIRECTORY)
+        self.patched_app_directory_development_false.start()
+        self.check_apply_update(TEST_UPDATE_APP_DIRECTORY, ROOT_DIRECTORY, TEST_BACKUPS_DIRECTORY)
     
 
     def test_02_test_apply_update_development_true(self) -> None:
         """Test apply update functionality. DEVELOPMENT_MODE is True."""
 
         self.patched_enabled_development_mode.start()
+        self.patched_app_directory_development_true.start()
         self.check_apply_update(os.path.join(DEVELOPMENT_ROOT_DIRECTORY, "_internal"),
                                 DEVELOPMENT_ROOT_DIRECTORY,
                                 DEVELOPMENT_BACKUPS_DIRECTORY)

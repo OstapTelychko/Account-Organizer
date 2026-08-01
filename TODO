@@ -28,6 +28,7 @@ Release:
   ☐ empty @don't-touch
 
 Archive:
+  ✔ test release 1.3.2 on windows @started(26-08-01 21:37) @done(26-08-01 21:45) @lasted(8m25s) @project(Release)
   ✔ add to quarter and year statistics average expense and income per month @started(26-07-13 00:40) @done(26-07-13 00:40) @lasted(22s) @project(Updates to existing features)
   ✔ add to categories values in statistics brackets average per day and per month in quarter and year total statistics @started(26-07-12 21:52) @done(26-07-13 00:40) @lasted(2h48m21s) @project(Updates to existing features)
   ✔ replace regular text search with fuzzy search @started(26-06-21 21:02) @done(26-06-22 00:00) @lasted(2h58m53s) @project(Updates to existing features)
