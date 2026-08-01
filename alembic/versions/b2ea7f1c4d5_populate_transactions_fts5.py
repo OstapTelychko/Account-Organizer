@@ -9,8 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
-from backend.fts_utils import build_fts_ngram_text
+from unicodedata import normalize
 
 
 # revision identifiers, used by Alembic.
@@ -18,6 +17,27 @@ revision: str = 'b2ea7f1c4d5'
 down_revision: Union[str, None] = 'a1f2c3d4e5f6'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+
+
+def build_fts_ngram_text(text: str | None, gram_size: int = 2) -> str:
+    """Build an n-gram token string for FTS indexing and querying.
+
+    The result is a space-separated list of overlapping character n-grams.
+    Short strings are returned as-is so single-character names still work.
+    """
+    if not text:
+        return ""
+
+    normalized = normalize("NFC", text)
+    normalized = " ".join(normalized.split())
+
+    if len(normalized) <= gram_size:
+        return normalized
+
+    return " ".join(
+        normalized[index:index + gram_size]
+        for index in range(len(normalized) - gram_size + 1)
+    )
 
 
 def upgrade() -> None:
