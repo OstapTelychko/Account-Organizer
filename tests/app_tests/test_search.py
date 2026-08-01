@@ -4,7 +4,7 @@ from PySide6.QtCore import QTimer, QDate
 from datetime import date
 import random
 
-from tests.tests_toolkit import DBTestCase
+from tests.tests_toolkit import DBTestCase, qsleep
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 
@@ -69,6 +69,11 @@ class TestSearch(DBTestCase):
             WindowsRegistry.SearchWindow.date_selection.search_to_date.setDate(date_range[1])
         self.click_on_widget(WindowsRegistry.SearchWindow.search)
         return self.get_search_result()
+
+
+    def setUp(self) -> None:
+        WindowsRegistry.SearchWindow.date_selection.search_from_date.setDate(QDate.currentDate())
+        super().setUp()
     
 
     def test_01_perform_search_where_transaction_expected_to_be_found(self) -> None:
@@ -103,7 +108,7 @@ class TestSearch(DBTestCase):
                         f"Expense transaction with name {self.test_expenses_transaction_name} not found in search results"
                         f" when attempting to search for transactions where {message}")
                     WindowsRegistry.SearchWindow.done(0)
-                    
+                    qsleep(100)
                 self.open_search_window(perform_search)
     
 
@@ -139,7 +144,7 @@ class TestSearch(DBTestCase):
                         f"Expense transaction with name {self.test_expenses_transaction_name} found in search results"
                         f" when attempting to search for transactions where {message}")
                     WindowsRegistry.SearchWindow.done(0)
-                    
+                    qsleep(100)
                 self.open_search_window(perform_search)
     
 
@@ -225,7 +230,7 @@ class TestSearch(DBTestCase):
                             f"found in search results. Searched where {message}"
                         )
                     WindowsRegistry.SearchWindow.done(0)
-
+                    qsleep(100)
             self.open_search_window(perform_search)
 
         for search_name, operand, search_value, message in parm_list_for_expected_to_be_found:
@@ -310,6 +315,7 @@ class TestSearch(DBTestCase):
                         )
                     WindowsRegistry.SearchWindow.done(0)
                 self.open_search_window(perform_search)
+                qsleep(100)
     
 
     def test_05_perform_search_within_different_date_ranges(self) -> None:
@@ -449,6 +455,7 @@ class TestSearch(DBTestCase):
                         )
                     WindowsRegistry.SearchWindow.done(0)
                 self.open_search_window(perform_search)
+            qsleep(100)
                         
 
     def test_06_fts5_unicode_case_insensitive_and_ngrams(self) -> None:
