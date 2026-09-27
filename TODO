@@ -7,6 +7,8 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
+  ☐ allow showing statistics when there is no expenses or income in the selected period
+  ☐ make backup loaded messages appear only for app_core or backup_management or for one of them make it print single log row like 120 of 120 backups loaded instead filling app logs
   
 Project life improvements:
   ☐ empty @don't-touch
@@ -18,17 +20,23 @@ Project life improvements:
   ☐ updated SubWindow to automatically add main_layout to window_container and window_menu_layout to main_layout
   ☐ removed word 'Window' for all windows in WindowsRegistry
   ☐ replace QTimer.singleShot with method that will automatically be executed with self.catch_failure
-
+  
 Bugs:
   ☐ empty @don't-touch
-  ☐ fix issue with not initialized ShortcutsManager when account doesn't exists
   ☐ fix issue with erasing values for anomalous transactions values is almost impossible
-
+  
 Release:
   ☐ empty @don't-touch
-
+    
 Archive:
+  ✔ fix issue with not initialized ShortcutsManager when account doesn't exists @started(26-09-20 11:06) @done(26-09-27 21:45) @lasted(1w10h39m20s) @project(Bugs)
   ✔ test release 1.3.2 on windows @started(26-08-01 21:37) @done(26-08-01 21:45) @lasted(8m25s) @project(Release)
+  ✔ error for showing custom range statistics for same month (for example 01/08/2026 - 31/08/2026) @started(26-09-20 11:05) @done(26-09-20 11:05) @lasted(59s) @project(Bugs)
+  Traceback (most recent call last)
+  File "Statistics/statistics.py", line 640, in show_custom_range_statistics_view
+  File "Statistics/statistics.py", line 294, in add_total_statistics
+  File "Statistics/statistics.py", line 233, in _format_category_total_value
+  ZeroDivisionError: float division by zero)
   ✔ add to quarter and year statistics average expense and income per month @started(26-07-13 00:40) @done(26-07-13 00:40) @lasted(22s) @project(Updates to existing features)
   ✔ add to categories values in statistics brackets average per day and per month in quarter and year total statistics @started(26-07-12 21:52) @done(26-07-13 00:40) @lasted(2h48m21s) @project(Updates to existing features)
   ✔ replace regular text search with fuzzy search @started(26-06-21 21:02) @done(26-06-22 00:00) @lasted(2h58m53s) @project(Updates to existing features)

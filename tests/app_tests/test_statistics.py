@@ -14,6 +14,7 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import CategoryType
 from GeneralTools.html_to_text import html_to_text
+from Statistics.statistics import _get_custom_range_months_amount
 
 if TYPE_CHECKING:
     from typing import Callable
@@ -467,6 +468,20 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
 
         self.open_statistics_window(_open_custom_range_statistics_window)
         qsleep(500)
+
+
+    def test_5_custom_range_statistics_single_month(self) -> None:
+        """Test that a custom range within one month uses daily averages."""
+
+        app_core = AppCore.instance()
+        from_date = date(app_core.current_year, app_core.current_month, 1)
+        to_date = date(app_core.current_year, app_core.current_month, 2)
+
+        self.assertEqual(
+            1,
+            _get_custom_range_months_amount(from_date, to_date),
+            "A custom range within one calendar month must have one month of averages",
+        )
 
 
 

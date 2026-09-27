@@ -251,6 +251,12 @@ def _format_category_total_value(
     )
 
 
+def _get_custom_range_months_amount(from_date:date, to_date:date) -> int:
+    """Return the number of calendar months covered by a custom date range."""
+
+    return max(1, (to_date.year - from_date.year) * 12 + (to_date.month - from_date.month))
+
+
 def add_total_statistics(
         statistic:CategoriesTotalValues,
         words:list[int],
@@ -626,7 +632,9 @@ def show_custom_range_statistics_view() -> int:
         LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}"
     )
 
-    months = (to_date.year () - from_date.year()) * 12 + (to_date.month() - from_date.month())
+    months = _get_custom_range_months_amount(
+        cast(date, from_date.toPython()), cast(date, to_date.toPython())
+    )
     if len(Incomes_categories):
         WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
             "<br/><br/>"+LanguageStructure.MainWindow.get_translation(1)
