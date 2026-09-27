@@ -86,10 +86,6 @@ def main(test_mode:bool=False) -> None:
     def post_show_setup() -> None:
         """Setup that needs to be done after the main window is shown"""
 
-        from AppObjects.shortcuts_manager import ShortcutsManager
-        
-        ShortcutsManager(app_core.config)
-
         #Load backups if they exists
         logger.info("Loading backups")
         load_backups()
@@ -154,6 +150,7 @@ def main(test_mode:bool=False) -> None:
     load_theme()
 
     from AppObjects.windows_registry import WindowsRegistry
+    from AppObjects.shortcuts_manager import ShortcutsManager
     from Statistics.statistics import show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics,\
     show_custom_range_statistics_window, show_custom_range_statistics_view
     from Statistics.copy_statistics import  copy_monthly_transactions, copy_monthly_statistics, copy_quarterly_statistics,\
@@ -172,6 +169,10 @@ def main(test_mode:bool=False) -> None:
         open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
     from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
     from AppManagement.search import show_search_window, perform_search
+
+    # UI dependencies are already loaded, so initialize shortcuts before the
+    # first-account flow without adding an earlier heavy import.
+    ShortcutsManager(app_core.config)
 
     #Set main window for instance guard
     app_core.instance_guard.main_window = WindowsRegistry.MainWindow
