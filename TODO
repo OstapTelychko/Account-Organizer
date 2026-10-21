@@ -3,6 +3,7 @@ New features:
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
   ☐ fix issue with weird looking buttons on windows
+  ☐ add scheduler of delayed payments and reminders of monthly payments @started(26-09-28 00:12)
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -20,6 +21,7 @@ Project life improvements:
   ☐ updated SubWindow to automatically add main_layout to window_container and window_menu_layout to main_layout
   ☐ removed word 'Window' for all windows in WindowsRegistry
   ☐ replace QTimer.singleShot with method that will automatically be executed with self.catch_failure
+  ☐ update existing logs format to simplify future data recovery to point in time while keeping logs readable for humans and maybe increase size and amount of logs files to keep in rotation (maybe add compression of logs files instead of deletion)
   
 Bugs:
   ☐ empty @don't-touch
