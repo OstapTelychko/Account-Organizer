@@ -149,3 +149,21 @@ class Messages(metaclass=QSingleton):
         self.search_name_too_short = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Information, APP_NAME
         )
+
+        # Message windows are translated by creation order, so new ones have to be appended
+        self.reminder_name_too_short = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )
+        self.reminder_already_exists = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )
+        self.reminder_day_out_range = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )
+
+        self.reminder_no_category = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Information, APP_NAME
+        )
+        self.delete_reminder_confirmation = MessageWindow(
+            main_window, message_windows, True, QMessageBox.Icon.Question, APP_NAME
+        )

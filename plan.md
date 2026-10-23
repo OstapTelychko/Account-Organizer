@@ -26,13 +26,10 @@ Allow users to create transactions with future dates (`date > today`). The main 
 *   **`AppObjects/app_core.py`**: Initialize in `__init__`: `today_balance: float = 0.0`, `projected_balance: float = 0.0`, `future_expenses_total: float = 0.0`, `future_incomes_total: float = 0.0`.
 
 ### 1.2. App Management Logic (`AppManagement/balance.py`)
-*   Add pure, GUI-independent helpers (directly testable):
-    *   `calculate_today_and_projected_balance(ledger_balance, future_incomes, future_expenses) -> tuple[float, float]`:
-        *   `today_balance = round(ledger_balance - future_incomes + future_expenses, 2)`
-        *   `projected_balance = round(today_balance - future_expenses, 2)`
-    *   `format_balance_text(today_balance, projected_balance, has_future_expenses) -> str`: returns `"100.0 (-50.0)"` or `"100.0"` when there are no future expenses.
-    *   `is_projected_balance_negative(projected_balance) -> bool`.
-*   Add `refresh_balance_label()` as the single place that queries future totals, updates the `AppCore` fields, sets the label text (with the `LanguageStructure.MainWindow.get_translation(0)` prefix), the red styling and the clickable state.
+*   `calculate_today_and_projected_balance(ledger_balance, future_incomes, future_expenses) -> tuple[float, float]` (used for the current account and in the account switcher):
+    *   `today_balance = round(ledger_balance - future_incomes + future_expenses, 2)` (the ledger contains future incomes, so they are subtracted out; they are never counted)
+    *   `projected_balance = round(today_balance - future_expenses, 2)`
+*   Add `refresh_balance_label()` as the single place that queries future totals, updates the `AppCore` fields, sets the label text (`today` or `today (projected)` with the `LanguageStructure.MainWindow.get_translation(0)` prefix), the red styling and the clickable state.
 *   Call `refresh_balance_label()` everywhere `account_current_balance` text is currently set:
     *   `calculate_current_balance()` (also used after category deletion).
     *   `load_account_balance()` (startup, account switch, backup restore).
@@ -43,7 +40,7 @@ Allow users to create transactions with future dates (`date > today`). The main 
 
 ### 1.3. GUI Updates
 *   **`GUI/windows/main_window.py`**:
-    *   Keep `account_current_balance` as a `QLabel`, switch it to rich text. The projected part is a link (`linkActivated` signal) that opens `DelayedPaymentsWindow`. The projected part is red when `projected_balance < 0`, otherwise uses the default theme color.
+    *   Keep `account_current_balance` as a `QLabel`, switch it to rich text. The projected part is a link (`linkActivated` signal) that opens `DelayedPaymentsWindow`. The projected part is red when `projected_balance < 0`, otherwise dodgerblue (the app's highlight color, signals it's clickable).
     *   When there are no future expenses, the label shows only today's balance and has no link.
 *   **`GUI/windows/delayed_payments.py`** (New File): `DelayedPaymentsWindow(SubWindow)` with a `CustomTableWidget` (columns: `Date | Category | Name | Value`) and a total of future expenses.
 *   Register `DelayedPaymentsWindow` in `AppObjects/windows_registry.py`; connect `linkActivated` in `main.py` `post_show_setup()`.
@@ -80,7 +77,7 @@ Create a new migration via Alembic (e.g., `alembic revision -m "add_monthly_remi
 *   Enable `PRAGMA foreign_keys=ON` in `set_sqlite_pragma()` in `backend/db_controller.py`.
 *   `alembic/env.py` creates its own engine, so migrations (which use `batch_alter_table` and recreate tables) run **without** FK enforcement. This must stay so for future migrations.
 *   Existing FKs (`categories.account_id`, `transactions.category_id`) have no `ON DELETE` clause; existing ORM cascades already delete children before parents, so current behavior is unchanged.
-*   On startup run `PRAGMA foreign_key_check` once and log any orphan rows found in existing databases (warning only).
+*   Existing orphan rows aren't checked: they don't break reads and nothing would act on such a report.
 *   `backend/models.py`: add a `Category.reminders` relationship with `cascade="all, delete-orphan", passive_deletes=True`. Deleting a category removes its reminders; deleting an account removes its categories and therefore their reminders.
 
 ### 2.3. Backend Queries & Human-Readable Logging
@@ -109,7 +106,7 @@ Create a new migration via Alembic (e.g., `alembic revision -m "add_monthly_remi
 
 ### 2.5. App Management & Startup Flow
 *   **`AppManagement/reminders_logic.py`** (New File):
-    *   Pure helpers: `get_initial_due_date(day, current_date)`, `get_next_due_date(current_due_date, day)`, `get_covered_period(next_due_date, day)`.
+    *   Date helpers live in `GeneralTools/Utils.py` (so `backend/` doesn't import `AppManagement/`): `shift_month`, `get_due_date_for_covered_month(year, month, day)`, `get_covered_period(next_due_date, day)`.
     *   `check_pending_reminders(current_date: date | None = None) -> list[MonthlyReminder]` (defaults to `date.today()`): for each reminder, while `current_date >= next_due_date`: if a matching transaction exists, silently call `update_next_due_date` (logged as RESOLVED) and continue; otherwise add it to the pending list and stop.
     *   `show_pending_reminders()`: fills and opens `PendingRemindersWindow` when the pending list is not empty.
     *   `ignore_reminders(reminder_ids)`, `pay_reminder(reminder_id)`.
@@ -120,7 +117,7 @@ Create a new migration via Alembic (e.g., `alembic revision -m "add_monthly_remi
 
 ### 2.6. GUI Updates
 *   **`PendingRemindersWindow`** (`GUI/windows/reminders.py`, inherits `SubWindow`):
-    *   Displays all unpaid reminders using `CustomListWidget`.
+    *   Displays all unpaid reminders as row widgets in a scroll area (`CustomListWidget` drag-scrolling would interfere with row buttons/checkboxes).
     *   Each row: `Reminder Name | Category | Expected Value (if any) | [Pay] | [ ] Ignore this month`.
     *   **Pay workflow:** Clicking `Pay` (or double-clicking a row) switches the main window to the covered month via `set_month_and_year()` (see 2.7; required because `TransactionManagementWindow` builds the date from the viewed month + day), then opens `TransactionManagementWindow` pre-filled with the reminder `name`, category, `value` (if any) and `day` (if any).
     *   After the transaction is saved, only that reminder is re-checked → resolved, `next_due_date` moves to the next month, and its row is removed. The list is not rebuilt, so other rows keep their state.
@@ -169,11 +166,10 @@ Because existing tests directly import from the product code (e.g., `tests/app_t
 1.  **Test Empty Future:** If there are no transactions with `date > current_date`, `future_expenses_total` must equal `0.0` and the label shows only today's balance.
 2.  **Test Income Exclusion:** Add future transactions in an Income category. Verify `future_expenses_total` remains `0.0`, `projected_balance == today_balance`, and today's balance excludes the future income.
 3.  **Test Mixed Dates:** Add transactions dated in the past, today and the future. Verify `get_future_totals` strictly sums only future dates (today is not future).
-4.  **Test Projected Balance Math & UI String:** If today's balance is `100.0` and `future_expenses_total` is `150.0`, verify `projected_balance == -50.0`, today's balance remains `100.0`, and `format_balance_text` returns `100.0 (-50.0)`.
-5.  **Test Visual Flag Trigger:** `is_projected_balance_negative` returns `True` when `projected_balance < 0` and `False` otherwise.
-6.  **Test Transaction Modifications:** Adding a future expense, editing a transaction from past to future (and back), and deleting a future expense each refresh `future_expenses_total` and the label text.
-7.  **Test Statistics Include Future Transactions** (`test_statistics.py`): A future-dated transaction in the selected month / quarter / year is included in the corresponding statistics.
-8.  **Test Settings Totals Exclude Future:** Adding a future income / expense does not change the displayed Settings `total_income` / `total_expense`.
+4.  **Test Projected Balance Math & Label:** With today's balance `100.0` and future expenses `150.0`, verify `projected_balance == -50.0`, today's balance remains `100.0`, and the label shows `100.0 (-50.0)` with the projected part in red.
+5.  **Test Transaction Modifications:** Adding a future expense, editing a transaction from past to future (and back), and deleting a future expense each refresh `future_expenses_total` and the label text.
+6.  **Test Statistics Include Future Transactions** (`test_statistics.py`): A future-dated transaction in the selected month / quarter / year is included in the corresponding statistics.
+7.  **Test Settings Totals Exclude Future:** Adding a future income / expense does not change the displayed Settings `total_income` / `total_expense`.
 
 ### 3.2. Monthly Reminders Logic Tests (`tests/app_tests/test_reminders.py` - New File)
 1.  **Test Due Date Generation (Day specified):** Create a reminder on October 15th with `day=20`. Verify `next_due_date` is October 20th.

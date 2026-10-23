@@ -7,6 +7,7 @@ from AppObjects.shortcuts_manager import ShortcutsManager
 
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LanguageStructure
+from AppManagement.balance import refresh_balance_label, get_account_today_balance
 
 
 
@@ -18,9 +19,7 @@ def change_language_for_startup() -> None:
     app_core = AppCore.instance()
     WindowsRegistry.SettingsWindow.languages.setCurrentIndex(AVAILABLE_LANGUAGES.index(app_core.config.language))
 
-    WindowsRegistry.MainWindow.account_current_balance.setText(
-        f"{LanguageStructure.MainWindow.get_translation(0)}{round(app_core.current_balance, 2)}"
-    )
+    refresh_balance_label()
 
     WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
@@ -42,8 +41,7 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.add_account.setText(LanguageStructure.Account.get_translation(1))
     WindowsRegistry.SettingsWindow.rename_account.setText(LanguageStructure.Account.get_translation(2))
     WindowsRegistry.SettingsWindow.switch_account.setText(LanguageStructure.Account.get_translation(6))
-    WindowsRegistry.SettingsWindow.total_income.setText(LanguageStructure.Statistics.get_translation(4)+str(app_core.current_total_income))
-    WindowsRegistry.SettingsWindow.total_expense.setText(LanguageStructure.Statistics.get_translation(6)+str(app_core.current_total_expenses))
+    refresh_balance_label()
     WindowsRegistry.SettingsWindow.account_created_date.setText(
         LanguageStructure.Settings.get_translation(1)
         + str(app_core.db.account_query.get_account().created_date.strftime("%Y-%m-%d %H:%M:%S"))
@@ -54,6 +52,38 @@ def change_language() -> None:
     WindowsRegistry.SettingsWindow.account_info_section.section_name.setText(LanguageStructure.Settings.get_translation(5))
     WindowsRegistry.SettingsWindow.backup_section.section_name.setText(LanguageStructure.Settings.get_translation(6))
     WindowsRegistry.SettingsWindow.shortcuts_management.setText(LanguageStructure.ShortcutsManagement.get_translation(0))
+    WindowsRegistry.SettingsWindow.monthly_reminders.setText(LanguageStructure.Reminders.get_translation(0))
+
+    WindowsRegistry.DelayedPaymentsWindow.setWindowTitle(LanguageStructure.DelayedPayments.get_translation(0))
+    WindowsRegistry.DelayedPaymentsWindow.transactions_table.setHorizontalHeaderLabels((
+        LanguageStructure.Transactions.get_translation(1),
+        LanguageStructure.DelayedPayments.get_translation(3),
+        LanguageStructure.Transactions.get_translation(0),
+        LanguageStructure.Transactions.get_translation(2)
+    ))
+
+    WindowsRegistry.PendingRemindersWindow.setWindowTitle(LanguageStructure.Reminders.get_translation(1))
+    WindowsRegistry.PendingRemindersWindow.confirm_button.setText(LanguageStructure.Reminders.get_translation(4))
+    for reminder_row in WindowsRegistry.PendingRemindersWindow.reminder_rows.values():
+        reminder_row.pay_button.setText(LanguageStructure.Reminders.get_translation(2))
+        reminder_row.ignore_checkbox.setText(LanguageStructure.Reminders.get_translation(3))
+
+    WindowsRegistry.RemindersManagementWindow.setWindowTitle(LanguageStructure.Reminders.get_translation(0))
+    WindowsRegistry.RemindersManagementWindow.reminders_table.setHorizontalHeaderLabels((
+        LanguageStructure.Transactions.get_translation(0),
+        LanguageStructure.Reminders.get_translation(6),
+        LanguageStructure.Reminders.get_translation(11),
+        LanguageStructure.Reminders.get_translation(12),
+        LanguageStructure.Reminders.get_translation(9)
+    ))
+    WindowsRegistry.RemindersManagementWindow.reminder_name.setPlaceholderText(LanguageStructure.Reminders.get_translation(5))
+    WindowsRegistry.RemindersManagementWindow.reminder_value.setPlaceholderText(LanguageStructure.Reminders.get_translation(7))
+    WindowsRegistry.RemindersManagementWindow.reminder_day.setPlaceholderText(LanguageStructure.Reminders.get_translation(8))
+    WindowsRegistry.RemindersManagementWindow.category_tabs.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
+    WindowsRegistry.RemindersManagementWindow.category_tabs.setTabText(1, LanguageStructure.MainWindow.get_translation(2))
+    WindowsRegistry.RemindersManagementWindow.add_reminder.setText(LanguageStructure.GeneralManagement.get_translation(1))
+    WindowsRegistry.RemindersManagementWindow.update_reminder.setText(LanguageStructure.GeneralManagement.get_translation(5))
+    WindowsRegistry.RemindersManagementWindow.delete_reminder.setText(LanguageStructure.GeneralManagement.get_translation(0))
     
     WindowsRegistry.SettingsWindow.app_version.setText(LanguageStructure.Settings.get_translation(2) + app_core.app_version)
                                        
@@ -65,7 +95,7 @@ def change_language() -> None:
     WindowsRegistry.SwitchAccountWindow.setWindowTitle(LanguageStructure.Account.get_translation(6))
     for account, account_switch_widget in zip(app_core.accounts_list, WindowsRegistry.SwitchAccountWindow.account_switch_widgets):
         account_switch_widget.account_balance_label.setText(
-            f"{LanguageStructure.MainWindow.get_translation(0)}{round(account.current_balance, 2)}"
+            f"{LanguageStructure.MainWindow.get_translation(0)}{get_account_today_balance(account)}"
 )
         account_switch_widget.account_creation_date_label.setText(
             f"{LanguageStructure.Settings.get_translation(1)}{account.created_date.strftime('%Y-%m-%d %H:%M:%S')}"

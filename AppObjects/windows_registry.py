@@ -14,6 +14,8 @@ from GUI.windows.update_progress import UpdateProgressWindow
 from GUI.windows.information_message import InformationMessage
 from GUI.windows.shortcuts import ShortcutsWindow
 from GUI.windows.search import SearchWindow
+from GUI.windows.delayed_payments import DelayedPaymentsWindow
+from GUI.windows.reminders import PendingRemindersWindow, RemindersManagementWindow
 
 
 
@@ -62,3 +64,7 @@ class WindowsRegistry:
 
     ShortcutsWindow = ShortcutsWindow(MainWindow, MainWindow.sub_windows)
     SearchWindow = SearchWindow(MainWindow, MainWindow.sub_windows)
+
+    DelayedPaymentsWindow = DelayedPaymentsWindow(MainWindow, MainWindow.sub_windows)
+    PendingRemindersWindow = PendingRemindersWindow(MainWindow, MainWindow.sub_windows)
+    RemindersManagementWindow = RemindersManagementWindow(MainWindow, MainWindow.sub_windows)

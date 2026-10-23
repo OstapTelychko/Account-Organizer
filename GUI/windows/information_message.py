@@ -7,6 +7,11 @@ from project_configuration import INFORMATION_MESSAGE_DURATION, INFORMATION_MESS
     INFORMATION_MESSAGE_STEPS
 
 
+INFORMATION_MESSAGE_MIN_WIDTH = 250
+INFORMATION_MESSAGE_LINE_HEIGHT = 50
+INFORMATION_MESSAGE_EXTRA_LINE_HEIGHT = 30
+INFORMATION_MESSAGE_HORIZONTAL_PADDING = 60
+
 
 
 class InformationMessage(QWidget, metaclass=QSingleton):
@@ -25,7 +30,9 @@ class InformationMessage(QWidget, metaclass=QSingleton):
         super().__init__()
         self.buttons = buttons
 
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.Popup)
+        # Tool tip windows don't grab input like popups, so shortcuts and clicks keep working while it's shown
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.NoDropShadowWindowHint | Qt.WindowType.ToolTip)
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.resize(250,50)
         self.setMaximumWidth(250)
         self.setMaximumHeight(50)
@@ -38,6 +45,7 @@ class InformationMessage(QWidget, metaclass=QSingleton):
 
         self.message_text = QLabel("Statistics has been copied")
         self.message_text.setFont(BASIC_FONT)
+        self.message_text.setAlignment(ALIGNMENT.AlignCenter)
         self.message_layout = QHBoxLayout()
         self.message_layout.addWidget(self.message_text,alignment=ALIGNMENT.AlignCenter)
         self.message.setLayout(self.message_layout)
@@ -56,7 +64,16 @@ class InformationMessage(QWidget, metaclass=QSingleton):
 
 
     def run(self) -> None:
-        """Show the information message with fade in/out animation."""
+        """Show the information message with fade in/out animation. The message is resized to fit long or multi-line text."""
+
+        lines_amount = self.message_text.text().count("\n") + 1
+        width = max(
+            INFORMATION_MESSAGE_MIN_WIDTH,
+            self.message_text.sizeHint().width() + INFORMATION_MESSAGE_HORIZONTAL_PADDING
+        )
+        height = INFORMATION_MESSAGE_LINE_HEIGHT + INFORMATION_MESSAGE_EXTRA_LINE_HEIGHT * (lines_amount - 1)
+        self.setMaximumSize(width, height)
+        self.resize(width, height)
 
         # Reset opacity
         self.opacity = 0.0

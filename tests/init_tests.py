@@ -4,13 +4,12 @@ import os
 import shutil
 from unittest import  TestSuite, TestLoader, TextTestRunner
 
-from alembic.config import Config
 from alembic import command
 
 from AppObjects.user_config import UserConfig
 from AppObjects.app_core import AppCore
 from AppObjects.single_instance_guard import SingleInstanceGuard
-from backend.db_controller import DBController
+from backend.db_controller import DBController, create_alembic_config
 from project_configuration import TEST_DB_PATH, APP_DIRECTORY, TEST_DB_FILE_PATH, TEST_BACKUPS_DIRECTORY,\
     TEST_USER_CONF_PATH, TEST_UPDATE_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_UPDATE_APP_DIRECTORY
 
@@ -53,9 +52,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
 
     cleanup_test_files()
 
-    test_alembic_config = Config(f"{APP_DIRECTORY}/alembic.ini")
-    test_alembic_config.set_main_option("script_location", f"{APP_DIRECTORY}/alembic")
-    test_alembic_config.set_main_option("sqlalchemy.url", TEST_DB_PATH)
+    test_alembic_config = create_alembic_config(APP_DIRECTORY, TEST_DB_PATH)
     command.upgrade(test_alembic_config, "head")
 
     user_config = UserConfig(True)
@@ -81,6 +78,8 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     from tests.app_tests.test_shortcuts import TestShortcuts
     from tests.app_tests.test_update_app import TestDownloadUpdate, TestPrepareUpdate, TestApplyUpdate
     from tests.app_tests.test_search import TestSearch
+    from tests.app_tests.test_balance import TestBalance
+    from tests.app_tests.test_reminders import TestReminders
 
     try:
         suite = TestSuite()
@@ -97,6 +96,8 @@ def test_main(app_main:Callable[[bool], None]) -> None:
             loader.loadTestsFromTestCase(TestPrepareUpdate),
             loader.loadTestsFromTestCase(TestApplyUpdate),
             loader.loadTestsFromTestCase(TestSearch),
+            loader.loadTestsFromTestCase(TestBalance),
+            loader.loadTestsFromTestCase(TestReminders),
         ))
         
         print(f"Tests found: {suite.countTestCases()}")

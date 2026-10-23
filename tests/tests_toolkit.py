@@ -22,7 +22,7 @@ from PySide6.QtCore import QEventLoop, QTimer, QObject, Signal
 from PySide6.QtWidgets import QPushButton, QToolButton, QCheckBox
 import sqlalchemy as sa
 
-from backend.models import Category, Transaction, Account
+from backend.models import Category, Transaction, Account, MonthlyReminder
 from project_configuration import TEST_BACKUPS_DIRECTORY, CategoryType
 from AppManagement.category import activate_categories, remove_categories_from_list
 from AppManagement.backup_management import remove_backup
@@ -310,9 +310,11 @@ class DBTestCase(DefaultTestCase):
         app_core = AppCore.instance()
         with app_core.db.session_factory() as session:
             with session.begin():
+                # Children first, because foreign keys are enforced
                 session.execute(sa.text("DELETE FROM transactions_fts"))
-                session.query(Category).delete()
+                session.query(MonthlyReminder).delete()
                 session.query(Transaction).delete()
+                session.query(Category).delete()
                 session.query(Account).filter(Account.id != 1).delete()
         
         app_core.config.account_name = "Test user"

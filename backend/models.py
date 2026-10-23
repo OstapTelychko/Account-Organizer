@@ -53,6 +53,11 @@ class Category(Base):
         back_populates="category",
         cascade="all, delete, delete-orphan"
     )
+    reminders: Mapped[list["MonthlyReminder"]] = relationship(
+        back_populates="category",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
     transaction_min_value: Mapped[float] = mapped_column(Float, nullable=True)
     transaction_max_value: Mapped[float] = mapped_column(Float, nullable=True)
@@ -81,6 +86,28 @@ class Transaction(Base):
 
     def __repr__(self) -> str:
         return f"{self.date}-{self.name} value:{self.value}"
+
+
+
+class MonthlyReminder(Base):
+    """Represents a monthly payment reminder. Its account is the account of its category."""
+
+    __tablename__ = "monthly_reminders"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    day: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    next_due_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
+
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("categories.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    category: Mapped["Category"] = relationship(back_populates="reminders")
+
+
+    def __repr__(self) -> str:
+        return f"Reminder {self.name} category_id:{self.category_id} next_due_date:{self.next_due_date}"
     
 
 class TransactionsFTS(Base):

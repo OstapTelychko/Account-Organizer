@@ -234,6 +234,34 @@
                 "7": "Transactions found: %transaction_amount%",
                 "8": "Income sum: %income_sum%",
                 "9": "Expense sum: %expense_sum%"
+            },
+
+            "Delayed payments":{
+                "0": "Delayed payments",
+                "1": "Total delayed expenses: ",
+                "2": "Click the balance in brackets to see delayed expenses",
+                "3": "Category"
+            },
+
+            "Date change":{
+                "0": "Month updated to %month%",
+                "1": "Year updated to %year%"
+            },
+
+            "Monthly reminders":{
+                "0": "Monthly reminders",
+                "1": "Pending payments",
+                "2": "Pay",
+                "3": "Ignore this month",
+                "4": "Confirm & Close",
+                "5": "Reminder name",
+                "6": "Category",
+                "7": "Expected value (optional)",
+                "8": "Day (optional)",
+                "9": "Next due date",
+                "10": "These monthly payments for <b>%month%</b> haven't been recorded yet",
+                "11": "Value",
+                "12": "Day"
             }
         },
 
@@ -276,7 +304,12 @@
             "35": "Failed to download update. Try again later. More info in %error_log% file",
             "36": "Minimum value for validation can't be bigger or equal to maximum",
             "37": "Transaction value <span style='color:dodgerblue'>%transaction_value%</span> is anomalous since it's outside of set range <span style='color:dodgerblue'>%min_value% - %max_value%</span>",
-            "38": "Please type at least <span style='color:dodgerblue'>2 characters</span> to search by transaction name"
+            "38": "Please type at least <span style='color:dodgerblue'>2 characters</span> to search by transaction name",
+            "39": "Reminder name must contain at least <span style='color:dodgerblue'>3 characters</span>",
+            "40": "Reminder with this <span style='color:red'>name</span> already exists",
+            "41": "The day must be <span style='color:red'>within range</span> 1-31",
+            "42": "You have to <span style='color:dodgerblue'>select a category</span> for the reminder",
+            "43": "Are you sure you want to <span style='color:red'>delete the reminder?</span>"
         }
             
     },
@@ -518,6 +551,34 @@
                 "7": "Знайдено транзакцій: %transaction_amount%",
                 "8": "Сума доходів: %income_sum%",
                 "9": "Сума витрат: %expense_sum%"
+            },
+
+            "Delayed payments":{
+                "0": "Відкладені платежі",
+                "1": "Усього відкладених витрат: ",
+                "2": "Натисніть на баланс у дужках, щоб переглянути відкладені витрати",
+                "3": "Категорія"
+            },
+
+            "Date change":{
+                "0": "Місяць змінено на %month%",
+                "1": "Рік змінено на %year%"
+            },
+
+            "Monthly reminders":{
+                "0": "Щомісячні нагадування",
+                "1": "Неоплачені платежі",
+                "2": "Оплатити",
+                "3": "Ігнорувати цього місяця",
+                "4": "Підтвердити та закрити",
+                "5": "Назва нагадування",
+                "6": "Категорія",
+                "7": "Очікувана сума (необов'язково)",
+                "8": "День (необов'язково)",
+                "9": "Наступна дата платежу",
+                "10": "Ці щомісячні платежі за <b>%month%</b> ще не записані",
+                "11": "Сума",
+                "12": "День"
             }
         },
 
@@ -560,7 +621,12 @@
             "35": "Не вдалося завантажити оновлення. Спробуйте пізніше. Більше інформації у файлі %error_log%",
             "36": "Мінімальне значення для валідації не може бути більшим чи рівним максимальному",
             "37": "Значення транзакції <span style='color:dodgerblue'>%transaction_value%</span> є аномальним, оскільки виходить за межі встановленого діапазону <span style='color:dodgerblue'>%min_value% - %max_value%</span>",
-            "38": "Будь ласка, введіть щонайменше <span style='color:dodgerblue'>2 символи</span>, щоб шукати за назвою транзакції"
+            "38": "Будь ласка, введіть щонайменше <span style='color:dodgerblue'>2 символи</span>, щоб шукати за назвою транзакції",
+            "39": "Назва нагадування повинна містити щонайменше <span style='color:dodgerblue'>3 символи</span>",
+            "40": "Нагадування з такою <span style='color:red'>назвою</span> вже існує",
+            "41": "День повинен бути <span style='color:red'>в межах діапазону</span> 1-31",
+            "42": "Потрібно <span style='color:dodgerblue'>вибрати категорію</span> для нагадування",
+            "43": "Ви впевнені, що хочете <span style='color:red'>видалити нагадування?</span>"
         }
     },
     
@@ -656,7 +722,7 @@
                     "1": "Utwórz kopię zapasową",
                     "2": "Usuń kopię zapasową",
                     "3": "Załaduj kopię zapasową",
-                    "4": "Automatyczne tworzenie kopii zapasowych",
+                    "4": "Automatyczne kopie zapasowe",
                     "5": "miesięcznie",
                     "6": "tygodniowo",
                     "7": "dziennie",
@@ -799,6 +865,34 @@
                 "7": "Znaleziono transakcji: %transaction_amount%",
                 "8": "Suma dochodów: %income_sum%",
                 "9": "Suma wydatków: %expense_sum%"
+            },
+
+            "Delayed payments":{
+                "0": "Odroczone płatności",
+                "1": "Łączne odroczone wydatki: ",
+                "2": "Kliknij saldo w nawiasach, aby zobaczyć odroczone wydatki",
+                "3": "Kategoria"
+            },
+
+            "Date change":{
+                "0": "Zmieniono miesiąc na %month%",
+                "1": "Zmieniono rok na %year%"
+            },
+
+            "Monthly reminders":{
+                "0": "Comiesięczne przypomnienia",
+                "1": "Oczekujące płatności",
+                "2": "Zapłać",
+                "3": "Ignoruj w tym miesiącu",
+                "4": "Potwierdź i zamknij",
+                "5": "Nazwa przypomnienia",
+                "6": "Kategoria",
+                "7": "Oczekiwana kwota (opcjonalnie)",
+                "8": "Dzień (opcjonalnie)",
+                "9": "Następny termin płatności",
+                "10": "Te comiesięczne płatności za <b>%month%</b> nie zostały jeszcze zapisane",
+                "11": "Kwota",
+                "12": "Dzień"
             }
         },
 
@@ -841,7 +935,12 @@
             "35": "Nie udało się pobrać aktualizacji. Spróbuj później. Więcej informacji w pliku %error_log%",
             "36": "Minimalna wartość dla walidacji nie może być większa lub równa maksymalnej",
             "37": "Wartość transakcji <span style='color:dodgerblue'>%transaction_value%</span> jest anomalna, ponieważ jest poza ustawionym zakresem <span style='color:dodgerblue'>%min_value% - %max_value%</span>",
-            "38": "Wpisz co najmniej <span style='color:dodgerblue'>2 znaki</span>, aby wyszukiwać po nazwie transakcji"
+            "38": "Wpisz co najmniej <span style='color:dodgerblue'>2 znaki</span>, aby wyszukiwać po nazwie transakcji",
+            "39": "Nazwa przypomnienia musi zawierać co najmniej <span style='color:dodgerblue'>3 znaki</span>",
+            "40": "Przypomnienie o tej <span style='color:red'>nazwie</span> już istnieje",
+            "41": "Dzień powinien być <span style='color:red'>w zakresie</span> 1-31",
+            "42": "Musisz <span style='color:dodgerblue'>wybrać kategorię</span> dla przypomnienia",
+            "43": "Czy na pewno chcesz <span style='color:red'>usunąć przypomnienie?</span>"
         }
     }
 }

@@ -15,6 +15,7 @@ from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import CategoryType
 from GeneralTools.html_to_text import html_to_text
 from Statistics.statistics import _get_custom_range_months_amount
+from GeneralTools.Utils import shift_month
 
 if TYPE_CHECKING:
     from typing import Callable
@@ -481,6 +482,30 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             1,
             _get_custom_range_months_amount(from_date, to_date),
             "A custom range within one calendar month must have one month of averages",
+        )
+
+
+    def test_6_future_transactions_included(self) -> None:
+        """Test that future-dated transactions are included in monthly, quarterly and yearly statistics."""
+
+        app_core = AppCore.instance()
+        today = date.today()
+        future_year, future_month = shift_month(today.year, today.month, 1)
+        app_core.db.transaction_query.add_transaction(
+            self.expenses_category.id, date(future_year, future_month, 1), 250, "Future expense"
+        )
+
+        self.assertEqual(
+            app_core.db.statistics_query.get_monthly_transactions_sum(self.expenses_category.id, future_year, future_month),
+            250,
+            "Future transaction isn't included in monthly statistics"
+        )
+        self.assertIn(
+            250.0,
+            app_core.db.statistics_query.get_categories_monthly_transactions_sum_by_months(
+                [self.expenses_category.id], future_year, list(range(1, 13))
+            )[self.expenses_category.id],
+            "Future transaction isn't included in quarterly/yearly statistics"
         )
 
 
