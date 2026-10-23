@@ -3,7 +3,6 @@ New features:
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
   ☐ fix issue with weird looking buttons on windows
-  ☐ add scheduler of delayed payments and reminders of monthly payments @started(26-09-28 00:12)
 	
 Updates to existing features:
   ☐ empty @don't-touch
@@ -31,6 +30,7 @@ Release:
   ☐ empty @don't-touch
     
 Archive:
+  ✔ add scheduler of delayed payments and reminders of monthly payments @started(26-09-28 00:12) @done(26-10-23 23:39) @lasted(3w4d23h27m57s) @project(New features)
   ✔ fix issue with not initialized ShortcutsManager when account doesn't exists @started(26-09-20 11:06) @done(26-09-27 21:45) @lasted(1w10h39m20s) @project(Bugs)
   ✔ test release 1.3.2 on windows @started(26-08-01 21:37) @done(26-08-01 21:45) @lasted(8m25s) @project(Release)
   ✔ error for showing custom range statistics for same month (for example 01/08/2026 - 31/08/2026) @started(26-09-20 11:05) @done(26-09-20 11:05) @lasted(59s) @project(Bugs)
