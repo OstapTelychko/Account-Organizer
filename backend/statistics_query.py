@@ -1,16 +1,34 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 from sqlalchemy.sql import func as sql_func
 from sqlalchemy import and_, extract
 from datetime import date
 
-from backend.models import Transaction
+from backend.models import Transaction, Category
 from GeneralTools.Utils import generate_month_range
+from project_configuration import CategoryType
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
     from sqlalchemy.engine import Row
     from typing import Sequence
+
+
+
+class FutureTotals(NamedTuple):
+    """Sums of income and expense transactions dated after a given date."""
+
+    incomes: float
+    expenses: float
+
+
+class FutureExpenseTransaction(NamedTuple):
+    """Expense transaction dated after a given date, shown in the delayed payments window."""
+
+    transaction_date: date
+    category_name: str
+    name: str | None
+    value: float
 
 
 
@@ -20,6 +38,63 @@ class StatisticsQuery:
     def __init__(self, session_factory:sessionmaker[sql_Session]) -> None:
         self.session_factory = session_factory
         self.account_id:int
+
+
+    def get_future_totals(self, current_date:date, account_id:int|None = None) -> FutureTotals:
+        """Get the sums of income and expense transactions dated after the given date.
+
+            Arguments
+            ---------
+                `current_date` : (date) - Transactions dated after this date are future transactions.
+                `account_id` : (int|None) - Account to calculate totals for. Defaults to the current account.
+            Returns
+            -------
+                `FutureTotals` - Future incomes and expenses sums.
+        """
+
+        target_account_id = self.account_id if account_id is None else account_id
+        with self.session_factory() as session:
+            with session.begin():
+                sums:Sequence[Row[tuple[str, float]]] = session.query(
+                    Category.category_type,
+                    sql_func.coalesce(sql_func.sum(Transaction.value), 0)
+                ).join(Category, Transaction.category_id == Category.id).filter(and_(
+                    Transaction.date > current_date,
+                    Category.account_id == target_account_id
+                )).group_by(Category.category_type).all()
+
+        totals = {category_type: float(total) for category_type, total in sums}
+        return FutureTotals(
+            incomes=round(totals.get(CategoryType.Income, 0.0), 2),
+            expenses=round(totals.get(CategoryType.Expense, 0.0), 2)
+        )
+
+
+    def get_future_expense_transactions(self, current_date:date) -> list[FutureExpenseTransaction]:
+        """Get expense transactions of the current account dated after the given date.
+
+            Arguments
+            ---------
+                `current_date` : (date) - Transactions dated after this date are future transactions.
+            Returns
+            -------
+                `list[FutureExpenseTransaction]` - Transactions ordered by date.
+        """
+
+        with self.session_factory() as session:
+            with session.begin():
+                rows:Sequence[Row[tuple[date, str, str|None, float]]] = session.query(
+                    Transaction.date, Category.name, Transaction.name, Transaction.value
+                ).join(Category, Transaction.category_id == Category.id).filter(and_(
+                    Transaction.date > current_date,
+                    Category.account_id == self.account_id,
+                    Category.category_type == CategoryType.Expense
+                )).order_by(Transaction.date, Transaction.id).all()
+
+        return [
+            FutureExpenseTransaction(transaction_date=row[0], category_name=row[1], name=row[2], value=row[3])
+            for row in rows
+        ]
     
 
     def get_monthly_transactions_sum(self, category_id:int, year:int, month:int) -> float:

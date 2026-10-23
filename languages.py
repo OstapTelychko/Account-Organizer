@@ -109,6 +109,9 @@ class LanguageStructure():
     Statistics = Windows.add_subcategory("Statistics")
     Update = Windows.add_subcategory("Update")
     Search = Windows.add_subcategory("Search")
+    DelayedPayments = Windows.add_subcategory("Delayed payments")
+    DateChange = Windows.add_subcategory("Date change")
+    Reminders = Windows.add_subcategory("Monthly reminders")
 
     Messages = LanguageCategory("Messages")
 

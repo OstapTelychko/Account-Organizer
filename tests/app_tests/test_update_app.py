@@ -8,7 +8,6 @@ import subprocess
 from sys import platform
 from typing import TYPE_CHECKING
 from sqlalchemy import create_engine
-from alembic.config import Config
 from unittest.mock import MagicMock, PropertyMock, create_autospec, mock_open, patch, call
 from io import BytesIO
 from pathlib import Path
@@ -29,6 +28,7 @@ from AppManagement.AppUpdate.download_update import check_internet_connection, g
 from AppManagement.AppUpdate.prepare_update import prepare_update, create_single_backup, migrate_single_backup
 from AppManagement.AppUpdate.apply_update import apply_update
 from AppManagement.backup_management import create_backup
+from backend.db_controller import create_alembic_config
 
 from project_configuration import DEVELOPMENT_ROOT_DIRECTORY, WINDOWS_GUI_LIBRARY_ZIP, WINDOWS_UPDATE_ZIP, \
     TEST_UPDATE_DIRECTORY, TEST_UPDATE_APP_DIRECTORY, TEST_APP_HASHES_DIRECTORY, TEST_GUI_LIBRARY_HASH_FILE_PATH,\
@@ -724,9 +724,7 @@ class TestPrepareUpdate(DBTestCase):
         for backup, updated_path in zip(AppCore.instance().backups.values(), updated_paths):
             migrate_single_backup(updated_path, AppCore.instance())
 
-            alembic_config = Config(os.path.join(TEST_UPDATE_APP_DIRECTORY, ALEMBIC_CONFIG_FILE))
-            alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{updated_path}")
-            alembic_config.set_main_option("script_location", os.path.join(TEST_UPDATE_APP_DIRECTORY, "alembic"))
+            alembic_config = create_alembic_config(TEST_UPDATE_APP_DIRECTORY, f"sqlite:///{updated_path}")
 
             engine = create_engine(f"sqlite:///{updated_path}")
             self.assertTrue(AppCore.instance().db.db_up_to_date(alembic_config, engine),

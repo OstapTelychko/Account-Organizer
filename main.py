@@ -126,6 +126,7 @@ def main(test_mode:bool=False) -> None:
 
         load_account_balance()
         load_language(app_core.config.language)
+        QTimer.singleShot(100, show_pending_reminders)
 
         if not test_mode:
             from AppManagement.AppUpdate.check_for_update import check_for_updates
@@ -157,7 +158,7 @@ def main(test_mode:bool=False) -> None:
     copy_yearly_statistics, copy_custom_range_statistics, copy_custom_range_transactions
 
     from AppManagement.language import load_language, change_language_during_add_account, change_language_for_startup
-    from AppManagement.balance import load_account_balance
+    from AppManagement.balance import load_account_balance, show_delayed_payments
     from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
         rename_category,  activate_categories, show_change_category_position, change_category_position, \
         save_anomalous_transaction_values_settings, show_anomalous_transaction_values_settings
@@ -169,6 +170,9 @@ def main(test_mode:bool=False) -> None:
         open_auto_backup_window, auto_backup, prevent_same_auto_backup_status, save_auto_backup_settings, auto_remove_backups
     from AppManagement.shortcuts.shortcuts_management import load_shortcuts, save_shortcuts
     from AppManagement.search import show_search_window, perform_search
+    from AppManagement.reminders_logic import show_pending_reminders, confirm_pending_reminders,\
+        show_reminders_management_window, add_reminder_from_form, update_reminder_from_form, delete_selected_reminder,\
+        fill_reminder_form_from_selection
 
     # UI dependencies are already loaded, so initialize shortcuts before the
     # first-account flow without adding an earlier heavy import.
@@ -191,6 +195,17 @@ def main(test_mode:bool=False) -> None:
     #Search
     WindowsRegistry.MainWindow.search.clicked.connect(show_search_window)
 
+    #Delayed payments
+    WindowsRegistry.MainWindow.account_current_balance.linkActivated.connect(lambda _link: show_delayed_payments())
+
+    #Monthly reminders
+    WindowsRegistry.PendingRemindersWindow.confirm_button.clicked.connect(confirm_pending_reminders)
+    WindowsRegistry.RemindersManagementWindow.add_reminder.clicked.connect(add_reminder_from_form)
+    WindowsRegistry.RemindersManagementWindow.update_reminder.clicked.connect(update_reminder_from_form)
+    WindowsRegistry.RemindersManagementWindow.delete_reminder.clicked.connect(delete_selected_reminder)
+    WindowsRegistry.RemindersManagementWindow.reminders_table.itemSelectionChanged.connect(
+        fill_reminder_form_from_selection
+    )
     #Statistics
     WindowsRegistry.MainWindow.statistics.clicked.connect(WindowsRegistry.StatisticsWindow.exec)
     WindowsRegistry.StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
@@ -284,6 +299,7 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.SettingsWindow.switch_account.clicked.connect(WindowsRegistry.SwitchAccountWindow.exec)
     WindowsRegistry.SettingsWindow.backup_management.clicked.connect(WindowsRegistry.BackupManagementWindow.exec)
     WindowsRegistry.SettingsWindow.shortcuts_management.clicked.connect(WindowsRegistry.ShortcutsWindow.exec)
+    WindowsRegistry.SettingsWindow.monthly_reminders.clicked.connect(show_reminders_management_window)
 
     #Search
     WindowsRegistry.SearchWindow.search.clicked.connect(perform_search)

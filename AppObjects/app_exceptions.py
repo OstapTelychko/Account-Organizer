@@ -33,3 +33,16 @@ class WidgetIsDisabledError(Exception):
 class WidgetIsNotVisibleError(Exception):
     """Exception raised when a widget is not visible."""
     pass
+
+
+class ReminderValidationError(Exception):
+    """Exception raised when monthly reminder data is invalid. `reason` holds one of the class constants."""
+
+    NAME_TOO_SHORT = "name_too_short"
+    NAME_EXISTS = "name_exists"
+    NO_CATEGORY = "no_category"
+    DAY_OUT_OF_RANGE = "day_out_of_range"
+
+    def __init__(self, reason:str) -> None:
+        super().__init__(reason)
+        self.reason = reason

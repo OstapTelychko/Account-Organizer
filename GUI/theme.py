@@ -70,6 +70,10 @@ DARK_THEME_EXTRA = """
 .category_data{
     background-color:rgb(45,45,45);
 }
+/* qdarktheme paints the header area (visible below the last row number) black */
+.category_data QHeaderView{
+    background-color:rgb(45,45,45);
+}
 
 .information_message{
     background-color:rgb(40, 40, 40);
@@ -115,6 +119,12 @@ DARK_THEME_EXTRA = """
     background-color:rgb(45, 45, 45)
 }
 
+/* Shows which message button Enter will press when switching between them with the keyboard */
+QMessageBox QPushButton:focus{
+    background-color:rgb(46, 70, 94);
+    border:1px solid rgb(138, 180, 247);
+}
+
 QScrollBar:vertical, QScrollBar:horizontal {
     background: rgb(43, 43, 43);       /* Track background color */   
     border-radius: 5px;        
@@ -143,6 +153,14 @@ QWidget{
 
 .category_data{
     background-color:rgb(205,205,205);
+}
+.category_data QHeaderView{
+    background-color:rgb(205,205,205);
+}
+
+QMessageBox QPushButton:focus{
+    background-color:rgb(181, 202, 244);
+    border:1px solid rgb(0, 129, 219);
 }
 
 .category > QPushButton{

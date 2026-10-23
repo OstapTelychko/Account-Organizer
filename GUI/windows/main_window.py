@@ -78,6 +78,8 @@ class MainWindow(QWidget, metaclass=QSingleton):
         #Account balance and settings
         self.account_current_balance = QLabel("Balance: 0")
         self.account_current_balance.setFont(BIG_BASIC_FONT)
+        self.account_current_balance.setTextFormat(Qt.TextFormat.RichText)
+        self.account_current_balance.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
 
         self.settings = QToolButton()
         self.settings.setIcon(QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "Settings icon.png")))

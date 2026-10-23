@@ -10,7 +10,7 @@ from alembic.script import ScriptDirectory
 from alembic.runtime import migration
 from alembic import command
 
-from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY
+from project_configuration import DB_PATH, TEST_DB_PATH, APP_DIRECTORY, ALEMBIC_CONFIG_FILE
 from AppObjects.logger import get_logger
 
 from backend.models import Account
@@ -20,6 +20,7 @@ from backend.transaction_query import TransactionQuery
 from backend.backup_query import BackupQuery
 from backend.statistics_query import StatisticsQuery
 from backend.search_query import SearchQuery
+from backend.reminder_query import ReminderQuery
 
 if TYPE_CHECKING:
     from sqlalchemy import Engine
@@ -28,6 +29,26 @@ if TYPE_CHECKING:
 
 
 logger = get_logger(__name__)
+
+def create_alembic_config(app_directory:str, db_url:str) -> Config:
+    """Create the alembic config used by the app. Every alembic config in the app has to be created here.
+
+        Arguments
+        ---------
+            `app_directory` : (str) - Directory that contains `alembic.ini` and the `alembic` scripts directory.
+            `db_url` : (str) - SQLAlchemy URL of the database to migrate.
+        Returns
+        -------
+            `Config` - Alembic config.
+    """
+
+    alembic_config = Config(os.path.join(app_directory, ALEMBIC_CONFIG_FILE))
+    alembic_config.set_main_option("script_location", os.path.join(app_directory, "alembic"))
+    alembic_config.set_main_option("sqlalchemy.url", db_url)
+    # Otherwise alembic/env.py runs fileConfig, which disables app loggers and replaces the app log handlers
+    alembic_config.attributes["configure_logger"] = False
+    return alembic_config
+
 
 class DBController():
     """
@@ -38,11 +59,6 @@ class DBController():
 
     def __init__(self, test_mode:bool, test_alembic_config:Config|None = None) -> None:
         # Init db connection 
-
-        logger.info("Loading alembic config")
-        self.alembic_config = Config(os.path.join(APP_DIRECTORY, "alembic.ini"))
-        self.alembic_config.set_main_option("script_location", os.path.join(APP_DIRECTORY, "alembic"))
-        self.alembic_config.set_main_option("sqlalchemy.url", DB_PATH)
 
         if test_mode:
             self.engine = create_engine(TEST_DB_PATH)
@@ -55,6 +71,8 @@ class DBController():
         else:
             self.engine = create_engine(DB_PATH)
             logger.debug("Engine created")
+            self.alembic_config = create_alembic_config(APP_DIRECTORY, DB_PATH)
+            logger.info("Alembic config loaded")
 
         @event.listens_for(self.engine, "connect")
         def set_sqlite_pragma(dbapi_connection:SQLiteConnection, connection_record:Any) -> None:
@@ -64,6 +82,9 @@ class DBController():
             # cursor.execute("PRAGMA journal_mode=WAL")
             cursor.execute("PRAGMA synchronous=OFF")
             logger.info("PRAGMA synchronous=OFF")
+            # Alembic migrations use their own engine, so they keep running without FK enforcement
+            cursor.execute("PRAGMA foreign_keys=ON")
+            logger.info("PRAGMA foreign_keys=ON")
             cursor.close()
 
         if not self.db_up_to_date(self.alembic_config, self.engine):
@@ -79,6 +100,7 @@ class DBController():
         self.backup_query = BackupQuery(self.session_factory, self.engine)
         self.statistics_query = StatisticsQuery(self.session_factory)
         self.search_query = SearchQuery(self.session_factory)
+        self.reminder_query = ReminderQuery(self.session_factory)
 
         logger.info("Db session created")
 
@@ -135,6 +157,7 @@ class DBController():
                 self.transaction_query.account_id = self.account_id
                 self.backup_query.account_id = self.account_id
                 self.statistics_query.account_id = self.account_id
+                self.reminder_query.account_id = self.account_id
     
 
     def create_account(self, account_name:str, balance:float|int=0) -> None:

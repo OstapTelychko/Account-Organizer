@@ -55,9 +55,14 @@ class AppCore:
 
         self.current_month = 4
         self.current_year = 2023
+        # Ledger values stored in the accounts table, they include future (delayed) transactions
         self.current_balance = 0.0
         self.current_total_income = 0.0
         self.current_total_expenses = 0.0
+        self.today_balance = 0.0
+        self.projected_balance = 0.0
+        self.future_expenses_total = 0.0
+        self.future_incomes_total = 0.0
 
         self.accounts_list:list[Account] = []
         self.categories:dict[int, Category] = {}

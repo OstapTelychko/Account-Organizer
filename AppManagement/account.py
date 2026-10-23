@@ -1,5 +1,6 @@
 from sys import exit
 from functools import partial
+from PySide6.QtCore import QTimer
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -9,9 +10,10 @@ from languages import LanguageStructure
 
 from GUI.gui_constants import ALIGN_V_CENTER
 
-from AppManagement.balance import load_account_balance
+from AppManagement.balance import load_account_balance, get_account_today_balance
 from AppManagement.category import remove_categories_from_list, load_categories, activate_categories
 from AppManagement.language import change_language_during_add_account, change_language
+from AppManagement.reminders_logic import show_pending_reminders
 
 
 
@@ -99,6 +101,8 @@ def load_account_data(name:str) -> None:
     activate_categories()
     load_account_balance()
     logger.info(f"Account {name} data loaded")
+    # Delayed so the windows that triggered the load (switch, backup restore) can close first
+    QTimer.singleShot(100, show_pending_reminders)
 
 
 def load_accounts() -> None:
@@ -111,7 +115,7 @@ def load_accounts() -> None:
         account_switch_widget = WindowsRegistry.SwitchAccountWindow.AccountSwitchWidget()
         account_switch_widget.account_name_label.setText(account.name)
         account_switch_widget.account_balance_label.setText(
-            LanguageStructure.MainWindow.get_translation(0) + str(account.current_balance))
+            LanguageStructure.MainWindow.get_translation(0) + str(get_account_today_balance(account)))
         account_switch_widget.account_creation_date_label.setText(
             LanguageStructure.Settings.get_translation(1) + account.created_date.strftime("%Y-%m-%d %H:%M:%S")
         )

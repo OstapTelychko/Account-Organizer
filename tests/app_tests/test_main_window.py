@@ -8,6 +8,7 @@ from languages import LanguageStructure
 from project_configuration import AVAILABLE_LANGUAGES
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
+from AppManagement.date import set_month_and_year
 from tests.tests_toolkit import qsleep, OutOfScopeTestCase
 
 from GUI.gui_constants import app
@@ -53,6 +54,9 @@ class TestMainWindow(OutOfScopeTestCase):
 
         current_month = datetime.now().month
         translated_current_month = LanguageStructure.Months.get_translation(current_month)
+        month_message = LanguageStructure.DateChange.get_translation(0)
+        year_message = LanguageStructure.DateChange.get_translation(1)
+        information_message = WindowsRegistry.InformationMessage.message_text
 
         current_showed_month = WindowsRegistry.MainWindow.current_month.text()
         self.assertEqual(
@@ -69,6 +73,7 @@ class TestMainWindow(OutOfScopeTestCase):
             current_showed_month,
             f"Wrong next month has been showed {current_showed_month} instead of {translated_next_month}"
         )
+        self.assertEqual(information_message.text(), month_message.replace("%month%", translated_next_month))
         
         translated_previous_month = LanguageStructure.Months.get_translation(current_month)
         self.click_on_widget(WindowsRegistry.MainWindow.previous_month_button)
@@ -78,6 +83,7 @@ class TestMainWindow(OutOfScopeTestCase):
             current_showed_month,
             f"Wrong previous month has been showed {current_showed_month} instead of {translated_previous_month}"
         )
+        self.assertEqual(information_message.text(), month_message.replace("%month%", translated_previous_month))
 
         current_year = datetime.now().year
         current_showed_year = WindowsRegistry.MainWindow.current_year.text()
@@ -94,6 +100,7 @@ class TestMainWindow(OutOfScopeTestCase):
             current_showed_year,
             f"Wrong next year has been showed {current_showed_year} instead of {current_year+1}"
         )
+        self.assertEqual(information_message.text(), year_message.replace("%year%", str(current_year+1)))
 
         self.click_on_widget(WindowsRegistry.MainWindow.previous_year_button)
         current_showed_year = WindowsRegistry.MainWindow.current_year.text()
@@ -102,6 +109,24 @@ class TestMainWindow(OutOfScopeTestCase):
             current_showed_year,
             f"Wrong previous year has been showed {current_showed_year} instead of {current_year}"
         )
+        self.assertEqual(information_message.text(), year_message.replace("%year%", str(current_year)))
+
+        other_month = 1 if current_month != 1 else 2
+        translated_other_month = LanguageStructure.Months.get_translation(other_month)
+        translated_current_month = LanguageStructure.Months.get_translation(current_month)
+
+        set_month_and_year(other_month, current_year+1)
+        self.assertEqual(
+            information_message.text(),
+            f"{month_message.replace('%month%', translated_other_month)}\n"
+            f"{year_message.replace('%year%', str(current_year+1))}"
+        )
+
+        set_month_and_year(other_month, current_year)
+        self.assertEqual(information_message.text(), year_message.replace("%year%", str(current_year)))
+
+        set_month_and_year(current_month, current_year)
+        self.assertEqual(information_message.text(), month_message.replace("%month%", translated_current_month))
     
 
     def test_3_mini_calculator(self) -> None:

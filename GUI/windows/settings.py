@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QLabel, QVBoxLayout, QGridLayout
+from PySide6.QtWidgets import QWidget, QToolButton, QComboBox, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout
 from PySide6.QtGui import QIcon
 
 from project_configuration import AVAILABLE_LANGUAGES, FLAGS_DIRECTORY
@@ -56,12 +56,19 @@ class SettingsWindow(SubWindow):
         for language in range(len(AVAILABLE_LANGUAGES)):
             self.languages.setItemIcon(language, QIcon(os.path.join(FLAGS_DIRECTORY, f"{language}-flag.png")))
 
-        self.shortcuts_management = create_button("Shortcuts management", (220, 50))
+        self.shortcuts_management = create_button("Shortcuts management", (280, 50))
+        self.monthly_reminders = create_button("Monthly reminders", (280, 50))
+
+        self.theme_and_language_layout = QHBoxLayout()
+        self.theme_and_language_layout.setSpacing(20)
+        self.theme_and_language_layout.addWidget(self.switch_themes_button, alignment=ALIGN_V_CENTER)
+        self.theme_and_language_layout.addWidget(self.languages, alignment=ALIGN_V_CENTER)
         
         self.general_section = self.SettingsSection()
-        self.general_section.section_layout.addWidget(self.switch_themes_button, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
-        self.general_section.section_layout.addWidget(self.languages, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.general_section.section_layout.addLayout(self.theme_and_language_layout)
+        self.general_section.section_layout.setAlignment(self.theme_and_language_layout, ALIGN_H_CENTER)
         self.general_section.section_layout.addWidget(self.shortcuts_management, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
+        self.general_section.section_layout.addWidget(self.monthly_reminders, alignment=ALIGN_H_CENTER | ALIGN_V_CENTER)
 
         self.switch_account = create_button("Switch account",(180,50))
         self.add_account = create_button("Add account",(180,50))

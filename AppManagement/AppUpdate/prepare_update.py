@@ -8,14 +8,14 @@ from pathlib import Path
 
 from sqlalchemy import create_engine
 from alembic import command
-from alembic.config import Config
 
 from AppObjects.logger import get_logger
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
+from backend.db_controller import create_alembic_config
 
 from project_configuration import PREVIOUS_VERSION_COPY_DIRECTORY, DEVELOPMENT_MODE,\
-UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, ALEMBIC_CONFIG_FILE, \
+UPDATE_DIRECTORY, MOVE_FILES_TO_UPDATE_INTERNAL, VERSION_FILE_NAME, \
 UPDATE_BACKUPS_DIRECTORY, MOVE_DIRECTORIES_TO_UPDATE_INTERNAL, UPDATE_APP_DIRECTORY, BACKUPS_DIRECTORY,\
 PREVIOUS_VERSION_BACKUPS_DIRECTORY, GUI_LIBRARY_DIRECTORY, GUI_LIBRARY_UPDATE_PATH, DEVELOPMENT_BACKUPS_DIRECTORY,\
 DEVELOPMENT_GUI_LIBRARY_DIRECTORY
@@ -41,9 +41,7 @@ def create_single_backup(backup:Backup, app_core:AppCore, update_version:str) ->
 def migrate_single_backup(backup_path:str, app_core:AppCore) -> str:
         """Upgrade the copied backup database schema to the latest version."""
 
-        alembic_config = Config(os.path.join(UPDATE_APP_DIRECTORY, ALEMBIC_CONFIG_FILE))
-        alembic_config.set_main_option("sqlalchemy.url", f"sqlite:///{backup_path}")
-        alembic_config.set_main_option("script_location", os.path.join(UPDATE_APP_DIRECTORY, "alembic"))
+        alembic_config = create_alembic_config(UPDATE_APP_DIRECTORY, f"sqlite:///{backup_path}")
 
         engine = create_engine(f"sqlite:///{backup_path}")
         logger.debug(f"Migrating backup: {backup_path}")
