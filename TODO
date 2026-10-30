@@ -24,7 +24,7 @@ Project life improvements:
   
 Bugs:
   ☐ empty @don't-touch
-  ☐ fix issue with erasing values for anomalous transactions values is almost impossible
+  ☐ fix issue with erasing values for anomalous transactions values is almost impossible and allow user to use "," in transactions but convert it to "." 
   
 Release:
   ☐ empty @don't-touch
