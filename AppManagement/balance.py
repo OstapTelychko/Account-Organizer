@@ -10,7 +10,7 @@ from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 from GUI.gui_constants import ALIGNMENT
 
 from languages import LanguageStructure
-from project_configuration import CategoryType, DISPLAY_DATE_FORMAT
+from project_configuration import CategoryType, DISPLAY_DATE_FORMAT, InvestmentOperation
 
 if TYPE_CHECKING:
     from backend.models import Account
@@ -105,6 +105,10 @@ def refresh_balance_label(current_date:date|None = None) -> None:
             f"{app_core.projected_balance}</a>)"
         )
 
+    app_core.investments_value = app_core.db.investment_query.get_total_investments_value(current_date)
+    if app_core.investments_value is not None:
+        balance_text += f"{LanguageStructure.Investments.get_translation(1)}{app_core.investments_value}"
+
     balance_label = WindowsRegistry.MainWindow.account_current_balance
     balance_label.setText(balance_text)
     balance_label.setToolTip(LanguageStructure.DelayedPayments.get_translation(2) if has_future_expenses else "")
@@ -153,11 +157,13 @@ def show_delayed_payments(current_date:date|None = None) -> None:
     WindowsRegistry.DelayedPaymentsWindow.exec()
 
 def calculate_current_balance() -> None:
-    """Calculate current balance. It sums up all incomes and expenses and updates the account balance."""
+    """Calculate current balance. It sums up all incomes, expenses and investments transfers
+    and updates the account balance. Deposits leave the balance, withdrawals return to it."""
 
     app_core = AppCore.instance()
     app_core.current_total_income = 0
     app_core.current_total_expenses = 0
+    investments_transfers = 0.0
 
     for category in app_core.db.category_query.get_all_categories():
 
@@ -168,12 +174,21 @@ def calculate_current_balance() -> None:
         elif category.category_type == CategoryType.Expense:
             for transaction in app_core.db.transaction_query.get_all_transactions(category.id):
                 app_core.current_total_expenses += transaction.value
+
+        elif category.category_type == CategoryType.Investment:
+            for transaction in app_core.db.transaction_query.get_all_transactions(category.id):
+                if transaction.operation_type == InvestmentOperation.Deposit:
+                    investments_transfers -= transaction.value
+                elif transaction.operation_type == InvestmentOperation.Withdrawal:
+                    investments_transfers += transaction.value
     
     app_core.current_total_income = round(app_core.current_total_income, 2)
     app_core.current_total_expenses = round(app_core.current_total_expenses, 2)
 
     start_balance = app_core.db.account_query.get_account().start_balance
-    app_core.current_balance = start_balance + round(app_core.current_total_income - app_core.current_total_expenses, 2)
+    app_core.current_balance = round(
+        start_balance + app_core.current_total_income - app_core.current_total_expenses + investments_transfers, 2
+    )
 
     app_core.db.account_query.update_account_balance(
         app_core.current_balance,

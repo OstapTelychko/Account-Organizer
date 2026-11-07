@@ -8,6 +8,8 @@ from AppObjects.shortcuts_manager import ShortcutsManager
 from project_configuration import AVAILABLE_LANGUAGES
 from languages import LanguageStructure
 from AppManagement.balance import refresh_balance_label, get_account_today_balance
+from AppManagement.category import update_category_total_value
+from GUI.category import get_category_table_headers
 
 
 
@@ -24,8 +26,11 @@ def change_language_for_startup() -> None:
     WindowsRegistry.MainWindow.current_month.setText(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
     WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(1, LanguageStructure.MainWindow.get_translation(2))
+    WindowsRegistry.MainWindow.Incomes_and_expenses.setTabText(2, LanguageStructure.Investments.get_translation(0))
     WindowsRegistry.MainWindow.add_incomes_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.add_expenses_category.setText(LanguageStructure.Categories.get_translation(0))
+    WindowsRegistry.MainWindow.add_investments_category.setText(LanguageStructure.Categories.get_translation(0))
+    WindowsRegistry.MainWindow.monthly_investments.setText(LanguageStructure.Investments.get_translation(13))
     WindowsRegistry.MainWindow.statistics.setText(LanguageStructure.Statistics.get_translation(0))
     WindowsRegistry.MainWindow.search.setText(LanguageStructure.Search.get_translation(0))
     WindowsRegistry.MainWindow.mini_calculator_label.setText(LanguageStructure.MiniCalculator.get_translation(0))
@@ -81,6 +86,7 @@ def change_language() -> None:
     WindowsRegistry.RemindersManagementWindow.reminder_day.setPlaceholderText(LanguageStructure.Reminders.get_translation(8))
     WindowsRegistry.RemindersManagementWindow.category_tabs.setTabText(0, LanguageStructure.MainWindow.get_translation(1))
     WindowsRegistry.RemindersManagementWindow.category_tabs.setTabText(1, LanguageStructure.MainWindow.get_translation(2))
+    WindowsRegistry.RemindersManagementWindow.category_tabs.setTabText(2, LanguageStructure.Investments.get_translation(0))
     WindowsRegistry.RemindersManagementWindow.add_reminder.setText(LanguageStructure.GeneralManagement.get_translation(1))
     WindowsRegistry.RemindersManagementWindow.update_reminder.setText(LanguageStructure.GeneralManagement.get_translation(5))
     WindowsRegistry.RemindersManagementWindow.delete_reminder.setText(LanguageStructure.GeneralManagement.get_translation(0))
@@ -147,6 +153,25 @@ def change_language() -> None:
     WindowsRegistry.TransactionManagementWindow.transaction_value.setPlaceholderText(
         LanguageStructure.Transactions.get_translation(2)
     )
+    for operation_index, translation_index in enumerate((2, 3, 4)):
+        WindowsRegistry.TransactionManagementWindow.operation_type.setItemText(
+            operation_index, LanguageStructure.Investments.get_translation(translation_index)
+        )
+
+    WindowsRegistry.MonthlyInvestmentsWindow.setWindowTitle(LanguageStructure.Investments.get_translation(13))
+    WindowsRegistry.MonthlyInvestmentsWindow.operations_day.setPlaceholderText(
+        LanguageStructure.Investments.get_translation(18)
+    )
+    WindowsRegistry.MonthlyInvestmentsWindow.total_amount.setPlaceholderText(
+        LanguageStructure.Investments.get_translation(16)
+    )
+    WindowsRegistry.MonthlyInvestmentsWindow.investments_table.setHorizontalHeaderLabels((
+        LanguageStructure.Investments.get_translation(14),
+        LanguageStructure.Investments.get_translation(8),
+        LanguageStructure.Investments.get_translation(2),
+        LanguageStructure.Investments.get_translation(15)
+    ))
+    WindowsRegistry.MonthlyInvestmentsWindow.save_button.setText(LanguageStructure.GeneralManagement.get_translation(6))
 
     WindowsRegistry.StatisticsWindow.setWindowTitle(LanguageStructure.Statistics.get_translation(0))
     WindowsRegistry.StatisticsWindow.monthly_statistics.setText(LanguageStructure.Statistics.get_translation(1))
@@ -202,14 +227,9 @@ def change_language() -> None:
         app_core.categories[category].add_transaction.setText(LanguageStructure.GeneralManagement.get_translation(1))
         app_core.categories[category].edit_transaction.setText(LanguageStructure.GeneralManagement.get_translation(7))
         app_core.categories[category].table_data.setHorizontalHeaderLabels(
-            (LanguageStructure.Transactions.get_translation(0),
-            LanguageStructure.Transactions.get_translation(1),
-            LanguageStructure.Transactions.get_translation(2))
+            get_category_table_headers(app_core.categories[category].type)
         )
-        total_value = app_core.categories[category].total_value_label.text().split(" ")[1]
-        app_core.categories[category].total_value_label.setText(
-            LanguageStructure.Categories.get_translation(10) + total_value
-        )
+        update_category_total_value(category)
 
     WindowsRegistry.BackupManagementWindow.setWindowTitle(LanguageStructure.BackupManagement.get_translation(0))
     WindowsRegistry.BackupManagementWindow.backups_table.setHorizontalHeaderLabels(

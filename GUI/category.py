@@ -4,13 +4,15 @@ import os
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QColor
 
-from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY, CategoryType
+from project_configuration import TRANSACTIONS_DIRECTORY, GENERAL_ICONS_DIRECTORY, CategoryType, InvestmentOperation
 from languages import LanguageStructure
 from AppObjects.category import Category
 from AppObjects.windows_registry import WindowsRegistry
 from backend.models import Transaction, Category as CategoryModel
+from backend.investment_query import calculate_investment_timeline
+from GeneralTools.Utils import generate_month_range
 
 from DesktopQtToolkit.table_widget import CustomTableWidget, CustomTableWidgetItem
 from DesktopQtToolkit.create_button import create_button
@@ -58,6 +60,90 @@ def load_transactions_into_category_table(category_data:CustomTableWidget, trans
         category_data.setItem(index, 3, transaction_id)
 
 
+def load_investment_transactions_into_category_table(
+        category_data:CustomTableWidget,
+        transactions:list[Transaction],
+        year:int,
+        month:int
+    ) -> float:
+    """Load operations of an Investments category in a month into its table widget.
+
+        Arguments
+        -------
+            `category_data` (CustomTableWidget): Table widget to load operations into<br>
+            `transactions` (list[Transaction]): All operations of the category dated before the end of the month<br>
+            `year` (int): Year of operations to show<br>
+            `month` (int): Month of operations to show
+        Returns
+        ------
+            `float`: Value of the category at the end of the month
+    """
+
+    month_start, _ = generate_month_range(year, month)
+    transactions_names:dict[int | None, str | None] = {
+        transaction.id: transaction.name for transaction in transactions
+    }
+    timeline = calculate_investment_timeline(transactions)
+    month_points = [point for point in timeline if point.date >= month_start]
+    operations_names = {
+        InvestmentOperation.Deposit: LanguageStructure.Investments.get_translation(2),
+        InvestmentOperation.Withdrawal: LanguageStructure.Investments.get_translation(3),
+        InvestmentOperation.Revaluation: LanguageStructure.Investments.get_translation(4)
+    }
+
+    category_data.setSortingEnabled(False)
+    category_data.setRowCount(0)
+    category_data.setRowCount(len(month_points))
+    for row, point in enumerate(month_points):
+        value_after_text = str(point.value_after)
+        if point.operation_type == InvestmentOperation.Revaluation:
+            value_after_text += f" ({'+' if point.value_change >= 0 else ''}{point.value_change})"
+
+        for column, text in enumerate((
+            transactions_names[point.transaction_id] or "",
+            str(point.date.day),
+            str(point.value),
+            str(point.transaction_id),
+            operations_names.get(InvestmentOperation(point.operation_type), ""),
+            value_after_text
+        )):
+            item = CustomTableWidgetItem(text)
+            item.setFlags(~ Qt.ItemFlag.ItemIsEditable)
+            if column != 0:
+                item.setTextAlignment(ALIGNMENT.AlignCenter)
+            if column == 5 and point.operation_type == InvestmentOperation.Revaluation:
+                item.setForeground(QColor("green" if point.value_change >= 0 else "red"))
+            category_data.setItem(row, column, item)
+    category_data.setSortingEnabled(True)
+
+    return timeline[-1].value_after if timeline else 0.0
+
+
+def get_category_table_headers(category_type:str) -> tuple[str, ...]:
+    """Get translated headers of a category table. Investments tables have a hidden ID column before the extra ones.
+
+        Arguments
+        -------
+            `category_type` (str): Type of the category
+        Returns
+        ------
+            `tuple[str, ...]`: Headers of the table columns
+    """
+
+    headers:tuple[str, ...] = (
+        LanguageStructure.Transactions.get_translation(0),
+        LanguageStructure.Transactions.get_translation(1),
+        LanguageStructure.Transactions.get_translation(2)
+    )
+    if category_type == CategoryType.Investment:
+        headers += (
+            "ID",
+            LanguageStructure.Investments.get_translation(6),
+            LanguageStructure.Investments.get_translation(7)
+        )
+    return headers
+
+
 def load_category(category:CategoryModel, db:DBController, year:int, month:int) -> Category:
     """Add category to user window
 
@@ -103,6 +189,8 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
 
     category_data.setColumnCount(4)
     category_data.setColumnHidden(3, True)
+    if category.category_type == CategoryType.Investment:
+        category_data.setColumnCount(6)
 
     row = category_data.horizontalHeader()
     row.setFont(BASIC_FONT)
@@ -115,20 +203,27 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
     column.setStretchLastSection(True)
 
-    category_data.setHorizontalHeaderLabels((
-        LanguageStructure.Transactions.get_translation(0),
-        LanguageStructure.Transactions.get_translation(1),
-        LanguageStructure.Transactions.get_translation(2)
-    ))
+    category_data.setHorizontalHeaderLabels(get_category_table_headers(category.category_type))
 
-    transactions = db.transaction_query.get_transactions_by_month(category.id, year, month)
-    
-    if len(transactions) > 0: #Check if transactions are in db
-        load_transactions_into_category_table(category_data, transactions)
-    category_total = round(db.statistics_query.get_monthly_transactions_sum(category.id, year, month), 2)
-    category_total_value.setText(
-        f"{LanguageStructure.Categories.get_translation(10)}{category_total}"
-    )
+    if category.category_type == CategoryType.Investment:
+        category_value = load_investment_transactions_into_category_table(
+            category_data,
+            db.investment_query.get_categories_transactions(
+                [category.id], generate_month_range(year, month)[1]
+            )[category.id],
+            year,
+            month
+        )
+        category_total_value.setText(f"{LanguageStructure.Investments.get_translation(5)}{category_value}")
+    else:
+        transactions = db.transaction_query.get_transactions_by_month(category.id, year, month)
+        
+        if len(transactions) > 0: #Check if transactions are in db
+            load_transactions_into_category_table(category_data, transactions)
+        category_total = round(db.statistics_query.get_monthly_transactions_sum(category.id, year, month), 2)
+        category_total_value.setText(
+            f"{LanguageStructure.Categories.get_translation(10)}{category_total}"
+        )
     category_data.setSortingEnabled(True)
 
     add_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(1),(185,40))
@@ -158,6 +253,8 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
 
     if category.category_type == CategoryType.Income:
         WindowsRegistry.MainWindow.Incomes_window_layout.addWidget(category_window)
+    elif category.category_type == CategoryType.Investment:
+        WindowsRegistry.MainWindow.Investments_window_layout.addWidget(category_window)
     else:
         WindowsRegistry.MainWindow.Expenses_window_layout.addWidget(category_window)
 

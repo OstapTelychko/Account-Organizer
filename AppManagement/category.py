@@ -6,7 +6,9 @@ from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import CategoryType
 from languages import LanguageStructure
-from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table
+from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table,\
+    load_investment_transactions_into_category_table
+from GeneralTools.Utils import generate_month_range
 
 from AppManagement.information_message import show_information_message
 from AppManagement.balance import calculate_current_balance
@@ -34,6 +36,10 @@ def load_categories_data() -> None:
 
     app_core = AppCore.instance()
     for category in app_core.categories:
+        if app_core.categories[category].type == CategoryType.Investment:
+            update_category_total_value(category)
+            continue
+
         category_data = app_core.categories[category].table_data
         if category_data.rowCount() != 0:#Remove current category transactions if it exist
             for row in range(1,category_data.rowCount()+1):
@@ -306,10 +312,25 @@ def change_category_position() -> int:
 
 
 def update_category_total_value(category_id:int) -> None:
-    """Update category total value. It updates the total value label for the category in the GUI."""
+    """Update category total value. It updates the total value label for the category in the GUI.
+    Investments categories also reload their table, because every operation changes the values after it.
+    """
 
     app_core = AppCore.instance()
-    app_core.categories[category_id].total_value_label.setText(
+    category = app_core.categories[category_id]
+    if category.type == CategoryType.Investment:
+        category_value = load_investment_transactions_into_category_table(
+            category.table_data,
+            app_core.db.investment_query.get_categories_transactions(
+                [category_id], generate_month_range(app_core.current_year, app_core.current_month)[1]
+            )[category_id],
+            app_core.current_year,
+            app_core.current_month
+        )
+        category.total_value_label.setText(LanguageStructure.Investments.get_translation(5) + str(category_value))
+        return
+
+    category.total_value_label.setText(
         LanguageStructure.Categories.get_translation(10) +
         str(round(app_core.db.statistics_query.get_monthly_transactions_sum(
             category_id, app_core.current_year, app_core.current_month

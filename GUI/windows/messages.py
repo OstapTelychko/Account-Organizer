@@ -167,3 +167,16 @@ class Messages(metaclass=QSingleton):
         self.delete_reminder_confirmation = MessageWindow(
             main_window, message_windows, True, QMessageBox.Icon.Question, APP_NAME
         )
+
+        self.future_investment_operation = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )
+        self.zero_investment_value = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )
+        self.negative_investment_value = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )
+        self.reminder_investment_category = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
+        )

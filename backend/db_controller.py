@@ -21,6 +21,7 @@ from backend.backup_query import BackupQuery
 from backend.statistics_query import StatisticsQuery
 from backend.search_query import SearchQuery
 from backend.reminder_query import ReminderQuery
+from backend.investment_query import InvestmentQuery
 
 if TYPE_CHECKING:
     from sqlalchemy import Engine
@@ -101,6 +102,7 @@ class DBController():
         self.statistics_query = StatisticsQuery(self.session_factory)
         self.search_query = SearchQuery(self.session_factory)
         self.reminder_query = ReminderQuery(self.session_factory)
+        self.investment_query = InvestmentQuery(self.session_factory)
 
         logger.info("Db session created")
 
@@ -158,6 +160,7 @@ class DBController():
                 self.backup_query.account_id = self.account_id
                 self.statistics_query.account_id = self.account_id
                 self.reminder_query.account_id = self.account_id
+                self.investment_query.account_id = self.account_id
     
 
     def create_account(self, account_name:str, balance:float|int=0) -> None:

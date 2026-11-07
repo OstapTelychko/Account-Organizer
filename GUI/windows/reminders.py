@@ -141,7 +141,9 @@ class RemindersManagementWindow(SubWindow):
 
         self.income_categories = QListWidget()
         self.expense_categories = QListWidget()
-        for categories_list in (self.income_categories, self.expense_categories):
+        # Items data is `ReminderType` of account level Investments reminders
+        self.investment_reminder_types = QListWidget()
+        for categories_list in (self.income_categories, self.expense_categories, self.investment_reminder_types):
             categories_list.setFont(BASIC_FONT)
             categories_list.setWordWrap(True)
             categories_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
@@ -152,6 +154,7 @@ class RemindersManagementWindow(SubWindow):
         self.category_tabs.setFont(BASIC_FONT)
         self.category_tabs.addTab(self.income_categories, "Income")
         self.category_tabs.addTab(self.expense_categories, "Expenses")
+        self.category_tabs.addTab(self.investment_reminder_types, "Investments")
         self.category_tabs.setFixedHeight(200)
         self.category_tabs.setMinimumWidth(350)
         # qdarktheme paints every QWidget dark, so the tab bar has to show the wrapper background

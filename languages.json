@@ -262,6 +262,31 @@
                 "10": "These monthly payments for <b>%month%</b> haven't been recorded yet",
                 "11": "Value",
                 "12": "Day"
+            },
+
+            "Investments":{
+                "0": "Investments",
+                "1": " | Investments: ",
+                "2": "Deposit",
+                "3": "Withdrawal",
+                "4": "Revaluation",
+                "5": "Value: ",
+                "6": "Operation",
+                "7": "Value after",
+                "8": "Current value",
+                "9": "Total deposits:  ",
+                "10": "Total withdrawals:  ",
+                "11": "Investments value change:  ",
+                "12": "Income minus expenses and net deposits   ",
+                "13": "Monthly investments",
+                "14": "Fund",
+                "15": "New value",
+                "16": "Total amount (optional)",
+                "17": "Remaining: ",
+                "18": "Day",
+                "19": "Investment transfer",
+                "20": "Investments revaluation",
+                "21": "%category%: value %value%, deposited %deposits%, withdrawn %withdrawals%, value change %change%"
             }
         },
 
@@ -280,8 +305,8 @@
             "11": "Are you sure you want to <span style='color:red'>remove %account%?</span> This action is <span style='color:red'>irreversible</span>",
             "12": "I can't calculate <span style='color:dodgerblue'>empty expression</span>",
             "13": "You have used <span style='color:red'>forbidden word</span> in expression",
-            "14": "You should have at least <span style='color:dodgerblue'>one</span> category for <span style='color:dodgerblue'>income</span> and <span style='color:dodgerblue'>one</span> for <span style='color:dodgerblue'>expenses</span> to see monthly statistics",
-            "15": "You should have at least <span style='color:dodgerblue'>one income</span> transaction and <span style='color:dodgerblue'>one expense</span> transaction to see monthly statistics",
+            "14": "You should have at least <span style='color:dodgerblue'>one category</span> to see statistics",
+            "15": "There are <span style='color:dodgerblue'>no transactions</span> in this month",
             "16": "Name of category can't be <span style='color:red'>empty field</span>",
             "17": "The position must be within <span style='color:dodgerblue'>0-%max_position%</span>",
             "18": "The position can't be <span style='color:red'>the same</span>",
@@ -309,7 +334,11 @@
             "40": "Reminder with this <span style='color:red'>name</span> already exists",
             "41": "The day must be <span style='color:red'>within range</span> 1-31",
             "42": "You have to <span style='color:dodgerblue'>select a category</span> for the reminder",
-            "43": "Are you sure you want to <span style='color:red'>delete the reminder?</span>"
+            "43": "Are you sure you want to <span style='color:red'>delete the reminder?</span>",
+            "44": "Investment operations <span style='color:red'>can't be dated in the future</span>",
+            "45": "Deposit and withdrawal value must be <span style='color:red'>greater than 0</span>",
+            "46": "This operation makes the investment value <span style='color:red'>negative</span>",
+            "47": "Investments categories <span style='color:red'>can't have regular reminders</span>. Use the reminders in the Investments tab"
         }
             
     },
@@ -579,6 +608,31 @@
                 "10": "Ці щомісячні платежі за <b>%month%</b> ще не записані",
                 "11": "Сума",
                 "12": "День"
+            },
+
+            "Investments":{
+                "0": "Інвестиції",
+                "1": " | Інвестиції: ",
+                "2": "Внесок",
+                "3": "Виведення",
+                "4": "Переоцінка",
+                "5": "Вартість: ",
+                "6": "Операція",
+                "7": "Вартість після",
+                "8": "Поточна вартість",
+                "9": "Усього внесено:  ",
+                "10": "Усього виведено:  ",
+                "11": "Зміна вартості інвестицій:  ",
+                "12": "Доходи мінус витрати та чисті внески   ",
+                "13": "Щомісячні інвестиції",
+                "14": "Фонд",
+                "15": "Нова вартість",
+                "16": "Загальна сума (необов'язково)",
+                "17": "Залишок: ",
+                "18": "День",
+                "19": "Інвестиційний переказ",
+                "20": "Переоцінка інвестицій",
+                "21": "%category%: вартість %value%, внесено %deposits%, виведено %withdrawals%, зміна вартості %change%"
             }
         },
 
@@ -597,8 +651,8 @@
             "11": "Ви впевнені, що хочете <span style='color:red'>видалити %account%?</span> Ця дія є <span style='color:red'>незворотною</span>",
             "12": "Я не можу обрахувати <span style='color:dodgerblue'>пустий</span> вираз",
             "13": "Ви використали <span style='color:red'>заборонені слова</span> в виразі",
-            "14": "Ви повинні мати принаймні <span style='color:dodgerblue'>одну</span> категорію для <span style='color:dodgerblue'>доходів</span> і <span style='color:dodgerblue'>одну</span> для <span style='color:dodgerblue'>витрат</span>, щоб побачити місячну статистику",
-            "15": "Ви повинні мати принаймні <span style='color:dodgerblue'>одну</span> транзакцію <span style='color:dodgerblue'>доходу</span> і <span style='color:dodgerblue'>одну</span> транзакцію <span style='color:dodgerblue'>витрат</span>, щоб побачити місячну статистику",
+            "14": "Ви повинні мати принаймні <span style='color:dodgerblue'>одну категорію</span>, щоб побачити статистику",
+            "15": "У цьому місяці <span style='color:dodgerblue'>немає транзакцій</span>",
             "16": "Назвою категорії не може бути <span style='color:red'>пусте поле</span>",
             "17": "Позиція повинна бути в межах <span style='color:dodgerblue'>0-%max_position%</span>",
             "18": "Позиція не може бути <span style='color:red'>такою самою</span>",
@@ -626,7 +680,11 @@
             "40": "Нагадування з такою <span style='color:red'>назвою</span> вже існує",
             "41": "День повинен бути <span style='color:red'>в межах діапазону</span> 1-31",
             "42": "Потрібно <span style='color:dodgerblue'>вибрати категорію</span> для нагадування",
-            "43": "Ви впевнені, що хочете <span style='color:red'>видалити нагадування?</span>"
+            "43": "Ви впевнені, що хочете <span style='color:red'>видалити нагадування?</span>",
+            "44": "Інвестиційні операції <span style='color:red'>не можуть бути датовані майбутнім</span>",
+            "45": "Сума внеску чи виведення повинна бути <span style='color:red'>більшою за 0</span>",
+            "46": "Ця операція робить вартість інвестиції <span style='color:red'>від'ємною</span>",
+            "47": "Інвестиційні категорії <span style='color:red'>не можуть мати звичайних нагадувань</span>. Використайте нагадування на вкладці Інвестиції"
         }
     },
     
@@ -893,6 +951,31 @@
                 "10": "Te comiesięczne płatności za <b>%month%</b> nie zostały jeszcze zapisane",
                 "11": "Kwota",
                 "12": "Dzień"
+            },
+
+            "Investments":{
+                "0": "Inwestycje",
+                "1": " | Inwestycje: ",
+                "2": "Wpłata",
+                "3": "Wypłata",
+                "4": "Wycena",
+                "5": "Wartość: ",
+                "6": "Operacja",
+                "7": "Wartość po",
+                "8": "Bieżąca wartość",
+                "9": "Suma wpłat:  ",
+                "10": "Suma wypłat:  ",
+                "11": "Zmiana wartości inwestycji:  ",
+                "12": "Dochody minus wydatki i wpłaty netto   ",
+                "13": "Inwestycje miesięczne",
+                "14": "Fundusz",
+                "15": "Nowa wartość",
+                "16": "Łączna kwota (opcjonalnie)",
+                "17": "Pozostało: ",
+                "18": "Dzień",
+                "19": "Przelew inwestycyjny",
+                "20": "Wycena inwestycji",
+                "21": "%category%: wartość %value%, wpłacono %deposits%, wypłacono %withdrawals%, zmiana wartości %change%"
             }
         },
 
@@ -911,8 +994,8 @@
             "11": "Czy na pewno chcecie <span style='color:red'>usunąć %account%?</span> Ta czynność jest <span style='color:red'>nieodwracalna</span>",
             "12": "Nie mogę obliczyć <span style='color:dodgerblue'>pustego</span> wyrażenia",
             "13": "W wyrażeniu użyłeś <span style='color:red'>zabronionych słów</span>",
-            "14": "Aby zobaczyć statystykę miesięczną, musicie mieć co najmniej <span style='color:dodgerblue'>jedną</span> kategorię <span style='color:dodgerblue'>dochodów</span> i <span style='color:dodgerblue'>jedną</span> kategorię <span style='color:dodgerblue'>wydatków</span>",
-            "15": "Aby zobaczyć miesięczną statystykę, musicie mieć co najmniej <span style='color:dodgerblue'>jedną</span> transakcję <span style='color:dodgerblue'>dochodową</span> i <span style='color:dodgerblue'>jedną</span> transakcję <span style='color:dodgerblue'>wydatkową</span>",
+            "14": "Aby zobaczyć statystykę, musicie mieć co najmniej <span style='color:dodgerblue'>jedną kategorię</span>",
+            "15": "W tym miesiącu <span style='color:dodgerblue'>nie ma transakcji</span>",
             "16": "Nazwą kategorii nie może być <span style='color:red'>puste pole</span>",
             "17": "Pozycja powinna być w zasięgu <span style='color:dodgerblue'>0-%max_position%</span>",
             "18": "Nie można zastosować <span style='color:red'>tej samej pozycji</span>",
@@ -940,7 +1023,11 @@
             "40": "Przypomnienie o tej <span style='color:red'>nazwie</span> już istnieje",
             "41": "Dzień powinien być <span style='color:red'>w zakresie</span> 1-31",
             "42": "Musisz <span style='color:dodgerblue'>wybrać kategorię</span> dla przypomnienia",
-            "43": "Czy na pewno chcesz <span style='color:red'>usunąć przypomnienie?</span>"
+            "43": "Czy na pewno chcesz <span style='color:red'>usunąć przypomnienie?</span>",
+            "44": "Operacje inwestycyjne <span style='color:red'>nie mogą mieć przyszłej daty</span>",
+            "45": "Kwota wpłaty lub wypłaty musi być <span style='color:red'>większa od 0</span>",
+            "46": "Ta operacja sprawia, że wartość inwestycji jest <span style='color:red'>ujemna</span>",
+            "47": "Kategorie inwestycji <span style='color:red'>nie mogą mieć zwykłych przypomnień</span>. Użyj przypomnień na karcie Inwestycje"
         }
     }
 }

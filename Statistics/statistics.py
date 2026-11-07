@@ -7,6 +7,7 @@ from textwrap import dedent
 
 from languages import LanguageStructure
 from project_configuration import CategoryType
+from GeneralTools.Utils import generate_month_range
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -16,6 +17,7 @@ from AppObjects.windows_registry import WindowsRegistry
 if TYPE_CHECKING:
     from PySide6.QtWidgets import QListWidget
     from backend.models import Transaction
+    from backend.investment_query import InvestmentTotals
     from AppObjects.category import Category
 
 
@@ -307,13 +309,76 @@ def add_total_statistics(
         )
 
 
+def get_net_result_text(
+        total_income:float,
+        total_expense:float,
+        investment_totals:InvestmentTotals|None
+    ) -> str:
+    """Get the text of the period result. Net Investments deposits are subtracted if the account has Investments.
+
+        Arguments
+        ---------
+            `total_income` (float): sum of incomes in the period
+            `total_expense` (float): sum of expenses in the period
+            `investment_totals` (InvestmentTotals|None): Investments sums in the period or None without Investments
+        Returns
+        -------
+            `str`: result text
+    """
+
+    if investment_totals is None:
+        return LanguageStructure.Statistics.get_translation(8) + str(round(total_income - total_expense, 2))
+    return LanguageStructure.Investments.get_translation(12) + str(round(
+        total_income - total_expense - investment_totals.deposits + investment_totals.withdrawals, 2
+    ))
+
+
+def add_investments_statistics(
+        statistics_list:QListWidget,
+        investment_categories:list[int],
+        investment_totals:InvestmentTotals,
+        start_date:date,
+        end_date:date
+    ) -> None:
+    """Add Investments sums of the period and the state of each Investments category to the list
+
+        Arguments
+        ---------
+            `statistics_list` (QListWidget): list to add statistic
+            `investment_categories` (list[int]): IDs of Investments categories
+            `investment_totals` (InvestmentTotals): sums of all Investments categories in the period
+            `start_date` (date): first day of the period
+            `end_date` (date): last day of the period
+    """
+
+    app_core = AppCore.instance()
+    categories_values = app_core.db.investment_query.get_categories_values(investment_categories, end_date)
+
+    statistics_list.addItem("<br/><br/>" + LanguageStructure.Investments.get_translation(0))
+    statistics_list.addItem(LanguageStructure.Investments.get_translation(9) + str(investment_totals.deposits))
+    statistics_list.addItem(LanguageStructure.Investments.get_translation(10) + str(investment_totals.withdrawals))
+    statistics_list.addItem(
+        LanguageStructure.Investments.get_translation(11) + str(investment_totals.value_change) + "<br/>"
+    )
+    for category_id in investment_categories:
+        category_totals = app_core.db.investment_query.get_investment_totals([category_id], start_date, end_date)
+        statistics_list.addItem(
+            LanguageStructure.Investments.get_translation(21)
+            .replace("%category%", app_core.categories[category_id].name)
+            .replace("%value%", str(categories_values[category_id]))
+            .replace("%deposits%", str(category_totals.deposits))
+            .replace("%withdrawals%", str(category_totals.withdrawals))
+            .replace("%change%", str(category_totals.value_change))
+        )
+
+
 def add_month_statistics(
         Incomes_categories:list[int],
         Expenses_categories:list[int],
         month_statistics:QListWidget,
         current_month:int
     ) -> None:
-    """Add month statistics to the list
+    """Add month statistics to the list. Blocks of category types without transactions in the month are skipped.
 
         Arguments
         ---------
@@ -342,12 +407,24 @@ def add_month_statistics(
                 )
             )
 
-    Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)
-    Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)
+    app_core = AppCore.instance()
+    Incomes_statistic = get_min_and_max_categories(Incomes_categories, current_month)\
+        if app_core.db.transaction_query.check_categories_have_transactions(
+            Incomes_categories, app_core.current_year, current_month
+        ) else None
+    Expenses_statistic = get_min_and_max_categories(Expenses_categories, current_month)\
+        if app_core.db.transaction_query.check_categories_have_transactions(
+            Expenses_categories, app_core.current_year, current_month
+        ) else None
 
-    total_income = round(sum([Incomes_statistic[4][category_id] for category_id in Incomes_statistic[4]]), 2)
-    total_expense = round(sum([Expenses_statistic[4][category_id] for category_id in Expenses_statistic[4]]), 2)
-    _, days_amount = monthrange(AppCore.instance().current_year, current_month)
+    total_income = round(sum(Incomes_statistic[4].values()), 2) if Incomes_statistic is not None else 0.0
+    total_expense = round(sum(Expenses_statistic[4].values()), 2) if Expenses_statistic is not None else 0.0
+    _, days_amount = monthrange(app_core.current_year, current_month)
+    month_start, month_end = generate_month_range(app_core.current_year, current_month)
+    investment_categories = app_core.get_investment_categories_ids()
+    investment_totals = app_core.db.investment_query.get_investment_totals(
+        investment_categories, month_start, month_end
+    ) if investment_categories else None
 
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(4)}{total_income}")
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>")
@@ -355,15 +432,22 @@ def add_month_statistics(
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}")
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}<br/>")
 
-    month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(8)}{round(total_income - total_expense, 2)}")
+    month_statistics.addItem(get_net_result_text(total_income, total_expense, investment_totals))
 
-    month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
-    add_statistic(month_statistics, Incomes_statistic, [9,10,13,14,11,15])
-    add_categories_months_sum(Incomes_statistic[4], CategoryType.Income)
+    if Incomes_statistic is not None:
+        month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
+        add_statistic(month_statistics, Incomes_statistic, [9,10,13,14,11,15])
+        add_categories_months_sum(Incomes_statistic[4], CategoryType.Income)
 
-    month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
-    add_statistic(month_statistics, Expenses_statistic, [17,18,20,21,19,22])
-    add_categories_months_sum(Expenses_statistic[4], CategoryType.Expense)
+    if Expenses_statistic is not None:
+        month_statistics.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
+        add_statistic(month_statistics, Expenses_statistic, [17,18,20,21,19,22])
+        add_categories_months_sum(Expenses_statistic[4], CategoryType.Expense)
+
+    if investment_totals is not None:
+        add_investments_statistics(
+            month_statistics, investment_categories, investment_totals, month_start, month_end
+        )
 
 def show_monthly_statistics() -> int:
     """This method is used to show the monthly statistics window."""
@@ -371,18 +455,14 @@ def show_monthly_statistics() -> int:
     app_core = AppCore.instance()
     WindowsRegistry.MonthlyStatistics.setWindowTitle(LanguageStructure.Months.get_translation(app_core.current_month))
     WindowsRegistry.MonthlyStatistics.statistics.clear()
-    app_core.get_income_and_expense_categories()
     Incomes_categories, Expenses_categories = app_core.get_income_and_expense_categories_as_ids()
 
-    if len(app_core.categories) < 2 or len(Incomes_categories) < 1 or len(Expenses_categories) < 1:
+    if len(app_core.categories) == 0:
         return WindowsRegistry.Messages.no_category.exec()
 
-    Incomes_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
-        Incomes_categories, app_core.current_year, app_core.current_month)
-    Expenses_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
-        Expenses_categories, app_core.current_year, app_core.current_month)
-
-    if not (Incomes_categories_have_transactions and Expenses_categories_have_transactions):
+    if not app_core.db.transaction_query.check_categories_have_transactions(
+        list(app_core.categories), app_core.current_year, app_core.current_month
+    ):
         return WindowsRegistry.Messages.no_transactions.exec()
     
     add_month_statistics(
@@ -405,8 +485,9 @@ def show_quarterly_statistics() -> int:
             month.data.clear()
 
     Incomes_categories, Expenses_categories = app_core.get_income_and_expense_categories_as_ids()
+    investment_categories = app_core.get_investment_categories_ids()
 
-    if len(app_core.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
+    if len(app_core.categories) == 0:
         return WindowsRegistry.Messages.no_category.exec()
     
     for quarter in WindowsRegistry.QuarterlyStatistics.statistics.quarters:
@@ -431,6 +512,11 @@ def show_quarterly_statistics() -> int:
         quarter_number = quarter.quarter_number
         months_in_quarter = range((quarter_number - 1) * 3 + 1, quarter_number * 3 + 1)
         days_amount = sum(monthrange(app_core.current_year, month)[1] for month in months_in_quarter)
+        quarter_start = generate_month_range(app_core.current_year, months_in_quarter[0])[0]
+        quarter_end = generate_month_range(app_core.current_year, months_in_quarter[-1])[1]
+        investment_totals = app_core.db.investment_query.get_investment_totals(
+            investment_categories, quarter_start, quarter_end
+        ) if investment_categories else None
 
         Total_statistic_list = quarter.total_quarter_statistics.data
 
@@ -442,36 +528,40 @@ def show_quarterly_statistics() -> int:
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(27)+str(round(total_expense/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(7)+str(round(total_expense/days_amount, 2))+"<br/>")
 
-        Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(8)+str(round(total_income - total_expense, 2)))
+        Total_statistic_list.addItem(get_net_result_text(total_income, total_expense, investment_totals))
 
-        Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
-        add_total_statistics(
-            Incomes_categories_total_values,
-            [9,13],
-            Total_statistic_list,
-            CategoryType.Income,
-            days_amount,
-            3,
-        )
+        if Incomes_categories:
+            Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
+            add_total_statistics(
+                Incomes_categories_total_values,
+                [9,13],
+                Total_statistic_list,
+                CategoryType.Income,
+                days_amount,
+                3,
+            )
 
-        Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
-        add_total_statistics(
-            Expenses_categories_total_values,
-            [17,20],
-            Total_statistic_list,
-            CategoryType.Expense,
-            days_amount,
-            3,
-        )
+        if Expenses_categories:
+            Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
+            add_total_statistics(
+                Expenses_categories_total_values,
+                [17,20],
+                Total_statistic_list,
+                CategoryType.Expense,
+                days_amount,
+                3,
+            )
+
+        if investment_totals is not None:
+            add_investments_statistics(
+                Total_statistic_list, investment_categories, investment_totals, quarter_start, quarter_end
+            )
 
         #Months statistics
         for month in quarter.months:
-            Incomes_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
-                                                        Incomes_categories, app_core.current_year, month.month_number)
-            Expenses_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
-                                                        Expenses_categories, app_core.current_year, month.month_number)
-
-            if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
+            if app_core.db.transaction_query.check_categories_have_transactions(
+                list(app_core.categories), app_core.current_year, month.month_number
+            ):
                 add_month_statistics(Incomes_categories, Expenses_categories, month.data, month.month_number)
             else:
                 month.data.addItem(WindowsRegistry.Messages.no_transactions.text())
@@ -491,7 +581,8 @@ def show_yearly_statistics() -> int:
         ymonth.data.clear()
     
     Incomes_categories, Expenses_categories = app_core.get_income_and_expense_categories_as_ids()
-    if len(app_core.categories) < 2 or len(Expenses_categories) < 1 or len(Incomes_categories) < 1:
+    investment_categories = app_core.get_investment_categories_ids()
+    if len(app_core.categories) == 0:
         return WindowsRegistry.Messages.no_category.exec()
     
     Incomes_categories_total_values:CategoriesTotalValues = {}
@@ -512,6 +603,11 @@ def show_yearly_statistics() -> int:
     total_income = round(sum(Incomes_categories_total_values.values()), 2)
     total_expense = round(sum(Expenses_categories_total_values.values()), 2)
     days_amount = 365 if app_core.current_year % 4 != 0 else 366# 365 days if year is not leap
+    year_start = date(app_core.current_year, 1, 1)
+    year_end = date(app_core.current_year, 12, 31)
+    investment_totals = app_core.db.investment_query.get_investment_totals(
+        investment_categories, year_start, year_end
+    ) if investment_categories else None
 
     Total_statistic_list = WindowsRegistry.YearlyStatistics.statistics.total_year_statistics.data
 
@@ -523,21 +619,25 @@ def show_yearly_statistics() -> int:
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(27)+str(round(total_expense/12, 2)))
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(26)+str(round(total_expense/days_amount, 2))+"<br/>")
 
-    Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}")
+    Total_statistic_list.addItem(get_net_result_text(total_income, total_expense, investment_totals))
 
-    Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
-    add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list, CategoryType.Income, days_amount, 12)
+    if Incomes_categories:
+        Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
+        add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list, CategoryType.Income, days_amount, 12)
 
-    Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
-    add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, CategoryType.Expense, days_amount, 12 )
+    if Expenses_categories:
+        Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
+        add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, CategoryType.Expense, days_amount, 12 )
+
+    if investment_totals is not None:
+        add_investments_statistics(
+            Total_statistic_list, investment_categories, investment_totals, year_start, year_end
+        )
 
     for ymonth in WindowsRegistry.YearlyStatistics.statistics.months:
-        Incomes_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
-            Incomes_categories, app_core.current_year, ymonth.month_number)
-        Expenses_categories_have_transactions = app_core.db.transaction_query.check_categories_have_transactions(
-            Expenses_categories, app_core.current_year, ymonth.month_number)
-
-        if Incomes_categories_have_transactions and Expenses_categories_have_transactions:
+        if app_core.db.transaction_query.check_categories_have_transactions(
+            list(app_core.categories), app_core.current_year, ymonth.month_number
+        ):
             add_month_statistics(Incomes_categories, Expenses_categories, ymonth.data, ymonth.month_number)
         else:
             ymonth.data.addItem(WindowsRegistry.Messages.no_transactions.text())
@@ -570,7 +670,9 @@ def show_custom_range_statistics_view() -> int:
     if from_date.daysTo(to_date) <= 0:
         return WindowsRegistry.Messages.wrong_date.exec()
     
-    if len(WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data) == 0:
+    investment_categories = AppCore.instance().get_investment_categories_ids()
+    if len(WindowsRegistry.CustomRangeStatistics.categories_selection.selected_categories_data) == 0\
+        and not investment_categories:
         return WindowsRegistry.Messages.no_selected_category.exec()
 
     date_difference:timedelta = cast(date, to_date.toPython()) - cast(date, from_date.toPython()) # pyright: ignore[reportOperatorIssue]
@@ -612,6 +714,9 @@ def show_custom_range_statistics_view() -> int:
     
     total_income = round(sum(total_value for total_value in Incomes_categories_total_values.values()), 2)
     total_expense = round(sum(total_value for total_value in Expenses_categories_total_values.values()), 2)
+    investment_totals = AppCore.instance().db.investment_query.get_investment_totals(
+        investment_categories, cast(date, from_date.toPython()), cast(date, to_date.toPython())
+    ) if investment_categories else None
 
     #Custom range statistics
     WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
@@ -629,7 +734,7 @@ def show_custom_range_statistics_view() -> int:
     )
 
     WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
-        LanguageStructure.Statistics.get_translation(8)+f"{round(total_income - total_expense, 2)}"
+        get_net_result_text(total_income, total_expense, investment_totals)
     )
 
     months = _get_custom_range_months_amount(
@@ -646,6 +751,12 @@ def show_custom_range_statistics_view() -> int:
             "<br/><br/>"+LanguageStructure.MainWindow.get_translation(2)
         )
         add_total_statistics(Expenses_categories_total_values, [17,20], WindowsRegistry.CustomRangeStatisticsView.statistics_list, CategoryType.Expense, days_amount, months)
+
+    if investment_totals is not None:
+        add_investments_statistics(
+            WindowsRegistry.CustomRangeStatisticsView.statistics_list, investment_categories, investment_totals,
+            cast(date, from_date.toPython()), cast(date, to_date.toPython())
+        )
     
     def add_transaction_to_transactions_list(transaction:Transaction) -> None:
         day = transaction.date.day                

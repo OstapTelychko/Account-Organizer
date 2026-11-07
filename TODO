@@ -3,6 +3,7 @@ New features:
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
   ☐ fix issue with weird looking buttons on windows
+  ☐ add third tab and type for actions/savings since when I transfer 4000 to buy government bonds, I want to see that in statistics I lost money but in total balance I have those 4000 also add option to update value of actions sine actions of companies may go down so I will current state monthly @started(26-11-07 18:22)
 	
 Updates to existing features:
   ☐ empty @don't-touch

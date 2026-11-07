@@ -1,6 +1,6 @@
 from __future__ import annotations
 import datetime
-from sqlalchemy import String, Float, ForeignKey, DateTime, SmallInteger, Date
+from sqlalchemy import String, Float, ForeignKey, DateTime, SmallInteger, Date, CheckConstraint
 from sqlalchemy.orm import Mapped, DeclarativeBase, relationship, mapped_column
 
 
@@ -77,6 +77,8 @@ class Transaction(Base):
     date: Mapped[datetime.date] = mapped_column(Date, nullable=False, index=True)
     value: Mapped[float] = mapped_column(Float, nullable=False)
     name: Mapped[str | None] = mapped_column(String)
+    # InvestmentOperation; only Investments categories use non-regular operations
+    operation_type: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0, server_default="0")
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category"] = relationship(
@@ -90,20 +92,30 @@ class Transaction(Base):
 
 
 class MonthlyReminder(Base):
-    """Represents a monthly payment reminder. Its account is the account of its category."""
+    """Represents a monthly reminder. Regular reminders have a category, Investments reminders don't."""
 
     __tablename__ = "monthly_reminders"
+    __table_args__ = (
+        CheckConstraint(
+            "(reminder_type = 0) = (category_id IS NOT NULL)", name="ck_monthly_reminders_category_by_type"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     value: Mapped[float | None] = mapped_column(Float, nullable=True)
     day: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
     next_due_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
+    # ReminderType
+    reminder_type: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0, server_default="0")
 
-    category_id: Mapped[int] = mapped_column(
-        ForeignKey("categories.id", ondelete="CASCADE"), nullable=False, index=True
+    account_id: Mapped[int] = mapped_column(
+        ForeignKey("accounts.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    category: Mapped["Category"] = relationship(back_populates="reminders")
+    category_id: Mapped[int | None] = mapped_column(
+        ForeignKey("categories.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    category: Mapped["Category | None"] = relationship(back_populates="reminders")
 
 
     def __repr__(self) -> str:

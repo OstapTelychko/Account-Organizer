@@ -17,8 +17,9 @@ from GUI.windows.reminders import PendingReminderRow
 
 from languages import LanguageStructure
 from project_configuration import CategoryType, MIN_REMINDER_NAME_LENGTH, MIN_REMINDER_DAY, MAX_REMINDER_DAY,\
-    DISPLAY_DATE_FORMAT
+    DISPLAY_DATE_FORMAT, ReminderType
 from AppManagement.date import set_month_and_year
+from AppManagement.investments import show_monthly_investments_window
 
 if TYPE_CHECKING:
     from backend.models import MonthlyReminder
@@ -36,6 +37,25 @@ class ReminderFormData(NamedTuple):
     category_id: int | None
     value: float | None
     day: int | None
+    reminder_type: ReminderType
+
+
+def get_reminder_category_text(reminder:MonthlyReminder) -> str:
+    """Get the category name of a reminder or the name of its type for account level Investments reminders.
+
+        Arguments
+        ---------
+            `reminder` : (MonthlyReminder) - Reminder to describe.
+        Returns
+        -------
+            `str` - Text shown in the category column.
+    """
+
+    if reminder.category is not None:
+        return reminder.category.name
+    if reminder.reminder_type == ReminderType.InvestmentTransfer:
+        return LanguageStructure.Investments.get_translation(19)
+    return LanguageStructure.Investments.get_translation(20)
 
 
 def get_covered_month_text(reminder:MonthlyReminder) -> str:
@@ -53,30 +73,43 @@ def get_covered_month_text(reminder:MonthlyReminder) -> str:
     return covered_start.strftime("%m-%Y")
 
 
-def validate_reminder(name:str, category_id:int|None, day:int|None, exclude_reminder_id:int|None = None) -> int:
+def validate_reminder(
+        name:str,
+        category_id:int|None,
+        day:int|None,
+        exclude_reminder_id:int|None = None,
+        reminder_type:ReminderType = ReminderType.Regular
+    ) -> int | None:
     """Validate reminder data. Raises `ReminderValidationError` with the reason if data is invalid.
 
         Arguments
         ---------
             `name` : (str) - Reminder name.
-            `category_id` : (int|None) - Category ID. Mandatory.
+            `category_id` : (int|None) - Category ID. Mandatory for regular reminders, ignored for Investments ones.
             `day` : (int|None) - Day of the month. Optional.
             `exclude_reminder_id` : (int|None) - Reminder that is being updated (skipped in the name check).
+            `reminder_type` : (ReminderType) - Type of the reminder.
         Returns
         -------
-            `int` - Validated category ID.
+            `int | None` - Validated category ID. None for Investments reminders.
     """
 
+    app_core = AppCore.instance()
     if len(name.strip()) < MIN_REMINDER_NAME_LENGTH:
         raise ReminderValidationError(ReminderValidationError.NAME_TOO_SHORT)
 
-    if category_id is None:
-        raise ReminderValidationError(ReminderValidationError.NO_CATEGORY)
+    if reminder_type == ReminderType.Regular:
+        if category_id is None:
+            raise ReminderValidationError(ReminderValidationError.NO_CATEGORY)
+        if app_core.db.category_query.get_category_by_id(category_id).category_type == CategoryType.Investment:
+            raise ReminderValidationError(ReminderValidationError.INVESTMENT_CATEGORY)
+    else:
+        category_id = None
 
     if day is not None and not MIN_REMINDER_DAY <= day <= MAX_REMINDER_DAY:
         raise ReminderValidationError(ReminderValidationError.DAY_OUT_OF_RANGE)
 
-    if AppCore.instance().db.reminder_query.reminder_name_exists(name, exclude_reminder_id):
+    if app_core.db.reminder_query.reminder_name_exists(name, exclude_reminder_id):
         raise ReminderValidationError(ReminderValidationError.NAME_EXISTS)
 
     return category_id
@@ -87,32 +120,38 @@ def create_reminder(
         category_id:int|None,
         value:float|None,
         day:int|None,
-        current_date:date|None = None
+        current_date:date|None = None,
+        reminder_type:ReminderType = ReminderType.Regular
     ) -> MonthlyReminder:
     """Validate and create a reminder.
 
         Arguments
         ---------
             `name` : (str) - Reminder name.
-            `category_id` : (int|None) - Category ID. Mandatory.
+            `category_id` : (int|None) - Category ID. Mandatory for regular reminders.
             `value` : (float|None) - Expected value.
             `day` : (int|None) - Day of the month.
             `current_date` : (date|None) - Date of creation. Defaults to `date.today()`.
+            `reminder_type` : (ReminderType) - Type of the reminder.
         Returns
         -------
             `MonthlyReminder` - Created reminder.
     """
 
     name = name.strip()
-    valid_category_id = validate_reminder(name, category_id, day)
+    valid_category_id = validate_reminder(name, category_id, day, reminder_type=reminder_type)
 
     current_date = current_date or date.today()
     next_due_date = get_due_date_for_covered_month(current_date.year, current_date.month, day)
-    return AppCore.instance().db.reminder_query.create_reminder(name, valid_category_id, value, day, next_due_date)
+    return AppCore.instance().db.reminder_query.create_reminder(
+        name, valid_category_id, value, day, next_due_date, reminder_type
+    )
 
 
 def is_reminder_paid(reminder:MonthlyReminder) -> bool:
-    """Check if a transaction matching the reminder exists in its covered month.
+    """Check if the reminder is fulfilled in its covered month.
+    A regular reminder needs a matching transaction, an Investments transfer needs any deposit
+    and an Investments revaluation needs a revaluation of every category that has value.
 
         Arguments
         ---------
@@ -122,8 +161,13 @@ def is_reminder_paid(reminder:MonthlyReminder) -> bool:
             `bool` - True if the reminder is paid.
     """
 
+    db = AppCore.instance().db
     period_start, period_end = get_covered_period(reminder.next_due_date, reminder.day)
-    return AppCore.instance().db.reminder_query.matching_transaction_exists(
+    if reminder.category_id is None:
+        if reminder.reminder_type == ReminderType.InvestmentTransfer:
+            return db.investment_query.deposit_exists(period_start, period_end)
+        return db.investment_query.all_investments_revalued(period_start, period_end)
+    return db.reminder_query.matching_transaction_exists(
         reminder.name, reminder.category_id, period_start, period_end
     )
 
@@ -233,7 +277,7 @@ def show_pending_reminders(current_date:date|None = None) -> None:
 
         row = PendingReminderRow()
         row.name_label.setText(reminder.name)
-        row.category_label.setText(reminder.category.name)
+        row.category_label.setText(get_reminder_category_text(reminder))
         row.value_label.setText(
             str(reminder.value) if reminder.value is not None else LanguageStructure.GeneralManagement.get_translation(12)
         )
@@ -269,21 +313,29 @@ def pay_reminder(reminder_id:int) -> None:
 
     # The transaction window builds the date from the viewed month and year
     set_month_and_year(covered_start.month, covered_start.year)
-    WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(
-        CategoryType.get_index(reminder.category.category_type)
-    )
 
-    transaction_window = WindowsRegistry.TransactionManagementWindow
-    transaction_window.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
-    transaction_window.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
-    transaction_window.transaction_name.setText(reminder.name)
-    transaction_window.transaction_day.setText(
-        str(min(reminder.day, covered_end.day)) if reminder.day is not None else ""
-    )
-    transaction_window.transaction_value.setText(str(reminder.value) if reminder.value is not None else "")
-    transaction_window.setWindowTitle(reminder.category.name)
-    transaction_window.transaction_name.setFocus()
-    transaction_window.exec()
+    if reminder.category is None:
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(CategoryType.get_index(CategoryType.Investment))
+        show_monthly_investments_window(
+            reminder.value if reminder.reminder_type == ReminderType.InvestmentTransfer else None
+        )
+    else:
+        WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(
+            CategoryType.get_index(reminder.category.category_type)
+        )
+
+        transaction_window = WindowsRegistry.TransactionManagementWindow
+        transaction_window.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
+        transaction_window.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
+        transaction_window.operation_type.hide()
+        transaction_window.transaction_name.setText(reminder.name)
+        transaction_window.transaction_day.setText(
+            str(min(reminder.day, covered_end.day)) if reminder.day is not None else ""
+        )
+        transaction_window.transaction_value.setText(str(reminder.value) if reminder.value is not None else "")
+        transaction_window.setWindowTitle(reminder.category.name)
+        transaction_window.transaction_name.setFocus()
+        transaction_window.exec()
 
     if not is_reminder_paid(reminder):
         return
@@ -320,7 +372,7 @@ def load_reminders_table() -> None:
     for row, reminder in enumerate(reminders):
         cells = (
             reminder.name,
-            reminder.category.name,
+            get_reminder_category_text(reminder),
             str(reminder.value) if reminder.value is not None else no_value,
             str(reminder.day) if reminder.day is not None else no_value,
             reminder.next_due_date.strftime(DISPLAY_DATE_FORMAT),
@@ -342,6 +394,7 @@ def clear_reminder_form() -> None:
     window.reminder_day.setText("")
     window.income_categories.clearSelection()
     window.expense_categories.clearSelection()
+    window.investment_reminder_types.clearSelection()
 
 
 def show_reminders_management_window() -> None:
@@ -350,13 +403,21 @@ def show_reminders_management_window() -> None:
     window = WindowsRegistry.RemindersManagementWindow
     window.income_categories.clear()
     window.expense_categories.clear()
+    window.investment_reminder_types.clear()
     for category in AppCore.instance().db.category_query.get_all_categories():
         item = QListWidgetItem(category.name)
         item.setData(Qt.ItemDataRole.UserRole, category.id)
         if category.category_type == CategoryType.Income:
             window.income_categories.addItem(item)
-        else:
+        elif category.category_type == CategoryType.Expense:
             window.expense_categories.addItem(item)
+
+    for reminder_type, translation_index in (
+        (ReminderType.InvestmentTransfer, 19), (ReminderType.InvestmentsRevaluation, 20)
+    ):
+        item = QListWidgetItem(LanguageStructure.Investments.get_translation(translation_index))
+        item.setData(Qt.ItemDataRole.UserRole, int(reminder_type))
+        window.investment_reminder_types.addItem(item)
 
     load_reminders_table()
     clear_reminder_form()
@@ -393,11 +454,18 @@ def fill_reminder_form_from_selection() -> None:
     window.reminder_value.setText(str(reminder.value) if reminder.value is not None else "")
     window.reminder_day.setText(str(reminder.day) if reminder.day is not None else "")
 
-    window.category_tabs.setCurrentIndex(CategoryType.get_index(reminder.category.category_type))
-    categories_list = window.income_categories if reminder.category.category_type == CategoryType.Income\
-        else window.expense_categories
+    selected_data:int|None
+    if reminder.category is None:
+        window.category_tabs.setCurrentIndex(CategoryType.get_index(CategoryType.Investment))
+        categories_list = window.investment_reminder_types
+        selected_data = int(reminder.reminder_type)
+    else:
+        window.category_tabs.setCurrentIndex(CategoryType.get_index(reminder.category.category_type))
+        categories_list = window.income_categories if reminder.category.category_type == CategoryType.Income\
+            else window.expense_categories
+        selected_data = reminder.category_id
     for row in range(categories_list.count()):
-        if categories_list.item(row).data(Qt.ItemDataRole.UserRole) == reminder.category_id:
+        if categories_list.item(row).data(Qt.ItemDataRole.UserRole) == selected_data:
             categories_list.setCurrentRow(row)
             categories_list.scrollToItem(categories_list.item(row))
 
@@ -422,10 +490,24 @@ def read_reminder_form() -> ReminderFormData | None:
         return None
 
     # Only the category selected in the visible tab counts
-    categories_list = window.income_categories if window.category_tabs.currentIndex() == 0 else window.expense_categories
+    selected_tab = window.category_tabs.currentIndex()
+    if selected_tab == CategoryType.get_index(CategoryType.Investment):
+        selected_items = window.investment_reminder_types.selectedItems()
+        if not selected_items:
+            WindowsRegistry.Messages.reminder_no_category.exec()
+            return None
+        return ReminderFormData(
+            name=window.reminder_name.text(), category_id=None, value=value, day=day,
+            reminder_type=ReminderType(selected_items[0].data(Qt.ItemDataRole.UserRole))
+        )
+
+    categories_list = window.income_categories if selected_tab == 0 else window.expense_categories
     selected_items = categories_list.selectedItems()
     category_id = selected_items[0].data(Qt.ItemDataRole.UserRole) if selected_items else None
-    return ReminderFormData(name=window.reminder_name.text(), category_id=category_id, value=value, day=day)
+    return ReminderFormData(
+        name=window.reminder_name.text(), category_id=category_id, value=value, day=day,
+        reminder_type=ReminderType.Regular
+    )
 
 
 def show_reminder_validation_error(error:ReminderValidationError) -> int:
@@ -444,6 +526,7 @@ def show_reminder_validation_error(error:ReminderValidationError) -> int:
         ReminderValidationError.NAME_EXISTS: WindowsRegistry.Messages.reminder_already_exists,
         ReminderValidationError.NO_CATEGORY: WindowsRegistry.Messages.reminder_no_category,
         ReminderValidationError.DAY_OUT_OF_RANGE: WindowsRegistry.Messages.reminder_day_out_range,
+        ReminderValidationError.INVESTMENT_CATEGORY: WindowsRegistry.Messages.reminder_investment_category,
     }
     return messages[error.reason].exec()
 
@@ -456,7 +539,10 @@ def add_reminder_from_form() -> int:
         return 0
 
     try:
-        create_reminder(form_data.name, form_data.category_id, form_data.value, form_data.day)
+        create_reminder(
+            form_data.name, form_data.category_id, form_data.value, form_data.day,
+            reminder_type=form_data.reminder_type
+        )
     except ReminderValidationError as error:
         return show_reminder_validation_error(error)
 
@@ -480,7 +566,9 @@ def update_reminder_from_form() -> int:
 
     name = form_data.name.strip()
     try:
-        valid_category_id = validate_reminder(name, form_data.category_id, form_data.day, reminder_id)
+        valid_category_id = validate_reminder(
+            name, form_data.category_id, form_data.day, reminder_id, form_data.reminder_type
+        )
     except ReminderValidationError as error:
         return show_reminder_validation_error(error)
 
@@ -489,7 +577,7 @@ def update_reminder_from_form() -> int:
     covered_start, _ = get_covered_period(reminder.next_due_date, reminder.day)
     next_due_date = get_due_date_for_covered_month(covered_start.year, covered_start.month, form_data.day)
     reminder_query.update_reminder(
-        reminder_id, name, valid_category_id, form_data.value, form_data.day, next_due_date
+        reminder_id, name, valid_category_id, form_data.value, form_data.day, next_due_date, form_data.reminder_type
     )
 
     load_reminders_table()

@@ -63,7 +63,8 @@ class AppCore:
         self.projected_balance = 0.0
         self.future_expenses_total = 0.0
         self.future_incomes_total = 0.0
-
+        # Value of all Investments categories today, None if the account has no Investments categories
+        self.investments_value:float | None = None
         self.accounts_list:list[Account] = []
         self.categories:dict[int, Category] = {}
         self.focused_income_category:Category | None
@@ -202,4 +203,10 @@ class AppCore:
         income_categories_ids = [category.id for category in self.categories.values() if category.type == CategoryType.Income]
         expense_categories_ids = [category.id for category in self.categories.values() if category.type == CategoryType.Expense]
         return income_categories_ids, expense_categories_ids
+
+
+    def get_investment_categories_ids(self) -> list[int]:
+        """Get ids of loaded Investments categories."""
+
+        return [category.id for category in self.categories.values() if category.type == CategoryType.Investment]
         

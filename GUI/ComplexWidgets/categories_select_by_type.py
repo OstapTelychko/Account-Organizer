@@ -287,6 +287,10 @@ class CategoriesSelectionByType(QWidget):
         self.clear_categories_selection()
 
         for category in categories:
+            # Investments statistics always include all Investments categories
+            if category.type == CategoryType.Investment:
+                continue
+
             category_item = self.CategoryItem(
                 category.name,
                 LanguageStructure.GeneralManagement.get_translation(0),

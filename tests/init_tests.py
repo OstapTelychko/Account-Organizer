@@ -80,6 +80,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
     from tests.app_tests.test_search import TestSearch
     from tests.app_tests.test_balance import TestBalance
     from tests.app_tests.test_reminders import TestReminders
+    from tests.app_tests.test_investments import TestInvestments
 
     try:
         suite = TestSuite()
@@ -98,6 +99,7 @@ def test_main(app_main:Callable[[bool], None]) -> None:
             loader.loadTestsFromTestCase(TestSearch),
             loader.loadTestsFromTestCase(TestBalance),
             loader.loadTestsFromTestCase(TestReminders),
+            loader.loadTestsFromTestCase(TestInvestments),
         ))
         
         print(f"Tests found: {suite.countTestCases()}")

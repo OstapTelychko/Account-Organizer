@@ -112,6 +112,7 @@ class LanguageStructure():
     DelayedPayments = Windows.add_subcategory("Delayed payments")
     DateChange = Windows.add_subcategory("Date change")
     Reminders = Windows.add_subcategory("Monthly reminders")
+    Investments = Windows.add_subcategory("Investments")
 
     Messages = LanguageCategory("Messages")
 

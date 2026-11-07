@@ -167,8 +167,37 @@ class MainWindow(QWidget, metaclass=QSingleton):
         self.Expenses_scroll.setObjectName("Expenses-window")
         self.Expenses_scroll.setStyleSheet("#Expenses-window{ border-color:rgba(205,0,0,100); border-width:2px }")
 
+        self.Investments_window = QWidget()
+        self.Investments_window.setContentsMargins(0, 10, 0, 10)
+
+        self.add_investments_category = create_button("Create category",(170,40))
+        self.monthly_investments = create_button("Monthly investments",(190,40))
+
+        self.Investments_buttons_layout = QVBoxLayout()
+        self.Investments_buttons_layout.addStretch(1)
+        self.Investments_buttons_layout.addWidget(self.add_investments_category)
+        self.Investments_buttons_layout.addWidget(self.monthly_investments)
+        self.Investments_buttons_layout.addStretch(1)
+
+        self.Investments_window_layout = QHBoxLayout()
+        self.Investments_window_layout.addLayout(self.Investments_buttons_layout)
+
+        self.Investments_window_layout.setSpacing(70)
+        self.Investments_window.setLayout(self.Investments_window_layout)
+
+        self.Investments_scroll = HorizontalScrollArea()
+        self.Investments_scroll.setWidget(self.Investments_window)
+        self.Investments_scroll.setWidgetResizable(True)
+        self.Investments_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.Investments_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.Investments_scroll.setObjectName("Investments-window")
+        self.Investments_scroll.setStyleSheet(
+            "#Investments-window{ border-color:rgba(30,144,255,100); border-width:2px }"
+        )
+
         self.Incomes_and_expenses.addTab(self.Incomes_scroll,"Income")
         self.Incomes_and_expenses.addTab(self.Expenses_scroll,"Expenses")
+        self.Incomes_and_expenses.addTab(self.Investments_scroll,"Investments")
         self.Incomes_and_expenses.setMinimumHeight(500)
         self.Incomes_and_expenses.setObjectName("Incomes-and-expenses")
         self.Incomes_and_expenses.setStyleSheet("QTabWidget::pane{border:none}")

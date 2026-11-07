@@ -162,7 +162,9 @@ def main(test_mode:bool=False) -> None:
     from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
         rename_category,  activate_categories, show_change_category_position, change_category_position, \
         save_anomalous_transaction_values_settings, show_anomalous_transaction_values_settings
-    from AppManagement.transaction import transaction_data_handler
+    from AppManagement.transaction import transaction_data_handler, update_transaction_value_placeholder
+    from AppManagement.investments import show_monthly_investments_window, update_monthly_investments_remaining,\
+        save_monthly_investments
     from AppManagement.date import next_month, previous_month, next_year, previous_year
     from AppManagement.account import show_add_user_window, add_account, remove_account,\
         show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
@@ -235,6 +237,19 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
     WindowsRegistry.AnomalousTransactionValuesWindow.save_button.clicked.connect(save_anomalous_transaction_values_settings)
     WindowsRegistry.TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
+    WindowsRegistry.TransactionManagementWindow.operation_type.currentIndexChanged.connect(
+        lambda _index: update_transaction_value_placeholder()
+    )
+
+    #Investments
+    WindowsRegistry.MainWindow.monthly_investments.clicked.connect(lambda: show_monthly_investments_window())
+    WindowsRegistry.MonthlyInvestmentsWindow.total_amount.textChanged.connect(
+        lambda _text: update_monthly_investments_remaining()
+    )
+    WindowsRegistry.MonthlyInvestmentsWindow.investments_table.itemChanged.connect(
+        lambda _item: update_monthly_investments_remaining()
+    )
+    WindowsRegistry.MonthlyInvestmentsWindow.save_button.clicked.connect(save_monthly_investments)
     
     #Date management
     WindowsRegistry.MainWindow.next_month_button.clicked.connect(next_month)
@@ -245,6 +260,7 @@ def main(test_mode:bool=False) -> None:
     #Add category
     WindowsRegistry.MainWindow.add_incomes_category.clicked.connect(WindowsRegistry.AddCategoryWindow.exec)
     WindowsRegistry.MainWindow.add_expenses_category.clicked.connect(WindowsRegistry.AddCategoryWindow.exec)
+    WindowsRegistry.MainWindow.add_investments_category.clicked.connect(WindowsRegistry.AddCategoryWindow.exec)
     WindowsRegistry.AddCategoryWindow.button.clicked.connect(create_category)
 
 

@@ -35,6 +35,7 @@ These guidelines apply to Gemini and other AI coding assistants working in the *
 - Do not run multiple application test sessions concurrently; the application uses a single-instance guard and concurrent runs conflict.
 - The full suite takes several minutes; run it with output redirected to a file (`.venv1/bin/python main.py --test > /tmp/out.txt 2>&1`) and grep the file for `FAIL|ERROR|Ran `.
 - Type checking: `.venv1/bin/python -m mypy .` (pyright isn't installed).
+- Prefer the `feature-dev-testing` skill scripts: `.github/skills/feature-dev-testing/run_selected_tests.py [Suite ...]` runs selected suites (restores `tests/init_tests.py` automatically) and prints only the summary and tracebacks; `check_text_fit.py` checks translated texts against a widget width.
 
 ## 5. Workspace Safety
 - Inspect the working tree and current file contents before editing; preserve user changes and do not overwrite unrelated modifications.
@@ -56,6 +57,11 @@ These guidelines apply to Gemini and other AI coding assistants working in the *
 
 ### GUI and translations
 - Every new text needs keys in `languages.json` for **English, Українська and Polski**, an accessor in `languages.py` and an update in `AppManagement/language.change_language()`. Polish (then Ukrainian) texts are the longest; check they fit fixed-size buttons (`create_button` sets min = max size).
+- Measure text width headlessly instead of guessing: `QT_QPA_PLATFORM=offscreen .venv1/bin/python -c "from GUI.gui_constants import app, BASIC_FONT; from PySide6.QtGui import QFontMetrics; print(QFontMetrics(BASIC_FONT).horizontalAdvance('Inwestycje miesięczne'))"`. Keep ~20 px of the button width for padding (160 px of text in a 170 px button is too tight). For all three languages at once use `QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv1/bin/python .github/skills/feature-dev-testing/check_text_fit.py --width 190 Windows.Investments.13`.
+- `isVisible()` is `False` for every child until its window is shown; to check whether a widget was hidden on purpose (e.g. before `exec()`), use `not widget.isHidden()`.
+- `QTableWidget.selectedItems()` skips hidden columns, so count visible columns when checking that exactly one row is selected.
+- `QPushButton.clicked` passes `checked: bool`; connect it through a `lambda` to slots whose first parameter is optional (e.g. `show_monthly_investments_window(total_amount=None)`).
+- `QTableWidget.item()` returns `QTableWidgetItem | None` for mypy; use `DesktopQtToolkit.Utils.get_table_widget_item`.
 - `Messages` windows are translated by creation order (`GUI/windows/messages.py` index = `Messages` key in `languages.json`); append new message windows at the end.
 - `InformationMessage` must not use `Qt.WindowType.Popup`: popups grab input, which blocks shortcuts and clicks while the message is shown.
 - Tables in sub windows use `setProperty("class", "category_data")` to get the category table background. qdarktheme paints `QHeaderView` black, so `GUI/theme.py` overrides `.category_data QHeaderView` for both themes.
@@ -70,3 +76,9 @@ These guidelines apply to Gemini and other AI coding assistants working in the *
 - Date-dependent logic must accept an explicit `current_date` so tests are deterministic. `DBTestCase` creates one income and one expense transaction (1000 each) dated today.
 - Tests that change the viewed month must restore it in `tearDown`; tests that change balances must call `calculate_current_balance()` after the database cleanup so later suites start from zero.
 - `load_account_data` schedules a pending reminders check with `QTimer`; a due reminder opens a modal window in later steps of the test.
+- Don't call `activate_categories()` again in a test: it reconnects the buttons of every loaded category, so windows open twice. To use an extra category, `load_category` it into `AppCore.categories` and call `show_add_transaction_window` / `show_edit_transaction_window` / `remove_transaction` directly.
+
+### Investments
+- Value of an Investments category is derived by `backend.investment_query.calculate_investment_timeline` (no stored value). On the same date deposits and withdrawals are applied before revaluations, so a revaluation sets the final value of that day; use different dates in tests to check a withdrawal after a revaluation.
+- Deposits and withdrawals change cash only through `calculate_current_balance()`; `update_account_balance()` handles incomes and expenses only.
+- Investments reminders have `category_id=None` and are told apart by `reminder_type`; always handle `reminder.category is None`.
