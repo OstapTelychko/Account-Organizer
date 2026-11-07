@@ -71,7 +71,7 @@ def load_investment_transactions_into_category_table(
         Arguments
         -------
             `category_data` (CustomTableWidget): Table widget to load operations into<br>
-            `transactions` (list[Transaction]): All operations of the category dated before the end of the month<br>
+            `transactions` (list[Transaction]): All operations of the category<br>
             `year` (int): Year of operations to show<br>
             `month` (int): Month of operations to show
         Returns
@@ -79,16 +79,16 @@ def load_investment_transactions_into_category_table(
             `float`: Value of the category at the end of the month
     """
 
-    month_start, _ = generate_month_range(year, month)
+    month_start, month_end = generate_month_range(year, month)
     transactions_names:dict[int | None, str | None] = {
         transaction.id: transaction.name for transaction in transactions
     }
-    timeline = calculate_investment_timeline(transactions)
+    timeline = [point for point in calculate_investment_timeline(transactions) if point.date <= month_end]
     month_points = [point for point in timeline if point.date >= month_start]
     operations_names = {
-        InvestmentOperation.Deposit: LanguageStructure.Investments.get_translation(2),
-        InvestmentOperation.Withdrawal: LanguageStructure.Investments.get_translation(3),
-        InvestmentOperation.Revaluation: LanguageStructure.Investments.get_translation(4)
+        InvestmentOperation.Deposit: LanguageStructure.Investments.get_translation(1),
+        InvestmentOperation.Withdrawal: LanguageStructure.Investments.get_translation(2),
+        InvestmentOperation.Revaluation: LanguageStructure.Investments.get_translation(3)
     }
 
     category_data.setSortingEnabled(False)
@@ -111,6 +111,8 @@ def load_investment_transactions_into_category_table(
             item.setFlags(~ Qt.ItemFlag.ItemIsEditable)
             if column != 0:
                 item.setTextAlignment(ALIGNMENT.AlignCenter)
+            if column == 4:
+                item.setData(Qt.ItemDataRole.UserRole, point.operation_type)
             if column == 5 and point.operation_type == InvestmentOperation.Revaluation:
                 item.setForeground(QColor("green" if point.value_change >= 0 else "red"))
             category_data.setItem(row, column, item)
@@ -138,8 +140,8 @@ def get_category_table_headers(category_type:str) -> tuple[str, ...]:
     if category_type == CategoryType.Investment:
         headers += (
             "ID",
-            LanguageStructure.Investments.get_translation(6),
-            LanguageStructure.Investments.get_translation(7)
+            LanguageStructure.Investments.get_translation(5),
+            LanguageStructure.Investments.get_translation(6)
         )
     return headers
 
@@ -207,14 +209,9 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
 
     if category.category_type == CategoryType.Investment:
         category_value = load_investment_transactions_into_category_table(
-            category_data,
-            db.investment_query.get_categories_transactions(
-                [category.id], generate_month_range(year, month)[1]
-            )[category.id],
-            year,
-            month
+            category_data, db.transaction_query.get_all_transactions(category.id), year, month
         )
-        category_total_value.setText(f"{LanguageStructure.Investments.get_translation(5)}{category_value}")
+        category_total_value.setText(f"{LanguageStructure.Investments.get_translation(4)}{category_value}")
     else:
         transactions = db.transaction_query.get_transactions_by_month(category.id, year, month)
         

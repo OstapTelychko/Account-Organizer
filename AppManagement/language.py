@@ -30,7 +30,6 @@ def change_language_for_startup() -> None:
     WindowsRegistry.MainWindow.add_incomes_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.add_expenses_category.setText(LanguageStructure.Categories.get_translation(0))
     WindowsRegistry.MainWindow.add_investments_category.setText(LanguageStructure.Categories.get_translation(0))
-    WindowsRegistry.MainWindow.monthly_investments.setText(LanguageStructure.Investments.get_translation(13))
     WindowsRegistry.MainWindow.statistics.setText(LanguageStructure.Statistics.get_translation(0))
     WindowsRegistry.MainWindow.search.setText(LanguageStructure.Search.get_translation(0))
     WindowsRegistry.MainWindow.mini_calculator_label.setText(LanguageStructure.MiniCalculator.get_translation(0))
@@ -153,25 +152,10 @@ def change_language() -> None:
     WindowsRegistry.TransactionManagementWindow.transaction_value.setPlaceholderText(
         LanguageStructure.Transactions.get_translation(2)
     )
-    for operation_index, translation_index in enumerate((2, 3, 4)):
+    for operation_index, translation_index in enumerate((1, 2, 3)):
         WindowsRegistry.TransactionManagementWindow.operation_type.setItemText(
             operation_index, LanguageStructure.Investments.get_translation(translation_index)
         )
-
-    WindowsRegistry.MonthlyInvestmentsWindow.setWindowTitle(LanguageStructure.Investments.get_translation(13))
-    WindowsRegistry.MonthlyInvestmentsWindow.operations_day.setPlaceholderText(
-        LanguageStructure.Investments.get_translation(18)
-    )
-    WindowsRegistry.MonthlyInvestmentsWindow.total_amount.setPlaceholderText(
-        LanguageStructure.Investments.get_translation(16)
-    )
-    WindowsRegistry.MonthlyInvestmentsWindow.investments_table.setHorizontalHeaderLabels((
-        LanguageStructure.Investments.get_translation(14),
-        LanguageStructure.Investments.get_translation(8),
-        LanguageStructure.Investments.get_translation(2),
-        LanguageStructure.Investments.get_translation(15)
-    ))
-    WindowsRegistry.MonthlyInvestmentsWindow.save_button.setText(LanguageStructure.GeneralManagement.get_translation(6))
 
     WindowsRegistry.StatisticsWindow.setWindowTitle(LanguageStructure.Statistics.get_translation(0))
     WindowsRegistry.StatisticsWindow.monthly_statistics.setText(LanguageStructure.Statistics.get_translation(1))

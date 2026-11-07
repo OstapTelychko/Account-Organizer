@@ -1,15 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, NamedTuple
-from collections import defaultdict
 from datetime import date
 from math import inf
 
-from backend.models import Transaction, Category
-from project_configuration import CategoryType, InvestmentOperation
+from project_configuration import InvestmentOperation
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from sqlalchemy.orm import sessionmaker, Session as sql_Session
+    from backend.models import Transaction
+    from backend.transaction_query import TransactionQuery
 
 
 
@@ -70,38 +69,12 @@ def calculate_investment_timeline(transactions:Iterable[Transaction]) -> list[In
 
 
 class InvestmentQuery:
-    """This class is used to calculate values of Investments categories."""
+    """This class is used to calculate values of Investments categories from their operations.
+    Later operations don't change earlier timeline points, so the timeline of all operations is cut by date.
+    """
 
-    def __init__(self, session_factory:sessionmaker[sql_Session]) -> None:
-        self.session_factory = session_factory
-        self.account_id:int
-
-
-    def get_categories_transactions(
-            self, categories_ids:Iterable[int], end_date:date|None = None
-        ) -> defaultdict[int, list[Transaction]]:
-        """Get operations of Investments categories grouped by category.
-
-            Arguments
-            ---------
-                `categories_ids` : (Iterable[int]) - IDs of Investments categories.
-                `end_date` : (date|None) - Include only operations dated on or before this date. Defaults to all.
-            Returns
-            -------
-                `defaultdict[int, list[Transaction]]` - Operations of each category.
-        """
-
-        with self.session_factory() as session:
-            with session.begin():
-                query = session.query(Transaction).filter(Transaction.category_id.in_(list(categories_ids)))
-                if end_date is not None:
-                    query = query.filter(Transaction.date <= end_date)
-                transactions = query.all()
-
-        categories_transactions:defaultdict[int, list[Transaction]] = defaultdict(list)
-        for transaction in transactions:
-            categories_transactions[transaction.category_id].append(transaction)
-        return categories_transactions
+    def __init__(self, transaction_query:TransactionQuery) -> None:
+        self.transaction_query = transaction_query
 
 
     def get_categories_values(self, categories_ids:list[int], as_of:date) -> dict[int, float]:
@@ -116,39 +89,23 @@ class InvestmentQuery:
                 `dict[int, float]` - Value of each category.
         """
 
-        categories_transactions = self.get_categories_transactions(categories_ids, as_of)
         values:dict[int, float] = {}
         for category_id in categories_ids:
-            timeline = calculate_investment_timeline(categories_transactions[category_id])
-            values[category_id] = timeline[-1].value_after if timeline else 0.0
+            points = [
+                point for point in calculate_investment_timeline(
+                    self.transaction_query.get_all_transactions(category_id)
+                ) if point.date <= as_of
+            ]
+            values[category_id] = points[-1].value_after if points else 0.0
         return values
 
 
-    def get_investment_categories_ids(self, account_id:int|None = None) -> list[int]:
-        """Get IDs of Investments categories of an account.
+    def deposit_exists(self, categories_ids:list[int], period_start:date, period_end:date) -> bool:
+        """Check if any of the Investments categories has a deposit in the period.
 
             Arguments
             ---------
-                `account_id` : (int|None) - Account to get categories of. Defaults to the current account.
-            Returns
-            -------
-                `list[int]` - IDs of Investments categories.
-        """
-
-        target_account_id = self.account_id if account_id is None else account_id
-        with self.session_factory() as session:
-            with session.begin():
-                return [category_id for (category_id,) in session.query(Category.id).filter(
-                    Category.account_id == target_account_id,
-                    Category.category_type == CategoryType.Investment
-                ).all()]
-
-
-    def deposit_exists(self, period_start:date, period_end:date) -> bool:
-        """Check if any Investments category of the current account has a deposit in the period.
-
-            Arguments
-            ---------
+                `categories_ids` : (list[int]) - IDs of Investments categories.
                 `period_start` : (date) - First day of the period.
                 `period_end` : (date) - Last day of the period.
             Returns
@@ -156,21 +113,20 @@ class InvestmentQuery:
                 `bool` - True if a deposit exists, False otherwise.
         """
 
-        with self.session_factory() as session:
-            with session.begin():
-                return session.query(Transaction.id).join(Category).filter(
-                    Category.account_id == self.account_id,
-                    Category.category_type == CategoryType.Investment,
-                    Transaction.operation_type == InvestmentOperation.Deposit,
-                    Transaction.date.between(period_start, period_end)
-                ).first() is not None
+        return any(
+            transaction.operation_type == InvestmentOperation.Deposit
+            and period_start <= transaction.date <= period_end
+            for category_id in categories_ids
+            for transaction in self.transaction_query.get_all_transactions(category_id)
+        )
 
 
-    def all_investments_revalued(self, period_start:date, period_end:date) -> bool:
+    def all_investments_revalued(self, categories_ids:list[int], period_start:date, period_end:date) -> bool:
         """Check if every Investments category that had value at the start of the period was revaluated in it.
 
             Arguments
             ---------
+                `categories_ids` : (list[int]) - IDs of Investments categories.
                 `period_start` : (date) - First day of the period.
                 `period_end` : (date) - Last day of the period.
             Returns
@@ -178,34 +134,33 @@ class InvestmentQuery:
                 `bool` - True if all such categories were revaluated, False otherwise.
         """
 
-        categories_ids = self.get_investment_categories_ids()
-        for category_id, transactions in self.get_categories_transactions(categories_ids, period_end).items():
-            timeline = calculate_investment_timeline(transactions)
+        for category_id in categories_ids:
+            timeline = calculate_investment_timeline(self.transaction_query.get_all_transactions(category_id))
             start_points = [point for point in timeline if point.date < period_start]
             if not start_points or start_points[-1].value_after <= 0:
                 continue
 
             if not any(
-                point.operation_type == InvestmentOperation.Revaluation and point.date >= period_start
+                point.operation_type == InvestmentOperation.Revaluation
+                and period_start <= point.date <= period_end
                 for point in timeline
             ):
                 return False
         return True
 
 
-    def get_total_investments_value(self, as_of:date, account_id:int|None = None) -> float | None:
-        """Get the summed value of all Investments categories of an account.
+    def get_total_investments_value(self, categories_ids:list[int], as_of:date) -> float | None:
+        """Get the summed value of Investments categories.
 
             Arguments
             ---------
+                `categories_ids` : (list[int]) - IDs of Investments categories.
                 `as_of` : (date) - Date to calculate the value for.
-                `account_id` : (int|None) - Account to calculate the value for. Defaults to the current account.
             Returns
             -------
-                `float | None` - Total value or `None` if the account has no Investments categories.
+                `float | None` - Total value or `None` if there are no Investments categories.
         """
 
-        categories_ids = self.get_investment_categories_ids(account_id)
         if not categories_ids:
             return None
         return round(sum(self.get_categories_values(categories_ids, as_of).values()), 2)
@@ -225,9 +180,9 @@ class InvestmentQuery:
         """
 
         deposits = withdrawals = value_change = 0.0
-        for transactions in self.get_categories_transactions(categories_ids, end_date).values():
-            for point in calculate_investment_timeline(transactions):
-                if point.date < start_date:
+        for category_id in categories_ids:
+            for point in calculate_investment_timeline(self.transaction_query.get_all_transactions(category_id)):
+                if not start_date <= point.date <= end_date:
                     continue
                 if point.operation_type == InvestmentOperation.Deposit:
                     deposits += point.value

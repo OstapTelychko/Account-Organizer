@@ -56,9 +56,26 @@ def update_transaction_value_placeholder() -> None:
 
     window = WindowsRegistry.TransactionManagementWindow
     if not window.operation_type.isHidden() and window.operation_type.currentData() == InvestmentOperation.Revaluation:
-        window.transaction_value.setPlaceholderText(LanguageStructure.Investments.get_translation(8))
+        window.transaction_value.setPlaceholderText(LanguageStructure.Investments.get_translation(7))
     else:
         window.transaction_value.setPlaceholderText(LanguageStructure.Transactions.get_translation(2))
+
+
+def prepare_operation_type(operation:InvestmentOperation) -> None:
+    """Show the operation selector of the transaction window only on the Investments tab and select an operation.
+
+        Arguments
+        ---------
+        `operation` : (InvestmentOperation) - Operation to select. Ignored outside of the Investments tab.
+    """
+
+    operation_type = WindowsRegistry.TransactionManagementWindow.operation_type
+    is_investment = CategoryType.get(
+        WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()
+    ) == CategoryType.Investment
+    operation_type.setVisible(is_investment)
+    operation_type.setCurrentIndex(max(operation_type.findData(int(operation)), 0))
+    update_transaction_value_placeholder()
 
 
 def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget) -> int:
@@ -85,14 +102,11 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
     WindowsRegistry.TransactionManagementWindow.transaction_day.setText(get_table_widget_item(category_data, row, 1).text())
     WindowsRegistry.TransactionManagementWindow.transaction_value.setText(get_table_widget_item(category_data, row, 2).text())
 
-    operation_type = WindowsRegistry.TransactionManagementWindow.operation_type
-    is_investment = WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == CategoryType.get_index(
-        CategoryType.Investment
-    )
-    operation_type.setVisible(is_investment)
-    if is_investment:
-        operation_type.setCurrentIndex(operation_type.findText(get_table_widget_item(category_data, row, 4).text()))
-    update_transaction_value_placeholder()
+    # Investments tables keep the operation type in the data of the "Operation" column
+    operation_item = category_data.item(row, 4)
+    prepare_operation_type(InvestmentOperation(
+        operation_item.data(Qt.ItemDataRole.UserRole) if operation_item is not None else InvestmentOperation.Regular
+    ))
 
     WindowsRegistry.TransactionManagementWindow.transaction_id = int(get_table_widget_item(category_data, row, 3).text())
     return WindowsRegistry.TransactionManagementWindow.exec()
@@ -152,11 +166,7 @@ def show_add_transaction_window(category_name:str) -> None:
     WindowsRegistry.TransactionManagementWindow.transaction_day.setText("")
     WindowsRegistry.TransactionManagementWindow.transaction_value.setText("")
 
-    WindowsRegistry.TransactionManagementWindow.operation_type.setCurrentIndex(0)
-    WindowsRegistry.TransactionManagementWindow.operation_type.setVisible(
-        WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == CategoryType.get_index(CategoryType.Investment)
-    )
-    update_transaction_value_placeholder()
+    prepare_operation_type(InvestmentOperation.Deposit)
 
     WindowsRegistry.TransactionManagementWindow.setWindowTitle(category_name)
     WindowsRegistry.TransactionManagementWindow.exec()
@@ -239,7 +249,7 @@ def transaction_data_handler() -> int:
     if raw_transaction_day == "" or raw_transaction_value == "":
         return WindowsRegistry.Messages.empty_fields.exec()
     
-    if raw_transaction_value.replace(".","").replace(",","").isdigit() and raw_transaction_day.isdigit():
+    if raw_transaction_value.replace(".", "", 1).isdigit() and raw_transaction_day.isdigit():
         transaction_day = int(raw_transaction_day)
     else:
         return WindowsRegistry.Messages.incorrect_data_type.exec()

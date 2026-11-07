@@ -3,7 +3,7 @@ from datetime import datetime
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 
 from project_configuration import CategoryType
-from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
+from AppManagement.shortcuts.shortcuts_actions import move_category_focus
 from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 
@@ -39,12 +39,12 @@ class TestTransaction(DBTestCase, OutOfScopeTestCase):
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(0)
         for category in income_categories:
             add_transaction_to_single_category()
-            move_to_next_category()
+            move_category_focus(1)
 
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         for category in expense_categories:
             add_transaction_to_single_category()
-            move_to_next_category()
+            move_category_focus(1)
 
         self.assertEqual(
             len(app_core.db.transaction_query.get_all_transactions(self.income_category.id)),

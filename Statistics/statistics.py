@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 
 
 logger = get_logger(__name__)
+# Same blue as the border of the Investments tab
+INVESTMENTS_COLOR = "rgb(30,144,255)"
 CountedTransactionsWithLowestValue:TypeAlias = dict[str, int]
 CountedTransactionsWithHighestValue:TypeAlias = dict[str, int]
 
@@ -328,7 +330,7 @@ def get_net_result_text(
 
     if investment_totals is None:
         return LanguageStructure.Statistics.get_translation(8) + str(round(total_income - total_expense, 2))
-    return LanguageStructure.Investments.get_translation(12) + str(round(
+    return LanguageStructure.Investments.get_translation(11) + str(round(
         total_income - total_expense - investment_totals.deposits + investment_totals.withdrawals, 2
     ))
 
@@ -354,21 +356,30 @@ def add_investments_statistics(
     app_core = AppCore.instance()
     categories_values = app_core.db.investment_query.get_categories_values(investment_categories, end_date)
 
+    # Deposits are colored as expenses and withdrawals as incomes, because they move money of the balance
     statistics_list.addItem("<br/><br/>" + LanguageStructure.Investments.get_translation(0))
-    statistics_list.addItem(LanguageStructure.Investments.get_translation(9) + str(investment_totals.deposits))
-    statistics_list.addItem(LanguageStructure.Investments.get_translation(10) + str(investment_totals.withdrawals))
     statistics_list.addItem(
-        LanguageStructure.Investments.get_translation(11) + str(investment_totals.value_change) + "<br/>"
+        f"{LanguageStructure.Investments.get_translation(8)}<span style='color:red'>{investment_totals.deposits}</span>"
+    )
+    statistics_list.addItem(
+        f"{LanguageStructure.Investments.get_translation(9)}"
+        f"<span style='color:green'>{investment_totals.withdrawals}</span>"
+    )
+    statistics_list.addItem(
+        f"{LanguageStructure.Investments.get_translation(10)}"
+        f"<span style='color:{'green' if investment_totals.value_change >= 0 else 'red'}'>"
+        f"{investment_totals.value_change}</span><br/>"
     )
     for category_id in investment_categories:
         category_totals = app_core.db.investment_query.get_investment_totals([category_id], start_date, end_date)
+        change_color = "green" if category_totals.value_change >= 0 else "red"
         statistics_list.addItem(
-            LanguageStructure.Investments.get_translation(21)
+            LanguageStructure.Investments.get_translation(14)
             .replace("%category%", app_core.categories[category_id].name)
-            .replace("%value%", str(categories_values[category_id]))
-            .replace("%deposits%", str(category_totals.deposits))
-            .replace("%withdrawals%", str(category_totals.withdrawals))
-            .replace("%change%", str(category_totals.value_change))
+            .replace("%value%", f"<span style='color:{INVESTMENTS_COLOR}'>{categories_values[category_id]}</span>")
+            .replace("%deposits%", f"<span style='color:red'>{category_totals.deposits}</span>")
+            .replace("%withdrawals%", f"<span style='color:green'>{category_totals.withdrawals}</span>")
+            .replace("%change%", f"<span style='color:{change_color}'>{category_totals.value_change}</span>")
         )
 
 

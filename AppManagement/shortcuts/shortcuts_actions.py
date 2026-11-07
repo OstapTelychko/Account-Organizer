@@ -6,6 +6,8 @@ from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.logger import get_logger
 
 from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
+from DesktopQtToolkit.horizontal_scroll_area import HorizontalScrollArea
+from project_configuration import CategoryType
 
 
     
@@ -13,80 +15,35 @@ from DesktopQtToolkit.default_drop_shadow_effect import DefaultDropShadowEffect
 
 logger = get_logger(__name__)
 
-def move_to_next_category() -> None:
-    """Move focus to the next category in the list of categories."""
+def move_category_focus(step:int) -> None:
+    """Move focus between categories of the opened tab. Focus wraps around the ends of the list.
+
+        Arguments
+        ---------
+            `step` : (int) - Number of categories to move by. `1` focuses the next category, `-1` the previous one.
+    """
 
     app_core = AppCore.instance()
-    income_categories, expense_categories = app_core.get_income_and_expense_categories()
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    categories = [category for category in app_core.categories.values() if category.type == category_type]
+    if len(categories) < 2:
+        return
 
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if len(income_categories) > 1:
-            if app_core.focused_income_category is None:
-                logger.error("Focused income category is None")
-                raise ValueError("Focused income category is None")
+    focused_category = app_core.focused_categories.get(category_type)
+    if focused_category is None:
+        logger.error(f"Focused {category_type} category is None")
+        raise ValueError(f"Focused {category_type} category is None")
 
-            current_index = income_categories.index(app_core.focused_income_category)
-            next_index = (current_index + 1) % len(income_categories)
-
-            app_core.focused_income_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
-            app_core.focused_income_category = income_categories[next_index]
-            app_core.focused_income_category.table_data.setGraphicsEffect(
-                DefaultDropShadowEffect(app_core.focused_income_category.table_data, focused=True)
-            )
-            WindowsRegistry.MainWindow.Incomes_scroll.ensureWidgetVisible(app_core.focused_income_category.table_data, 300)
-    
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if len(expense_categories) > 1:
-            if app_core.focused_expense_category is None:
-                logger.error("Focused expense category is None")
-                raise ValueError("Focused expense category is None")
-
-            current_index = expense_categories.index(app_core.focused_expense_category)
-            next_index = (current_index + 1) % len(expense_categories)
-
-            app_core.focused_expense_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
-            app_core.focused_expense_category = expense_categories[next_index]
-            app_core.focused_expense_category.table_data.setGraphicsEffect(
-                DefaultDropShadowEffect(app_core.focused_expense_category.table_data, focused=True)
-            )
-            WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(app_core.focused_expense_category.table_data, 300)
-
-
-def move_to_previous_category() -> None:
-    """Move focus to the previous category in the list of categories."""
-
-    app_core = AppCore.instance()
-    income_categories, expense_categories = app_core.get_income_and_expense_categories()
-
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if len(income_categories) > 1:
-            if app_core.focused_income_category is None:
-                logger.error("Focused income category is None")
-                raise ValueError("Focused income category is None")
-
-            current_index = income_categories.index(app_core.focused_income_category)
-            previous_index = (current_index - 1) % len(income_categories)
-
-            app_core.focused_income_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
-            app_core.focused_income_category = income_categories[previous_index]
-            app_core.focused_income_category.table_data.setGraphicsEffect(
-                DefaultDropShadowEffect(app_core.focused_income_category.table_data, focused=True))
-            WindowsRegistry.MainWindow.Incomes_scroll.ensureWidgetVisible(app_core.focused_income_category.table_data, 300)
-    
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if len(expense_categories) > 1:
-            if app_core.focused_expense_category is None:
-                logger.error("Focused expense category is None")
-                raise ValueError("Focused expense category is None")
-
-            current_index = expense_categories.index(app_core.focused_expense_category)
-            previous_index = (current_index - 1) % len(expense_categories)
-
-            app_core.focused_expense_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
-            app_core.focused_expense_category = expense_categories[previous_index]
-            app_core.focused_expense_category.table_data.setGraphicsEffect(
-                DefaultDropShadowEffect(app_core.focused_expense_category.table_data, focused=True))
-            WindowsRegistry.MainWindow.Expenses_scroll.ensureWidgetVisible(app_core.focused_expense_category.table_data, 300)
+    focused_category.table_data.setGraphicsEffect(cast(DefaultDropShadowEffect, None))
+    focused_category = categories[(categories.index(focused_category) + step) % len(categories)]
+    app_core.focused_categories[category_type] = focused_category
+    focused_category.table_data.setGraphicsEffect(
+        DefaultDropShadowEffect(focused_category.table_data, focused=True)
+    )
+    # Every tab of the main window is a scroll area with categories of one type
+    cast(HorizontalScrollArea, WindowsRegistry.MainWindow.Incomes_and_expenses.currentWidget()).ensureWidgetVisible(
+        focused_category.table_data, 300
+    )
 
 
 def add_transaction_to_focused_category() -> None:
@@ -94,37 +51,28 @@ def add_transaction_to_focused_category() -> None:
     Adds a transaction to the focused category.
     """
 
-    app_core = AppCore.instance()
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if app_core.focused_income_category is not None:
-            app_core.focused_income_category.add_transaction.click()
-
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if app_core.focused_expense_category is not None:
-            app_core.focused_expense_category.add_transaction.click()
+    focused_category = AppCore.instance().focused_categories.get(
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    if focused_category is not None:
+        focused_category.add_transaction.click()
 
 
 def select_previous_transaction() -> None:
     """Selects the previous transaction in the focused category."""
 
-    app_core = AppCore.instance()
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if app_core.focused_income_category is not None:
-            current_index = app_core.focused_income_category.table_data.currentRow()
-    
-            if current_index > 0:
-                app_core.focused_income_category.table_data.selectRow(current_index - 1)
-            elif current_index == 0 and app_core.focused_income_category.table_data.rowCount() == 1:
-                app_core.focused_income_category.table_data.selectRow(0)
+    focused_category = AppCore.instance().focused_categories.get(
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    if focused_category is None:
+        return
 
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if app_core.focused_expense_category is not None:
-            current_index = app_core.focused_expense_category.table_data.currentRow()
-
-            if current_index > 0:
-                app_core.focused_expense_category.table_data.selectRow(current_index - 1)
-            elif current_index == 0 and app_core.focused_expense_category.table_data.rowCount() == 1:
-                app_core.focused_expense_category.table_data.selectRow(0)
+    table = focused_category.table_data
+    current_index = table.currentRow()
+    if current_index > 0:
+        table.selectRow(current_index - 1)
+    elif current_index == 0 and table.rowCount() == 1:
+        table.selectRow(0)
 
 
 def select_next_transaction() -> None:
@@ -132,24 +80,18 @@ def select_next_transaction() -> None:
     Selects the next transaction in the focused category.
     """
 
-    app_core = AppCore.instance()
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if app_core.focused_income_category is not None:
-            current_index = app_core.focused_income_category.table_data.currentRow()
+    focused_category = AppCore.instance().focused_categories.get(
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    if focused_category is None:
+        return
 
-            if current_index < app_core.focused_income_category.table_data.rowCount() - 1:
-                app_core.focused_income_category.table_data.selectRow(current_index + 1)
-            elif current_index == 0 and app_core.focused_income_category.table_data.rowCount() == 1:
-                app_core.focused_income_category.table_data.selectRow(0)
-
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if app_core.focused_expense_category is not None:
-            current_index = app_core.focused_expense_category.table_data.currentRow()
-            
-            if current_index < app_core.focused_expense_category.table_data.rowCount() - 1:
-                app_core.focused_expense_category.table_data.selectRow(current_index + 1)
-            elif current_index == 0 and app_core.focused_expense_category.table_data.rowCount() == 1:
-                app_core.focused_expense_category.table_data.selectRow(0)
+    table = focused_category.table_data
+    current_index = table.currentRow()
+    if current_index < table.rowCount() - 1:
+        table.selectRow(current_index + 1)
+    elif current_index == 0 and table.rowCount() == 1:
+        table.selectRow(0)
 
 
 def delete_transaction() -> None:
@@ -157,14 +99,11 @@ def delete_transaction() -> None:
     Deletes the selected transaction in the focused category.
     """
 
-    app_core = AppCore.instance()
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if app_core.focused_income_category is not None:
-            app_core.focused_income_category.delete_transaction.click()
-
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if app_core.focused_expense_category is not None:
-            app_core.focused_expense_category.delete_transaction.click()
+    focused_category = AppCore.instance().focused_categories.get(
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    if focused_category is not None:
+        focused_category.delete_transaction.click()
 
 
 def edit_transaction() -> None:
@@ -172,11 +111,8 @@ def edit_transaction() -> None:
     Edits the selected transaction in the focused category.
     """
 
-    app_core = AppCore.instance()
-    if WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 0:
-        if app_core.focused_income_category is not None:
-            app_core.focused_income_category.edit_transaction.click()
-
-    elif WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex() == 1:
-        if app_core.focused_expense_category is not None:
-            app_core.focused_expense_category.edit_transaction.click()
+    focused_category = AppCore.instance().focused_categories.get(
+        CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
+    )
+    if focused_category is not None:
+        focused_category.edit_transaction.click()

@@ -102,7 +102,7 @@ class DBController():
         self.statistics_query = StatisticsQuery(self.session_factory)
         self.search_query = SearchQuery(self.session_factory)
         self.reminder_query = ReminderQuery(self.session_factory)
-        self.investment_query = InvestmentQuery(self.session_factory)
+        self.investment_query = InvestmentQuery(self.transaction_query)
 
         logger.info("Db session created")
 
@@ -160,7 +160,6 @@ class DBController():
                 self.backup_query.account_id = self.account_id
                 self.statistics_query.account_id = self.account_id
                 self.reminder_query.account_id = self.account_id
-                self.investment_query.account_id = self.account_id
     
 
     def create_account(self, account_name:str, balance:float|int=0) -> None:

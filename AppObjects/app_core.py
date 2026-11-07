@@ -67,8 +67,8 @@ class AppCore:
         self.investments_value:float | None = None
         self.accounts_list:list[Account] = []
         self.categories:dict[int, Category] = {}
-        self.focused_income_category:Category | None
-        self.focused_expense_category:Category | None
+        # Category of each type (`CategoryType`) that keyboard shortcuts work with
+        self.focused_categories:dict[str, Category | None] = {}
 
         self.db = db_controller
         self.backups:dict[str, Backup] = {}

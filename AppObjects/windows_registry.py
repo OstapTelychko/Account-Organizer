@@ -16,7 +16,6 @@ from GUI.windows.shortcuts import ShortcutsWindow
 from GUI.windows.search import SearchWindow
 from GUI.windows.delayed_payments import DelayedPaymentsWindow
 from GUI.windows.reminders import PendingRemindersWindow, RemindersManagementWindow
-from GUI.windows.investments import MonthlyInvestmentsWindow
 
 
 
@@ -69,4 +68,3 @@ class WindowsRegistry:
     DelayedPaymentsWindow = DelayedPaymentsWindow(MainWindow, MainWindow.sub_windows)
     PendingRemindersWindow = PendingRemindersWindow(MainWindow, MainWindow.sub_windows)
     RemindersManagementWindow = RemindersManagementWindow(MainWindow, MainWindow.sub_windows)
-    MonthlyInvestmentsWindow = MonthlyInvestmentsWindow(MainWindow, MainWindow.sub_windows)

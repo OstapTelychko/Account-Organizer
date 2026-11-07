@@ -57,10 +57,11 @@ These guidelines apply to Gemini and other AI coding assistants working in the *
 
 ### GUI and translations
 - Every new text needs keys in `languages.json` for **English, Українська and Polski**, an accessor in `languages.py` and an update in `AppManagement/language.change_language()`. Polish (then Ukrainian) texts are the longest; check they fit fixed-size buttons (`create_button` sets min = max size).
-- Measure text width headlessly instead of guessing: `QT_QPA_PLATFORM=offscreen .venv1/bin/python -c "from GUI.gui_constants import app, BASIC_FONT; from PySide6.QtGui import QFontMetrics; print(QFontMetrics(BASIC_FONT).horizontalAdvance('Inwestycje miesięczne'))"`. Keep ~20 px of the button width for padding (160 px of text in a 170 px button is too tight). For all three languages at once use `QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv1/bin/python .github/skills/feature-dev-testing/check_text_fit.py --width 190 Windows.Investments.13`.
+- Measure text width headlessly instead of guessing: `QT_QPA_PLATFORM=offscreen .venv1/bin/python -c "from GUI.gui_constants import app, BASIC_FONT; from PySide6.QtGui import QFontMetrics; print(QFontMetrics(BASIC_FONT).horizontalAdvance('Wycena inwestycji'))"`. Keep ~20 px of the button width for padding (160 px of text in a 170 px button is too tight). For all three languages at once use `QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv1/bin/python .github/skills/feature-dev-testing/check_text_fit.py --width 190 Windows.Investments.13`.
+- Number inputs use `StrictDoubleValidator` (C locale, only `.` is accepted), so pass their text straight to `float()`; don't replace `,` with `.`.
 - `isVisible()` is `False` for every child until its window is shown; to check whether a widget was hidden on purpose (e.g. before `exec()`), use `not widget.isHidden()`.
 - `QTableWidget.selectedItems()` skips hidden columns, so count visible columns when checking that exactly one row is selected.
-- `QPushButton.clicked` passes `checked: bool`; connect it through a `lambda` to slots whose first parameter is optional (e.g. `show_monthly_investments_window(total_amount=None)`).
+- `QPushButton.clicked` passes `checked: bool`; connect it through a `lambda` to slots whose first parameter is optional (e.g. `lambda: show_pending_reminders()`).
 - `QTableWidget.item()` returns `QTableWidgetItem | None` for mypy; use `DesktopQtToolkit.Utils.get_table_widget_item`.
 - `Messages` windows are translated by creation order (`GUI/windows/messages.py` index = `Messages` key in `languages.json`); append new message windows at the end.
 - `InformationMessage` must not use `Qt.WindowType.Popup`: popups grab input, which blocks shortcuts and clicks while the message is shown.
@@ -82,3 +83,6 @@ These guidelines apply to Gemini and other AI coding assistants working in the *
 - Value of an Investments category is derived by `backend.investment_query.calculate_investment_timeline` (no stored value). On the same date deposits and withdrawals are applied before revaluations, so a revaluation sets the final value of that day; use different dates in tests to check a withdrawal after a revaluation.
 - Deposits and withdrawals change cash only through `calculate_current_balance()`; `update_account_balance()` handles incomes and expenses only.
 - Investments reminders have `category_id=None` and are told apart by `reminder_type`; always handle `reminder.category is None`.
+- `InvestmentQuery` methods take category ids; pass `AppCore.get_investment_categories_ids()` (the loaded categories of the current account) instead of querying them again.
+- Get the category type of the current tab with `CategoryType.get(Incomes_and_expenses.currentIndex())`. The focused category of each type is in `AppCore.focused_categories[CategoryType.X]`, so shortcut actions work on every tab.
+- Before `TransactionManagementWindow.exec()` call `AppManagement.transaction.prepare_operation_type(operation)`; it shows the operation selector only on the Investments tab.

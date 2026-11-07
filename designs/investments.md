@@ -91,7 +91,7 @@ Investments reminders are attached to the **account**, not to one fund, because 
 *   **Investment transfer** reminder (e.g. `Invest`, value 4000, day 10): resolved when **any** deposit into **any** Investments category of the account exists in the covered month. Name and value aren't compared (one fund getting money is enough).
 *   **Investments revaluation** reminder: resolved when every Investments category with value `> 0` at the start of the covered month has a revaluation in that month.
 *   Regular reminders can't use an Investments category (use the transfer reminder instead).
-*   `pay_reminder()` for both Investments types switches to the covered month, selects tab 2 and opens `MonthlyInvestmentsWindow` (5.4); the transfer reminder pre-fills the total amount.
+*   `pay_reminder()` for both Investments types switches to the covered month, selects tab 2 and opens the operation window (5.3): the transfer reminder opens a pre-filled Deposit into the focused Investments category, the revaluation reminder opens a Revaluation of the first category that isn't revaluated in the covered month.
 *   After saving, only that reminder is re-checked, as for regular reminders.
 
 ## 5. GUI
@@ -112,13 +112,8 @@ Investments reminders are attached to the **account**, not to one fund, because 
 *   Name is optional; the table shows the translated operation name when empty.
 *   The add button is disabled when the viewed month is in the future.
 
-### 5.4. `MonthlyInvestmentsWindow` (`GUI/windows/investments.py`, New File)
-One place for the monthly routine; opened from a button on the Investments tab and by Investments reminders.
-*   Day field (date = viewed month + day, not in the future), optional total amount with a `Remaining: X` label.
-*   One row per Investments category: `Fund | Current value | Deposit | New value`.
-    *   `Deposit` empty or 0 → no deposit for that fund (a skyrocketing fund can be skipped).
-    *   `New value` empty → no revaluation; filled → revaluation including that day's deposit (39000 in the example).
-*   Save validates all rows first and then writes all operations, so a single invalid row writes nothing.
+### 5.4. Shortcuts
+*   Category focus shortcuts (next/previous category, add/edit/delete/select transaction) work on the current tab, including Investments (`AppCore.focused_categories` keeps one focused category per type).
 
 ### 5.5. Reminders management window
 *   A type selector: Regular / Investment transfer / Investments revaluation. The category field is shown only for Regular and lists Income/Expense categories; value is hidden for revaluation.
@@ -137,7 +132,7 @@ New keys in `languages.json` for **English, Українська and Polski** (t
 ---
 
 ## 6. Development & Testing Workflow (Pragmatic TDD)
-1.  **Scaffolding:** `CategoryType` / `InvestmentOperation` / `ReminderType`, models, migration, `InvestmentQuery` signatures, third tab layout, `MonthlyInvestmentsWindow` skeleton.
+1.  **Scaffolding:** `CategoryType` / `InvestmentOperation` / `ReminderType`, models, migration, `InvestmentQuery` signatures, third tab layout.
 2.  **Tests:** write the tests below.
 3.  **Refinement:** implement until all tests pass; run `.venv1/bin/python -m mypy .`.
 
@@ -168,10 +163,8 @@ New keys in `languages.json` for **English, Українська and Polski** (t
 3.  Deleting an Investments category restores cash and removes the investments part.
 4.  The Investments category header shows the value at the end of the viewed month (a later month shows the later value).
 
-### 6.4. Monthly investments window
-1.  Total 4000 split into 2500 / 1500 / empty → two deposits, the third fund untouched, cash −4000.
-2.  `New value` filled → revaluation including the same-day deposit; empty → no revaluation.
-3.  One invalid row (e.g. future day, negative value) → nothing is written.
+### 6.4. Shortcuts
+1.  Next/previous category shortcuts move the focus between Investments categories on the Investments tab.
 
 ### 6.5. Statistics (`test_statistics.py`)
 1.  Monthly: deposit 4000 decreases the net line by 4000; withdrawal increases it; revaluation doesn't change it but appears as value change.
@@ -183,7 +176,7 @@ New keys in `languages.json` for **English, Українська and Polski** (t
 ### 6.6. Reminders (`test_reminders.py`)
 1.  Transfer reminder is resolved by a deposit into any one Investments category in the covered month; a withdrawal or revaluation doesn't resolve it.
 2.  Revaluation reminder stays pending until every fund with value `> 0` has a revaluation in the covered month; funds with value 0 are skipped.
-3.  Pay of an Investments reminder switches to the covered month, selects the Investments tab and opens `MonthlyInvestmentsWindow` (transfer pre-fills the total).
+3.  Pay of an Investments reminder switches to the covered month, selects the Investments tab and opens a pre-filled Deposit (transfer) or Revaluation (revaluation reminder).
 4.  Regular reminder with an Investments category, and Investments reminder with a category, are rejected.
 5.  Deleting an account removes its Investments reminders.
 

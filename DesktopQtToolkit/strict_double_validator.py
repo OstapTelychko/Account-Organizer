@@ -1,4 +1,5 @@
 from typing import cast
+from PySide6.QtCore import QLocale, QObject
 from PySide6.QtGui import QDoubleValidator, QValidator
 
 
@@ -7,7 +8,24 @@ class StrictDoubleValidator(QDoubleValidator):
     """A custom QDoubleValidator that validates double values with strict bounds.
     
         This validator ensures that the input is a valid double and falls within the specified range.
+        It uses the C locale, so only `.` is accepted as the decimal separator and the text can be passed to `float()`.
     """
+
+    def __init__(self, bottom:float, top:float, decimals:int, parent:QObject|None = None) -> None:
+        """Create the validator.
+
+            Arguments
+            ---------
+                `bottom` : (float) - Lowest allowed value (exclusive).
+                `top` : (float) - Highest allowed value (exclusive).
+                `decimals` : (int) - Maximum number of decimals.
+                `parent` : (QObject|None) - Parent object.
+        """
+
+        super().__init__(bottom, top, decimals, parent)
+        locale = QLocale.c()
+        locale.setNumberOptions(QLocale.NumberOption.RejectGroupSeparator)
+        self.setLocale(locale)
 
     def check_value_bounds(self, value:str) -> bool:
         """Check if the value is within the specified bounds."""

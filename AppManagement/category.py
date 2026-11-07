@@ -8,7 +8,6 @@ from project_configuration import CategoryType
 from languages import LanguageStructure
 from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table,\
     load_investment_transactions_into_category_table
-from GeneralTools.Utils import generate_month_range
 
 from AppManagement.information_message import show_information_message
 from AppManagement.balance import calculate_current_balance
@@ -321,13 +320,11 @@ def update_category_total_value(category_id:int) -> None:
     if category.type == CategoryType.Investment:
         category_value = load_investment_transactions_into_category_table(
             category.table_data,
-            app_core.db.investment_query.get_categories_transactions(
-                [category_id], generate_month_range(app_core.current_year, app_core.current_month)[1]
-            )[category_id],
+            app_core.db.transaction_query.get_all_transactions(category_id),
             app_core.current_year,
             app_core.current_month
         )
-        category.total_value_label.setText(LanguageStructure.Investments.get_translation(5) + str(category_value))
+        category.total_value_label.setText(LanguageStructure.Investments.get_translation(4) + str(category_value))
         return
 
     category.total_value_label.setText(
@@ -349,20 +346,15 @@ def activate_categories() -> None:
 
 
 def reset_focused_category() -> None:
-    """Reset focused category. It sets the focused income and expense categories to the first category of their type."""
+    """Reset focused categories. Each category type focuses its first category or None if it has no categories."""
 
     app_core = AppCore.instance()
-    income_categories, expense_categories = app_core.get_income_and_expense_categories()
-
-    if len(income_categories) != 0:
-        app_core.focused_income_category = income_categories[0]
-    else:
-        app_core.focused_income_category = None
-    
-    if len(expense_categories) != 0:
-        app_core.focused_expense_category = expense_categories[0]
-    else:
-        app_core.focused_expense_category = None
+    app_core.focused_categories = {
+        category_type: next(
+            (category for category in app_core.categories.values() if category.type == category_type), None
+        )
+        for category_type in (CategoryType.Income, CategoryType.Expense, CategoryType.Investment)
+    }
 
 
 def show_anomalous_transaction_values_settings() -> None:

@@ -105,9 +105,11 @@ def refresh_balance_label(current_date:date|None = None) -> None:
             f"{app_core.projected_balance}</a>)"
         )
 
-    app_core.investments_value = app_core.db.investment_query.get_total_investments_value(current_date)
+    app_core.investments_value = app_core.db.investment_query.get_total_investments_value(
+        app_core.get_investment_categories_ids(), current_date
+    )
     if app_core.investments_value is not None:
-        balance_text += f"{LanguageStructure.Investments.get_translation(1)}{app_core.investments_value}"
+        balance_text += f" | {LanguageStructure.Investments.get_translation(0)}: {app_core.investments_value}"
 
     balance_label = WindowsRegistry.MainWindow.account_current_balance
     balance_label.setText(balance_text)

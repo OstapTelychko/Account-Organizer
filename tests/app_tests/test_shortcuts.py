@@ -175,15 +175,16 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]))
         qsleep(200)
 
-        if app_core.focused_income_category is None:
+        focused_category = app_core.focused_categories[CategoryType.Income]
+        if focused_category is None:
             logger.error("Focused category is None")
             raise ValueError("Focused category is None")
 
         self.assertEqual(
-            app_core.focused_income_category, expected_focused_category,
+            focused_category, expected_focused_category,
             f"Focused category should be {expected_focused_category.name} after \
             {app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]} shortcut not \
-            {app_core.focused_income_category.name}."
+            {focused_category.name}."
         )
     
 
@@ -218,15 +219,16 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]))
         qsleep(200)
 
-        if app_core.focused_income_category is None:
+        focused_category = app_core.focused_categories[CategoryType.Income]
+        if focused_category is None:
             logger.error("Focused category is None")
             raise ValueError("Focused category is None")
 
         self.assertEqual(
-            app_core.focused_income_category, app_core.categories[self.income_category.id],
+            focused_category, app_core.categories[self.income_category.id],
             f"Focused category should be {self.income_category.name} after \
             {app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]} shortcut not \
-            {app_core.focused_income_category.name}."
+            {focused_category.name}."
         )
         
     

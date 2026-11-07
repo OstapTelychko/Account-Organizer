@@ -14,9 +14,10 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from AppManagement.balance import calculate_current_balance
 from AppManagement.date import set_month_and_year
-from AppManagement.category import update_category_total_value
+from AppManagement.category import update_category_total_value, reset_focused_category
 from AppManagement.transaction import show_add_transaction_window, remove_transaction
-from AppManagement.reminders_logic import create_reminder, check_pending_reminders
+from AppManagement.reminders_logic import create_reminder, check_pending_reminders, pay_reminder
+from AppManagement.shortcuts.shortcuts_actions import move_category_focus
 from DesktopQtToolkit.Utils import get_table_widget_item
 
 
@@ -161,7 +162,7 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         self.assertEqual(app_core.current_balance, -2500)
         self.assertEqual(app_core.investments_value, 3000)
         self.assertIn(
-            f"{LanguageStructure.Investments.get_translation(1)}3000.0",
+            f" | {LanguageStructure.Investments.get_translation(0)}: 3000.0",
             WindowsRegistry.MainWindow.account_current_balance.text()
         )
 
@@ -225,31 +226,35 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         )
 
 
-    def test_06_monthly_investments_window(self) -> None:
-        """Monthly investments window saves deposits and new values of categories."""
+    def test_06_pay_reminder(self) -> None:
+        """Paying an Investments transfer reminder opens a pre-filled deposit to an Investments category."""
 
         app_core = AppCore.instance()
-        window = WindowsRegistry.MonthlyInvestmentsWindow
+        reminder = create_reminder(
+            "Bonds", None, 4000, self.today.day, self.today - timedelta(days=40), ReminderType.InvestmentTransfer
+        )
+        window = WindowsRegistry.TransactionManagementWindow
 
-        def _fill() -> None:
-            self.assertEqual(window.investments_table.rowCount(), 1)
-            window.total_amount.setText("5000")
-            get_table_widget_item(window.investments_table, 0, 2).setText("4000")
-            self.assertIn("1000.0", window.remaining_amount.text())
-            get_table_widget_item(window.investments_table, 0, 3).setText("4100")
-            self.click_on_widget(window.save_button)
+        def _check_window() -> None:
+            self.assertFalse(window.operation_type.isHidden(), "Operation type isn't shown for Investments reminder")
+            self.assertEqual(window.operation_type.currentData(), InvestmentOperation.Deposit)
+            self.assertEqual(window.windowTitle(), self.investment_category.name)
+            self.assertEqual(window.transaction_value.text(), "4000.0")
+            self.click_on_widget(window.button)
 
-        QTimer.singleShot(100, self.catch_failure(_fill))
-        self.click_on_widget(WindowsRegistry.MainWindow.monthly_investments)
+        QTimer.singleShot(100, self.catch_failure(_check_window))
+        pay_reminder(reminder.id)
         qsleep(300)
 
-        operations = {
-            transaction.operation_type: transaction.value
-            for transaction in app_core.db.transaction_query.get_all_transactions(self.investment_category.id)
-        }
-        self.assertEqual(operations, {InvestmentOperation.Deposit: 4000, InvestmentOperation.Revaluation: 4100})
-        self.assertEqual(app_core.current_balance, -4000)
-        self.assertEqual(app_core.investments_value, 4100)
+        transactions = app_core.db.transaction_query.get_all_transactions(self.investment_category.id)
+        self.assertEqual(
+            [(transaction.operation_type, transaction.value) for transaction in transactions],
+            [(InvestmentOperation.Deposit, 4000)]
+        )
+        self.assertGreater(
+            app_core.db.reminder_query.get_reminder(reminder.id).next_due_date, reminder.next_due_date,
+            "Paid reminder hasn't been moved to the next month"
+        )
 
 
     def test_07_reminders(self) -> None:
@@ -285,8 +290,11 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
             def _check_statistics() -> None:
                 statistics_list = WindowsRegistry.MonthlyStatistics.statistics
                 statistics = "".join(statistics_list.item(index).text() for index in range(statistics_list.count()))
-                self.assertIn(f"{LanguageStructure.Investments.get_translation(9)}4000.0", statistics)
-                self.assertIn(f"{LanguageStructure.Investments.get_translation(12)}-4000.0", statistics)
+                self.assertIn(
+                    f"{LanguageStructure.Investments.get_translation(8)}<span style='color:red'>4000.0</span>",
+                    statistics
+                )
+                self.assertIn(f"{LanguageStructure.Investments.get_translation(11)}-4000.0", statistics)
                 WindowsRegistry.MonthlyStatistics.done(1)
 
             QTimer.singleShot(100, self.catch_failure(_check_statistics))
@@ -295,3 +303,26 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         QTimer.singleShot(100, self.catch_failure(_open_monthly_statistics))
         self.click_on_widget(WindowsRegistry.MainWindow.statistics)
         qsleep(500)
+
+
+    def test_09_focus_shortcuts(self) -> None:
+        """Focus shortcuts move between Investments categories."""
+
+        app_core = AppCore.instance()
+        app_core.db.category_query.create_category("Second investments category", CategoryType.Investment, 1)
+        second_category = app_core.db.category_query.get_category(
+            "Second investments category", CategoryType.Investment
+        )
+        if second_category is None:
+            raise ValueError("Just created Investments category not found in the database")
+        app_core.categories[second_category.id] = load_category(
+            second_category, app_core.db, app_core.current_year, app_core.current_month
+        )
+        reset_focused_category()
+
+        move_category_focus(1)
+        self.assertIs(app_core.focused_categories[CategoryType.Investment], app_core.categories[second_category.id])
+        move_category_focus(-1)
+        self.assertIs(
+            app_core.focused_categories[CategoryType.Investment], app_core.categories[self.investment_category.id]
+        )

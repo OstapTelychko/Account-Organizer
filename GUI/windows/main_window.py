@@ -171,12 +171,10 @@ class MainWindow(QWidget, metaclass=QSingleton):
         self.Investments_window.setContentsMargins(0, 10, 0, 10)
 
         self.add_investments_category = create_button("Create category",(170,40))
-        self.monthly_investments = create_button("Monthly investments",(190,40))
 
         self.Investments_buttons_layout = QVBoxLayout()
         self.Investments_buttons_layout.addStretch(1)
         self.Investments_buttons_layout.addWidget(self.add_investments_category)
-        self.Investments_buttons_layout.addWidget(self.monthly_investments)
         self.Investments_buttons_layout.addStretch(1)
 
         self.Investments_window_layout = QHBoxLayout()
