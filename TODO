@@ -2,13 +2,12 @@ New features:
   ☐ empty @don't-touch
   ☐ add auto paste into name date and value fields in transaction creation window if user copied transaction from another or the same category
   ☐ add option to change account position in switch account window
-  ☐ fix issue with weird looking buttons on windows
   ☐ add third tab and type for actions/savings since when I transfer 4000 to buy government bonds, I want to see that in statistics I lost money but in total balance I have those 4000 also add option to update value of actions sine actions of companies may go down so I will current state monthly @started(26-11-07 18:22)
 	
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
-  ☐ allow showing statistics when there is no expenses or income in the selected period
+  ☐ allow showing statistics when there is no expenses or income in the selected period @started(26-11-07 18:22)
   ☐ make backup loaded messages appear only for app_core or backup_management or for one of them make it print single log row like 120 of 120 backups loaded instead filling app logs
   
 Project life improvements:
@@ -31,6 +30,7 @@ Release:
   ☐ empty @don't-touch
     
 Archive:
+  ✘ fix issue with weird looking buttons on windows @cancelled(26-11-08 01:05) @project(New features)
   ✔ add scheduler of delayed payments and reminders of monthly payments @started(26-09-28 00:12) @done(26-10-23 23:39) @lasted(3w4d23h27m57s) @project(New features)
   ✔ fix issue with not initialized ShortcutsManager when account doesn't exists @started(26-09-20 11:06) @done(26-09-27 21:45) @lasted(1w10h39m20s) @project(Bugs)
   ✔ test release 1.3.2 on windows @started(26-08-01 21:37) @done(26-08-01 21:45) @lasted(8m25s) @project(Release)
