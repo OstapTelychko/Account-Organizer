@@ -15,6 +15,18 @@ from project_configuration import CategoryType
 
 logger = get_logger(__name__)
 
+def switch_tab(step:int) -> None:
+    """Switch the main window to another tab of categories. Switching wraps around the first and last tabs.
+
+        Arguments
+        ---------
+            `step` : (int) - Number of tabs to move by. `1` opens the next tab, `-1` the previous one.
+    """
+
+    tabs = WindowsRegistry.MainWindow.Incomes_and_expenses
+    tabs.setCurrentIndex((tabs.currentIndex() + step) % tabs.count())
+
+
 def move_category_focus(step:int) -> None:
     """Move focus between categories of the opened tab. Focus wraps around the ends of the list.
 

@@ -74,42 +74,38 @@ class TestShortcuts(DBTestCase, OutOfScopeTestCase):
             qsleep(250)
             
 
-    def test_03_switch_to_expense(self) -> None:
-        """Test switching to expense tab with shortcut."""        
-        
+    def test_03_switch_to_next_tab(self) -> None:
+        """Test switching to the next tab with shortcut. From the last tab it switches to the first one."""
+
         app_core = AppCore.instance()
-        def _check_switch() -> None:
+        tabs = WindowsRegistry.MainWindow.Incomes_and_expenses
+        shortcut = app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_NEXT_TAB]
+        tabs.setCurrentIndex(CategoryType.get_index(CategoryType.Income))
+
+        for expected_type in (CategoryType.Expense, CategoryType.Investment, CategoryType.Income):
+            QTest.keySequence(WindowsRegistry.MainWindow, QKeySequence(shortcut))
+            qsleep(100)
             self.assertEqual(
-                WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(),
-                1,
-                f"Tab should be switched to expense after \
-                {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]} shortcut."
+                tabs.currentIndex(), CategoryType.get_index(expected_type),
+                f"Tab should be switched to {expected_type} after {shortcut} shortcut."
             )
-            
-        QTimer.singleShot(100, self.catch_failure(_check_switch))
-        QTest.keySequence(
-            WindowsRegistry.MainWindow,
-            QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]))
-        qsleep(200)
 
 
-    def test_04_switch_to_income(self) -> None:
-        """Test switching to income tab with shortcut."""        
-        
+    def test_04_switch_to_previous_tab(self) -> None:
+        """Test switching to the previous tab with shortcut. From the first tab it switches to the last one."""
+
         app_core = AppCore.instance()
-        def _check_switch() -> None:
+        tabs = WindowsRegistry.MainWindow.Incomes_and_expenses
+        shortcut = app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_PREVIOUS_TAB]
+        tabs.setCurrentIndex(CategoryType.get_index(CategoryType.Income))
+
+        for expected_type in (CategoryType.Investment, CategoryType.Expense, CategoryType.Income):
+            QTest.keySequence(WindowsRegistry.MainWindow, QKeySequence(shortcut))
+            qsleep(100)
             self.assertEqual(
-                WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex(),
-                0,
-                f"Tab should be switched to income after \
-                {app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]} shortcut."
+                tabs.currentIndex(), CategoryType.get_index(expected_type),
+                f"Tab should be switched to {expected_type} after {shortcut} shortcut."
             )
-            
-        QTimer.singleShot(100, self.catch_failure(_check_switch))
-        QTest.keySequence(
-            WindowsRegistry.MainWindow,
-            QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]))
-        qsleep(200)
 
 
     def test_05_load_previous_month(self) -> None:

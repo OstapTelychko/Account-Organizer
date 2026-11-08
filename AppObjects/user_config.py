@@ -39,8 +39,8 @@ class UserConfig:
         OPEN_SETTINGS = "Open_settings"
         OPEN_STATISTICS = "Open_statistics"
         SWITCH_ACCOUNT = "Switch_account"
-        SWITCH_TO_INCOME = "Switch_to_income"
-        SWITCH_TO_EXPENSE = "Switch_to_expense"
+        SWITCH_TO_PREVIOUS_TAB = "Switch_to_previous_tab"
+        SWITCH_TO_NEXT_TAB = "Switch_to_next_tab"
         LOAD_PREVIOUS_MONTH = "Load_previous_month"
         LOAD_NEXT_MONTH = "Load_next_month"
         FOCUS_ON_NEXT_CATEGORY = "Focus_on_next_category"
@@ -51,6 +51,13 @@ class UserConfig:
         DELETE_TRANSACTION = "Delete_transaction"
         EDIT_TRANSACTION = "Edit_transaction"
         OPEN_SEARCH = "Open_search"
+
+
+    # Shortcut ids renamed in newer versions mapped to their names in older configuration files
+    LEGACY_SHORTCUT_IDS = {
+        ShortcutId.SWITCH_TO_PREVIOUS_TAB:"Switch_to_income",
+        ShortcutId.SWITCH_TO_NEXT_TAB:"Switch_to_expense"
+    }
     
 
     def __init__(self, test_mode:bool = False) -> None:
@@ -70,8 +77,8 @@ class UserConfig:
             UserConfig.ShortcutId.OPEN_SETTINGS:"S",
             UserConfig.ShortcutId.OPEN_STATISTICS:"A",
             UserConfig.ShortcutId.SWITCH_ACCOUNT:"Shift+S",
-            UserConfig.ShortcutId.SWITCH_TO_INCOME:"Q",
-            UserConfig.ShortcutId.SWITCH_TO_EXPENSE:"W",
+            UserConfig.ShortcutId.SWITCH_TO_PREVIOUS_TAB:"Q",
+            UserConfig.ShortcutId.SWITCH_TO_NEXT_TAB:"W",
             UserConfig.ShortcutId.LOAD_PREVIOUS_MONTH:"Shift+Q",
             UserConfig.ShortcutId.LOAD_NEXT_MONTH:"Shift+W",
             UserConfig.ShortcutId.FOCUS_ON_NEXT_CATEGORY:"Ctrl+Right",
@@ -114,10 +121,10 @@ class UserConfig:
             )
 
             for shortcut_id, shortcut_value in self.shortcuts.items():
-                if shortcut_id in User_conf["Shortcuts"]:
-                    self.shortcuts[shortcut_id] = str(User_conf["Shortcuts"].get(shortcut_id, shortcut_value))
-                else:
-                    self.shortcuts[shortcut_id] = shortcut_value
+                legacy_shortcut_id = UserConfig.LEGACY_SHORTCUT_IDS.get(shortcut_id, shortcut_id)
+                self.shortcuts[shortcut_id] = str(User_conf["Shortcuts"].get(
+                    shortcut_id, User_conf["Shortcuts"].get(legacy_shortcut_id, shortcut_value)
+                ))
 
         else:
             # If the file is not in the new format, load it as a legacy configuration (1.1.1)
