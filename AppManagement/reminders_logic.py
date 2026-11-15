@@ -198,6 +198,7 @@ def resolve_reminder(reminder:MonthlyReminder) -> date:
 
 def check_pending_reminders(current_date:date|None = None) -> list[MonthlyReminder]:
     """Find due reminders without a matching transaction. Paid reminders are silently moved to the next month.
+    Investments reminders are skipped while the account has no Investments categories, because they can't be paid.
 
         Arguments
         ---------
@@ -209,8 +210,12 @@ def check_pending_reminders(current_date:date|None = None) -> list[MonthlyRemind
 
     current_date = current_date or date.today()
     pending:list[MonthlyReminder] = []
+    app_core = AppCore.instance()
+    has_investment_categories = len(app_core.get_investment_categories_ids()) > 0
 
-    for reminder in AppCore.instance().db.reminder_query.get_all_reminders():
+    for reminder in app_core.db.reminder_query.get_all_reminders():
+        if reminder.category_id is None and not has_investment_categories:
+            continue
         while current_date >= reminder.next_due_date:
             if not is_reminder_paid(reminder):
                 pending.append(reminder)
@@ -306,6 +311,7 @@ def pay_reminder(reminder_id:int) -> None:
     """Open the add transaction window pre-filled with reminder data for its covered month.
     Investments reminders open a deposit to the focused Investments category
     or a revaluation of the first category that isn't revaluated yet.
+    Without Investments categories they can't be paid, so only a message is shown.
     If the saved transaction matches the reminder, it is resolved and its row is removed.
 
         Arguments
@@ -316,16 +322,16 @@ def pay_reminder(reminder_id:int) -> None:
     app_core = AppCore.instance()
     reminder = app_core.db.reminder_query.get_reminder(reminder_id)
     covered_start, covered_end = get_covered_period(reminder.next_due_date, reminder.day)
+    investment_categories_ids = app_core.get_investment_categories_ids()
+    if reminder.category is None and not investment_categories_ids:
+        WindowsRegistry.Messages.no_investment_categories.exec()
+        return
 
     # The transaction window builds the date from the viewed month and year
     set_month_and_year(covered_start.month, covered_start.year)
 
     if reminder.category is None:
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(CategoryType.get_index(CategoryType.Investment))
-        investment_categories_ids = app_core.get_investment_categories_ids()
-        if not investment_categories_ids:
-            return
-
         if reminder.reminder_type == ReminderType.InvestmentTransfer:
             operation = InvestmentOperation.Deposit
             focused_category = app_core.focused_categories.get(CategoryType.Investment)
@@ -347,13 +353,15 @@ def pay_reminder(reminder_id:int) -> None:
     transaction_window = WindowsRegistry.TransactionManagementWindow
     transaction_window.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
     transaction_window.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
-    prepare_operation_type(operation)
+    transaction_window.setWindowTitle(category_name)
     transaction_window.transaction_name.setText(reminder.name)
+    transaction_window.transaction_value.setText(str(reminder.value) if reminder.value is not None else "")
+    transaction_window.prefilled_value = ""
+    # Selecting the operation and the day pre-fills the value of a revaluation
+    prepare_operation_type(operation)
     transaction_window.transaction_day.setText(
         str(min(reminder.day, covered_end.day)) if reminder.day is not None else ""
     )
-    transaction_window.transaction_value.setText(str(reminder.value) if reminder.value is not None else "")
-    transaction_window.setWindowTitle(category_name)
     transaction_window.transaction_name.setFocus()
     transaction_window.exec()
 
@@ -490,6 +498,18 @@ def fill_reminder_form_from_selection() -> None:
             categories_list.scrollToItem(categories_list.item(row))
 
 
+def update_reminder_value_visibility() -> None:
+    """Hide the value field for revaluation reminders, because the market value isn't known in advance."""
+
+    window = WindowsRegistry.RemindersManagementWindow
+    selected_items = window.investment_reminder_types.selectedItems()
+    window.reminder_value.setHidden(
+        window.category_tabs.currentIndex() == CategoryType.get_index(CategoryType.Investment)
+        and len(selected_items) > 0
+        and selected_items[0].data(Qt.ItemDataRole.UserRole) == ReminderType.InvestmentsRevaluation
+    )
+
+
 def read_reminder_form() -> ReminderFormData | None:
     """Read the reminder form. Shows a message and returns None if the value or day can't be parsed.
 
@@ -516,9 +536,11 @@ def read_reminder_form() -> ReminderFormData | None:
         if not selected_items:
             WindowsRegistry.Messages.reminder_no_category.exec()
             return None
+        reminder_type = ReminderType(selected_items[0].data(Qt.ItemDataRole.UserRole))
         return ReminderFormData(
-            name=window.reminder_name.text(), category_id=None, value=value, day=day,
-            reminder_type=ReminderType(selected_items[0].data(Qt.ItemDataRole.UserRole))
+            name=window.reminder_name.text(), category_id=None,
+            value=None if reminder_type == ReminderType.InvestmentsRevaluation else value, day=day,
+            reminder_type=reminder_type
         )
 
     categories_list = window.income_categories if selected_tab == 0 else window.expense_categories

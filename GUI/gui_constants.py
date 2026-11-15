@@ -18,6 +18,8 @@ ALIGN_H_CENTER = ALIGNMENT.AlignHCenter
 ALIGN_V_CENTER = ALIGNMENT.AlignVCenter
 
 ICON_SIZE = QSize(30, 30)
+# Same blue as the border of the Investments tab
+INVESTMENTS_COLOR = "rgb(30,144,255)"
 
 if platform == "linux":
     APP_ICON = QIcon(os.path.join(GENERAL_ICONS_DIRECTORY, "App icon.png"))

@@ -180,3 +180,6 @@ class Messages(metaclass=QSingleton):
         self.reminder_investment_category = MessageWindow(
             main_window, message_windows, False, QMessageBox.Icon.Warning, APP_NAME
         )
+        self.no_investment_categories = MessageWindow(
+            main_window, message_windows, False, QMessageBox.Icon.Information, APP_NAME
+        )

@@ -58,7 +58,7 @@ These guidelines apply to Gemini and other AI coding assistants working in the *
 ### GUI and translations
 - Every new text needs keys in `languages.json` for **English, Українська and Polski**, an accessor in `languages.py` and an update in `AppManagement/language.change_language()`. Polish (then Ukrainian) texts are the longest; check they fit fixed-size buttons (`create_button` sets min = max size).
 - Measure text width headlessly instead of guessing: `QT_QPA_PLATFORM=offscreen .venv1/bin/python -c "from GUI.gui_constants import app, BASIC_FONT; from PySide6.QtGui import QFontMetrics; print(QFontMetrics(BASIC_FONT).horizontalAdvance('Wycena inwestycji'))"`. Keep ~20 px of the button width for padding (160 px of text in a 170 px button is too tight). For all three languages at once use `QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv1/bin/python .github/skills/feature-dev-testing/check_text_fit.py --width 190 Windows.Investments.13`.
-- Number inputs use `StrictDoubleValidator` (C locale, only `.` is accepted), so pass their text straight to `float()`; don't replace `,` with `.`.
+- Number inputs use `StrictDoubleValidator` (C locale; a typed `,` is converted to `.` by the validator), so pass their text straight to `float()`; don't replace `,` with `.` again.
 - `isVisible()` is `False` for every child until its window is shown; to check whether a widget was hidden on purpose (e.g. before `exec()`), use `not widget.isHidden()`.
 - `QTableWidget.selectedItems()` skips hidden columns, so count visible columns when checking that exactly one row is selected.
 - `QPushButton.clicked` passes `checked: bool`; connect it through a `lambda` to slots whose first parameter is optional (e.g. `lambda: show_pending_reminders()`).

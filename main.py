@@ -162,7 +162,7 @@ def main(test_mode:bool=False) -> None:
     from AppManagement.category import create_category, load_categories, remove_category, show_rename_category_window,\
         rename_category,  activate_categories, show_change_category_position, change_category_position, \
         save_anomalous_transaction_values_settings, show_anomalous_transaction_values_settings
-    from AppManagement.transaction import transaction_data_handler, update_transaction_value_placeholder
+    from AppManagement.transaction import transaction_data_handler, update_transaction_value_field
     from AppManagement.date import next_month, previous_month, next_year, previous_year
     from AppManagement.account import show_add_user_window, add_account, remove_account,\
         show_rename_account_window, rename_account, load_accounts, clear_accounts_layout 
@@ -172,7 +172,7 @@ def main(test_mode:bool=False) -> None:
     from AppManagement.search import show_search_window, perform_search
     from AppManagement.reminders_logic import show_pending_reminders, confirm_pending_reminders,\
         show_reminders_management_window, add_reminder_from_form, update_reminder_from_form, delete_selected_reminder,\
-        fill_reminder_form_from_selection
+        fill_reminder_form_from_selection, update_reminder_value_visibility
 
     # UI dependencies are already loaded, so initialize shortcuts before the
     # first-account flow without adding an earlier heavy import.
@@ -206,6 +206,12 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.RemindersManagementWindow.reminders_table.itemSelectionChanged.connect(
         fill_reminder_form_from_selection
     )
+    WindowsRegistry.RemindersManagementWindow.investment_reminder_types.itemSelectionChanged.connect(
+        update_reminder_value_visibility
+    )
+    WindowsRegistry.RemindersManagementWindow.category_tabs.currentChanged.connect(
+        lambda _index: update_reminder_value_visibility()
+    )
     #Statistics
     WindowsRegistry.MainWindow.statistics.clicked.connect(WindowsRegistry.StatisticsWindow.exec)
     WindowsRegistry.StatisticsWindow.monthly_statistics.clicked.connect(show_monthly_statistics)
@@ -234,9 +240,12 @@ def main(test_mode:bool=False) -> None:
     WindowsRegistry.RenameCategoryWindow.button.clicked.connect(rename_category)
     WindowsRegistry.ChangeCategoryPositionWindow.enter_new_position.clicked.connect(change_category_position)
     WindowsRegistry.AnomalousTransactionValuesWindow.save_button.clicked.connect(save_anomalous_transaction_values_settings)
-    WindowsRegistry.TransactionManagementWindow.button.clicked.connect(transaction_data_handler)
+    WindowsRegistry.TransactionManagementWindow.button.clicked.connect(lambda: transaction_data_handler())
     WindowsRegistry.TransactionManagementWindow.operation_type.currentIndexChanged.connect(
-        lambda _index: update_transaction_value_placeholder()
+        lambda _index: update_transaction_value_field()
+    )
+    WindowsRegistry.TransactionManagementWindow.transaction_day.textChanged.connect(
+        lambda _text: update_transaction_value_field()
     )
     
     #Date management

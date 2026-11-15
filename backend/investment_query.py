@@ -31,6 +31,15 @@ class InvestmentTotals(NamedTuple):
     value_change: float
 
 
+class InvestmentsPeriodStatistics(NamedTuple):
+    """Investments sums of a period for all categories together and for each of them."""
+
+    totals: InvestmentTotals
+    categories_totals: dict[int, InvestmentTotals]
+    # Value of each category at the end of the period
+    categories_values: dict[int, float]
+
+
 def calculate_investment_timeline(transactions:Iterable[Transaction]) -> list[InvestmentTimelinePoint]:
     """Calculate the value of one Investments category after each of its operations.
     On the same date deposits and withdrawals are applied before revaluations.
@@ -64,6 +73,34 @@ def calculate_investment_timeline(transactions:Iterable[Transaction]) -> list[In
         timeline.append(InvestmentTimelinePoint(
             transaction.id, transaction.date, transaction.operation_type, transaction.value, value, value_change
         ))
+    return timeline
+
+
+def validate_category_timeline(
+        transactions:Iterable[Transaction],
+        removed_transaction_id:int | None,
+        added_operation:Transaction | None
+    ) -> list[InvestmentTimelinePoint] | None:
+    """Simulate adding, editing or deleting an operation of one Investments category.
+    An edit removes the old operation and adds the changed one with the same ID.
+
+        Arguments
+        ---------
+            `transactions` : (Iterable[Transaction]) - Saved operations of the category.
+            `removed_transaction_id` : (int | None) - ID of the operation that is deleted or edited.
+            `added_operation` : (Transaction | None) - Added or edited operation.
+        Returns
+        -------
+            `list[InvestmentTimelinePoint] | None` - New timeline or None if the value becomes negative at any point.
+    """
+
+    new_transactions = [transaction for transaction in transactions if transaction.id != removed_transaction_id]
+    if added_operation is not None:
+        new_transactions.append(added_operation)
+
+    timeline = calculate_investment_timeline(new_transactions)
+    if any(point.value_after < 0 for point in timeline):
+        return None
     return timeline
 
 
@@ -166,8 +203,14 @@ class InvestmentQuery:
         return round(sum(self.get_categories_values(categories_ids, as_of).values()), 2)
 
 
-    def get_investment_totals(self, categories_ids:list[int], start_date:date, end_date:date) -> InvestmentTotals:
-        """Get sums of deposits, withdrawals and value changes of Investments categories in a period.
+    def get_period_statistics(
+            self,
+            categories_ids:list[int],
+            start_date:date,
+            end_date:date
+        ) -> InvestmentsPeriodStatistics:
+        """Get sums of deposits, withdrawals and value changes of Investments categories in a period
+        and their values at the end of it. Operations of each category are loaded once.
 
             Arguments
             ---------
@@ -176,13 +219,18 @@ class InvestmentQuery:
                 `end_date` : (date) - Last day of the period.
             Returns
             -------
-                `InvestmentTotals` - Sums of the period.
+                `InvestmentsPeriodStatistics` - Sums and values of the period.
         """
 
-        deposits = withdrawals = value_change = 0.0
+        categories_totals:dict[int, InvestmentTotals] = {}
+        categories_values:dict[int, float] = {}
         for category_id in categories_ids:
+            deposits = withdrawals = value_change = value = 0.0
             for point in calculate_investment_timeline(self.transaction_query.get_all_transactions(category_id)):
-                if not start_date <= point.date <= end_date:
+                if point.date > end_date:
+                    break
+                value = point.value_after
+                if point.date < start_date:
                     continue
                 if point.operation_type == InvestmentOperation.Deposit:
                     deposits += point.value
@@ -191,4 +239,14 @@ class InvestmentQuery:
                 elif point.operation_type == InvestmentOperation.Revaluation:
                     value_change += point.value_change
 
-        return InvestmentTotals(round(deposits, 2), round(withdrawals, 2), round(value_change, 2))
+            categories_totals[category_id] = InvestmentTotals(
+                round(deposits, 2), round(withdrawals, 2), round(value_change, 2)
+            )
+            categories_values[category_id] = value
+
+        totals = InvestmentTotals(
+            round(sum(category_totals.deposits for category_totals in categories_totals.values()), 2),
+            round(sum(category_totals.withdrawals for category_totals in categories_totals.values()), 2),
+            round(sum(category_totals.value_change for category_totals in categories_totals.values()), 2)
+        )
+        return InvestmentsPeriodStatistics(totals, categories_totals, categories_values)

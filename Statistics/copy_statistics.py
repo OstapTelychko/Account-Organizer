@@ -6,6 +6,7 @@ from project_configuration import CategoryType
 from AppManagement.information_message import show_information_message
 from languages import LanguageStructure
 from GUI.gui_constants import app
+from GUI.category import get_investment_operation_name
 from GeneralTools.html_to_text import html_to_text
 
 
@@ -37,7 +38,10 @@ def copy_monthly_transactions() -> None:
             result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
             
             for index,transaction in enumerate(transactions):
-                result += f"{index}\t{transaction.value}\t\t{transaction.date.day}\t{transaction.name}\n"
+                result += f"{index}\t{transaction.value}\t\t{transaction.date.day}\t{transaction.name}"
+                if category.category_type == CategoryType.Investment:
+                    result += f"\t{get_investment_operation_name(transaction.operation_type)}"
+                result += "\n"
             
 
             app.clipboard().setText(result)

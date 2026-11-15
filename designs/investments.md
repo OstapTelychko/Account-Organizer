@@ -42,10 +42,10 @@ Invariant (tested): `current_value = deposits - withdrawals + sum(value changes)
 New migration `add_investments` (down revision `c3d4e5f6a7b8`).
 
 *   **`transactions.operation_type`**: SmallInteger, Not Null, `server_default="0"`: `0` = Regular (Income / Expense categories), `1` = Deposit, `2` = Withdrawal, `3` = Revaluation.
-    *   Added with plain `op.add_column` (no `batch_alter_table`): SQLite only updates the schema, the table isn't rewritten and the `transactions_fts` triggers stay.
+    *   Added with plain `op.add_column` (no `batch_alter_table`): SQLite only updates the schema and the table isn't rewritten. `transactions_fts` has no triggers; the app fills it in `add_transaction` / `update_transaction`, so it isn't affected.
     *   Cost: SQLite stores the integers 0 and 1 in the record header only, so about 1 byte per row; no index and no extra join. Income/Expense queries already filter by `categories.category_type`, so they don't need to read the column.
     *   Chosen over a separate revaluations table + negative withdrawal values: one CRUD path, one table widget loader, one timeline source, search finds all operations, and existing positive-value validation stays.
-*   **`monthly_reminders`** (via `batch_alter_table`; this table has no FTS triggers):
+*   **`monthly_reminders`** (via `batch_alter_table`):
     *   `account_id`: Integer, ForeignKey(`accounts.id`, `ondelete="CASCADE"`), Not Null, Indexed. Back-filled from the category's account. Reads filter by it directly.
     *   `category_id` becomes nullable (Investments reminders have no category, see 4.1).
     *   `reminder_type`: SmallInteger, Not Null, `server_default="0"`: `0` = Regular, `1` = Investment transfer, `2` = Investments revaluation.
@@ -65,14 +65,14 @@ New migration `add_investments` (down revision `c3d4e5f6a7b8`).
     *   `calculate_investment_timeline(transactions) -> list[InvestmentTimelinePoint]` (module-level, pure; `InvestmentTimelinePoint` is a `NamedTuple(transaction_id, date, operation_type, value, value_after, value_change)`).
     *   `get_category_value(category_id, as_of: date) -> float`.
     *   `get_total_investments_value(as_of: date) -> float` (current account).
-    *   `get_investment_totals(category_ids, start: date, end: date) -> InvestmentTotals` (`NamedTuple(deposits, withdrawals, value_change)`), used by statistics.
-    *   `validate_category_timeline(category_id, changed_operation) -> bool`: simulates the add/edit/delete and returns `False` if any point becomes negative.
+    *   `get_period_statistics(category_ids, start: date, end: date) -> InvestmentsPeriodStatistics` (`NamedTuple(totals, categories_totals, categories_values)`; totals are `InvestmentTotals(deposits, withdrawals, value_change)`), one pass per category, used by statistics.
+    *   `validate_category_timeline(transactions, removed_transaction_id, added_operation) -> list[InvestmentTimelinePoint] | None` (module-level): simulates the add/edit/delete and returns `None` if any point becomes negative.
 *   **`backend/statistics_query.py`**: existing Income/Expense sums already filter by category type; verify every query does, so investment transactions never leak into income/expense totals.
 *   **Logging (Point-In-Time Recovery)** via `logger.info`:
-    *   `[ENTITY: INVESTMENT] [ACTION: DEPOSIT] category="XTB" date=2026-11-07 value=4000 value_after=4000`
+    *   `[ENTITY: INVESTMENT] [ACTION: DEPOSIT] category="XTB" operation=Deposit name="" date=2026-11-07 value=4000 value_after=4000`
     *   `[ENTITY: INVESTMENT] [ACTION: WITHDRAWAL] ...`
-    *   `[ENTITY: INVESTMENT] [ACTION: REVALUATED] category="XTB" date=2026-11-30 value=5200 change=1200`
-    *   `[ACTION: UPDATED]` / `[ACTION: DELETED]` with old and new fields.
+    *   `[ENTITY: INVESTMENT] [ACTION: REVALUATED] category="XTB" operation=Revaluation name="" date=2026-11-30 value=5200 value_after=5200 change=+1200`
+    *   `[ACTION: UPDATED] id=.. category=".." old: ... new: ...` and `[ACTION: DELETED] id=.. category=".." ...` with operation type, date, value and value_after.
 
 ## 4. App Management
 
@@ -108,7 +108,7 @@ Investments reminders are attached to the **account**, not to one fund, because 
 *   Buttons: the existing add transaction button opens the operation window; edit/delete work as for transactions.
 
 ### 5.3. Operation window (`TransactionManagementWindow`)
-*   On the Investments tab it shows an operation selector (Deposit / Withdrawal / Revaluation). For Revaluation the value field label becomes `Current value`, pre-filled with the value at the selected date.
+*   On the Investments tab it shows an operation selector (Deposit / Withdrawal / Revaluation). For Revaluation the value field label becomes `Current value` and accepts 0. A new Revaluation is pre-filled with the value at the entered day (or at the end of the viewed month, not later than today, while the day is empty); the pre-filled value is replaced only while the user hasn't changed it.
 *   Name is optional; the table shows the translated operation name when empty.
 *   The add button is disabled when the viewed month is in the future.
 
@@ -182,4 +182,4 @@ New keys in `languages.json` for **English, Українська and Polski** (t
 
 ### 6.7. Migration
 1.  Existing reminders get `account_id` from their category and `reminder_type = 0`; they keep working.
-2.  Existing transactions get `operation_type = 0`; FTS search still finds transactions added after the migration (triggers kept).
+2.  Existing transactions get `operation_type = 0`; the downgrade removes Investments reminders and the added columns.

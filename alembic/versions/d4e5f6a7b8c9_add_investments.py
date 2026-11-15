@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Add `transactions.operation_type` and make monthly reminders belong to an account."""
 
-    # Plain ADD COLUMN keeps the transactions table (and its FTS triggers) untouched
+    # Plain ADD COLUMN keeps the transactions table untouched
     op.add_column(
         'transactions',
         sa.Column('operation_type', sa.SmallInteger(), nullable=False, server_default='0')

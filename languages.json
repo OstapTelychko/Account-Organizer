@@ -331,7 +331,8 @@
             "44": "Investment operations <span style='color:red'>can't be dated in the future</span>",
             "45": "Deposit and withdrawal value must be <span style='color:red'>greater than 0</span>",
             "46": "This operation makes the investment value <span style='color:red'>negative</span>",
-            "47": "Investments categories <span style='color:red'>can't have regular reminders</span>. Use the reminders in the Investments tab"
+            "47": "Investments categories <span style='color:red'>can't have regular reminders</span>. Use the reminders in the Investments tab",
+            "48": "Add an <span style='color:dodgerblue'>Investments category</span> first. Investments reminders are paid into it"
         }
             
     },
@@ -670,7 +671,8 @@
             "44": "Інвестиційні операції <span style='color:red'>не можуть бути датовані майбутнім</span>",
             "45": "Сума внеску чи виведення повинна бути <span style='color:red'>більшою за 0</span>",
             "46": "Ця операція робить вартість інвестиції <span style='color:red'>від'ємною</span>",
-            "47": "Інвестиційні категорії <span style='color:red'>не можуть мати звичайних нагадувань</span>. Використайте нагадування на вкладці Інвестиції"
+            "47": "Інвестиційні категорії <span style='color:red'>не можуть мати звичайних нагадувань</span>. Використайте нагадування на вкладці Інвестиції",
+            "48": "Спочатку додайте <span style='color:dodgerblue'>інвестиційну категорію</span>. Інвестиційні нагадування оплачуються в неї"
         }
     },
     
@@ -1006,7 +1008,8 @@
             "44": "Operacje inwestycyjne <span style='color:red'>nie mogą mieć przyszłej daty</span>",
             "45": "Kwota wpłaty lub wypłaty musi być <span style='color:red'>większa od 0</span>",
             "46": "Ta operacja sprawia, że wartość inwestycji jest <span style='color:red'>ujemna</span>",
-            "47": "Kategorie inwestycji <span style='color:red'>nie mogą mieć zwykłych przypomnień</span>. Użyj przypomnień na karcie Inwestycje"
+            "47": "Kategorie inwestycji <span style='color:red'>nie mogą mieć zwykłych przypomnień</span>. Użyj przypomnień na karcie Inwestycje",
+            "48": "Najpierw dodaj <span style='color:dodgerblue'>kategorię inwestycji</span>. Przypomnienia inwestycyjne są opłacane do niej"
         }
     }
 }

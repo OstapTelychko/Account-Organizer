@@ -30,6 +30,12 @@ class Account(Base):
         back_populates="account",
         cascade="all, delete, delete-orphan"
     )
+    # Investments reminders have no category, so they are removed with the account by the database
+    reminders: Mapped[list["MonthlyReminder"]] = relationship(
+        back_populates="account",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
 
     def __repr__(self) -> str:
@@ -116,6 +122,7 @@ class MonthlyReminder(Base):
         ForeignKey("categories.id", ondelete="CASCADE"), nullable=True, index=True
     )
     category: Mapped["Category | None"] = relationship(back_populates="reminders")
+    account: Mapped[Account] = relationship(back_populates="reminders")
 
 
     def __repr__(self) -> str:

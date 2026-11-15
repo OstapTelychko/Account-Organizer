@@ -1,4 +1,5 @@
 from functools import partial
+from datetime import date
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -325,6 +326,11 @@ def update_category_total_value(category_id:int) -> None:
             app_core.current_month
         )
         category.total_value_label.setText(LanguageStructure.Investments.get_translation(4) + str(category_value))
+        # Investments operations can't be added to future months
+        today = date.today()
+        category.add_transaction.setEnabled(
+            (app_core.current_year, app_core.current_month) <= (today.year, today.month)
+        )
         return
 
     category.total_value_label.setText(

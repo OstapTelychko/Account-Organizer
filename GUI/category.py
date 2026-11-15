@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+from datetime import date
 
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView
@@ -26,6 +27,29 @@ if TYPE_CHECKING:
 ADD_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "add transaction.png"))
 REMOVE_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "remove transaction.png"))
 EDIT_TRANSACTION_ICON = QIcon(os.path.join(TRANSACTIONS_DIRECTORY, "edit transaction.png"))
+# Logical columns of an Investments table in the shown order: Day | Operation | Name | Value | ID | Value after
+INVESTMENT_COLUMNS_ORDER = (1, 4, 0, 2, 3, 5)
+
+
+def get_investment_operation_name(operation_type:int) -> str:
+    """Get the translated name of an Investments operation.
+
+        Arguments
+        -------
+            `operation_type` (int): `InvestmentOperation` of a transaction
+        Returns
+        ------
+            `str`: Operation name or an empty string for regular transactions
+    """
+
+    translation_indexes = {
+        InvestmentOperation.Deposit: 1,
+        InvestmentOperation.Withdrawal: 2,
+        InvestmentOperation.Revaluation: 3
+    }
+    if operation_type not in translation_indexes:
+        return ""
+    return LanguageStructure.Investments.get_translation(translation_indexes[InvestmentOperation(operation_type)])
 
 
 def load_transactions_into_category_table(category_data:CustomTableWidget, transactions:list[Transaction]) -> None:
@@ -85,11 +109,6 @@ def load_investment_transactions_into_category_table(
     }
     timeline = [point for point in calculate_investment_timeline(transactions) if point.date <= month_end]
     month_points = [point for point in timeline if point.date >= month_start]
-    operations_names = {
-        InvestmentOperation.Deposit: LanguageStructure.Investments.get_translation(1),
-        InvestmentOperation.Withdrawal: LanguageStructure.Investments.get_translation(2),
-        InvestmentOperation.Revaluation: LanguageStructure.Investments.get_translation(3)
-    }
 
     category_data.setSortingEnabled(False)
     category_data.setRowCount(0)
@@ -104,7 +123,7 @@ def load_investment_transactions_into_category_table(
             str(point.date.day),
             str(point.value),
             str(point.transaction_id),
-            operations_names.get(InvestmentOperation(point.operation_type), ""),
+            get_investment_operation_name(point.operation_type),
             value_after_text
         )):
             item = CustomTableWidgetItem(text)
@@ -200,6 +219,9 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
     row.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)# Name of transaction
     row.setSectionResizeMode(1, QHeaderView.ResizeMode.Custom)# Day of transaction
     category_data.setColumnWidth(1, 50)
+    if category.category_type == CategoryType.Investment:
+        for visual_index, logical_index in enumerate(INVESTMENT_COLUMNS_ORDER):
+            row.moveSection(row.visualIndex(logical_index), visual_index)
 
     column = category_data.verticalHeader()
     column.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -226,6 +248,10 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
     add_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(1),(185,40))
     add_transaction.setIcon(ADD_TRANSACTION_ICON)
     add_transaction.setIconSize(ICON_SIZE)
+    if category.category_type == CategoryType.Investment:
+        # Investments operations can't be added to future months
+        today = date.today()
+        add_transaction.setEnabled((year, month) <= (today.year, today.month))
 
     delete_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(0),(185,40))
     delete_transaction.setIcon(REMOVE_TRANSACTION_ICON)
