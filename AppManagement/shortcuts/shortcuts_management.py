@@ -9,8 +9,8 @@ from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 from AppObjects.shortcuts_manager import ShortcutsManager
 
-from AppManagement.shortcuts.shortcuts_actions import move_to_next_category, move_to_previous_category, add_transaction_to_focused_category,\
-select_previous_transaction, select_next_transaction, delete_transaction, edit_transaction
+from AppManagement.shortcuts.shortcuts_actions import switch_tab, move_category_focus, \
+add_transaction_to_focused_category, select_previous_transaction, select_next_transaction, delete_transaction, edit_transaction
 from AppManagement.information_message import show_information_message
 from AppManagement.search import show_search_window
 
@@ -79,12 +79,12 @@ def assign_shortcuts() -> None:
         WindowsRegistry.MainWindow, WindowsRegistry.SwitchAccountWindow.exec)
     
     shortcuts_manager.add_shortcut(
-        QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_INCOME]),
-        WindowsRegistry.MainWindow, lambda: WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(0))
+        QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_PREVIOUS_TAB]),
+        WindowsRegistry.MainWindow, partial(switch_tab, -1))
 
     shortcuts_manager.add_shortcut(
-        QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_EXPENSE]),
-        WindowsRegistry.MainWindow, lambda: WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1))
+        QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.SWITCH_TO_NEXT_TAB]),
+        WindowsRegistry.MainWindow, partial(switch_tab, 1))
     
     shortcuts_manager.add_shortcut(
         QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.LOAD_PREVIOUS_MONTH]),
@@ -96,11 +96,11 @@ def assign_shortcuts() -> None:
 
     shortcuts_manager.add_shortcut(
         QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_NEXT_CATEGORY]),
-        WindowsRegistry.MainWindow, move_to_next_category)
+        WindowsRegistry.MainWindow, partial(move_category_focus, 1))
     
     shortcuts_manager.add_shortcut(
         QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.FOCUS_ON_PREVIOUS_CATEGORY]),
-        WindowsRegistry.MainWindow, move_to_previous_category)
+        WindowsRegistry.MainWindow, partial(move_category_focus, -1))
 
     shortcuts_manager.add_shortcut(
         QKeySequence(app_core.config.shortcuts[app_core.config.ShortcutId.ADD_TRANSACTION_TO_FOCUSED_CATEGORY]),

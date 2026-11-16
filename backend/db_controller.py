@@ -21,6 +21,7 @@ from backend.backup_query import BackupQuery
 from backend.statistics_query import StatisticsQuery
 from backend.search_query import SearchQuery
 from backend.reminder_query import ReminderQuery
+from backend.investment_query import InvestmentQuery
 
 if TYPE_CHECKING:
     from sqlalchemy import Engine
@@ -101,6 +102,7 @@ class DBController():
         self.statistics_query = StatisticsQuery(self.session_factory)
         self.search_query = SearchQuery(self.session_factory)
         self.reminder_query = ReminderQuery(self.session_factory)
+        self.investment_query = InvestmentQuery(self.transaction_query)
 
         logger.info("Db session created")
 

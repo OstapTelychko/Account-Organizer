@@ -32,8 +32,8 @@ class ShortcutsManager:
             WindowsRegistry.ShortcutsWindow.open_settings_shortcut: 1,
             WindowsRegistry.ShortcutsWindow.open_statistics_shortcut: 2,
             WindowsRegistry.ShortcutsWindow.switch_account_shortcut: 3,
-            WindowsRegistry.ShortcutsWindow.switch_to_income_shortcut: 4,
-            WindowsRegistry.ShortcutsWindow.switch_to_expense_shortcut: 5,
+            WindowsRegistry.ShortcutsWindow.switch_to_previous_tab_shortcut: 4,
+            WindowsRegistry.ShortcutsWindow.switch_to_next_tab_shortcut: 5,
             WindowsRegistry.ShortcutsWindow.load_previous_month_shortcut: 6,
             WindowsRegistry.ShortcutsWindow.load_next_month_shortcut: 7,
             WindowsRegistry.ShortcutsWindow.focus_on_next_category_shortcut: 8,
@@ -66,13 +66,13 @@ class ShortcutsManager:
                 self.default_shortcuts_values[user_config.ShortcutId.SWITCH_ACCOUNT],
                 user_config.ShortcutId.SWITCH_ACCOUNT
             ),
-            WindowsRegistry.ShortcutsWindow.switch_to_income_shortcut: (
-                self.default_shortcuts_values[user_config.ShortcutId.SWITCH_TO_INCOME],
-                user_config.ShortcutId.SWITCH_TO_INCOME
+            WindowsRegistry.ShortcutsWindow.switch_to_previous_tab_shortcut: (
+                self.default_shortcuts_values[user_config.ShortcutId.SWITCH_TO_PREVIOUS_TAB],
+                user_config.ShortcutId.SWITCH_TO_PREVIOUS_TAB
             ),
-            WindowsRegistry.ShortcutsWindow.switch_to_expense_shortcut: (
-                self.default_shortcuts_values[user_config.ShortcutId.SWITCH_TO_EXPENSE],
-                user_config.ShortcutId.SWITCH_TO_EXPENSE
+            WindowsRegistry.ShortcutsWindow.switch_to_next_tab_shortcut: (
+                self.default_shortcuts_values[user_config.ShortcutId.SWITCH_TO_NEXT_TAB],
+                user_config.ShortcutId.SWITCH_TO_NEXT_TAB
             ),
             WindowsRegistry.ShortcutsWindow.load_previous_month_shortcut: (
                 self.default_shortcuts_values[user_config.ShortcutId.LOAD_PREVIOUS_MONTH],

@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 from backend.models import Category, MonthlyReminder, Transaction
 from GeneralTools.Utils import get_covered_period, shift_month, get_due_date_for_covered_month
 from AppObjects.logger import get_logger
+from project_configuration import ReminderType
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
@@ -35,10 +36,10 @@ class ReminderQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                return session.query(MonthlyReminder).join(Category).options(
+                return session.query(MonthlyReminder).options(
                     joinedload(MonthlyReminder.category)
                 ).filter(
-                    Category.account_id == self.account_id
+                    MonthlyReminder.account_id == self.account_id
                 ).order_by(MonthlyReminder.next_due_date, MonthlyReminder.name).all()
 
 
@@ -55,11 +56,11 @@ class ReminderQuery:
 
         with self.session_factory() as session:
             with session.begin():
-                reminder = session.query(MonthlyReminder).join(Category).options(
+                reminder = session.query(MonthlyReminder).options(
                     joinedload(MonthlyReminder.category)
                 ).filter(and_(
                     MonthlyReminder.id == reminder_id,
-                    Category.account_id == self.account_id
+                    MonthlyReminder.account_id == self.account_id
                 )).first()
 
                 if reminder is None:
@@ -83,8 +84,8 @@ class ReminderQuery:
         normalized_name = name.strip().casefold()
         with self.session_factory() as session:
             with session.begin():
-                rows = session.query(MonthlyReminder.id, MonthlyReminder.name).join(Category).filter(
-                    Category.account_id == self.account_id
+                rows = session.query(MonthlyReminder.id, MonthlyReminder.name).filter(
+                    MonthlyReminder.account_id == self.account_id
                 ).all()
 
         return any(
@@ -96,20 +97,22 @@ class ReminderQuery:
     def create_reminder(
             self,
             name:str,
-            category_id:int,
+            category_id:int|None,
             value:float|None,
             day:int|None,
-            next_due_date:date
+            next_due_date:date,
+            reminder_type:int = ReminderType.Regular
         ) -> MonthlyReminder:
-        """Create a new reminder.
+        """Create a new reminder in the current account.
 
             Arguments
             ---------
                 `name` : (str) - Reminder name.
-                `category_id` : (int) - Category ID.
+                `category_id` : (int|None) - Category ID. `None` for Investments reminders.
                 `value` : (float|None) - Expected value.
                 `day` : (int|None) - Day of the month.
                 `next_due_date` : (date) - First due date.
+                `reminder_type` : (int) - `ReminderType` of the reminder.
             Returns
             -------
                 `MonthlyReminder` - The created reminder.
@@ -118,13 +121,14 @@ class ReminderQuery:
         with self.session_factory() as session:
             with session.begin():
                 reminder = MonthlyReminder(
-                    name=name, category_id=category_id, value=value, day=day, next_due_date=next_due_date
+                    name=name, category_id=category_id, value=value, day=day, next_due_date=next_due_date,
+                    reminder_type=reminder_type, account_id=self.account_id
                 )
                 session.add(reminder)
 
         logger.info(
-            f'[ENTITY: REMINDER] [ACTION: CREATED] name="{name}" category_id={category_id} value={value} day={day} '
-            f'next_due_date={next_due_date}'
+            f'[ENTITY: REMINDER] [ACTION: CREATED] name="{name}" type={reminder_type} category_id={category_id} '
+            f'value={value} day={day} next_due_date={next_due_date}'
         )
         return reminder
 
@@ -133,10 +137,11 @@ class ReminderQuery:
             self,
             reminder_id:int,
             name:str,
-            category_id:int,
+            category_id:int|None,
             value:float|None,
             day:int|None,
-            next_due_date:date
+            next_due_date:date,
+            reminder_type:int = ReminderType.Regular
         ) -> None:
         """Update a reminder.
 
@@ -144,10 +149,11 @@ class ReminderQuery:
             ---------
                 `reminder_id` : (int) - ID of the reminder to update.
                 `name` : (str) - New name.
-                `category_id` : (int) - New category ID.
+                `category_id` : (int|None) - New category ID. `None` for Investments reminders.
                 `value` : (float|None) - New expected value.
                 `day` : (int|None) - New day of the month.
                 `next_due_date` : (date) - New next due date.
+                `reminder_type` : (int) - New `ReminderType`.
         """
 
         with self.session_factory() as session:
@@ -160,13 +166,14 @@ class ReminderQuery:
                 old_name = reminder.name
                 reminder.name = name
                 reminder.category_id = category_id
+                reminder.reminder_type = reminder_type
                 reminder.value = value
                 reminder.day = day
                 reminder.next_due_date = next_due_date
 
         logger.info(
             f'[ENTITY: REMINDER] [ACTION: UPDATED] id={reminder_id} old_name="{old_name}" name="{name}" '
-            f'category_id={category_id} value={value} day={day} next_due_date={next_due_date}'
+            f'type={reminder_type} category_id={category_id} value={value} day={day} next_due_date={next_due_date}'
         )
 
 

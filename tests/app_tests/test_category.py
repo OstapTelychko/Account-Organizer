@@ -8,7 +8,7 @@ from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from languages import LanguageStructure
 from backend.models import Category
 from GUI.gui_constants import app
-from AppManagement.shortcuts.shortcuts_actions import move_to_next_category
+from AppManagement.shortcuts.shortcuts_actions import move_category_focus
 from project_configuration import CategoryType
 
 from AppObjects.app_core import AppCore
@@ -212,13 +212,13 @@ class TestCategory(DBTestCase, OutOfScopeTestCase):
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(0)
         for category in income_categories:
             check_single_category()
-            move_to_next_category()
+            move_category_focus(1)
             qsleep(500)
         
         WindowsRegistry.MainWindow.Incomes_and_expenses.setCurrentIndex(1)
         for category in expense_categories:
             check_single_category()
-            move_to_next_category()
+            move_category_focus(1)
             qsleep(500)
 
         qsleep(1700)

@@ -42,6 +42,7 @@ class ReminderValidationError(Exception):
     NAME_EXISTS = "name_exists"
     NO_CATEGORY = "no_category"
     DAY_OUT_OF_RANGE = "day_out_of_range"
+    INVESTMENT_CATEGORY = "investment_category"
 
     def __init__(self, reason:str) -> None:
         super().__init__(reason)

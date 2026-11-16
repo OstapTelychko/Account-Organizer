@@ -6,7 +6,8 @@ from AppObjects.windows_registry import WindowsRegistry
 
 from project_configuration import CategoryType
 from languages import LanguageStructure
-from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table
+from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table,\
+    load_investment_category_data
 
 from AppManagement.information_message import show_information_message
 from AppManagement.balance import calculate_current_balance
@@ -34,6 +35,10 @@ def load_categories_data() -> None:
 
     app_core = AppCore.instance()
     for category in app_core.categories:
+        if app_core.categories[category].type == CategoryType.Investment:
+            update_category_total_value(category)
+            continue
+
         category_data = app_core.categories[category].table_data
         if category_data.rowCount() != 0:#Remove current category transactions if it exist
             for row in range(1,category_data.rowCount()+1):
@@ -306,10 +311,24 @@ def change_category_position() -> int:
 
 
 def update_category_total_value(category_id:int) -> None:
-    """Update category total value. It updates the total value label for the category in the GUI."""
+    """Update category total value. It updates the total value label for the category in the GUI.
+    Investments categories also reload their table, because every operation changes the values after it.
+    """
 
     app_core = AppCore.instance()
-    app_core.categories[category_id].total_value_label.setText(
+    category = app_core.categories[category_id]
+    if category.type == CategoryType.Investment:
+        load_investment_category_data(
+            category.table_data,
+            category.total_value_label,
+            category.add_transaction,
+            app_core.db.transaction_query.get_all_transactions(category_id),
+            app_core.current_year,
+            app_core.current_month
+        )
+        return
+
+    category.total_value_label.setText(
         LanguageStructure.Categories.get_translation(10) +
         str(round(app_core.db.statistics_query.get_monthly_transactions_sum(
             category_id, app_core.current_year, app_core.current_month
@@ -328,20 +347,15 @@ def activate_categories() -> None:
 
 
 def reset_focused_category() -> None:
-    """Reset focused category. It sets the focused income and expense categories to the first category of their type."""
+    """Reset focused categories. Each category type focuses its first category or None if it has no categories."""
 
     app_core = AppCore.instance()
-    income_categories, expense_categories = app_core.get_income_and_expense_categories()
-
-    if len(income_categories) != 0:
-        app_core.focused_income_category = income_categories[0]
-    else:
-        app_core.focused_income_category = None
-    
-    if len(expense_categories) != 0:
-        app_core.focused_expense_category = expense_categories[0]
-    else:
-        app_core.focused_expense_category = None
+    app_core.focused_categories = {
+        category_type: next(
+            (category for category in app_core.categories.values() if category.type == category_type), None
+        )
+        for category_type in (CategoryType.Income, CategoryType.Expense, CategoryType.Investment)
+    }
 
 
 def show_anomalous_transaction_values_settings() -> None:

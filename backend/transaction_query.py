@@ -6,6 +6,7 @@ from sqlalchemy import and_
 from backend.fts_utils import build_fts_ngram_text
 from backend.models import Transaction, TransactionsFTS
 from GeneralTools.Utils import generate_month_range
+from project_configuration import InvestmentOperation
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker, Session as sql_Session
@@ -34,7 +35,14 @@ class TransactionQuery:
                 session.query(Transaction).filter_by(id=transaction_id).delete(False)
             
 
-    def update_transaction(self, transaction_id:int, transaction_name:str, day:int, transaction_value:float) -> None:
+    def update_transaction(
+            self,
+            transaction_id:int,
+            transaction_name:str,
+            day:int,
+            transaction_value:float,
+            operation_type:int|None = None
+        ) -> None:
         """Update a transaction in the database.
 
             Arguments
@@ -43,6 +51,7 @@ class TransactionQuery:
                 `transaction_name` : (str) - New name of the transaction.
                 `transaction_day` : (int) - New day of the transaction.
                 `transaction_value` : (float) - New value of the transaction.
+                `operation_type` : (int|None) - New `InvestmentOperation` of the transaction. `None` keeps it.
         """
 
         with self.session_factory() as session:
@@ -55,6 +64,8 @@ class TransactionQuery:
                 transaction.name = transaction_name
                 transaction.date = date(transaction.date.year, transaction.date.month, day)
                 transaction.value = transaction_value
+                if operation_type is not None:
+                    transaction.operation_type = operation_type
 
                 fts_row = session.get(TransactionsFTS, transaction_id)
                 fts_name = build_fts_ngram_text(transaction_name)
@@ -64,7 +75,14 @@ class TransactionQuery:
                     fts_row.name = fts_name
 
 
-    def add_transaction(self, category_id:int, date:date, value:float, name:str) -> Transaction:
+    def add_transaction(
+            self,
+            category_id:int,
+            date:date,
+            value:float,
+            name:str,
+            operation_type:int = InvestmentOperation.Regular
+        ) -> Transaction:
         """Add a new transaction to the database.
 
             Arguments
@@ -73,11 +91,14 @@ class TransactionQuery:
                 `date` : (date) - Date of the transaction.
                 `value` : (float) - Value of the transaction.
                 `name` : (str) - Name of the transaction.
+                `operation_type` : (int) - `InvestmentOperation` of the transaction.
         """
 
         with self.session_factory() as session:
             with session.begin():
-                transaction = Transaction(date=date, value=value, name=name, category_id=category_id)
+                transaction = Transaction(
+                    date=date, value=value, name=name, category_id=category_id, operation_type=operation_type
+                )
                 session.add(transaction)
                 session.flush()
                 session.add(TransactionsFTS(rowid=transaction.id, name=build_fts_ngram_text(name)))

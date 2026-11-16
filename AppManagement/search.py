@@ -4,6 +4,8 @@ from datetime import date
 from AppObjects.windows_registry import WindowsRegistry
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
+from GUI.gui_constants import INVESTMENTS_COLOR
+from GUI.category import get_investment_operation_name
 
 from languages import LanguageStructure
 from project_configuration import CategoryType
@@ -79,14 +81,17 @@ def perform_search() -> None | int:
             transaction_name = LanguageStructure.Statistics.get_translation(12)
         
         category = app_core.categories[transaction.category_id]
-        category_name = category.name
+        category_text = category.name
         if category.type == CategoryType.Income:
             transaction_color = "rgb(0,205,0)"
+        elif category.type == CategoryType.Investment:
+            transaction_color = INVESTMENTS_COLOR
+            category_text += f", {get_investment_operation_name(transaction.operation_type)}"
         else:
             transaction_color = "rgb(205,0,0)"
 
         WindowsRegistry.SearchWindow.transactions_list.addItem(
-            f"<b style='color:{transaction_color}'>{transaction_name}</b> ({category_name}) <br>"
+            f"<b style='color:{transaction_color}'>{transaction_name}</b> ({category_text}) <br>"
             f"Date: <b>{transaction.date}</b>  Value: <b>{transaction.value}</b>"
         )
 

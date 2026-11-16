@@ -1,4 +1,5 @@
 from typing import cast
+from PySide6.QtCore import QLocale, QObject
 from PySide6.QtGui import QDoubleValidator, QValidator
 
 
@@ -7,7 +8,26 @@ class StrictDoubleValidator(QDoubleValidator):
     """A custom QDoubleValidator that validates double values with strict bounds.
     
         This validator ensures that the input is a valid double and falls within the specified range.
+        It uses the C locale with `.` as the decimal separator; a typed `,` is converted to `.`,
+        so the text can always be passed to `float()`.
     """
+
+    def __init__(self, bottom:float, top:float, decimals:int, parent:QObject|None = None) -> None:
+        """Create the validator.
+
+            Arguments
+            ---------
+                `bottom` : (float) - Lowest allowed value (exclusive unless `inclusive_bottom` is set).
+                `top` : (float) - Highest allowed value (exclusive).
+                `decimals` : (int) - Maximum number of decimals.
+                `parent` : (QObject|None) - Parent object.
+        """
+
+        super().__init__(bottom, top, decimals, parent)
+        locale = QLocale.c()
+        locale.setNumberOptions(QLocale.NumberOption.RejectGroupSeparator)
+        self.setLocale(locale)
+        self.inclusive_bottom:bool = False
 
     def check_value_bounds(self, value:str) -> bool:
         """Check if the value is within the specified bounds."""
@@ -16,10 +36,13 @@ class StrictDoubleValidator(QDoubleValidator):
         except ValueError:
             return True# If the value is not a valid float, we consider it's intermediate state for example input is 1. and user is still typing
         
+        if self.inclusive_bottom:
+            return self.bottom() <= value_float < self.top()
         return self.bottom() < value_float < self.top()
 
 
     def validate(self, input_str:str, pos:int) -> tuple[QValidator.State, str, int]:
+        input_str = input_str.replace(",", ".")
         result = super().validate(input_str, pos)
         # Cast is needed because mypy doesn't know the return type of super().validate
         state, input_str, pos = cast(tuple[QValidator.State, str, int], result)

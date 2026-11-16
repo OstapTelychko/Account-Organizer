@@ -1,10 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QComboBox
 from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtCore import QRegularExpression
 
-from project_configuration import MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, TRANSACTION_DAY_REGEX
+from project_configuration import MIN_TRANSACTION_VALUE, MAX_TRANSACTION_VALUE, TRANSACTION_DAY_REGEX,\
+    InvestmentOperation
 
 from DesktopQtToolkit.sub_window import SubWindow
 from DesktopQtToolkit.strict_double_validator import StrictDoubleValidator
@@ -47,7 +48,22 @@ class TransactionManagementWindow(SubWindow):
         self.transaction_value.setValidator(self.transaction_value_validator)
 
         self.transaction_id:int
+        # True while the window edits `transaction_id`, False while it adds a new transaction
+        self.is_editing = False
+        # Value pre-filled for a new revaluation, so it's replaced only while the user hasn't changed it
+        self.prefilled_value = ""
 
+        # Shown only for Investments categories, items data is `InvestmentOperation`
+        self.operation_type = QComboBox()
+        self.operation_type.setFont(BASIC_FONT)
+        self.operation_type.setMinimumWidth(170)
+        for operation in (
+            InvestmentOperation.Deposit, InvestmentOperation.Withdrawal, InvestmentOperation.Revaluation
+        ):
+            self.operation_type.addItem(operation.name, int(operation))
+        self.operation_type.hide()
+
+        self.transaction_layout.addWidget(self.operation_type, alignment=ALIGN_V_CENTER)
         self.transaction_layout.addWidget(self.transaction_name, alignment=ALIGN_V_CENTER)
         self.transaction_layout.addWidget(self.transaction_day, alignment=ALIGN_V_CENTER)
         self.transaction_layout.addWidget(self.transaction_value, alignment=ALIGN_V_CENTER)

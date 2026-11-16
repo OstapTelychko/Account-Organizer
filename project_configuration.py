@@ -1,4 +1,5 @@
 import os
+from enum import IntEnum
 from pathlib import Path
 from sys import platform
 
@@ -134,6 +135,7 @@ DISPLAY_DATE_FORMAT = "%d/%m/%Y"
 class CategoryType:
     Income = "Incomes"
     Expense = "Expenses"
+    Investment = "Investments"
     
 
     @staticmethod
@@ -142,6 +144,8 @@ class CategoryType:
             return CategoryType.Income
         elif index == 1:
             return CategoryType.Expense
+        elif index == 2:
+            return CategoryType.Investment
         else:
             raise ValueError("Invalid category type index")
     
@@ -152,5 +156,24 @@ class CategoryType:
             return 0
         elif category_type == CategoryType.Expense:
             return 1
+        elif category_type == CategoryType.Investment:
+            return 2
         else:
             raise ValueError("Invalid category type string")
+
+
+class InvestmentOperation(IntEnum):
+    """Operation type of a transaction. Income and Expense categories only have `Regular` transactions."""
+
+    Regular = 0
+    Deposit = 1
+    Withdrawal = 2
+    Revaluation = 3
+
+
+class ReminderType(IntEnum):
+    """Type of a monthly reminder. Investments reminders belong to the account, not to a category."""
+
+    Regular = 0
+    InvestmentTransfer = 1
+    InvestmentsRevaluation = 2

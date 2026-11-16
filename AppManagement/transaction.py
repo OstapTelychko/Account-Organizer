@@ -13,16 +13,121 @@ from DesktopQtToolkit.table_widget import CustomTableWidgetItem
 from DesktopQtToolkit.Utils import get_table_widget_item
 
 from languages import LanguageStructure
-from project_configuration import CategoryType
-from AppManagement.balance import update_account_balance
+from project_configuration import CategoryType, InvestmentOperation
+from AppManagement.balance import update_account_balance, calculate_current_balance
 from project_configuration import MAX_TRANSACTION_VALUE
+from backend.models import Transaction
+from backend.investment_query import calculate_investment_timeline, validate_category_timeline
 
 if TYPE_CHECKING:
     from DesktopQtToolkit.table_widget import CustomTableWidget
+    from DesktopQtToolkit.message_window import MessageWindow
+    from backend.investment_query import InvestmentTimelinePoint
 
 
 
 logger = get_logger(__name__)
+
+def get_row_selection_error(category_data:CustomTableWidget) -> MessageWindow | None:
+    """Check that exactly one whole row is selected in a category table.
+
+        Arguments
+        ---------
+        `category_data` : (CustomTableWidget) - Table widget with transaction data.
+
+        Returns
+        -------
+        `MessageWindow | None` - Message to show if the selection is wrong, otherwise None.
+    """
+
+    visible_columns = sum(
+        not category_data.isColumnHidden(column) for column in range(category_data.columnCount())
+    )
+    selected_items = category_data.selectedItems()
+
+    if len(selected_items) < visible_columns:
+        return WindowsRegistry.Messages.unselected_row
+    if len(selected_items) > visible_columns or len({item.row() for item in selected_items}) != 1:
+        return WindowsRegistry.Messages.only_one_row
+    return None
+
+
+def update_transaction_value_field() -> None:
+    """Adapt the value field of the transaction window to the selected operation.
+    A revaluation accepts 0 and a new one is pre-filled with the category value at the entered day,
+    or at the end of the viewed month (but not later than today) while the day is empty.
+    The pre-filled value is replaced only while the user hasn't changed it.
+    """
+
+    window = WindowsRegistry.TransactionManagementWindow
+    is_revaluation = not window.operation_type.isHidden()\
+        and window.operation_type.currentData() == InvestmentOperation.Revaluation
+    window.transaction_value_validator.inclusive_bottom = is_revaluation
+    if is_revaluation:
+        window.transaction_value.setPlaceholderText(LanguageStructure.Investments.get_translation(7))
+    else:
+        window.transaction_value.setPlaceholderText(LanguageStructure.Transactions.get_translation(2))
+
+    if window.is_editing or window.transaction_value.text() != window.prefilled_value:
+        return
+
+    app_core = AppCore.instance()
+    category_id = next((
+        category.id for category in app_core.categories.values()
+        if category.type == CategoryType.Investment and category.name == window.windowTitle()
+    ), None)
+    prefilled_value = ""
+    if is_revaluation and category_id is not None:
+        _, max_month_day = monthrange(app_core.current_year, app_core.current_month)
+        raw_day = window.transaction_day.text()
+        if raw_day.isdigit() and 0 < int(raw_day) <= max_month_day:
+            as_of = date(app_core.current_year, app_core.current_month, int(raw_day))
+        else:
+            as_of = min(date(app_core.current_year, app_core.current_month, max_month_day), date.today())
+        prefilled_value = str(app_core.db.investment_query.get_categories_values([category_id], as_of)[category_id])
+
+    window.prefilled_value = prefilled_value
+    window.transaction_value.setText(prefilled_value)
+
+
+def describe_investment_operation(name:str | None, point:InvestmentTimelinePoint) -> str:
+    """Describe an Investments operation for logs.
+
+        Arguments
+        ---------
+        `name` : (str | None) - Name of the operation.
+        `point` : (InvestmentTimelinePoint) - State of the category right after the operation.
+
+        Returns
+        -------
+        `str` - Operation type, name, date, value and the category value after it.
+    """
+
+    description = (
+        f'operation={InvestmentOperation(point.operation_type).name} name="{name or ""}" date={point.date} '
+        f'value={point.value} value_after={point.value_after}'
+    )
+    if point.operation_type == InvestmentOperation.Revaluation:
+        description += f" change={point.value_change:+}"
+    return description
+
+
+def prepare_operation_type(operation:InvestmentOperation) -> None:
+    """Show the operation selector of the transaction window only on the Investments tab and select an operation.
+
+        Arguments
+        ---------
+        `operation` : (InvestmentOperation) - Operation to select. Ignored outside of the Investments tab.
+    """
+
+    operation_type = WindowsRegistry.TransactionManagementWindow.operation_type
+    is_investment = CategoryType.get(
+        WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()
+    ) == CategoryType.Investment
+    operation_type.setVisible(is_investment)
+    operation_type.setCurrentIndex(max(operation_type.findData(int(operation)), 0))
+    update_transaction_value_field()
+
 
 def show_edit_transaction_window(category_name:str, category_data:CustomTableWidget) -> int:
     """Show edit transaction window. It allows to edit transaction data.
@@ -34,24 +139,28 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
         `category_data` : (CustomTableWidget) - Table widget with transaction data. It will be used to get selected row data.
     """
 
-    selected_row = category_data.selectedItems()
-
-    if len(selected_row) == 0 or len(selected_row) < 3:
-        return WindowsRegistry.Messages.unselected_row.exec()
-        
-    if len(selected_row) > 3 or selected_row[0].row() != selected_row[1].row() or selected_row[0].row() != selected_row[2].row():
-        return WindowsRegistry.Messages.only_one_row.exec()
+    selection_error = get_row_selection_error(category_data)
+    if selection_error is not None:
+        return selection_error.exec()
+    row = category_data.selectedItems()[0].row()
     
+    WindowsRegistry.TransactionManagementWindow.is_editing = True
     WindowsRegistry.TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(5))
     WindowsRegistry.TransactionManagementWindow.message.setText(LanguageStructure.TransactionsMessages.get_translation(0))
     WindowsRegistry.TransactionManagementWindow.setWindowTitle(category_name)
 
-    WindowsRegistry.TransactionManagementWindow.transaction_name.setText(selected_row[0].text())
+    WindowsRegistry.TransactionManagementWindow.transaction_name.setText(get_table_widget_item(category_data, row, 0).text())
     WindowsRegistry.TransactionManagementWindow.transaction_name.setFocus()
-    WindowsRegistry.TransactionManagementWindow.transaction_day.setText(selected_row[1].text())
-    WindowsRegistry.TransactionManagementWindow.transaction_value.setText(selected_row[2].text())
+    WindowsRegistry.TransactionManagementWindow.transaction_day.setText(get_table_widget_item(category_data, row, 1).text())
+    WindowsRegistry.TransactionManagementWindow.transaction_value.setText(get_table_widget_item(category_data, row, 2).text())
 
-    WindowsRegistry.TransactionManagementWindow.transaction_id = int(get_table_widget_item(category_data, selected_row[0].row(), 3).text())
+    # Investments tables keep the operation type in the data of the "Operation" column
+    operation_item = category_data.item(row, 4)
+    prepare_operation_type(InvestmentOperation(
+        operation_item.data(Qt.ItemDataRole.UserRole) if operation_item is not None else InvestmentOperation.Regular
+    ))
+
+    WindowsRegistry.TransactionManagementWindow.transaction_id = int(get_table_widget_item(category_data, row, 3).text())
     return WindowsRegistry.TransactionManagementWindow.exec()
 
 
@@ -101,6 +210,7 @@ def show_add_transaction_window(category_name:str) -> None:
         `category_name` : (str) - Name of the category. It will be shown in the window title.
     """
 
+    WindowsRegistry.TransactionManagementWindow.is_editing = False
     WindowsRegistry.TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
     WindowsRegistry.TransactionManagementWindow.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
 
@@ -108,8 +218,11 @@ def show_add_transaction_window(category_name:str) -> None:
     WindowsRegistry.TransactionManagementWindow.transaction_name.setFocus()
     WindowsRegistry.TransactionManagementWindow.transaction_day.setText("")
     WindowsRegistry.TransactionManagementWindow.transaction_value.setText("")
-
+    WindowsRegistry.TransactionManagementWindow.prefilled_value = ""
     WindowsRegistry.TransactionManagementWindow.setWindowTitle(category_name)
+
+    prepare_operation_type(InvestmentOperation.Deposit)
+
     WindowsRegistry.TransactionManagementWindow.exec()
 
 
@@ -164,8 +277,14 @@ def add_transaction(transaction_name:str, transaction_day:int, transaction_value
     WindowsRegistry.TransactionManagementWindow.hide()
 
 
-def transaction_data_handler() -> int:
-    """Handle transaction data. It checks if transaction data is valid and adds or updates transaction data."""
+def transaction_data_handler(current_date:date | None = None) -> int:
+    """Handle transaction data. It checks if transaction data is valid and adds or updates transaction data.
+
+        Arguments
+        ---------
+
+        `current_date` : (date | None) - Date considered as today for Investments operations. Defaults to `date.today()`.
+    """
 
     from AppManagement.category import update_category_total_value
 
@@ -190,7 +309,7 @@ def transaction_data_handler() -> int:
     if raw_transaction_day == "" or raw_transaction_value == "":
         return WindowsRegistry.Messages.empty_fields.exec()
     
-    if raw_transaction_value.replace(".","").replace(",","").isdigit() and raw_transaction_day.isdigit():
+    if raw_transaction_value.replace(".", "", 1).isdigit() and raw_transaction_day.isdigit():
         transaction_day = int(raw_transaction_day)
     else:
         return WindowsRegistry.Messages.incorrect_data_type.exec()
@@ -212,7 +331,56 @@ def transaction_data_handler() -> int:
         )
         return WindowsRegistry.Messages.transaction_value_anomalous.exec()
 
-    if WindowsRegistry.TransactionManagementWindow.button.text() == LanguageStructure.GeneralManagement.get_translation(5): #Update 
+    is_update = WindowsRegistry.TransactionManagementWindow.is_editing
+
+    if category_type == CategoryType.Investment:
+        operation_type = InvestmentOperation(WindowsRegistry.TransactionManagementWindow.operation_type.currentData())
+        transaction_date = date(app_core.current_year, app_core.current_month, transaction_day)
+
+        if transaction_date > (current_date or date.today()):
+            return WindowsRegistry.Messages.future_investment_operation.exec()
+
+        if operation_type != InvestmentOperation.Revaluation and transaction_value == 0:
+            return WindowsRegistry.Messages.zero_investment_value.exec()
+
+        transaction_id = WindowsRegistry.TransactionManagementWindow.transaction_id if is_update else None
+        saved_transactions = app_core.db.transaction_query.get_all_transactions(category_id)
+        new_timeline = validate_category_timeline(saved_transactions, transaction_id, Transaction(
+            id=transaction_id, date=transaction_date, value=transaction_value,
+            operation_type=operation_type, category_id=category_id
+        ))
+        if new_timeline is None:
+            return WindowsRegistry.Messages.negative_investment_value.exec()
+        new_state = describe_investment_operation(
+            transaction_name, next(point for point in new_timeline if point.transaction_id == transaction_id)
+        )
+
+        if transaction_id is not None:
+            old_transaction = next(transaction for transaction in saved_transactions if transaction.id == transaction_id)
+            old_state = describe_investment_operation(old_transaction.name, next(
+                point for point in calculate_investment_timeline(saved_transactions)
+                if point.transaction_id == transaction_id
+            ))
+            app_core.db.transaction_query.update_transaction(
+                transaction_id, transaction_name, transaction_day, transaction_value, operation_type
+            )
+            logger.info(
+                f'[ENTITY: INVESTMENT] [ACTION: UPDATED] id={transaction_id} category="{category.name}" '
+                f'old: {old_state} new: {new_state}'
+            )
+        else:
+            app_core.db.transaction_query.add_transaction(
+                category_id, transaction_date, transaction_value, transaction_name, operation_type
+            )
+            action = "REVALUATED" if operation_type == InvestmentOperation.Revaluation else operation_type.name.upper()
+            logger.info(f'[ENTITY: INVESTMENT] [ACTION: {action}] category="{category.name}" {new_state}')
+
+        update_category_total_value(category_id)
+        calculate_current_balance()
+        WindowsRegistry.TransactionManagementWindow.hide()
+        return 1
+
+    if is_update:
         transaction_id = WindowsRegistry.TransactionManagementWindow.transaction_id
         update_transaction(transaction_id, transaction_name, transaction_day, transaction_value, category_data)
         logger.debug(f"Transaction updated: {transaction_name}\
@@ -248,27 +416,45 @@ def remove_transaction(category_data:CustomTableWidget, category_id:int) -> int:
     from AppManagement.category import update_category_total_value
 
     app_core = AppCore.instance()
-    selected_row = category_data.selectedItems()
+    selection_error = get_row_selection_error(category_data)
+    if selection_error is not None:
+        return selection_error.exec()
+    row = category_data.selectedItems()[0].row()
+    transaction_id = int(get_table_widget_item(category_data, row, 3).text())
+    category_type = CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex())
 
-    if len(selected_row) == 0 or len(selected_row) < 3:
-        return WindowsRegistry.Messages.unselected_row.exec()
-    
-    if len(selected_row) == 3 and selected_row[0].row() == selected_row[1].row() and selected_row[0].row() == selected_row[2].row():
-        transaction_id = int(get_table_widget_item(category_data, selected_row[0].row(), 3).text())
-    else:
-        return WindowsRegistry.Messages.only_one_row.exec()
+    if category_type == CategoryType.Investment:
+        saved_transactions = app_core.db.transaction_query.get_all_transactions(category_id)
+        if validate_category_timeline(saved_transactions, transaction_id, None) is None:
+            return WindowsRegistry.Messages.negative_investment_value.exec()
 
     WindowsRegistry.Messages.delete_transaction_confirmation.exec()
     ok_button = WindowsRegistry.Messages.delete_transaction_confirmation.ok_button
     if WindowsRegistry.Messages.delete_transaction_confirmation.clickedButton() == ok_button:
-        transaction_value = float(selected_row[2].text())
+        transaction_value = float(get_table_widget_item(category_data, row, 2).text())
         app_core.db.transaction_query.delete_transaction(transaction_id)
 
-        category_data.removeRow(selected_row[0].row())
+        if category_type == CategoryType.Investment:
+            deleted_transaction = next(
+                transaction for transaction in saved_transactions if transaction.id == transaction_id
+            )
+            deleted_state = describe_investment_operation(deleted_transaction.name, next(
+                point for point in calculate_investment_timeline(saved_transactions)
+                if point.transaction_id == transaction_id
+            ))
+            logger.info(
+                f'[ENTITY: INVESTMENT] [ACTION: DELETED] id={transaction_id} '
+                f'category="{app_core.categories[category_id].name}" {deleted_state}'
+            )
+            update_category_total_value(category_id)
+            calculate_current_balance()
+            return 1
+
+        category_data.removeRow(row)
 
         update_category_total_value(category_id)
 
-        if CategoryType.get(WindowsRegistry.MainWindow.Incomes_and_expenses.currentIndex()) == CategoryType.Income:
+        if category_type == CategoryType.Income:
             app_core.current_total_income -= transaction_value
             app_core.current_balance -= transaction_value
         else:
