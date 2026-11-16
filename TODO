@@ -7,7 +7,6 @@ New features:
 Updates to existing features:
   ☐ empty @don't-touch
   ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
-  ☐ allow showing statistics when there is no expenses or income in the selected period @started(26-11-07 18:22)
   ☐ make backup loaded messages appear only for app_core or backup_management or for one of them make it print single log row like 120 of 120 backups loaded instead filling app logs
   
 Project life improvements:
@@ -30,6 +29,7 @@ Release:
   ☐ empty @don't-touch
     
 Archive:
+  ✔ allow showing statistics when there is no expenses or income in the selected period @started(26-11-07 18:22) @done(26-11-16 01:39) @lasted(1w1d7h17m8s) @project(Updates to existing features)
   ✘ fix issue with weird looking buttons on windows @cancelled(26-11-08 01:05) @project(New features)
   ✔ add scheduler of delayed payments and reminders of monthly payments @started(26-09-28 00:12) @done(26-10-23 23:39) @lasted(3w4d23h27m57s) @project(New features)
   ✔ fix issue with not initialized ShortcutsManager when account doesn't exists @started(26-09-20 11:06) @done(26-09-27 21:45) @lasted(1w10h39m20s) @project(Bugs)
