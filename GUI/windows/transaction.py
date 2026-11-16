@@ -48,6 +48,8 @@ class TransactionManagementWindow(SubWindow):
         self.transaction_value.setValidator(self.transaction_value_validator)
 
         self.transaction_id:int
+        # True while the window edits `transaction_id`, False while it adds a new transaction
+        self.is_editing = False
         # Value pre-filled for a new revaluation, so it's replaced only while the user hasn't changed it
         self.prefilled_value = ""
 

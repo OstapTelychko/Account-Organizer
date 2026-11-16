@@ -1,5 +1,4 @@
 from functools import partial
-from datetime import date
 
 from AppObjects.app_core import AppCore
 from AppObjects.logger import get_logger
@@ -8,7 +7,7 @@ from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import CategoryType
 from languages import LanguageStructure
 from GUI.category import load_category, add_category_to_position_list, load_transactions_into_category_table,\
-    load_investment_transactions_into_category_table
+    load_investment_category_data
 
 from AppManagement.information_message import show_information_message
 from AppManagement.balance import calculate_current_balance
@@ -319,17 +318,13 @@ def update_category_total_value(category_id:int) -> None:
     app_core = AppCore.instance()
     category = app_core.categories[category_id]
     if category.type == CategoryType.Investment:
-        category_value = load_investment_transactions_into_category_table(
+        load_investment_category_data(
             category.table_data,
+            category.total_value_label,
+            category.add_transaction,
             app_core.db.transaction_query.get_all_transactions(category_id),
             app_core.current_year,
             app_core.current_month
-        )
-        category.total_value_label.setText(LanguageStructure.Investments.get_translation(4) + str(category_value))
-        # Investments operations can't be added to future months
-        today = date.today()
-        category.add_transaction.setEnabled(
-            (app_core.current_year, app_core.current_month) <= (today.year, today.month)
         )
         return
 

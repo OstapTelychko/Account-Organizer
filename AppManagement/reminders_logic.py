@@ -351,6 +351,7 @@ def pay_reminder(reminder_id:int) -> None:
         category_name = reminder.category.name
 
     transaction_window = WindowsRegistry.TransactionManagementWindow
+    transaction_window.is_editing = False
     transaction_window.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
     transaction_window.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
     transaction_window.setWindowTitle(category_name)

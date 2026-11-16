@@ -68,8 +68,7 @@ def update_transaction_value_field() -> None:
     else:
         window.transaction_value.setPlaceholderText(LanguageStructure.Transactions.get_translation(2))
 
-    is_adding = window.button.text() == LanguageStructure.GeneralManagement.get_translation(1)
-    if not is_adding or window.transaction_value.text() != window.prefilled_value:
+    if window.is_editing or window.transaction_value.text() != window.prefilled_value:
         return
 
     app_core = AppCore.instance()
@@ -145,6 +144,7 @@ def show_edit_transaction_window(category_name:str, category_data:CustomTableWid
         return selection_error.exec()
     row = category_data.selectedItems()[0].row()
     
+    WindowsRegistry.TransactionManagementWindow.is_editing = True
     WindowsRegistry.TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(5))
     WindowsRegistry.TransactionManagementWindow.message.setText(LanguageStructure.TransactionsMessages.get_translation(0))
     WindowsRegistry.TransactionManagementWindow.setWindowTitle(category_name)
@@ -210,6 +210,7 @@ def show_add_transaction_window(category_name:str) -> None:
         `category_name` : (str) - Name of the category. It will be shown in the window title.
     """
 
+    WindowsRegistry.TransactionManagementWindow.is_editing = False
     WindowsRegistry.TransactionManagementWindow.button.setText(LanguageStructure.GeneralManagement.get_translation(1))
     WindowsRegistry.TransactionManagementWindow.message.setText(LanguageStructure.TransactionsMessages.get_translation(1))
 
@@ -330,7 +331,7 @@ def transaction_data_handler(current_date:date | None = None) -> int:
         )
         return WindowsRegistry.Messages.transaction_value_anomalous.exec()
 
-    is_update = WindowsRegistry.TransactionManagementWindow.button.text() == LanguageStructure.GeneralManagement.get_translation(5)
+    is_update = WindowsRegistry.TransactionManagementWindow.is_editing
 
     if category_type == CategoryType.Investment:
         operation_type = InvestmentOperation(WindowsRegistry.TransactionManagementWindow.operation_type.currentData())

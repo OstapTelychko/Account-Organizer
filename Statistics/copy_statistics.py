@@ -34,8 +34,11 @@ def copy_monthly_transactions() -> None:
             category_id, app_core.current_year, app_core.current_month
         )
         if len(transactions):
+            # Investments rows end with the operation, so its header goes before the month
+            operation_header = f"\t{LanguageStructure.Investments.get_translation(5)}"\
+                if category.category_type == CategoryType.Investment else ""
             result = ""
-            result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
+            result += f"\t{LanguageStructure.Transactions.get_translation(2)}\t{LanguageStructure.Transactions.get_translation(1)}\t{LanguageStructure.Transactions.get_translation(0)}\t{operation_header}\t{LanguageStructure.Months.get_translation(app_core.current_month)}\t{app_core.current_year}\n"
             
             for index,transaction in enumerate(transactions):
                 result += f"{index}\t{transaction.value}\t\t{transaction.date.day}\t{transaction.name}"

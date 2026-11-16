@@ -3,7 +3,7 @@ import os
 from datetime import date
 
 from typing import TYPE_CHECKING
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QHeaderView, QPushButton
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon, QColor
 
@@ -84,23 +84,25 @@ def load_transactions_into_category_table(category_data:CustomTableWidget, trans
         category_data.setItem(index, 3, transaction_id)
 
 
-def load_investment_transactions_into_category_table(
+def load_investment_category_data(
         category_data:CustomTableWidget,
+        total_value_label:QLabel,
+        add_transaction:QPushButton,
         transactions:list[Transaction],
         year:int,
         month:int
-    ) -> float:
-    """Load operations of an Investments category in a month into its table widget.
+    ) -> None:
+    """Load operations of an Investments category in a month into its table widget,
+    show the category value at the end of the month and allow adding operations only up to the current month.
 
         Arguments
         -------
             `category_data` (CustomTableWidget): Table widget to load operations into<br>
+            `total_value_label` (QLabel): Label that shows the category value<br>
+            `add_transaction` (QPushButton): Button that adds an operation<br>
             `transactions` (list[Transaction]): All operations of the category<br>
             `year` (int): Year of operations to show<br>
             `month` (int): Month of operations to show
-        Returns
-        ------
-            `float`: Value of the category at the end of the month
     """
 
     month_start, month_end = generate_month_range(year, month)
@@ -137,7 +139,10 @@ def load_investment_transactions_into_category_table(
             category_data.setItem(row, column, item)
     category_data.setSortingEnabled(True)
 
-    return timeline[-1].value_after if timeline else 0.0
+    category_value = timeline[-1].value_after if timeline else 0.0
+    total_value_label.setText(f"{LanguageStructure.Investments.get_translation(4)}{category_value}")
+    today = date.today()
+    add_transaction.setEnabled((year, month) <= (today.year, today.month))
 
 
 def get_category_table_headers(category_type:str) -> tuple[str, ...]:
@@ -229,11 +234,19 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
 
     category_data.setHorizontalHeaderLabels(get_category_table_headers(category.category_type))
 
+    add_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(1),(185,40))
+    add_transaction.setIcon(ADD_TRANSACTION_ICON)
+    add_transaction.setIconSize(ICON_SIZE)
+
     if category.category_type == CategoryType.Investment:
-        category_value = load_investment_transactions_into_category_table(
-            category_data, db.transaction_query.get_all_transactions(category.id), year, month
+        load_investment_category_data(
+            category_data,
+            category_total_value,
+            add_transaction,
+            db.transaction_query.get_all_transactions(category.id),
+            year,
+            month
         )
-        category_total_value.setText(f"{LanguageStructure.Investments.get_translation(4)}{category_value}")
     else:
         transactions = db.transaction_query.get_transactions_by_month(category.id, year, month)
         
@@ -244,14 +257,6 @@ def load_category(category:CategoryModel, db:DBController, year:int, month:int) 
             f"{LanguageStructure.Categories.get_translation(10)}{category_total}"
         )
     category_data.setSortingEnabled(True)
-
-    add_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(1),(185,40))
-    add_transaction.setIcon(ADD_TRANSACTION_ICON)
-    add_transaction.setIconSize(ICON_SIZE)
-    if category.category_type == CategoryType.Investment:
-        # Investments operations can't be added to future months
-        today = date.today()
-        add_transaction.setEnabled((year, month) <= (today.year, today.month))
 
     delete_transaction = create_button(LanguageStructure.GeneralManagement.get_translation(0),(185,40))
     delete_transaction.setIcon(REMOVE_TRANSACTION_ICON)

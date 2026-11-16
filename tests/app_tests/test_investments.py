@@ -170,6 +170,24 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         )
 
 
+    def find_operation_row(self, transaction_id:int) -> int:
+        """Find the row of an operation in the table of the test Investments category.
+
+            Arguments
+            ---------
+                `transaction_id` : (int) - ID of the operation.
+            Returns
+            -------
+                `int` - Row of the operation.
+        """
+
+        table = AppCore.instance().categories[self.investment_category.id].table_data
+        return next(
+            row for row in range(table.rowCount())
+            if get_table_widget_item(table, row, 3).text() == str(transaction_id)
+        )
+
+
     def check_message_shown(self, message_name:str, show:Callable[[], object]) -> None:
         """Check that a message window is shown by the function and close it.
 
@@ -330,10 +348,7 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         )
         update_category_total_value(self.investment_category.id)
         table = app_core.categories[self.investment_category.id].table_data
-        deposit_row = next(
-            row for row in range(table.rowCount()) if get_table_widget_item(table, row, 3).text() == str(deposit_id)
-        )
-        table.selectRow(deposit_row)
+        table.selectRow(self.find_operation_row(deposit_id))
 
         def _check_message() -> None:
             self.assertTrue(WindowsRegistry.Messages.negative_investment_value.isVisible())
@@ -612,14 +627,7 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         revaluation_id = next(t.id for t in transactions if t.operation_type == InvestmentOperation.Revaluation)
         update_category_total_value(self.investment_category.id)
         table = app_core.categories[self.investment_category.id].table_data
-
-        def _find_row(transaction_id:int) -> int:
-            return next(
-                row for row in range(table.rowCount())
-                if get_table_widget_item(table, row, 3).text() == str(transaction_id)
-            )
-
-        table.selectRow(_find_row(deposit_id))
+        table.selectRow(self.find_operation_row(deposit_id))
 
         def _edit() -> None:
             window = WindowsRegistry.TransactionManagementWindow
@@ -631,7 +639,9 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         show_edit_transaction_window(self.investment_category.name, table)
         qsleep(300)
 
-        self.assertEqual(get_table_widget_item(table, _find_row(revaluation_id), 5).text(), "1500.0 (+300.0)")
+        self.assertEqual(
+            get_table_widget_item(table, self.find_operation_row(revaluation_id), 5).text(), "1500.0 (+300.0)"
+        )
         self.assertEqual(app_core.current_balance, -1200)
 
 
@@ -842,3 +852,39 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
             self.assertEqual(reminder_names, [("Groceries",)])
         finally:
             shutil.rmtree(temp_directory, ignore_errors=True)
+
+
+    def test_23_rejected_edit(self) -> None:
+        """Editing a deposit so that a later withdrawal makes the value negative is rejected and nothing changes."""
+
+        app_core = AppCore.instance()
+        self.add_operation(InvestmentOperation.Deposit, 1000, date(self.today.year, self.today.month, 1))
+        self.add_operation(InvestmentOperation.Withdrawal, 800)
+        deposit_id = next(
+            transaction.id for transaction in app_core.db.transaction_query.get_all_transactions(self.investment_category.id)
+            if transaction.operation_type == InvestmentOperation.Deposit
+        )
+        update_category_total_value(self.investment_category.id)
+        table = app_core.categories[self.investment_category.id].table_data
+        table.selectRow(self.find_operation_row(deposit_id))
+        message = WindowsRegistry.Messages.negative_investment_value
+
+        def _edit() -> None:
+            def _check_message() -> None:
+                self.assertTrue(message.isVisible(), "Message negative_investment_value wasn't shown")
+                message.ok_button.click()
+                WindowsRegistry.TransactionManagementWindow.done(1)
+
+            QTimer.singleShot(100, self.catch_failure(_check_message))
+            WindowsRegistry.TransactionManagementWindow.transaction_value.setText("500")
+            self.click_on_widget(WindowsRegistry.TransactionManagementWindow.button)
+
+        QTimer.singleShot(100, self.catch_failure(_edit))
+        show_edit_transaction_window(self.investment_category.name, table)
+        qsleep(300)
+
+        deposit = next(
+            transaction for transaction in app_core.db.transaction_query.get_all_transactions(self.investment_category.id)
+            if transaction.id == deposit_id
+        )
+        self.assertEqual(deposit.value, 1000, "Rejected edit of the deposit has been saved")
