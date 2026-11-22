@@ -5,6 +5,7 @@ import re
 
 from datetime import date
 from PySide6.QtCore import QTimer, QDate
+from PySide6.QtWidgets import QListWidget
 from calendar import monthrange, isleap
 from textwrap import dedent
 
@@ -14,7 +15,15 @@ from AppObjects.app_core import AppCore
 from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import CategoryType
 from GeneralTools.html_to_text import html_to_text
-from Statistics.statistics import _get_custom_range_months_amount
+from GUI.category import load_category
+from Statistics.statistics import (
+    _expense_total_text,
+    _format_category_total_value,
+    _get_custom_range_months_amount,
+    add_total_statistics,
+    get_min_and_max_categories,
+    get_net_result_text,
+)
 from GeneralTools.Utils import shift_month
 
 if TYPE_CHECKING:
@@ -54,9 +63,9 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         return [
             f"{LanguageStructure.Statistics.get_translation(4)}1000.0",
             f"{LanguageStructure.Statistics.get_translation(5)}{round(1000/days_amount, 2)}",
-            f"{LanguageStructure.Statistics.get_translation(6)}1000.0",
+            re.escape(f"{LanguageStructure.Statistics.get_translation(6)}1000.0 (100%)"),
             f"{LanguageStructure.Statistics.get_translation(7)}{round(1000/days_amount, 2)}",
-            f"{LanguageStructure.Statistics.get_translation(8)}0.0",
+            re.escape(f"{LanguageStructure.Statistics.get_translation(8)}0.0 (0%)"),
             f"{self.translated_incomes}",
             fr"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name}\s+\(1000.0\)",
             f"{LanguageStructure.Statistics.get_translation(11)}",
@@ -75,17 +84,18 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             total_value:float,
             days_amount:int,
             months_amount:int,
-            average_color:str|None = None
+            category_type: str
         ) -> str:
-        """Create expected category total statistics row with averages."""
+        """Build the expected row for the fixture's single category of each type."""
 
-        if total_value == 0:
-            return f"{category_name} - {total_value}"
+        shares: str = f"100% {LanguageStructure.Statistics.get_translation(42)}"
+        if category_type == CategoryType.Expense:
+            shares += f", 100% {LanguageStructure.Statistics.get_translation(43)}"
 
         average_per_day = round(total_value / days_amount, 2)
         if months_amount == 1:
             return (
-                f"{category_name} - {total_value} "
+                f"{category_name} - {total_value} ({shares}) "
                 f"({LanguageStructure.Statistics.get_translation(40)}{average_per_day})"
             )
 
@@ -95,7 +105,7 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         average_per_month_text = f"{LanguageStructure.Statistics.get_translation(41)}{average_per_month}"
 
         return (
-            f"{category_name} - {total_value} "
+            f"{category_name} - {total_value} ({shares}) "
             f"({average_per_day_text}, {average_per_month_text})"
         )
 
@@ -205,10 +215,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                         f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
                         f"{LanguageStructure.Statistics.get_translation(25)}{round(total_income/3, 2)}",
                         f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>",
-                        f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                        f"{LanguageStructure.Statistics.get_translation(6)}{total_expense} (100%)",
                         f"{LanguageStructure.Statistics.get_translation(27)}{round(total_expense/3, 2)}",
                         f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}<br/>",
-                        f"{LanguageStructure.Statistics.get_translation(8)}0.0",
+                        f"{LanguageStructure.Statistics.get_translation(8)}0.0 (0%)",
                         f"<br/><br/>{self.translated_incomes}",
                         f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
                         self.create_category_total_statistics(self.income_category.name, total_income, days_amount, 3, CategoryType.Income),
@@ -297,10 +307,10 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
                     f"{LanguageStructure.Statistics.get_translation(25)}{round(total_income/12, 2)}",
                     f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}<br/>",
-                    f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                    f"{LanguageStructure.Statistics.get_translation(6)}{total_expense} (100%)",
                     f"{LanguageStructure.Statistics.get_translation(27)}{round(total_expense/12, 2)}",
                     f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}<br/>",
-                    f"{LanguageStructure.Statistics.get_translation(8)}0.0",
+                    f"{LanguageStructure.Statistics.get_translation(8)}0.0 (0%)",
                     f"<br/><br/>{self.translated_incomes}",
                     f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
                     self.create_category_total_statistics(self.income_category.name, total_income, days_amount, 12, CategoryType.Income),
@@ -407,9 +417,9 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
                     expected_custom_range_statistics = [
                         f"{LanguageStructure.Statistics.get_translation(4)}{total_income}",
                         f"{LanguageStructure.Statistics.get_translation(24)}{round(total_income/days_amount, 2)}<br/>",
-                        f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}",
+                        f"{LanguageStructure.Statistics.get_translation(6)}{total_expense} (100%)",
                         f"{LanguageStructure.Statistics.get_translation(26)}{round(total_expense/days_amount, 2)}<br/>",
-                        f"{LanguageStructure.Statistics.get_translation(8)}0.0",
+                        f"{LanguageStructure.Statistics.get_translation(8)}0.0 (0%)",
                         f"<br/><br/>{self.translated_incomes}",
                         f"{LanguageStructure.Statistics.get_translation(9)}{self.income_category.name} ({total_income}) <br/>",
                         self.create_category_total_statistics(self.income_category.name, total_income, days_amount, 5, CategoryType.Income),
@@ -508,6 +518,68 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
             "Future transaction isn't included in quarterly/yearly statistics"
         )
 
+    def test_expense_and_net_percentages(self) -> None:
+        """Warn for spending at or above income and for a negative net amount and defined share."""
+        for income, expense, expense_share, net_text in (
+            (1000, 750, "75%", "250 (25%)"),
+            (1000, 999.99, "100%", "0.01 (0%)"),
+            (1000, 1000, "<span style='color:red'>100%</span>", "0 (0%)"),
+            (1000, 1250, "<span style='color:red'>125%</span>",
+             "<span style='color:red'>-250</span> (<span style='color:red'>-25%</span>)"),
+            (0, 50, "—", "<span style='color:red'>-50</span> (—)"),
+            (0, 0, "—", "0 (—)"),
+        ):
+            with self.subTest(income=income, expense=expense):
+                self.assertTrue(_expense_total_text(income, expense).endswith(f"({expense_share})"))
+                self.assertEqual(
+                    get_net_result_text(income, expense, None),
+                    LanguageStructure.Statistics.get_translation(8) + net_text,
+                )
 
+    def test_zero_categories_are_not_ranked(self) -> None:
+        """Rank the smallest active category, not an unused one; omit rankings when none qualify."""
+        core: AppCore = AppCore.instance()
+        totals: dict[int, float] = {self.expenses_category.id: 1000.0}
+        for name, total in (("Unused", 0.0), ("Travel", 25.0)):
+            core.db.category_query.create_category(name, CategoryType.Expense, len(totals))
+            category = core.db.category_query.get_category(name, CategoryType.Expense)
+            assert category is not None
+            if total:
+                core.db.transaction_query.add_transaction(category.id, self.expenses_transaction.date, total, name)
+            core.categories[category.id] = load_category(category, core.db, core.current_year, core.current_month)
+            totals[category.id] = total
 
+        _, _, lowest, value, _ = get_min_and_max_categories(list(totals), core.current_month)
+        self.assertEqual(([core.categories[key].name for key in lowest], value), (["Travel"], 25.0))
+
+        rows: QListWidget = QListWidget()
+        add_total_statistics(totals, [17, 20], rows, CategoryType.Expense, 1000, 1025, 90, 3)
+        self.assertIn(LanguageStructure.Statistics.get_translation(20) + "Travel (25.0)", rows.item(1).text())
+        self.assertTrue(any(rows.item(i).text().startswith("Unused - 0") for i in range(rows.count())))
+
+        rows.clear()
+        add_total_statistics(dict.fromkeys(totals, 0.0), [17, 20], rows, CategoryType.Expense, 0, 0, 90, 3)
+        self.assertEqual(rows.count(), len(totals))  # Only the category breakdown remains.
+
+    def test_category_shares_and_warning(self) -> None:
+        """Check both denominators independently and highlight only a majority of expenses."""
+        of_income: str = LanguageStructure.Statistics.get_translation(42)
+        of_expenses: str = LanguageStructure.Statistics.get_translation(43)
+        for value, income, expenses, income_share, expense_share in (
+            (150, 1000, 500, "15%", "30%"),
+            (250, 1000, 500, "25%", "50%"),
+            (250.01, 1000, 500, "25%", "<span style='color:red'>50%</span>"),
+            (1200, 1000, 2000, "120%", "<span style='color:red'>60%</span>"),
+            (150, 0, 500, "—", "30%"),
+            (0, 1000, 0, "0%", "—"),
+        ):
+            with self.subTest(value=value, income=income, expenses=expenses):
+                row: str = _format_category_total_value(
+                    "Products", value, CategoryType.Expense, income, expenses, 30, 1
+                )
+                self.assertIn(f"({income_share} {of_income}, {expense_share} {of_expenses})", row)
+
+        salary: str = _format_category_total_value("Salary", 800, CategoryType.Income, 1000, 500, 30, 1)
+        self.assertIn(f"(80% {of_income})", salary)
+        self.assertNotIn(of_expenses, salary)
 

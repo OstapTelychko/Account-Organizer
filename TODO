@@ -5,7 +5,7 @@ New features:
 	
 Updates to existing features:
   ☐ empty @don't-touch
-  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative
+  ☐ add to total of expenses and netto income percentage of total income, even if expenses will be over 100% of income and netto income will be negative @started(26-11-22 22:00)
   ☐ make backup loaded messages appear only for app_core or backup_management or for one of them make it print single log row like 120 of 120 backups loaded instead filling app logs
   
 Project life improvements:

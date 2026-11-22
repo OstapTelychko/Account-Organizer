@@ -213,7 +213,9 @@
                 "38": "Transactions have been copied",
                 "39": "(No transactions)",
                 "40": "Average per day ",
-                "41": "per month "
+                "41": "per month ",
+                "42": "of income",
+                "43": "of expenses"
             },
 
             "Update":{
@@ -276,10 +278,11 @@
                 "8": "Total deposits:  ",
                 "9": "Total withdrawals:  ",
                 "10": "Investments value change:  ",
-                "11": "Income minus expenses and net deposits   ",
+                "11": "Cash change: ",
                 "12": "Investment transfer",
                 "13": "Investments revaluation",
-                "14": "%category%: value %value%, deposited %deposits%, withdrawn %withdrawals%, value change %change%"
+                "14": "%category%: value %value%, deposited %deposits%, withdrawn %withdrawals%, value change %change%",
+                "15": "Cash + investments change: "
             }
         },
 
@@ -553,7 +556,9 @@
                 "38": "Транзакції були скопійовані",
                 "39": "(Відсутні транзакції)",
                 "40": "Всередньому за день ",
-                "41": "за місяць "
+                "41": "за місяць ",
+                "42": "від доходів",
+                "43": "від витрат"
             },
 
             "Update":{
@@ -616,10 +621,11 @@
                 "8": "Усього внесено:  ",
                 "9": "Усього виведено:  ",
                 "10": "Зміна вартості інвестицій:  ",
-                "11": "Доходи мінус витрати та чисті внески   ",
+                "11": "Зміна залишку на рахунку: ",
                 "12": "Інвестиційний переказ",
                 "13": "Коригування інвестицій",
-                "14": "%category%: вартість %value%, внесено %deposits%, виведено %withdrawals%, зміна вартості %change%"
+                "14": "%category%: вартість %value%, внесено %deposits%, виведено %withdrawals%, зміна вартості %change%",
+                "15": "Зміна залишку з урахуванням інвестицій: "
             }
         },
 
@@ -890,7 +896,9 @@
                 "38": "Transakcje zostały skopiowane",
                 "39": "(Brak transakcji)",
                 "40": "Średnio na dzień ",
-                "41": "na miesiąc "
+                "41": "na miesiąc ",
+                "42": "dochodów",
+                "43": "wydatków"
             },
 
             "Update":{
@@ -953,10 +961,11 @@
                 "8": "Suma wpłat:  ",
                 "9": "Suma wypłat:  ",
                 "10": "Zmiana wartości inwestycji:  ",
-                "11": "Dochody minus wydatki i wpłaty netto   ",
+                "11": "Zmiana salda na koncie: ",
                 "12": "Przelew inwestycyjny",
                 "13": "Wycena inwestycji",
-                "14": "%category%: wartość %value%, wpłacono %deposits%, wypłacono %withdrawals%, zmiana wartości %change%"
+                "14": "%category%: wartość %value%, wpłacono %deposits%, wypłacono %withdrawals%, zmiana wartości %change%",
+                "15": "Zmiana salda z inwestycjami: "
             }
         },
 
