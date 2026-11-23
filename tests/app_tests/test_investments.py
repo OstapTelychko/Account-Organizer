@@ -32,7 +32,8 @@ from AppManagement.reminders_logic import (
 from AppManagement.shortcuts.shortcuts_actions import move_category_focus
 from DesktopQtToolkit.Utils import get_table_widget_item
 from Statistics.statistics import (
-    show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics, show_custom_range_statistics_view
+    get_net_result_text, show_monthly_statistics, show_quarterly_statistics, show_yearly_statistics,
+    show_custom_range_statistics_view,
 )
 
 if TYPE_CHECKING:
@@ -432,7 +433,12 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
                     f"{LanguageStructure.Investments.get_translation(8)}<span style='color:red'>4000.0</span>",
                     statistics
                 )
-                self.assertIn(f"{LanguageStructure.Investments.get_translation(11)}-4000.0", statistics)
+                self.assertIn(
+                    LanguageStructure.Investments.get_translation(11)
+                    + "<span style='color:red'>-4000.0</span> (<span style='color:red'>-400%</span>), "
+                    + LanguageStructure.Investments.get_translation(15) + "0.0 (0%)",
+                    statistics,
+                )
                 # Deposits aren't counted as expenses
                 self.assertIn(f"{LanguageStructure.Statistics.get_translation(4)}1000.0", statistics)
                 self.assertIn(f"{LanguageStructure.Statistics.get_translation(6)}1000.0", statistics)
@@ -445,6 +451,29 @@ class TestInvestments(DBTestCase, OutOfScopeTestCase):
         QTimer.singleShot(100, self.catch_failure(_open_monthly_statistics))
         self.click_on_widget(WindowsRegistry.MainWindow.statistics)
         qsleep(500)
+
+
+    def test_net_change_with_opening_investments(self) -> None:
+        """Exclude prior holdings and count market changes, but not transfers, in the combined result."""
+        self.add_operation(InvestmentOperation.Deposit, 500, date(2025, 12, 31))
+        self.add_operation(InvestmentOperation.Deposit, 150, date(2026, 1, 2))
+        self.add_operation(InvestmentOperation.Withdrawal, 25, date(2026, 1, 3))
+        self.add_operation(InvestmentOperation.Revaluation, 645, date(2026, 1, 4))
+        self.add_operation(InvestmentOperation.Revaluation, 600, date(2026, 2, 1))
+
+        query = AppCore.instance().db.investment_query
+        january = query.get_period_statistics([self.investment_category.id], date(2026, 1, 1), date(2026, 1, 31))
+        february = query.get_period_statistics([self.investment_category.id], date(2026, 2, 1), date(2026, 2, 28))
+        cash_label: str = LanguageStructure.Investments.get_translation(11)
+        combined_label: str = LanguageStructure.Investments.get_translation(15)
+        self.assertEqual(
+            get_net_result_text(300.0, 100.0, january),
+            f"{cash_label}75.0 (25%), {combined_label}220.0 (73.33%)",
+        )
+        self.assertEqual(
+            get_net_result_text(0.0, 0.0, february),
+            f"{cash_label}0.0 (—), {combined_label}<span style='color:red'>-45.0</span> (—)",
+        )
 
 
     def test_09_focus_shortcuts(self) -> None:

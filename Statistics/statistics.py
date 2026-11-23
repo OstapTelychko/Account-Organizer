@@ -63,7 +63,11 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
     for category, total in zip(unsorted_categories, categories_sums):
         Categories_total_values[category] = round(total, 2)
 
-    highest_total_value = max(Categories_total_values.values())
+    # Zero totals stay in the breakdown but are never ranked.
+    ranked_total_values: CategoriesTotalValues = {
+        category: total for category, total in Categories_total_values.items() if total != 0
+    }
+    highest_total_value: float = max(ranked_total_values.values(), default=0.0)
 
     def _get_min_and_max_transactions(category:int, year:int, month:int) -> tuple[
         CountedTransactionsWithHighestValue, float, CountedTransactionsWithLowestValue, float
@@ -109,23 +113,17 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
 
     #Highest categories
     Categories_with_highest_total_value:CategoriesWithHighestTotalValue = {}
-    for category in Categories_total_values:
-        if Categories_total_values[category] == highest_total_value:
+    for category, total in ranked_total_values.items():
+        if total == highest_total_value:
             transactions_statistic = _get_min_and_max_transactions(category, app_core.current_year, month)
             Categories_with_highest_total_value[category] = (*transactions_statistic,)
 
     #Lowest categories
-    for category,total_value in Categories_total_values.copy().items():
-        if total_value == 0:
-            del Categories_total_values[category]
-
     Categories_with_lowest_total_value:CategoriesWithLowestTotalValue = {}
-    lowest_total_value = 0.0
-    if len(Categories_total_values) != 0:
-        lowest_total_value = min([total_value for total_value in Categories_total_values.values() if total_value])
-        
-        for category in Categories_total_values:
-            if Categories_total_values[category] == lowest_total_value and Categories_total_values[category] != highest_total_value:#If we have only one category don't add it to lowest categories (it is already highest)
+    lowest_total_value: float = min(ranked_total_values.values(), default=0.0)
+    if lowest_total_value != highest_total_value:
+        for category, total in ranked_total_values.items():
+            if total == lowest_total_value:
                 transactions_statistic = _get_min_and_max_transactions(category, app_core.current_year, month)
                 Categories_with_lowest_total_value[category] = (*transactions_statistic,)
 
@@ -220,25 +218,35 @@ def add_statistic(statistic_list:QListWidget, statistic_data:tuple[
             _add_highest_and_lowest_transactions(category, statistic_data[2])
 
 
+def _format_percentage(value: float, total: float, *, warn: bool = False) -> str:
+    """Format value's share of total, highlighting a warning only for a defined share."""
+    if total == 0:
+        return "—"
+    number: str = f"{value / total * 100:.2f}".rstrip("0").rstrip(".")
+    return f"<span style='color:red'>{number}%</span>" if warn else f"{number}%"
+
+
 def _format_category_total_value(
-        category_name:str,
-        total_value:float,
-        days_amount:int|None = None,
-        months_amount:int|None = None,
-        category_type:str|None = None
-    ) -> str:
-    """Format a category total row, adding averages only when requested and meaningful."""
+    category_name: str, total_value: float, category_type: str,
+    total_income: float, total_expense: float, days_amount: int, months_amount: int,
+) -> str:
+    """Format a category's period amount and shares, followed by its existing averages."""
+    income_share: str = _format_percentage(total_value, total_income)
+    shares: str = f"{income_share} {LanguageStructure.Statistics.get_translation(42)}"
+    if category_type == CategoryType.Expense:
+        expense_share: str = _format_percentage(
+            total_value, total_expense, warn=total_value > total_expense / 2
+        )
+        shares += f", {expense_share} {LanguageStructure.Statistics.get_translation(43)}"
 
-    if total_value == 0 or days_amount is None or months_amount is None:
-        return f"{category_name} - {total_value}"
+    if total_value == 0:
+        return f"{category_name} - {total_value} ({shares})"
 
-    average_per_day = round(total_value / days_amount, 2)
-    average_per_month = round(total_value / months_amount, 2)
-
-    average_per_day_text = f"{LanguageStructure.Statistics.get_translation(40)}"
-    average_per_month_text = f"{LanguageStructure.Statistics.get_translation(41)}"
-
-    color = "green" if category_type == CategoryType.Income else "red" 
+    average_per_day: float = round(total_value / days_amount, 2)
+    average_per_month: float = round(total_value / months_amount, 2)
+    average_per_day_text: str = LanguageStructure.Statistics.get_translation(40)
+    average_per_month_text: str = LanguageStructure.Statistics.get_translation(41)
+    color: str = "green" if category_type == CategoryType.Income else "red"
 
     average_per_day_text += f"<span style='color:{color}'>{average_per_day}</span>"
     average_per_month_text += f"<span style='color:{color}'>{average_per_month}</span>"
@@ -250,7 +258,7 @@ def _format_category_total_value(
 
     return (
         f"{category_name} - <span style='color:{color}'>{total_value}</span> "
-        f"{average_text}"
+        f"({shares}) {average_text}"
     )
 
 
@@ -265,8 +273,10 @@ def add_total_statistics(
         words:list[int],
         total_statistics_list:QListWidget,
         category_type:str,
-        days_amount:int|None = None,
-        months_amount:int|None = None,
+        total_income: float,
+        total_expense: float,
+        days_amount: int,
+        months_amount: int,
     ) -> None:
     """Add total statistics to the list
 
@@ -278,24 +288,23 @@ def add_total_statistics(
     """        
 
     app_core = AppCore.instance()
-    max_total_value  = max(total_value for total_value in statistic.values())
-    min_total_value = min(total_value for total_value in statistic.values())
-
-    max_category = [category for category,total_value in statistic.items() if total_value == max_total_value ][0]
-    min_category = [category for category,total_value in statistic.items() if total_value == min_total_value ][0]
-
-    total_statistics_list.addItem(
-        LanguageStructure.Statistics.get_translation(words[0])
-         + app_core.categories[max_category].name +
-        f" ({max_total_value}) <br/>"
-    )
-
-    if min_category != max_category:
+    ranked: CategoriesTotalValues = {
+        category: total for category, total in statistic.items() if total != 0
+    }
+    if ranked:
+        max_category: int = max(ranked, key=ranked.__getitem__)
+        min_category: int = min(ranked, key=ranked.__getitem__)
         total_statistics_list.addItem(
-            LanguageStructure.Statistics.get_translation(words[1])
-            + app_core.categories[min_category].name
-            + f" ({min_total_value})<br/>"
+            LanguageStructure.Statistics.get_translation(words[0])
+            + app_core.categories[max_category].name
+            + f" ({ranked[max_category]}) <br/>"
         )
+        if min_category != max_category:
+            total_statistics_list.addItem(
+                LanguageStructure.Statistics.get_translation(words[1])
+                + app_core.categories[min_category].name
+                + f" ({ranked[min_category]})<br/>"
+            )
 
     sorted_categories = dict(sorted(statistic.items(), key=lambda category: category[1], reverse=True))
     for category, total_value in sorted_categories.items():
@@ -303,37 +312,48 @@ def add_total_statistics(
             _format_category_total_value(
                 app_core.categories[category].name,
                 total_value,
+                category_type,
+                total_income,
+                total_expense,
                 days_amount,
                 months_amount,
-                category_type,
             )
         )
 
 
+def _expense_total_text(total_income: float, total_expense: float) -> str:
+    """Return the expense summary, warning when spending meets or exceeds income."""
+    share: str = _format_percentage(total_expense, total_income, warn=total_expense >= total_income)
+    return f"{LanguageStructure.Statistics.get_translation(6)}{total_expense} ({share})"
+
+
+def _format_net_amount(amount: float, total_income: float) -> str:
+    """Format a period result and its share of income, highlighting losses."""
+    result: float = round(amount, 2)
+    negative: bool = result < 0
+    text: str = f"<span style='color:red'>{result}</span>" if negative else str(result)
+    share: str = _format_percentage(result, total_income, warn=negative)
+    return f"{text} ({share})"
+
+
 def get_net_result_text(
-        total_income:float,
-        total_expense:float,
-        investment_statistics:InvestmentsPeriodStatistics|None
-    ) -> str:
-    """Get the text of the period result. Net Investments deposits are subtracted if the account has Investments.
-
-        Arguments
-        ---------
-            `total_income` (float): sum of incomes in the period
-            `total_expense` (float): sum of expenses in the period
-            `investment_statistics` (InvestmentsPeriodStatistics|None): Investments sums in the period
-                or None without Investments
-        Returns
-        -------
-            `str`: result text
-    """
-
+    total_income: float,
+    total_expense: float,
+    investment_statistics: InvestmentsPeriodStatistics | None,
+) -> str:
+    """Show the period's net income, separating cash and combined changes when investments exist."""
+    net_income: float = total_income - total_expense
     if investment_statistics is None:
-        return LanguageStructure.Statistics.get_translation(8) + str(round(total_income - total_expense, 2))
-    investment_totals = investment_statistics.totals
-    return LanguageStructure.Investments.get_translation(11) + str(round(
-        total_income - total_expense - investment_totals.deposits + investment_totals.withdrawals, 2
-    ))
+        return LanguageStructure.Statistics.get_translation(8) + _format_net_amount(net_income, total_income)
+
+    totals = investment_statistics.totals
+    cash: float = net_income - totals.deposits + totals.withdrawals
+    # Transfers between cash and investments cancel in the combined change.
+    combined: float = net_income + totals.value_change
+    return (
+        f"{LanguageStructure.Investments.get_translation(11)}{_format_net_amount(cash, total_income)}, "
+        f"{LanguageStructure.Investments.get_translation(15)}{_format_net_amount(combined, total_income)}"
+    )
 
 
 def add_investments_statistics(
@@ -407,9 +427,11 @@ def add_month_statistics(
                 _format_category_total_value(
                     AppCore.instance().categories[category_id].name,
                     total_value,
+                    category_type,
+                    total_income,
+                    total_expense,
                     days_amount,
                     1,
-                    category_type
                 )
             )
 
@@ -435,7 +457,7 @@ def add_month_statistics(
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(4)}{total_income}")
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(5)}{round(total_income/days_amount, 2)}<br/>")
 
-    month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(6)}{total_expense}")
+    month_statistics.addItem(_expense_total_text(total_income, total_expense))
     month_statistics.addItem(f"{LanguageStructure.Statistics.get_translation(7)}{round(total_expense/days_amount, 2)}<br/>")
 
     month_statistics.addItem(get_net_result_text(total_income, total_expense, investment_statistics))
@@ -528,7 +550,7 @@ def show_quarterly_statistics() -> int:
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(25)+str(round(total_income/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(5)+str(round(total_income/days_amount, 2))+"<br/>")
 
-        Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(6)+str(total_expense))
+        Total_statistic_list.addItem(_expense_total_text(total_income, total_expense))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(27)+str(round(total_expense/3, 2)))
         Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(7)+str(round(total_expense/days_amount, 2))+"<br/>")
 
@@ -541,6 +563,8 @@ def show_quarterly_statistics() -> int:
                 [9,13],
                 Total_statistic_list,
                 CategoryType.Income,
+                total_income,
+                total_expense,
                 days_amount,
                 3,
             )
@@ -552,6 +576,8 @@ def show_quarterly_statistics() -> int:
                 [17,20],
                 Total_statistic_list,
                 CategoryType.Expense,
+                total_income,
+                total_expense,
                 days_amount,
                 3,
             )
@@ -617,7 +643,7 @@ def show_yearly_statistics() -> int:
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(25)+str(round(total_income/12, 2)))
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(24)+str(round(total_income/days_amount, 2))+"<br/>")
 
-    Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(6)+str(total_expense))
+    Total_statistic_list.addItem(_expense_total_text(total_income, total_expense))
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(27)+str(round(total_expense/12, 2)))
     Total_statistic_list.addItem(LanguageStructure.Statistics.get_translation(26)+str(round(total_expense/days_amount, 2))+"<br/>")
 
@@ -625,11 +651,17 @@ def show_yearly_statistics() -> int:
 
     if Incomes_categories:
         Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(1))
-        add_total_statistics(Incomes_categories_total_values, [9,13], Total_statistic_list, CategoryType.Income, days_amount, 12)
+        add_total_statistics(
+            Incomes_categories_total_values, [9, 13], Total_statistic_list, CategoryType.Income,
+            total_income, total_expense, days_amount, 12,
+        )
 
     if Expenses_categories:
         Total_statistic_list.addItem("<br/><br/>"+LanguageStructure.MainWindow.get_translation(2))
-        add_total_statistics(Expenses_categories_total_values, [17,20], Total_statistic_list, CategoryType.Expense, days_amount, 12 )
+        add_total_statistics(
+            Expenses_categories_total_values, [17, 20], Total_statistic_list, CategoryType.Expense,
+            total_income, total_expense, days_amount, 12,
+        )
 
     if investment_statistics is not None:
         add_investments_statistics(Total_statistic_list, investment_statistics)
@@ -727,7 +759,7 @@ def show_custom_range_statistics_view() -> int:
     )
 
     WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
-        LanguageStructure.Statistics.get_translation(6)+str(total_expense)
+        _expense_total_text(total_income, total_expense)
     )
     WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
         LanguageStructure.Statistics.get_translation(26)+str(round(total_expense/days_amount, 2))+"<br/>"
@@ -744,13 +776,19 @@ def show_custom_range_statistics_view() -> int:
         WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
             "<br/><br/>"+LanguageStructure.MainWindow.get_translation(1)
         )
-        add_total_statistics(Incomes_categories_total_values, [9,13], WindowsRegistry.CustomRangeStatisticsView.statistics_list, CategoryType.Income, days_amount, months)
+        add_total_statistics(
+            Incomes_categories_total_values, [9, 13], WindowsRegistry.CustomRangeStatisticsView.statistics_list,
+            CategoryType.Income, total_income, total_expense, days_amount, months,
+        )
 
     if len(Expenses_categories):
         WindowsRegistry.CustomRangeStatisticsView.statistics_list.addItem(
             "<br/><br/>"+LanguageStructure.MainWindow.get_translation(2)
         )
-        add_total_statistics(Expenses_categories_total_values, [17,20], WindowsRegistry.CustomRangeStatisticsView.statistics_list, CategoryType.Expense, days_amount, months)
+        add_total_statistics(
+            Expenses_categories_total_values, [17, 20], WindowsRegistry.CustomRangeStatisticsView.statistics_list,
+            CategoryType.Expense, total_income, total_expense, days_amount, months,
+        )
 
     if investment_statistics is not None:
         add_investments_statistics(WindowsRegistry.CustomRangeStatisticsView.statistics_list, investment_statistics)
