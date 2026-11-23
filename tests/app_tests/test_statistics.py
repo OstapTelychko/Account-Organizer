@@ -12,6 +12,7 @@ from textwrap import dedent
 from tests.tests_toolkit import DBTestCase, OutOfScopeTestCase, qsleep
 from languages import LanguageStructure
 from AppObjects.app_core import AppCore
+from AppObjects.category import Category
 from AppObjects.windows_registry import WindowsRegistry
 from project_configuration import CategoryType
 from GeneralTools.html_to_text import html_to_text
@@ -20,9 +21,11 @@ from Statistics.statistics import (
     _expense_total_text,
     _format_category_total_value,
     _get_custom_range_months_amount,
+    add_month_statistics,
     add_total_statistics,
     get_min_and_max_categories,
     get_net_result_text,
+    show_custom_range_statistics_view,
 )
 from GeneralTools.Utils import shift_month
 
@@ -582,4 +585,82 @@ class TestStatistics(DBTestCase, OutOfScopeTestCase):
         salary: str = _format_category_total_value("Salary", 800, CategoryType.Income, 1000, 500, 30, 1)
         self.assertIn(f"(80% {of_income})", salary)
         self.assertNotIn(of_expenses, salary)
+
+    def test_monthly_breakdown_keeps_zero_categories(self) -> None:
+        """List a zero-total category in the monthly breakdown without ranking it as the cheapest."""
+        core: AppCore = AppCore.instance()
+        expense_ids: list[int] = [self.expenses_category.id]
+        for name, total in (("Rent", 80.0), ("Travel", 0.0)):
+            core.db.category_query.create_category(name, CategoryType.Expense, len(expense_ids))
+            category = core.db.category_query.get_category(name, CategoryType.Expense)
+            assert category is not None
+            if total:
+                core.db.transaction_query.add_transaction(category.id, self.expenses_transaction.date, total, name)
+            core.categories[category.id] = load_category(category, core.db, core.current_year, core.current_month)
+            expense_ids.append(category.id)
+
+        rows: QListWidget = QListWidget()
+        add_month_statistics([self.income_category.id], expense_ids, rows, core.current_month)
+        texts: list[str] = [html_to_text(rows.item(i).text()) for i in range(rows.count())]
+
+        cheapest: list[str] = [
+            text.strip() for text in texts
+            if text.strip().startswith(html_to_text(LanguageStructure.Statistics.get_translation(20)).strip())
+        ]
+        self.assertEqual(len(cheapest), 1, texts)
+        self.assertIn("Rent (80.0)", cheapest[0])
+        self.assertTrue(any(text.startswith("Travel - 0.0") for text in texts), texts)
+        self.assertTrue(any(text.startswith("Rent - 80.0") for text in texts), texts)
+
+    def test_custom_range_shares_use_selected_categories(self) -> None:
+        """Compute custom-range shares from selected categories only, ignoring excluded transactions."""
+        core: AppCore = AppCore.instance()
+        transaction_date: date = self.expenses_transaction.date
+        selection = WindowsRegistry.CustomRangeStatistics.categories_selection
+        selected: dict[int, tuple[Category, str]] = {
+            self.income_category.id: (core.categories[self.income_category.id], self.translated_incomes)
+        }
+        for position, (name, category_type, total, is_selected) in enumerate((
+            ("Groceries", CategoryType.Expense, 150.0, True),
+            ("Rent", CategoryType.Expense, 350.0, True),
+            ("Excluded expense", CategoryType.Expense, 700.0, False),
+            ("Excluded income", CategoryType.Income, 900.0, False),
+        )):
+            core.db.category_query.create_category(name, category_type, position + 1)
+            category = core.db.category_query.get_category(name, category_type)
+            assert category is not None
+            core.db.transaction_query.add_transaction(category.id, transaction_date, total, name)
+            core.categories[category.id] = load_category(
+                category, core.db, core.current_year, core.current_month
+            )
+            if is_selected:
+                selected[category.id] = (core.categories[category.id], self.translated_expenses)
+
+        selection.clear_categories_selection()
+        selection.selected_categories_data.update(selected)
+        from_date: QDate = QDate(transaction_date.year, transaction_date.month, transaction_date.day)
+        WindowsRegistry.CustomRangeStatistics.from_date.setDate(from_date.addDays(-10))
+        WindowsRegistry.CustomRangeStatistics.to_date.setDate(from_date.addDays(10))
+
+        def _check_shares() -> None:
+            """Check totals and the share of the selected 150 expense row."""
+            statistics_list: QListWidget = WindowsRegistry.CustomRangeStatisticsView.statistics_list
+            texts: list[str] = [
+                html_to_text(statistics_list.item(i).text()) for i in range(statistics_list.count())
+            ]
+            WindowsRegistry.CustomRangeStatisticsView.done(1)
+
+            self.assertIn(html_to_text(_expense_total_text(1000.0, 500.0)), texts)
+            groceries: list[str] = [text for text in texts if text.startswith("Groceries - 150.0")]
+            self.assertEqual(len(groceries), 1, texts)
+            self.assertIn(
+                f"(15% {LanguageStructure.Statistics.get_translation(42)}, "
+                f"30% {LanguageStructure.Statistics.get_translation(43)})",
+                groceries[0],
+            )
+
+        QTimer.singleShot(100, self.catch_failure(_check_shares))
+        show_custom_range_statistics_view()
+        selection.clear_categories_selection()
+        qsleep(300)
 

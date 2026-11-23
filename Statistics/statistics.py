@@ -61,11 +61,13 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
         unsorted_categories, app_core.current_year, month
     )
     for category, total in zip(unsorted_categories, categories_sums):
-        rounded_total: float = round(total, 2)
-        if rounded_total != 0:
-            Categories_total_values[category] = rounded_total
+        Categories_total_values[category] = round(total, 2)
 
-    highest_total_value: float = max(Categories_total_values.values(), default=0.0)
+    # Zero totals stay in the breakdown but are never ranked.
+    ranked_total_values: CategoriesTotalValues = {
+        category: total for category, total in Categories_total_values.items() if total != 0
+    }
+    highest_total_value: float = max(ranked_total_values.values(), default=0.0)
 
     def _get_min_and_max_transactions(category:int, year:int, month:int) -> tuple[
         CountedTransactionsWithHighestValue, float, CountedTransactionsWithLowestValue, float
@@ -111,16 +113,16 @@ def get_min_and_max_categories(unsorted_categories:list[int], month:int) -> tupl
 
     #Highest categories
     Categories_with_highest_total_value:CategoriesWithHighestTotalValue = {}
-    for category in Categories_total_values:
-        if Categories_total_values[category] == highest_total_value:
+    for category, total in ranked_total_values.items():
+        if total == highest_total_value:
             transactions_statistic = _get_min_and_max_transactions(category, app_core.current_year, month)
             Categories_with_highest_total_value[category] = (*transactions_statistic,)
 
     #Lowest categories
     Categories_with_lowest_total_value:CategoriesWithLowestTotalValue = {}
-    lowest_total_value: float = min(Categories_total_values.values(), default=0.0)
+    lowest_total_value: float = min(ranked_total_values.values(), default=0.0)
     if lowest_total_value != highest_total_value:
-        for category, total in Categories_total_values.items():
+        for category, total in ranked_total_values.items():
             if total == lowest_total_value:
                 transactions_statistic = _get_min_and_max_transactions(category, app_core.current_year, month)
                 Categories_with_lowest_total_value[category] = (*transactions_statistic,)
